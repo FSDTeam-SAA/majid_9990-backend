@@ -1,18 +1,47 @@
 import nodemailer from 'nodemailer';
-export const sendEmail = async (to: string, subject: string, html: string) => {
-      const transporter = nodemailer.createTransport({
-            host: 'smtp.gmail.com',
-            port: 587,
-            secure: false,
-            auth: {
-                  user: 'tahsin.bdcalling@gmail.com',
-                  pass: 'lcnt cxiw pcui vikv',
-            },
-      });
-      await transporter.sendMail({
-            from: 'nm.bdcalling@gmail.com', // sender address
-            to,
-            subject: subject ? subject : 'Password change Link : change it by 10 minutes',
-            html,
-      });
+import config from '../config/config';
+
+
+interface SendEmailParams {
+      to: string;
+      subject: string;
+      html: string;
+}
+
+interface SendEmailResponse {
+      success: boolean;
+      error?: string;
+}
+
+const sendEmail = async ({ to, subject, html }: SendEmailParams): Promise<SendEmailResponse> => {
+      try {
+            const transporter = nodemailer.createTransport({
+                  host: 'smtp.gmail.com',
+                  port: 587,
+                  secure: false,
+                  auth: {
+                        user: config.email.emailAddress,
+                        pass: config.email.emailPass,
+                  },
+                  tls: {
+                        rejectUnauthorized: false,
+                  },
+            });
+
+            const mailOptions = {
+                  from: config.email.emailAddress,
+                  to,
+                  subject,
+                  html,
+            };
+
+            await transporter.sendMail(mailOptions);
+
+
+            return { success: true };
+      } catch (error: any) {
+            return { success: false, error: error.message };
+      }
 };
+
+export default sendEmail;

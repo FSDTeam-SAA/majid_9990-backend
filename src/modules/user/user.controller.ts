@@ -1,34 +1,110 @@
-import { Request, Response, NextFunction } from 'express';
+import { StatusCodes } from 'http-status-codes';
+import catchAsync from '../../utils/catchAsync';
+import sendResponse from '../../utils/sendResponse';
+import userService from './user.service';
 
-export const getUsers = async (req: Request, res: Response, next: NextFunction) => {
-      try {
-            res.json({ message: 'Get all users' });
-      } catch (err) {
-            next(err);
-      }
+const registerUser = catchAsync(async (req, res) => {
+      const result = await userService.registerUser(req.body);
+
+      sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: 'Account created successfully. Please verify your email.',
+            data: result,
+      });
+});
+
+const verifyEmail = catchAsync(async (req, res) => {
+      const { email } = req.user;
+      const result = await userService.verifyEmail(email, req.body);
+
+      sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: 'Email verified successfully. You can now log in.',
+            data: result,
+      });
+});
+
+const resendOtpCode = catchAsync(async (req, res) => {
+      const { email } = req.user;
+      const result = await userService.resendOtpCode(email);
+
+      sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: 'OTP code sent successfully',
+            data: result,
+      });
+});
+
+const getAllUsers = catchAsync(async (req, res) => {
+      const result = await userService.getAllUsers();
+
+      sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: 'Users retrieved successfully.',
+            data: result,
+      });
+});
+
+const getAdminId = catchAsync(async (req, res) => {
+      const result = await userService.getAdminId();
+
+      sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: 'Admin ID fetched successfully',
+            data: result,
+      });
+});
+
+const getMyProfile = catchAsync(async (req, res) => {
+      const { email } = req.user;
+
+      const result = await userService.getMyProfile(email);
+      sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: 'Your profile has been retrieved successfully.',
+            data: result,
+      });
+});
+
+const updateUserProfile = catchAsync(async (req, res) => {
+      const { email } = req.user;
+      const result = await userService.updateUserProfile(req.body, email, req.file);
+
+      sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: 'Your profile has been updated successfully.',
+            data: result,
+      });
+});
+
+const deleteUser = catchAsync(async (req, res) => {
+      const { userId } = req.params;
+      const result = await userService.deleteUserFromDB(userId as string);
+
+      sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: 'User deleted successfully.',
+            data: result,
+      });
+});
+
+const userController = {
+      registerUser,
+      verifyEmail,
+      resendOtpCode,
+      getAllUsers,
+      getMyProfile,
+      updateUserProfile,
+      getAdminId,
+      deleteUser,
 };
 
-const signup = async (req: Request, res: Response) => {
-      // Implement signup logic here
-};
-
-const login = async (req: Request, res: Response) => {
-      // Implement login logic here
-};
-
-const forgotPassword = async (req: Request, res: Response) => {
-      // Implement forgot password logic with OTP here
-};
-
-const changePassword = async (req: Request, res: Response) => {
-      // Implement change password logic here
-};
-
-// Export the functions
-module.exports = {
-      signup,
-      login,
-      forgotPassword,
-      changePassword,
-      getUsers,
-};
+export default userController;
