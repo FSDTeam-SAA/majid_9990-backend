@@ -2,20 +2,28 @@ import axios, { AxiosInstance } from 'axios';
 import qs from 'qs';
 
 class DhruService {
-      private client: AxiosInstance;
-      private username: string;
-      private apiKey: string;
+      private readonly client: AxiosInstance;
+      private readonly username: string;
+      private readonly apiKey: string;
+      private readonly baseUrl: string;
 
       constructor() {
-            this.username = process.env.DHRU_USERNAME as string;
-            this.apiKey = process.env.DHRU_API_KEY as string;
+            this.baseUrl = String(process.env.DHRU_BASE_URL ?? '').trim();
+            this.username = String(process.env.DHRU_USERNAME ?? '').trim();
+            this.apiKey = String(process.env.DHRU_API_KEY ?? '').trim();
+
+            if (!this.baseUrl || !this.username || !this.apiKey) {
+                  throw new Error('Missing DHRU configuration: DHRU_BASE_URL, DHRU_USERNAME, DHRU_API_KEY');
+            }
+
+            const timeoutMs = Number(process.env.DHRU_TIMEOUT_MS ?? 60000);
 
             this.client = axios.create({
-                  baseURL: process.env.DHRU_BASE_URL,
+                  baseURL: this.baseUrl,
                   headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
                   },
-                  timeout: 60000,
+                  timeout: Number.isFinite(timeoutMs) && timeoutMs > 0 ? timeoutMs : 60000,
             });
       }
 
@@ -37,6 +45,11 @@ class DhruService {
                   serviceid: serviceId,
                   imei,
             });
+      }
+
+      // this is the part you asked for
+      async getImeiServices() {
+            return this.request('imeiservicelist');
       }
 
       async getImeiOrder(orderId: string | number) {
