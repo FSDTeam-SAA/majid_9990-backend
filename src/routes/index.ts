@@ -1,17 +1,22 @@
 import { Router } from 'express';
+import authRouter from '../modules/auth/auth.router';
+import deviceCheckRoutes from '../modules/deviceCheck/dhru.routes';
 import userRoutes from '../modules/user/user.router';
-import deviceCheckRoutes from '../modules/deviceCheck/dhru.routes'
 
 const router = Router();
 
 const moduleRoutes = [
       {
-            path: '/users',
+            path: '/user',
             route: userRoutes,
       },
       {
             path: '/imei',
             route: deviceCheckRoutes,
+      },
+      {
+            path: '/auth',
+            route: authRouter,
       },
 ];
 

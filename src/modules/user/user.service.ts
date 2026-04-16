@@ -175,8 +175,8 @@ const updateUserProfile = async (payload: any, email: string, file: any) => {
             oldImagePublicId = user.image?.public_id;
 
             updateData.image = {
-                  public_id: uploadResult.public_id,
-                  url: uploadResult.secure_url,
+                  public_id: uploadResult!.public_id,
+                  url: uploadResult!.secure_url,
             };
       }
 
