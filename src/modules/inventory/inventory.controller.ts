@@ -65,10 +65,38 @@ const deleteInventory = catchAsync(async (req, res) => {
       });
 });
 
+const getMyInventory = catchAsync(async (req, res) => {
+      const userId = req.user._id;
+
+      const result = await inventoryService.getMyInventory(userId);
+
+      sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: 'My inventory fetched successfully',
+            data: result,
+      });
+});
+
+const getInventoryByUserId = catchAsync(async (req, res) => {
+      const { userId } = req.params;
+
+      const result = await inventoryService.getInventoryByUserId(userId as string);
+
+      sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: 'User inventory fetched successfully',
+            data: result,
+      });
+});
+
 export default {
       createInventory,
       getAllInventory,
       getSingleInventory,
       updateInventory,
       deleteInventory,
+      getMyInventory,
+      getInventoryByUserId,
 };

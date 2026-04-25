@@ -15,4 +15,9 @@ router.put('/:id', protect, upload.single('image'), inventoryController.updateIn
 
 router.delete('/:id', protect, inventoryController.deleteInventory);
 
+router.get('/my-inventory', protect, inventoryController.getMyInventory);
+
+//ideally admin only
+router.get('/user/:userId', protect, inventoryController.getInventoryByUserId);
+
 export default router;

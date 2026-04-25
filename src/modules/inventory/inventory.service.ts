@@ -38,10 +38,20 @@ const deleteInventory = async (id: string) => {
       return await Inventory.findByIdAndDelete(id);
 };
 
+const getMyInventory = async (userId: string) => {
+      return await Inventory.find({ userId });
+};
+
+const getInventoryByUserId = async (userId: string) => {
+      return await Inventory.find({ userId });
+};
+
 export default {
       createInventory,
       getAllInventory,
       getSingleInventory,
       updateInventory,
       deleteInventory,
+      getMyInventory,
+      getInventoryByUserId,
 };
