@@ -3,6 +3,7 @@ import authRouter from '../modules/auth/auth.router';
 import deviceCheckRoutes from '../modules/deviceCheck/dhru.routes';
 import subscriptionRouter from '../modules/subscription/subscription.router';
 import userRoutes from '../modules/user/user.router';
+import inventoryRouter from '../modules/inventory/inventory.router';
 
 const router = Router();
 
@@ -22,6 +23,10 @@ const moduleRoutes = [
       {
             path: '/subscription',
             route: subscriptionRouter,
+      },
+      {
+            path: '/inventory',
+            route: inventoryRouter,
       },
 ];
 
