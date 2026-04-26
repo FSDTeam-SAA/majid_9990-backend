@@ -10,6 +10,7 @@ import { createToken } from '../../utils/tokenGenerate';
 import verificationCodeTemplate from '../../utils/verificationCodeTemplate';
 import { IUser } from './user.interface';
 import { User } from './user.model';
+import { createNotification } from '../socket/notification.service';
 
 const registerUser = async (payload: IUser) => {
       const existingUser = await User.isUserExistByEmail(payload.email);
@@ -66,6 +67,17 @@ const registerUser = async (payload: IUser) => {
             config.refreshTokenSecret as string,
             config.jwtRefreshTokenExpiresIn as string
       );
+
+
+      //   const adminUsers = await User.findOne({ role: 'admin' });
+
+      //   await createNotification({
+      //         to: new mongoose.Types.ObjectId(adminUsers!._id as any),
+      //         message: `New user registered: ${username}`,
+      //         type: 'user',
+      //         id: user._id,
+      //   });
+
 
       return {
             accessToken,
