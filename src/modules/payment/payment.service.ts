@@ -1,13 +1,29 @@
 import Stripe from 'stripe';
 import config from '../../config/config';
+import AppError from '../../errors/AppError';
 import { Payment } from './payment.model';
 
-const stripe = new Stripe((config as { stripe_secret_key?: string }).stripe_secret_key as string, {
-      apiVersion: '2026-04-22.dahlia',
-});
+let stripeClient: Stripe | null = null;
+
+const getStripeClient = () => {
+      if (stripeClient) return stripeClient;
+
+      const stripeSecretKey = (config as { stripe_secret_key?: string }).stripe_secret_key;
+
+      if (!stripeSecretKey) {
+            throw new AppError('Stripe is not configured. Missing STRIPE_SECRET_KEY.', 500);
+      }
+
+      stripeClient = new Stripe(stripeSecretKey, {
+            apiVersion: '2026-04-22.dahlia',
+      });
+
+      return stripeClient;
+};
 
 // ✅ Create Checkout Session
 const createPaymentSession = async (user: any, payload: any) => {
+      const stripe = getStripeClient();
       const { amount, subscriptionId } = payload;
       const frontendUrl = (config as { frontend_url?: string }).frontend_url ?? '';
 
