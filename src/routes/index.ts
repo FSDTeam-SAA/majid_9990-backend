@@ -19,6 +19,10 @@ const moduleRoutes = [
             route: deviceCheckRoutes,
       },
       {
+            path: '/device',
+            route: deviceCheckRoutes,
+      },
+      {
             path: '/auth',
             route: authRouter,
       },
