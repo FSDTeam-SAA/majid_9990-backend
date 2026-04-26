@@ -5,6 +5,7 @@ import subscriptionRouter from '../modules/subscription/subscription.router';
 import userRoutes from '../modules/user/user.router';
 import inventoryRouter from '../modules/inventory/inventory.router';
 import paymentRouter from '../modules/payment/payment.router'
+import notificationRouter from '../modules/notification/notification.router';
 
 const router = Router();
 
@@ -32,6 +33,10 @@ const moduleRoutes = [
       {
             path: '/payment',
             route: paymentRouter,
+      },
+      {
+            path: '/notification',
+            route: notificationRouter,
       },
 ];
 
