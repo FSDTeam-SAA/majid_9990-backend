@@ -1,16 +1,15 @@
 import bcrypt from 'bcrypt';
 import { StatusCodes } from 'http-status-codes';
-
 import AppError from '../../errors/AppError';
 import { deleteFromCloudinary, uploadToCloudinary } from '../../utils/cloudinary';
 import sendEmail from '../../utils/sendEmail';
-
 import config from '../../config/config';
 import { createToken } from '../../utils/tokenGenerate';
 import verificationCodeTemplate from '../../utils/verificationCodeTemplate';
 import { IUser } from './user.interface';
 import { User } from './user.model';
 import { createNotification } from '../socket/notification.service';
+import mongoose from 'mongoose';
 
 const registerUser = async (payload: IUser) => {
       const existingUser = await User.isUserExistByEmail(payload.email);
@@ -69,14 +68,14 @@ const registerUser = async (payload: IUser) => {
       );
 
 
-      //   const adminUsers = await User.findOne({ role: 'admin' });
-
-      //   await createNotification({
-      //         to: new mongoose.Types.ObjectId(adminUsers!._id as any),
-      //         message: `New user registered: ${username}`,
-      //         type: 'user',
-      //         id: user._id,
-      //   });
+  const admin = await User.findOne({ role: 'admin' });
+  await createNotification({
+        to: new mongoose.Types.ObjectId(admin!._id),
+        message: `${result.firstName} ${result.lastName} has registered a new account.`,
+        type: 'REGISTRATION',
+        title: "New User",
+        id: new mongoose.Types.ObjectId(result._id),
+  });
 
 
       return {
