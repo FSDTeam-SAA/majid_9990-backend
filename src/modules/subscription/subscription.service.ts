@@ -2,58 +2,73 @@ import { ISubscription } from './subscription.interface';
 import Subscription from './subscription.model';
 
 const createSubscription = async (payload: ISubscription) => {
+      // limit total subscriptions
       const totalSubscriptions = await Subscription.countDocuments();
-      if (totalSubscriptions >= 3) {
-            throw new Error('You can create only 3 subscriptions');
+      if (totalSubscriptions >= 4) {
+            throw new Error('You can create only 4 subscriptions');
       }
 
-      if (!payload.title) {
-            throw new Error('Title is required');
+      // required fields according to new model
+      if (!payload.name) {
+            throw new Error('Name is required');
       }
 
-      if (!payload.billingModel) {
-            throw new Error('Billing model is required');
+      if (!payload.type) {
+            throw new Error('Type is required');
       }
 
-      // 2️⃣ Duplicate check
-      const isExist = await Subscription.findOne({ title: payload.title });
+      if (payload.price === undefined || payload.price === null) {
+            throw new Error('Price is required');
+      }
+
+      if (!payload.priceLabel) {
+            throw new Error('Price label is required');
+      }
+
+      if (!payload.description) {
+            throw new Error('Description is required');
+      }
+
+      if (!payload.ctaText) {createSubscription;
+            throw new Error('CTA text is required');
+      }
+
+      // duplicate check by name
+      const isExist = await Subscription.findOne({ name: payload.name });
       if (isExist) {
-            throw new Error('Subscription with this title already exists');
+            throw new Error('Subscription with this name already exists');
       }
 
-      // 3️⃣ FREE plan logic
-      if (payload.billingModel === 'free') {
-            payload.price.amount = 0;
-            payload.isFree = true;
+      // features default
+      if (!payload.features) {
+            payload.features = [];
       }
 
-      // 4️⃣ ENTERPRISE plan (NO PRICE REQUIRED)
-      const isEnterprise = payload.billingModel === 'subscription';
+      // default flags
+      if (payload.isPopular === undefined) {
+            payload.isPopular = false;
+      }
 
-      if (!isEnterprise) {
-            if (!payload.price || !payload.price.currency) {
-                  throw new Error('Price and currency are required');
+      if (payload.apiAccess === undefined) {
+            payload.apiAccess = false;
+      }
+
+      if (payload.customPricing === undefined) {
+            payload.customPricing = false;
+      }
+
+      // discount validation if provided
+      if (payload.discount !== undefined && payload.discount !== null) {
+            if (typeof payload.discount !== 'number') {
+                  throw new Error('Discount must be a number between 0 and 100');
             }
 
-            const { amount, min, max } = payload.price;
-
-            // conflict check
-            if (amount !== undefined && (min !== undefined || max !== undefined)) {
-                  throw new Error('Use either amount OR min/max, not both');
-            }
-
-            // required check
-            if (amount === undefined && (min === undefined || max === undefined)) {
-                  throw new Error('Provide either fixed amount or min & max range');
+            if (payload.discount < 0 || payload.discount > 100) {
+                  throw new Error('Discount must be between 0 and 100');
             }
       }
 
-      // 5️⃣ Default discount
-      if (!payload.discount) {
-            payload.discount = [];
-      }
-
-      // 6️⃣ Create subscription
+      // create
       const result = await Subscription.create(payload);
       return result;
 };
@@ -71,43 +86,44 @@ const updateSubscription = async (id: string, payload: Partial<ISubscription>) =
             throw new Error('Subscription not found');
       }
 
-      // 2️⃣ Prevent duplicate title (if title is being updated)
-      if (payload.title && payload.title !== subscription.title) {
+      // 2️⃣ Prevent duplicate name (if name is being updated)
+      if (payload.name && payload.name !== subscription.name) {
             const isExist = await Subscription.findOne({
-                  title: payload.title,
+                  name: payload.name,
             });
 
             if (isExist) {
-                  throw new Error('Subscription with this title already exists');
+                  throw new Error('Subscription with this name already exists');
             }
       }
 
-      // 3️⃣ FREE plan logic
-      if (payload.billingModel === 'free') {
-            if (payload.price) {
-                  payload.price.amount = 0;
+      // 3️⃣ Price validation (if provided)
+      if (payload.price !== undefined && payload.price !== null) {
+            if (typeof payload.price !== 'number' || Number.isNaN(payload.price)) {
+                  throw new Error('Price must be a valid number');
+            }
+
+            if (payload.price < 0) {
+                  throw new Error('Price must be >= 0');
             }
       }
 
-      // 4️⃣ PRICE VALIDATION (only if price is sent)
-      if (payload.price) {
-            const { amount, min, max } = payload.price;
-
-            const hasRange = min !== undefined || max !== undefined;
-            const hasAmount = amount !== undefined;
-
-            if (hasAmount && hasRange) {
-                  throw new Error('Use either amount OR min/max, not both');
+      // 4️⃣ Discount validation (if provided)
+      if (payload.discount !== undefined && payload.discount !== null) {
+            if (typeof payload.discount !== 'number' || Number.isNaN(payload.discount)) {
+                  throw new Error('Discount must be a number between 0 and 100');
             }
 
-            if (!hasAmount && !hasRange) {
-                  throw new Error('Provide either fixed amount or min & max range');
+            if (payload.discount < 0 || payload.discount > 100) {
+                  throw new Error('Discount must be between 0 and 100');
             }
       }
 
-      // 5️⃣ Default discount
-      if (payload.discount && payload.discount.length === 0) {
-            payload.discount = [];
+      // 5️⃣ Features validation (if provided)
+      if (payload.features !== undefined && payload.features !== null) {
+            if (!Array.isArray(payload.features)) {
+                  throw new Error('Features must be an array');
+            }
       }
 
       // 6️⃣ Update DB

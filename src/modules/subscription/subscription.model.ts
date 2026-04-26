@@ -1,72 +1,87 @@
-import { model, Schema } from 'mongoose';
-import { ISubscription } from './subscription.interface';
+import { Schema, model } from 'mongoose';
+import { IPlanFeature, ISubscription } from './subscription.interface';
 
-const PriceSchema = new Schema(
+const planFeatureSchema = new Schema<IPlanFeature>(
       {
-            amount: { type: Number },
-            min: { type: Number },
-            max: { type: Number },
-            currency: {
+            name: {
                   type: String,
                   required: true,
+                  trim: true,
+            },
+            included: {
+                  type: Boolean,
+                  required: true,
+                  default: false,
             },
       },
-      { _id: false }
+      {
+            _id: false,
+      }
 );
 
-const DiscountTierSchema = new Schema(
+const subscriptionSchema = new Schema<ISubscription>(
       {
-            tier: {
-                  type: String,
-                  enum: ['bronze', 'silver', 'diamond'],
-                  required: true,
-            },
-            percentage: {
-                  type: Number,
-                  required: true,
-            },
-      },
-      { _id: false }
-);
-
-const SubscriptionSchema = new Schema<ISubscription>(
-      {
-            title: {
+            name: {
                   type: String,
                   required: true,
                   trim: true,
             },
 
-            badge: {
+            type: {
                   type: String,
+                  enum: ['STARTER', 'PAY AS YOU GO', 'DIAMOND', 'ENTERPRISE'],
                   required: true,
             },
 
             price: {
-                  type: PriceSchema,
+                  type: Number,
                   required: true,
+                  min: 0,
             },
 
-            billingModel: {
+            priceLabel: {
                   type: String,
-                  enum: ['free', 'one-time', 'subscription'],
                   required: true,
             },
 
-            features: [
-                  {
-                        type: String,
-                        required: true,
-                  },
-            ],
+            description: {
+                  type: String,
+                  required: true,
+            },
 
-            discount: {
-                  type: [DiscountTierSchema],
+            features: {
+                  type: [planFeatureSchema],
                   default: [],
             },
-            isFree: {
+
+            isPopular: {
                   type: Boolean,
                   default: false,
+            },
+
+            discount: {
+                  type: Number,
+                  min: 0,
+                  max: 100,
+            },
+
+            apiAccess: {
+                  type: Boolean,
+                  default: false,
+            },
+
+            customPricing: {
+                  type: Boolean,
+                  default: false,
+            },
+
+            ctaText: {
+                  type: String,
+                  required: true,
+            },
+            isAvailable: {
+                  type: Boolean,
+                  default: true,
             },
       },
       {
@@ -75,5 +90,5 @@ const SubscriptionSchema = new Schema<ISubscription>(
       }
 );
 
-const Subscription = model<ISubscription>('Subscription', SubscriptionSchema);
+const Subscription = model<ISubscription>('Subscription', subscriptionSchema);
 export default Subscription;
