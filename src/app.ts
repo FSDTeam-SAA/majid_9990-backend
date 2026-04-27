@@ -8,7 +8,7 @@ const app = express();
 app.use(express.json());
 
 const corsOptions = {
-      origin: 'https://majid-website-two.vercel.app',
+      origin: 'https://majid-website-two.vercel.app, https://majid-dashboard.vercel.app',
 
       methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
       credentials: true,
