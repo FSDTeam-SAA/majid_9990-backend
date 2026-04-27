@@ -1,5 +1,4 @@
 import { Types } from "mongoose";
-
 export interface IRepairEstimate {
       cost: number;
       currency: string;
@@ -15,20 +14,15 @@ export type RepairStatus =
       | 'rejected'
       | 'in_progress'
       | 'completed';
-
-
       export interface IRepairTimeline {
-            status: RepairStatus;
-            message?: string;
-            createdAt: Date;
+        status: RepairStatus;
+        message?: string;
+        createdAt: Date;
       }
-
-
       export interface INote{
             message: string;
             date: Date
       }
-
 export interface IRepairRequest {
       shopkeeperId: Types.ObjectId;
       userId: Types.ObjectId;
@@ -38,8 +32,8 @@ export interface IRepairRequest {
       IMEINumber: string;
       description: string;
       images: {
-            public_id: string;
-            url: string;
+        public_id: string;
+        url: string;
       }[];
       status: RepairStatus;
       estimate?: IRepairEstimate;
