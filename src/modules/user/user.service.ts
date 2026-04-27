@@ -1,18 +1,18 @@
 import bcrypt from 'bcrypt';
 import { StatusCodes } from 'http-status-codes';
+import mongoose from 'mongoose';
+import config from '../../config/config';
 import AppError from '../../errors/AppError';
 import { deleteFromCloudinary, uploadToCloudinary } from '../../utils/cloudinary';
 import sendEmail from '../../utils/sendEmail';
-import config from '../../config/config';
 import { createToken } from '../../utils/tokenGenerate';
 import verificationCodeTemplate from '../../utils/verificationCodeTemplate';
+import { createNotification } from '../socket/notification.service';
 import { IUser } from './user.interface';
 import { User } from './user.model';
-import { createNotification } from '../socket/notification.service';
-import mongoose from 'mongoose';
 
 const registerUser = async (payload: IUser) => {
-      if(!payload.role){
+      if (!payload.role) {
             throw new AppError('You have to select a role ', StatusCodes.BAD_REQUEST);
       }
 
@@ -91,10 +91,9 @@ const registerUser = async (payload: IUser) => {
             to: new mongoose.Types.ObjectId(admin!._id),
             message: `${result.firstName} ${result.lastName} just joined your platform as a ${roleText}.`,
             type: 'REGISTRATION',
-            title: "New User Registered",
+            title: 'New User Registered',
             id: new mongoose.Types.ObjectId(result._id),
       });
-
 
       return {
             accessToken,
@@ -228,6 +227,46 @@ const deleteUserFromDB = async (userId: string) => {
       return result;
 };
 
+const getAllShopkeepers = async (query: any) => {
+      const { page = 1, limit = 10, search, minRating, maxRating } = query;
+      const skip = (Number(page) - 1) * Number(limit);
+      const filter: any = { role: 'shopkeeper' };
+
+      //  Rating filter (directly on user)
+      if (minRating || maxRating) {
+            filter.averageRating = {};
+
+            if (minRating) filter.averageRating.$gte = Number(minRating);
+            if (maxRating) filter.averageRating.$lte = Number(maxRating);
+      }
+
+      // Search (on user fields, since no shop model exists)
+      if (search) {
+            filter.$or = [
+                  { shopName: { $regex: search, $options: 'i' } },
+                  { shopAddress: { $regex: search, $options: 'i' } },
+            ];
+      }
+
+        const data = await User.find(filter)
+              .select('shopName shopAddress totalReviews averageRating')
+              .skip(skip)
+              .limit(Number(limit))
+              .sort({ createdAt: -1 });
+
+      const total = await User.countDocuments(filter);
+
+      return {
+            data,
+            meta: {
+                  total,
+                  page: Number(page),
+                  limit: Number(limit),
+                  totalPage: Math.ceil(total / limit),
+            },
+      };
+};
+
 const userService = {
       registerUser,
       verifyEmail,
@@ -237,6 +276,7 @@ const userService = {
       updateUserProfile,
       getAdminId,
       deleteUserFromDB,
+      getAllShopkeepers,
 };
 
 export default userService;
