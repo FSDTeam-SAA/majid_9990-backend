@@ -12,6 +12,22 @@ import { createNotification } from '../socket/notification.service';
 import mongoose from 'mongoose';
 
 const registerUser = async (payload: IUser) => {
+      if(!payload.role){
+            throw new AppError('You have to select a role ', StatusCodes.BAD_REQUEST);
+      }
+
+      const errors = [];
+
+      if (payload.role === 'shopkeeper') {
+            if (!payload.shopName) errors.push('Shop name is required for shopkeeper account.');
+            if (!payload.shopAddress) errors.push('Shop address is required for shopkeeper account.');
+            if (!payload.whatsappNumber) errors.push('WhatsApp number is required for shopkeeper account.');
+      }
+
+      if (errors.length) {
+            throw new Error(errors.join(' '));
+      }
+
       const existingUser = await User.isUserExistByEmail(payload.email);
       if (existingUser && existingUser.isVerified) {
             throw new AppError('User already exists', StatusCodes.CONFLICT);
@@ -67,15 +83,17 @@ const registerUser = async (payload: IUser) => {
             config.jwtRefreshTokenExpiresIn as string
       );
 
+      const roleText =
+            payload.role === 'user' ? 'customer' : payload.role === 'shopkeeper' ? 'shopkeeper' : payload.role;
 
-  const admin = await User.findOne({ role: 'admin' });
-  await createNotification({
-        to: new mongoose.Types.ObjectId(admin!._id),
-        message: `${result.firstName} ${result.lastName} has registered a new account.`,
-        type: 'REGISTRATION',
-        title: "New User",
-        id: new mongoose.Types.ObjectId(result._id),
-  });
+      const admin = await User.findOne({ role: 'admin' });
+      await createNotification({
+            to: new mongoose.Types.ObjectId(admin!._id),
+            message: `${result.firstName} ${result.lastName} just joined your platform as a ${roleText}.`,
+            type: 'REGISTRATION',
+            title: "New User Registered",
+            id: new mongoose.Types.ObjectId(result._id),
+      });
 
 
       return {
