@@ -4,9 +4,10 @@ import deviceCheckRoutes from '../modules/deviceCheck/dhru.routes';
 import subscriptionRouter from '../modules/subscription/subscription.router';
 import userRoutes from '../modules/user/user.router';
 import inventoryRouter from '../modules/inventory/inventory.router';
-import paymentRouter from '../modules/payment/payment.router'
+import paymentRouter from '../modules/payment/payment.router';
 import notificationRouter from '../modules/notification/notification.router';
 import dashboardRouter from '../modules/dashboard/dashboard.router';
+import soldProductRoutes from '../modules/soldProduct/soldProduct.router';
 
 const router = Router();
 
@@ -46,6 +47,10 @@ const moduleRoutes = [
       {
             path: '/dashboard',
             route: dashboardRouter,
+      },
+      {
+            path: '/sold-products',
+            route: soldProductRoutes,
       },
 ];
 
