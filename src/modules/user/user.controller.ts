@@ -96,6 +96,26 @@ const deleteUser = catchAsync(async (req, res) => {
       });
 });
 
+
+const getAllShopkeepers = catchAsync(async (req, res) => {
+      const result = await userService.getAllShopkeepers(req.query);
+
+      sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: 'Shopkeepers retrieved successfully.',
+            data: result.data,
+            meta: result.meta,
+      });
+});
+
+
+
+
+
+
+
+
 const userController = {
       registerUser,
       verifyEmail,
@@ -105,6 +125,7 @@ const userController = {
       updateUserProfile,
       getAdminId,
       deleteUser,
+      getAllShopkeepers,
 };
 
 export default userController;

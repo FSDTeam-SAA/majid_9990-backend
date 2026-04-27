@@ -1,6 +1,5 @@
 import bcrypt from 'bcrypt';
 import { model, Schema } from 'mongoose';
-
 import config from '../../config/config';
 import { IUser, userModel } from './user.interface';
 
@@ -58,6 +57,8 @@ const userSchema = new Schema<IUser>(
             shopName: { type: String, default: '' },
             shopAddress: { type: String, default: '' },
             whatsappNumber: { type: String, default: '' },
+            totalReviews: { type: Number, default: 0 },
+            averageRating: { type: Number, default: 0 },
             otp: { type: String, default: null },
             otpExpires: { type: Date, default: null },
             resetPasswordOtp: { type: String, default: null },

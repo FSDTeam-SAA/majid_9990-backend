@@ -24,6 +24,10 @@ export interface IUser {
   shopName?: string;
   shopAddress?: string;
   whatsappNumber?: string;
+  totalReviews?: number;
+  averageRating?: number;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export interface userModel extends Model<IUser> {

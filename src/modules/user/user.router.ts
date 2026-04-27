@@ -15,6 +15,7 @@ router.post('/resend-otp', protect, userController.resendOtpCode);
 
 router.get('/all-users', userController.getAllUsers);
 router.get('/my-profile', protect, userController.getMyProfile);
+router.get("/shopkeeper", userController.getAllShopkeepers);
 
 router.put('/update-profile', upload.single('image'), protect, userController.updateUserProfile);
 
