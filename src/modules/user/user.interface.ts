@@ -21,6 +21,9 @@ export interface IUser {
   otpExpires?: Date | null;
   resetPasswordOtp?: string | null;
   resetPasswordOtpExpires?: Date | null;
+  shopName?: string;
+  shopAddress?: string;
+  whatsappNumber?: string;
 }
 
 export interface userModel extends Model<IUser> {

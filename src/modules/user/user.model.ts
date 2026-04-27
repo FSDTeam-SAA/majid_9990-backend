@@ -40,7 +40,7 @@ const userSchema = new Schema<IUser>(
             },
             role: {
                   type: String,
-                  enum: ['user', 'admin'],
+                  enum: ['user', 'admin', "shopkeeper"],
                   default: 'user',
             },
             image: {
@@ -55,6 +55,9 @@ const userSchema = new Schema<IUser>(
                   type: Boolean,
                   default: false,
             },
+            shopName: { type: String, default: '' },
+            shopAddress: { type: String, default: '' },
+            whatsappNumber: { type: String, default: '' },
             otp: { type: String, default: null },
             otpExpires: { type: Date, default: null },
             resetPasswordOtp: { type: String, default: null },
