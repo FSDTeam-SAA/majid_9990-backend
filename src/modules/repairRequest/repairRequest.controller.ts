@@ -5,7 +5,9 @@ import repairRequestService from "./repairRequest.service";
 
 
 const addNewRepairRequest = catchAsync(async (req, res) => {
-    const result = await repairRequestService.addNewRepairRequest(req.body);
+    const { id } = req.user;
+    const files = req.files as Express.Multer.File[];
+    const result = await repairRequestService.addNewRepairRequest(req.body, files, id);
 
     sendResponse(res, {
         statusCode: StatusCodes.OK,

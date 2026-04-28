@@ -16,7 +16,8 @@ const RepairTimelineSchema = new Schema(
             status: {
                   type: String,
                   enum: ['submitted', 'in_review', 'quote_sent', 'approved', 'rejected', 'in_progress', 'completed'],
-                  required: true,
+                  default: 'submitted',
+
             },
             message: { type: String },
             createdAt: { type: Date, default: Date.now },
