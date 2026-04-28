@@ -39,8 +39,93 @@ const addNewRepairRequest = async (payload: IRepairRequest, files: Express.Multe
       return newRequest;
 };
 
+const getMyRepairRequestsHistory = async (
+  userId: string,
+  query: any
+) => {
+  const page = Number(query.page) || 1;
+  const limit = Number(query.limit) || 10;
+
+  const skip = (page - 1) * limit;
+
+  const filter = { userId };
+
+  const data = await RepairRequest.find(filter)
+    .populate({
+      path: 'shopkeeperId',
+      select: 'shopName',
+    })
+    .skip(skip)
+    .limit(limit)
+    .sort({ createdAt: -1 });
+
+  const total = await RepairRequest.countDocuments(filter);
+
+  return {
+    data,
+    meta: {
+      page,
+      limit,
+      total,
+      totalPage: Math.ceil(total / limit),
+    },
+  };
+};
+
+const getShopKeepersShopsHistory = async (
+  shopkeeperId: string,
+  query: any
+) => {
+  const page = Number(query.page) || 1;
+  const limit = Number(query.limit) || 10;
+
+  const skip = (page - 1) * limit;
+
+  const filter = { shopkeeperId };
+
+  const data = await RepairRequest.find(filter)
+    .populate({
+      path: 'userId',
+      select: 'firstName',
+    })
+    .skip(skip)
+    .limit(limit)
+    .sort({ createdAt: -1 });
+
+  const total = await RepairRequest.countDocuments(filter);
+
+  return {
+    data,
+    meta: {
+      page,
+      limit,
+      total,
+      totalPage: Math.ceil(total / limit),
+    },
+  };
+};
+
+
+const getSingleRepairRequest = async (id: string) => {
+  const result = await RepairRequest.findById(id).populate({
+    path: 'shopkeeperId',
+    select: 'shopName',
+  });
+
+  return result;
+  }
+
+
+
+
+
+
+
 const repairRequestService = {
       addNewRepairRequest,
+      getMyRepairRequestsHistory,
+      getShopKeepersShopsHistory,
+      getSingleRepairRequest,
 };
 
 export default repairRequestService;
