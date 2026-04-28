@@ -1,27 +1,20 @@
 import { Types } from "mongoose";
-export interface IRepairEstimate {
-      cost: number;
-      currency: string;
-      estimatedDays: number;
-      approved: boolean;
-}
 
 export type RepairStatus =
-      | 'submitted'
+      | 'request_submitted'
       | 'in_review'
       | 'quote_sent'
       | 'approved'
       | 'rejected'
-      | 'in_progress'
+      | 'repair_in_progress'
       | 'completed';
-      export interface IRepairTimeline {
-        status: RepairStatus;
-        message?: string;
-        createdAt: Date;
-      }
-      export interface INote{
+      
+      export interface INote {
             message: string;
-            date: Date
+            cost: number;
+            estimatedDays: number;
+            date: Date;
+            status: 'inProgress' | 'approved' | 'rejected';
       }
 export interface IRepairRequest {
       shopkeeperId: Types.ObjectId;
@@ -36,8 +29,6 @@ export interface IRepairRequest {
         url: string;
       }[];
       status: RepairStatus;
-      estimate?: IRepairEstimate;
-      timeline: IRepairTimeline[];
       shopkeeperNotes?: INote;
       createdAt: Date;
       updatedAt: Date;

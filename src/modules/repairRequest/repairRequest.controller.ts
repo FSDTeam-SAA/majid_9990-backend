@@ -3,7 +3,6 @@ import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import repairRequestService from "./repairRequest.service";
 
-
 const addNewRepairRequest = catchAsync(async (req, res) => {
     const { id } = req.user;
     const files = req.files as Express.Multer.File[];
@@ -17,12 +16,8 @@ const addNewRepairRequest = catchAsync(async (req, res) => {
     });
 });
 
-
-
-// controller
 const getMyRepairRequestsHistory = catchAsync(async (req, res) => {
   const { id } = req.user;
-
   const result = await repairRequestService.getMyRepairRequestsHistory(
     id,
     req.query
@@ -37,10 +32,8 @@ const getMyRepairRequestsHistory = catchAsync(async (req, res) => {
   });
 });
 
-
 const getShopKeepersShopsHistory = catchAsync(async (req, res) => {
   const { id } = req.user;
-
   const result = await repairRequestService.getShopKeepersShopsHistory(
     id,
     req.query
@@ -70,11 +63,54 @@ const getSingleRepairRequest = catchAsync(async (req, res) => {
 
 
 
+const updateStatusByShopKeeper = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await repairRequestService.updateStatusByShopKeeper(id as string, req.body);
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'Repair request status updated successfully',
+    data: result,
+  });
+});
+
+
+const addNoteByShopKeeper = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await repairRequestService.addNoteByShopKeeper(id as string, req.body);
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'Repair request status updated successfully',
+    data: result,
+  });
+});
+
+
+
+const updateQuoteStatusByUser = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await repairRequestService.updateQuoteStatusByUser(id as string, req.body);
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'Repair request status updated successfully',
+    data: result,
+  });
+});
+
+
 const repairRequestController = {
       addNewRepairRequest,
       getMyRepairRequestsHistory,
       getShopKeepersShopsHistory,
       getSingleRepairRequest,
+      updateStatusByShopKeeper,
+      addNoteByShopKeeper,
+      updateQuoteStatusByUser,
 };
 
 export default repairRequestController;

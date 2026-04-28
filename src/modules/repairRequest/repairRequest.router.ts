@@ -13,5 +13,11 @@ router.get('/shopkeepers-history', protect, repairRequestController.getShopKeepe
 
 router.get('/:id', repairRequestController.getSingleRepairRequest);
 
+router.put('/update-status/:id', protect, repairRequestController.updateStatusByShopKeeper);
+
+router.put('/add-note/:id', protect, repairRequestController.addNoteByShopKeeper);
+
+router.put('/quote-status/:id', repairRequestController.updateQuoteStatusByUser);
+
 const repairRequestRouter = router;
 export default repairRequestRouter;

@@ -1,36 +1,19 @@
 import { Schema, model } from 'mongoose';
 import { IRepairRequest } from './repairRequest.interface';
 
-const RepairEstimateSchema = new Schema(
-      {
-            cost: { type: Number },
-            currency: { type: String, default: 'USD' },
-            estimatedDays: { type: Number },
-            approved: { type: Boolean, default: false },
-      },
-      { _id: false }
-);
-
-const RepairTimelineSchema = new Schema(
-      {
-            status: {
-                  type: String,
-                  enum: ['submitted', 'in_review', 'quote_sent', 'approved', 'rejected', 'in_progress', 'completed'],
-                  default: 'submitted',
-
-            },
-            message: { type: String },
-            createdAt: { type: Date, default: Date.now },
-      },
-      { _id: false }
-);
-
 const NoteSchema = new Schema(
       {
             message: { type: String, required: true },
             date: { type: Date, default: Date.now },
+            cost: { type: Number, required: true },
+            estimatedDays: { type: Number, required: true },
+            status: {
+                  type: String,
+                  enum: ['inProgress', 'approved', 'rejected'],
+                  default: 'inProgress',
+            },
       },
-      { _id: false }
+      
 );
 
 const ImageSchema = new Schema(
@@ -61,11 +44,9 @@ const RepairRequestSchema = new Schema<IRepairRequest>(
             images: [ImageSchema],
             status: {
                   type: String,
-                  enum: ['submitted', 'in_review', 'quote_sent', 'approved', 'rejected', 'in_progress', 'completed'],
-                  default: 'submitted',
+                  enum: ['request_submitted', 'in_review', 'quote_sent', 'quote_accepted', 'quote_rejected', 'rejected', 'repair_in_progress', 'completed'],
+                  default: 'request_submitted',
             },
-            estimate: RepairEstimateSchema,
-            timeline: [RepairTimelineSchema],
             shopkeeperNotes: [NoteSchema],
       },
       {
