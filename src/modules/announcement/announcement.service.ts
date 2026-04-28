@@ -39,10 +39,28 @@ const sendAnnouncement = async (payload: IAnnouncement) => {
 };
 
 
-const getAnnouncement = async () => {
-    const result = await Announcement.find();
-    return result;
-}
+const getAnnouncement = async (query: any) => {
+      const page = Number(query.page) || 1;
+      const limit = Number(query.limit) || 10;
+      const skip = (page - 1) * limit;
+
+      const search = query.search || '';
+      const filter = search ? { title: { $regex: search, $options: 'i' } } : {};
+
+      const result = await Announcement.find(filter).skip(skip).limit(limit).sort({ createdAt: -1 });
+
+      const total = await Announcement.countDocuments(filter);
+
+      return {
+            data: result,
+            meta: {
+                  total,
+                  page,
+                  limit,
+                  totalPage: Math.ceil(total / limit),
+            },
+      };
+};
 
 
 const announcementService = {
