@@ -37,7 +37,7 @@ const sendEmail = async ({ to, subject, html }: SendEmailParams): Promise<SendEm
 
             await transporter.sendMail(mailOptions);
 
-
+            console.log("email is send");
             return { success: true };
       } catch (error: any) {
             return { success: false, error: error.message };

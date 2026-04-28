@@ -9,6 +9,7 @@ import notificationRouter from '../modules/notification/notification.router';
 import dashboardRouter from '../modules/dashboard/dashboard.router';
 import soldProductRoutes from '../modules/soldProduct/soldProduct.router';
 import repairRequestRouter from '../modules/repairRequest/repairRequest.router';
+import announcementRouter from '../modules/announcement/announcement.router';
 
 const router = Router();
 
@@ -56,6 +57,10 @@ const moduleRoutes = [
       {
             path: '/repair-requests',
             route: repairRequestRouter,
+      },
+      {
+            path: '/announcements',
+            route: announcementRouter,
       },
 ];
 
