@@ -54,5 +54,5 @@ const RepairRequestSchema = new Schema<IRepairRequest>(
       }
 );
 
- const RepairRequest = model<IRepairRequest>('RepairRequest', RepairRequestSchema);
+const RepairRequest = model<IRepairRequest>('RepairRequest', RepairRequestSchema);
 export default RepairRequest;

@@ -88,8 +88,6 @@ const addNoteByShopKeeper = catchAsync(async (req, res) => {
   });
 });
 
-
-
 const updateQuoteStatusByUser = catchAsync(async (req, res) => {
   const { id } = req.params;
   const result = await repairRequestService.updateQuoteStatusByUser(id as string, req.body);
@@ -101,7 +99,6 @@ const updateQuoteStatusByUser = catchAsync(async (req, res) => {
     data: result,
   });
 });
-
 
 const repairRequestController = {
       addNewRepairRequest,
