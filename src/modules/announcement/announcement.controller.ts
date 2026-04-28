@@ -17,14 +17,15 @@ const sendAnnouncement = catchAsync(async (req, res) => {
 
 
 const getAnnouncement = catchAsync(async (req, res) => {
-    const result = await announcementService.getAnnouncement();
+      const result = await announcementService.getAnnouncement(req.query);
 
-    sendResponse(res, {
-        statusCode: StatusCodes.OK,
-        success: true,
-        message: 'Announcement retrieved successfully',
-        data: result,
-    });
+      sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: 'Announcement retrieved successfully',
+            data: result.data,
+            meta: result.meta,
+      });
 });
 
 
