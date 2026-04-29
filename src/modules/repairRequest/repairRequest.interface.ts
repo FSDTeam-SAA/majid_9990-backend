@@ -15,6 +15,10 @@ export type RepairStatus =
             estimatedDays: number;
             date: Date;
             status: 'inProgress' | 'approved' | 'rejected';
+            images: {
+        public_id: string;
+        url: string;
+      }[];
       }
 export interface IRepairRequest {
       shopkeeperId: Types.ObjectId;

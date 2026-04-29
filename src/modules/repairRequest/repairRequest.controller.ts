@@ -78,12 +78,13 @@ const updateStatusByShopKeeper = catchAsync(async (req, res) => {
 
 const addNoteByShopKeeper = catchAsync(async (req, res) => {
   const { id } = req.params;
-  const result = await repairRequestService.addNoteByShopKeeper(id as string, req.body);
+  const files = req.files as Express.Multer.File[];
+  const result = await repairRequestService.addNoteByShopKeeper(id as string, req.body, files);
 
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
-    message: 'Repair request status updated successfully',
+    message: 'Repair request note added successfully',
     data: result,
   });
 });

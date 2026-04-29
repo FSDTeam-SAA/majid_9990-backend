@@ -124,7 +124,7 @@ const getSingleRepairRequest = async (id: string) => {
                 to: result!.userId,
                 message:
                       result?.status === 'in_review'
-                            ? 'Your repair request has been under review'
+                        ? 'Your repair request has been under review'
                             : 'Your repair request has been rejected',
                 type: 'REPAIR_REQUEST',
                 title: 'Your repair request status updated',
@@ -136,14 +136,25 @@ const getSingleRepairRequest = async (id: string) => {
   };
 
 
-const addNoteByShopKeeper = async (id: string, payload: any) => {
+const addNoteByShopKeeper = async (id: string, payload: any, files: Express.Multer.File[] = []) => {
       const { message, cost, estimatedDays } = payload;
+
+      // Upload images to Cloudinary if provided
+      const images: { public_id: string; url: string }[] = [];
+      for (const file of files) {
+            const uploaded = await uploadToCloudinary(file.path);
+            if (uploaded && uploaded.public_id && uploaded.secure_url) {
+                  images.push({ public_id: uploaded.public_id, url: uploaded.secure_url });
+            }
+      }
+
       const newNote = {
             message,
             cost,
             estimatedDays,
             status: 'inProgress',
             date: new Date(),
+            images,
       };
 
       const result = await RepairRequest.findByIdAndUpdate(
