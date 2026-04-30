@@ -12,8 +12,14 @@ const NoteSchema = new Schema(
                   enum: ['inProgress', 'approved', 'rejected'],
                   default: 'inProgress',
             },
+            images: [
+                  {
+                        public_id: { type: String, required: true },
+                        url: { type: String, required: true },
+                  },
+            ],
       },
-      
+
 );
 
 const ImageSchema = new Schema(
@@ -54,5 +60,5 @@ const RepairRequestSchema = new Schema<IRepairRequest>(
       }
 );
 
- const RepairRequest = model<IRepairRequest>('RepairRequest', RepairRequestSchema);
+const RepairRequest = model<IRepairRequest>('RepairRequest', RepairRequestSchema);
 export default RepairRequest;

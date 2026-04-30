@@ -29,11 +29,36 @@ export const uploadToCloudinary = async (localFilePath: string) => {
       }
 };
 
-export const deleteFromCloudinary = async (publicId: string) => {
+export const uploadVideoToCloudinary = async (filePath: string, folder: string) => {
       try {
-            if (!publicId) return;
-            await cloudinary.uploader.destroy(publicId);
+            const result = await cloudinary.uploader.upload(filePath, {
+                  folder,
+                  resource_type: 'video',
+                  chunk_size: 9000000,
+            });
+
+            fs.unlinkSync(filePath);
+
+            return {
+                  public_id: result.public_id,
+                  secure_url: result.secure_url,
+                  duration: result.duration,
+                  format: result.format,
+            };
+      } catch (error: any) {
+            console.error('Error uploading video to Cloudinary:', error);
+            throw new Error('Failed to upload video to Cloudinary');
+      }
+};
+
+// /
+
+export const deleteFromCloudinary = async (publicId: string, resourceType: 'image' | 'video' | 'raw' = 'image') => {
+      try {
+            await cloudinary.uploader.destroy(publicId, {
+                  resource_type: resourceType,
+            });
       } catch (error) {
-            console.error('Error deleting from Cloudinary:', error);
+            throw new Error('Failed to delete file from Cloudinary');
       }
 };

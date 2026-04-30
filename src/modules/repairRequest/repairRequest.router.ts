@@ -15,7 +15,7 @@ router.get('/:id', repairRequestController.getSingleRepairRequest);
 
 router.put('/update-status/:id', protect, repairRequestController.updateStatusByShopKeeper);
 
-router.put('/add-note/:id', protect, repairRequestController.addNoteByShopKeeper);
+router.put('/add-note/:id', protect, upload.array('images', 6), repairRequestController.addNoteByShopKeeper);
 
 router.put('/quote-status/:id', repairRequestController.updateQuoteStatusByUser);
 
