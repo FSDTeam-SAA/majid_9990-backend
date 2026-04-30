@@ -8,14 +8,14 @@ const router = Router();
  * Public routes (no auth required)
  */
 
-// Search by barcode (EAN / UPC / GTIN / ISBN)
-router.get('/:code', barcodeController.searchByBarcode);
-
 // Search by name/keyword
 router.get('/search', barcodeController.searchByName);
 
 // Fallback REST-based search
 router.get('/fallback/:code', barcodeController.fallbackSearch);
+
+// Search by barcode (EAN / UPC / GTIN / ISBN)
+router.get('/:code', barcodeController.searchByBarcode);
 
 /**
  * Protected routes (auth required - optional)
