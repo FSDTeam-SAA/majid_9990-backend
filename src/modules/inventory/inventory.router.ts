@@ -6,6 +6,7 @@ import inventoryController from './inventory.controller';
 const router = Router();
 
 router.post('/create', protect, upload.single('image'), inventoryController.createInventory);
+router.post('/create-from-barcode', protect, upload.single('image'), inventoryController.createInventoryFromBarcode);
 
 router.get('/', protect, inventoryController.getAllInventory);
 

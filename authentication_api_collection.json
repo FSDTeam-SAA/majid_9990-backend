@@ -84,6 +84,57 @@
                               "path": ["imei", "device-analysis"]
                         }
                   }
+            },
+            {
+                  "name": "Create Inventory From Barcode",
+                  "request": {
+                        "method": "POST",
+                        "header": [
+                              {
+                                    "key": "Authorization",
+                                    "value": "Bearer {{token}}"
+                              }
+                        ],
+                        "body": {
+                              "mode": "formdata",
+                              "formdata": [
+                                    {
+                                          "key": "code",
+                                          "value": "1234567890123",
+                                          "type": "text"
+                                    },
+                                    {
+                                          "key": "userId",
+                                          "value": "6828f0b8c4c0f7c9d4a12345",
+                                          "type": "text"
+                                    },
+                                    {
+                                          "key": "imeiNumber",
+                                          "value": "490154203237518",
+                                          "type": "text"
+                                    },
+                                    {
+                                          "key": "purchasePrice",
+                                          "value": "250",
+                                          "type": "text"
+                                    },
+                                    {
+                                          "key": "currentState",
+                                          "value": "new",
+                                          "type": "text"
+                                    },
+                                    {
+                                          "key": "image",
+                                          "type": "file"
+                                    }
+                              ]
+                        },
+                        "url": {
+                              "raw": "{{base_url}}/inventory/create-from-barcode",
+                              "host": ["{{base_url}}"],
+                              "path": ["inventory", "create-from-barcode"]
+                        }
+                  }
             }
       ]
 }

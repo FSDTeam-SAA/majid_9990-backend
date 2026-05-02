@@ -21,6 +21,28 @@ const createInventory = catchAsync(async (req, res) => {
       });
 });
 
+const createInventoryFromBarcode = catchAsync(async (req, res) => {
+      const { code, userId, imeiNumber, purchasePrice, currentState } = req.body;
+
+      const result = await inventoryService.createInventoryFromBarcode(
+            {
+                  code,
+                  userId,
+                  imeiNumber,
+                  purchasePrice,
+                  currentState,
+            },
+            req.file
+      );
+
+      sendResponse(res, {
+            statusCode: StatusCodes.CREATED,
+            success: true,
+            message: 'Inventory created from barcode successfully',
+            data: result,
+      });
+});
+
 const getAllInventory = catchAsync(async (req, res) => {
       const result = await inventoryService.getAllInventory();
 
@@ -93,6 +115,7 @@ const getInventoryByUserId = catchAsync(async (req, res) => {
 
 export default {
       createInventory,
+      createInventoryFromBarcode,
       getAllInventory,
       getSingleInventory,
       updateInventory,

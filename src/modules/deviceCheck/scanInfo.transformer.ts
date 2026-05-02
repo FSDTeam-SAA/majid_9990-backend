@@ -7,9 +7,12 @@ type ProviderPayload = Record<string, any>;
 
 const htmlToText = (input: string) =>
       input
-            .replace(/<br\s*\/?>/gi, '\n')
-            .replace(/<[^>]*>/g, '')
-            .replace(/&nbsp;/gi, ' ')
+            .split(/<br\s*\/?>/gi)
+            .join('\n')
+            .split(/<[^>]*>/g)
+            .join('')
+            .split(/&nbsp;/gi)
+            .join(' ')
             .trim();
 
 const extractTextBlock = (providerData: ProviderPayload): string => {
@@ -32,7 +35,7 @@ const toNumber = (value: string | null, fallback: number) => {
             return fallback;
       }
 
-      const parsed = Number(String(value).replace(/[^\d.]/g, ''));
+      const parsed = Number((String(value).match(/[\d.]+/g) ?? []).join(''));
       return Number.isFinite(parsed) ? parsed : fallback;
 };
 
@@ -139,7 +142,7 @@ const parseJsonObject = (value: string) => {
       }
 };
 
-const getOpenAiInsight = async (params: {
+export const getOpenAiInsight = async (params: {
       imei: string;
       deviceName: string;
       deviceStatus: DeviceStatus;

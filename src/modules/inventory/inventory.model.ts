@@ -15,11 +15,9 @@ const inventorySchema = new Schema<IInventory>(
             },
             purchasePrice: {
                   type: Number,
-                  required: true,
             },
             expectedPrice: {
                   type: Number,
-                  required: true,
             },
             image: {
                   public_id: String,
