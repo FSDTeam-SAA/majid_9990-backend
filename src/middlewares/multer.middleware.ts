@@ -1,5 +1,5 @@
 import multer from 'multer';
-import path from 'path';
+import path from 'node:path';
 
 const storage = multer.diskStorage({
       destination: function (req, file, cb) {
@@ -15,13 +15,33 @@ export const upload = multer({
       storage: storage,
       limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
       fileFilter: (req, file, cb) => {
-            const filetypes = /jpeg|jpg|pdf|png|mp4|avi|mov|avif|webp|doc|docx|mp3|mpeg|wav|m4a|xls|xlsx|ppt|pptx/;
-            const mimetype = filetypes.test(file.mimetype);
-            const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+            const allowedExtensions = new Set(['.jpeg', '.jpg', '.pdf', '.png', '.mp4', '.avi', '.mov', '.avif', '.webp', '.doc', '.docx', '.mp3', '.mpeg', '.wav', '.m4a', '.xls', '.xlsx', '.csv', '.ppt', '.pptx']);
+            const allowedMimeTypes = new Set([
+                  'image/jpeg',
+                  'image/png',
+                  'application/pdf',
+                  'video/mp4',
+                  'video/x-msvideo',
+                  'video/quicktime',
+                  'image/avif',
+                  'image/webp',
+                  'application/msword',
+                  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                  'audio/mpeg',
+                  'audio/wav',
+                  'audio/mp4',
+                  'application/vnd.ms-excel',
+                  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                  'text/csv',
+                  'application/vnd.ms-powerpoint',
+                  'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+            ]);
+            const mimetype = allowedMimeTypes.has(file.mimetype);
+            const extname = allowedExtensions.has(path.extname(file.originalname).toLowerCase());
 
             if (mimetype && extname) {
                   return cb(null, true);
             }
-            cb(new Error('Only images (jpeg, jpg, png) are allowed'));
+            cb(new Error('Only supported files (images, documents, spreadsheets, csv) are allowed'));
       },
 });
