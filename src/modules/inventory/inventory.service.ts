@@ -7,6 +7,7 @@ import barcodeService from '../barcode/barcode.service';
 import { getOpenAiInsight } from '../deviceCheck/scanInfo.transformer';
 import { IInventory } from './inventory.interface';
 import { Inventory } from './inventory.model';
+import { uploadToCloudinary } from '../../utils/cloudinary';
 
 const parseOptionalNumber = (value: unknown) => {
       if (value === undefined || value === null || value === '') {
@@ -128,10 +129,13 @@ const extractBarcodeRowsFromFile = (filePath: string): TBarcodeBulkRow[] => {
 
 const createInventory = async (payload: Partial<IInventory>, file?: any) => {
       if (file) {
-            payload.image = {
-                  public_id: file.filename,
-                  url: file.path,
-            };
+            const cloudinaryResponse = await uploadToCloudinary(file.path);
+            if (cloudinaryResponse) {
+                  payload.image = {
+                        public_id: cloudinaryResponse.public_id,
+                        url: cloudinaryResponse.secure_url,
+                  };
+            }
       }
 
       const result = await Inventory.create(payload);
@@ -296,10 +300,13 @@ const updateInventory = async (id: string, payload: Partial<IInventory>, file?: 
       assertValidObjectId(id, 'id');
 
       if (file) {
-            payload.image = {
-                  public_id: file.filename,
-                  url: file.path,
-            };
+            const cloudinaryResponse = await uploadToCloudinary(file.path);
+            if (cloudinaryResponse) {
+                  payload.image = {
+                        public_id: cloudinaryResponse.public_id,
+                        url: cloudinaryResponse.secure_url,
+                  };
+            }
       }
 
       return await Inventory.findByIdAndUpdate(id, payload, {
