@@ -19,6 +19,12 @@ const inventorySchema = new Schema<IInventory>(
             expectedPrice: {
                   type: Number,
             },
+            productDetails: {
+                  type: Schema.Types.Mixed,
+            },
+            aiDescription: {
+                  type: String,
+            },
             image: {
                   public_id: String,
                   url: String,

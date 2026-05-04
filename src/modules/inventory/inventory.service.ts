@@ -194,6 +194,16 @@ const createInventoryFromBarcode = async (
       const purchasePrice = parseOptionalNumber(payload.purchasePrice);
       const expectedPrice = parseOptionalNumber(aiInsight?.estimatedMarketValueUSD) ?? estimatedMarketValue;
 
+      const productDetails = {
+            name: itemName,
+            brand: barcodeResult.brand,
+            category: barcodeResult.category,
+            description: barcodeResult.description,
+            raw: barcodeResult,
+      };
+
+      const aiDescription = aiInsight?.message ?? aiInsight?.title ?? '';
+
       const result = await createInventory(
             {
                   itemName,
@@ -202,12 +212,16 @@ const createInventoryFromBarcode = async (
                   purchasePrice,
                   expectedPrice,
                   currentState: normalizeCondition(payload.currentState),
+                  productDetails,
+                  aiDescription,
             },
             file
       );
 
       return {
             result,
+            productDetails,
+            aiDescription,
             barcodeResult,
             aiInsight,
       };
