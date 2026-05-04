@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import { model, Schema } from 'mongoose';
 import config from '../../config/config';
-import { IUser, userModel } from './user.interface';
+import { IUser, UserModel } from './user.interface';
 
 const userSchema = new Schema<IUser>(
       {
@@ -25,6 +25,11 @@ const userSchema = new Schema<IUser>(
                   type: String,
                   required: true,
             },
+            balance: {
+                  type: Number,
+                  default: 0,
+                  min: 0,
+            },
             street: {
                   type: String,
             },
@@ -39,7 +44,7 @@ const userSchema = new Schema<IUser>(
             },
             role: {
                   type: String,
-                  enum: ['user', 'admin', "shopkeeper"],
+                  enum: ['user', 'admin', 'shopkeeper'],
                   default: 'user',
             },
             image: {
@@ -99,4 +104,4 @@ userSchema.statics.isOTPVerified = async function (_id: string): Promise<boolean
       return user.isVerified;
 };
 
-export const User = model<IUser, userModel>('User', userSchema);
+export const User = model<IUser, UserModel>('User', userSchema);

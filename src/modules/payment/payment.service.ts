@@ -2,6 +2,7 @@ import Stripe from 'stripe';
 import config from '../../config/config';
 import AppError from '../../errors/AppError';
 import { Payment } from './payment.model';
+import { creditUserBalance } from './balanceTransaction.service';
 
 let stripeClient: InstanceType<typeof Stripe> | null = null;
 
@@ -71,14 +72,27 @@ const handleStripeWebhook = async (event: any) => {
       if (event.type === 'checkout.session.completed') {
             const session: any = event.data.object;
 
-            await Payment.findOneAndUpdate(
-                  { stripeSessionId: session.id },
+            const payment = await Payment.findOneAndUpdate(
+                  { stripeSessionId: session.id, paymentStatus: { $ne: 'paid' } },
                   {
                         paymentStatus: 'paid',
                         stripePaymentIntentId: session.payment_intent,
                         paymentMethod: session.payment_method_types?.[0],
-                  }
+                  },
+                  { new: true }
             );
+
+            if (payment) {
+                  await creditUserBalance({
+                        userId: payment.userId.toString(),
+                        amount: payment.amount,
+                        currency: payment.currency,
+                        source: 'payment',
+                        description: `Balance credited from payment ${payment.stripeSessionId ?? ''}`.trim(),
+                        referenceId: payment._id.toString(),
+                        paymentId: payment._id.toString(),
+                  });
+            }
       }
 
       if (event.type === 'payment_intent.payment_failed') {

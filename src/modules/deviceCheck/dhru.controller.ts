@@ -2,10 +2,12 @@ import { Request, Response, NextFunction } from 'express';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import XLSX from 'xlsx';
+import AppError from '../../errors/AppError';
 import { ImeiServiceCatalog } from './imeiService.model';
 import { curatedDhruServices, normalizeServiceName } from './dhru.services.catalog';
 import { dhruService } from './dhru.service';
 import { getExistingScanInfoByImei, isValidImei, resolveServiceId, runImeiCheck } from './deviceCheck.helpers';
+import { creditUserBalance, debitUserBalance } from '../payment/balanceTransaction.service';
 
 type SingleImeiCheckResult =
       | {
@@ -84,6 +86,26 @@ const extractUpstreamServices = (response: unknown): UpstreamService[] => {
 
 const formatPriceLabel = (price: string) => (price.toUpperCase() === 'FREE' ? 'FREE' : `${price}$`);
 
+export const resolveServicePrice = (service: { price: string; isFree: boolean }) => {
+      if (service.isFree || service.price.toUpperCase() === 'FREE') {
+            return 0;
+      }
+
+      const parsedPrice = Number(service.price);
+
+      if (!Number.isFinite(parsedPrice) || parsedPrice < 0) {
+            throw new AppError('Invalid service price', 500);
+      }
+
+      return Number(parsedPrice.toFixed(3));
+};
+
+export const findServiceByServiceId = async (serviceId: number) => {
+      return await ImeiServiceCatalog.findOne({
+            $or: [{ serviceId }, { serviceIds: serviceId }],
+      }).lean();
+};
+
 const groupByCategory = <T extends { category: string }>(items: T[]) => {
       const groups = new Map<string, T[]>();
 
@@ -157,6 +179,7 @@ const readStoredServices = async () => {
 };
 
 const processSingleImeiCheck = async (
+      userId: string,
       imei: string,
       serviceId: number,
       shouldGenerateFresh: boolean
@@ -167,6 +190,55 @@ const processSingleImeiCheck = async (
                   statusCode: 400,
                   message: 'Valid 15-digit imei is required',
             };
+      }
+
+      if (!Number.isFinite(serviceId) || serviceId <= 0) {
+            return {
+                  ok: false,
+                  statusCode: 400,
+                  message: 'Valid serviceId is required',
+            };
+      }
+
+      const service = await findServiceByServiceId(serviceId);
+
+      if (!service) {
+            return {
+                  ok: false,
+                  statusCode: 404,
+                  message: 'Service not found in the catalog',
+            };
+      }
+
+      const servicePrice = resolveServicePrice(service);
+      const shouldCharge = servicePrice > 0;
+
+      if (shouldCharge) {
+            try {
+                  await debitUserBalance({
+                        userId,
+                        amount: servicePrice,
+                        currency: service.currency ?? 'USD',
+                        source: 'imei_service',
+                        description: `IMEI service charge for ${service.name}`,
+                        serviceId,
+                        serviceName: service.name,
+                        imei,
+                        metadata: {
+                              normalizedName: service.normalizedName,
+                        },
+                  });
+            } catch (error) {
+                  if (error instanceof AppError) {
+                        return {
+                              ok: false,
+                              statusCode: error.statusCode || 400,
+                              message: error.message,
+                        };
+                  }
+
+                  throw error;
+            }
       }
 
       const existingScanInfo = shouldGenerateFresh ? null : await getExistingScanInfoByImei(imei);
@@ -182,17 +254,26 @@ const processSingleImeiCheck = async (
             };
       }
 
-      if (!Number.isFinite(serviceId) || serviceId <= 0) {
-            return {
-                  ok: false,
-                  statusCode: 400,
-                  message: 'Valid serviceId is required',
-            };
-      }
-
       const result = await runImeiCheck(String(imei), serviceId);
 
       if (!result.ok) {
+            if (shouldCharge) {
+                  await creditUserBalance({
+                        userId,
+                        amount: servicePrice,
+                        currency: service.currency ?? 'USD',
+                        source: 'refund',
+                        description: `Refund for failed IMEI service ${service.name}`,
+                        serviceId,
+                        serviceName: service.name,
+                        imei,
+                        metadata: {
+                              normalizedName: service.normalizedName,
+                              reason: result.message,
+                        },
+                  }).catch(() => undefined);
+            }
+
             return {
                   ok: false,
                   statusCode: result.statusCode,
@@ -248,6 +329,7 @@ const extractImeisFromWorkbook = (filePath: string) => {
 
 export const checkImeiFromDhru = async (req: Request, res: Response, next: NextFunction) => {
       try {
+            const userId = req.user._id;
             const imei = String(req.body?.imei ?? '').trim();
             const shouldGenerateFresh =
                   String(req.body?.genarate ?? req.body?.generate ?? '')
@@ -255,7 +337,7 @@ export const checkImeiFromDhru = async (req: Request, res: Response, next: NextF
                         .toLowerCase() === 'new';
             const requestedServiceId = resolveServiceId(req.body?.serviceId);
 
-            const result = await processSingleImeiCheck(imei, requestedServiceId, shouldGenerateFresh);
+            const result = await processSingleImeiCheck(userId, imei, requestedServiceId, shouldGenerateFresh);
 
             if (!result.ok) {
                   return res.status(400).json({
@@ -277,6 +359,7 @@ export const checkImeiFromDhru = async (req: Request, res: Response, next: NextF
 
 export const checkImeisFromFile = async (req: Request, res: Response, next: NextFunction) => {
       const file = req.file;
+      const userId = req.user._id;
       const shouldGenerateFresh =
             String(req.body?.genarate ?? req.body?.generate ?? '')
                   .trim()
@@ -322,7 +405,12 @@ export const checkImeisFromFile = async (req: Request, res: Response, next: Next
 
             for (let index = 0; index < imeis.length; index += 1) {
                   const imei = imeis[index];
-                  const singleResult = await processSingleImeiCheck(imei, requestedServiceId, shouldGenerateFresh);
+                  const singleResult = await processSingleImeiCheck(
+                        userId,
+                        imei,
+                        requestedServiceId,
+                        shouldGenerateFresh
+                  );
 
                   if (singleResult.ok) {
                         results.push({

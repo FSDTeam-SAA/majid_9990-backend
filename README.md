@@ -47,3 +47,22 @@ The same `device-analysis` route is also available under `/api/v1/device/device-
 ### Bulk Upload inventory from CSV
 post /create-from-barcode/bulk
 - Details: It accepts a CSV, XLS, or XLSX upload on the file field, reads the first worksheet, maps each row into the same payload shape used by createInventoryFromBarcode, and processes rows one by one. It supports header-based sheets with fields like code or barcode, userId, imeiNumber, purchasePrice, and currentState, and it also falls back to positional columns if there is no header row. The response returns a summary plus per-row success or failure details.
+
+
+
+### How the payment system is working and deduct form users
+When a Stripe payment is confirmed, the amount is added to the user balance in payment.service.ts. Every credit and debit is also written to a new transaction ledger in balanceTransaction.model.ts, with the supporting logic in balanceTransaction.service.ts. The user schema now stores balance directly in user.model.ts.
+
+For IMEI/device-check requests, the API is now protected and checks the service price from the catalog before calling the upstream provider. If the service is not free, the price is deducted from the user balance first. If the balance is not enough, the request is rejected and the service response is not returned. This is wired through dhru.routes.ts, dhru.controller.ts, and riskAnalysis.controller.ts.
+
+A new history API was added so the user can see balance changes, including credits from payment and deductions from service usage. The route is in user.router.ts, with the controller and service in user.controller.ts and user.service.ts.
+
+##### How it works in practice:
+
+- User pays money through Stripe.
+- Webhook marks payment as paid and credits the user balance.
+- User calls an IMEI or analysis endpoint.
+- Server finds the service price in the IMEI catalog.
+- If balance is enough, the amount is deducted and the request continues.
+- If balance is not enough, the request fails.
+- User can view all balance activity through the history endpoint.

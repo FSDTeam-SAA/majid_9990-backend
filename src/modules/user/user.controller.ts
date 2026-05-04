@@ -96,6 +96,17 @@ const deleteUser = catchAsync(async (req, res) => {
       });
 });
 
+const getBalanceHistory = catchAsync(async (req, res) => {
+      const result = await userService.getBalanceHistory(req.user._id, req.query);
+
+      sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: 'Balance history retrieved successfully.',
+            data: result.data,
+            meta: result.meta,
+      });
+});
 
 const getAllShopkeepers = catchAsync(async (req, res) => {
       const result = await userService.getAllShopkeepers(req.query);
@@ -109,13 +120,6 @@ const getAllShopkeepers = catchAsync(async (req, res) => {
       });
 });
 
-
-
-
-
-
-
-
 const userController = {
       registerUser,
       verifyEmail,
@@ -126,6 +130,7 @@ const userController = {
       getAdminId,
       deleteUser,
       getAllShopkeepers,
+      getBalanceHistory,
 };
 
 export default userController;

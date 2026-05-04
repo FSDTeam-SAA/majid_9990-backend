@@ -8,6 +8,7 @@ import sendEmail from '../../utils/sendEmail';
 import { createToken } from '../../utils/tokenGenerate';
 import verificationCodeTemplate from '../../utils/verificationCodeTemplate';
 import { createNotification } from '../socket/notification.service';
+import { getUserBalanceHistory } from '../payment/balanceTransaction.service';
 import { IUser } from './user.interface';
 import { User } from './user.model';
 
@@ -248,11 +249,11 @@ const getAllShopkeepers = async (query: any) => {
             ];
       }
 
-        const data = await User.find(filter)
-              .select('shopName shopAddress totalReviews averageRating')
-              .skip(skip)
-              .limit(Number(limit))
-              .sort({ createdAt: -1 });
+      const data = await User.find(filter)
+            .select('shopName shopAddress totalReviews averageRating')
+            .skip(skip)
+            .limit(Number(limit))
+            .sort({ createdAt: -1 });
 
       const total = await User.countDocuments(filter);
 
@@ -267,6 +268,10 @@ const getAllShopkeepers = async (query: any) => {
       };
 };
 
+const getBalanceHistory = async (userId: string, query: any) => {
+      return await getUserBalanceHistory(userId, query);
+};
+
 const userService = {
       registerUser,
       verifyEmail,
@@ -277,6 +282,7 @@ const userService = {
       getAdminId,
       deleteUserFromDB,
       getAllShopkeepers,
+      getBalanceHistory,
 };
 
 export default userService;
