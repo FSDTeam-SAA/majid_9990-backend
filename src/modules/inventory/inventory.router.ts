@@ -15,16 +15,14 @@ router.post(
 );
 
 router.get('/', protect, inventoryController.getAllInventory);
+router.get('/my-inventory', protect, inventoryController.getMyInventory);
+// ideally admin only
+router.get('/user/:userId', protect, inventoryController.getInventoryByUserId);
 
 router.get('/:id', protect, inventoryController.getSingleInventory);
 
 router.put('/:id', protect, upload.single('image'), inventoryController.updateInventory);
 
 router.delete('/:id', protect, inventoryController.deleteInventory);
-
-router.get('/my-inventory', protect, inventoryController.getMyInventory);
-
-//ideally admin only
-router.get('/user/:userId', protect, inventoryController.getInventoryByUserId);
 
 export default router;

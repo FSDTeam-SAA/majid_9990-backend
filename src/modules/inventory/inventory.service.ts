@@ -46,6 +46,12 @@ const normalizeCondition = (value: IInventory['currentState']) => {
       return value === 'good condition' ? 'good condition' : 'new';
 };
 
+const assertValidObjectId = (value: string, fieldName: string) => {
+      if (!Types.ObjectId.isValid(value)) {
+            throw new AppError(`Invalid ${fieldName}`, 400);
+      }
+};
+
 type TBarcodeBulkRow = {
       rowNumber: number;
       code: string;
@@ -282,10 +288,13 @@ const getAllInventory = async () => {
 };
 
 const getSingleInventory = async (id: string) => {
+      assertValidObjectId(id, 'id');
       return await Inventory.findById(id).populate('userId');
 };
 
 const updateInventory = async (id: string, payload: Partial<IInventory>, file?: any) => {
+      assertValidObjectId(id, 'id');
+
       if (file) {
             payload.image = {
                   public_id: file.filename,
@@ -299,6 +308,8 @@ const updateInventory = async (id: string, payload: Partial<IInventory>, file?: 
 };
 
 const deleteInventory = async (id: string) => {
+      assertValidObjectId(id, 'id');
+
       return await Inventory.findByIdAndDelete(id);
 };
 
@@ -307,6 +318,8 @@ const getMyInventory = async (userId: string) => {
 };
 
 const getInventoryByUserId = async (userId: string) => {
+      assertValidObjectId(userId, 'userId');
+
       return await Inventory.find({ userId });
 };
 
