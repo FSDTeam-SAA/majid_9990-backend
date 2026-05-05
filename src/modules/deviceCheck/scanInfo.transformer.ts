@@ -311,35 +311,6 @@ export const buildStructuredScanInfo = async (imei: string, providerData: Provid
                         isOriginalComponents: true,
                   },
             },
-            technicalBreakdown: {
-                  processor: 'Unknown',
-                  batteryHealth: {
-                        percentage: 85,
-                        cycleCount: 200,
-                        label: '85% (200 cycles)',
-                  },
-                  storage: {
-                        total: 'Unknown',
-                        free: 'Unknown',
-                        label: 'Unknown',
-                  },
-                  modem: 'Unknown',
-                  display: 'Unknown',
-                  warranty: {
-                        status: 'unknown',
-                        label: 'Unknown',
-                  },
-                  origin: {
-                        country: 'Unknown',
-                        modelNumber: modelName ?? 'Unknown',
-                        label: `${manufacturer ?? 'Unknown'} (${modelName ?? 'Unknown'})`,
-                  },
-                  activation: {
-                        lockStatus: 'unknown',
-                        simType: 'unknown',
-                        label: 'Unknown',
-                  },
-            },
             reportActions: {
                   smartInvoiceCreated: false,
                   pdfCertificateUrl: null,
