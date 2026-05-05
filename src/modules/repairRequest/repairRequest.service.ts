@@ -47,7 +47,6 @@ const getMyRepairRequestsHistory = async (
 ) => {
   const page = Number(query.page) || 1;
   const limit = Number(query.limit) || 10;
-
   const skip = (page - 1) * limit;
 
   const filter = { userId };
@@ -114,10 +113,9 @@ const getSingleRepairRequest = async (id: string) => {
   });
 
   return result;
-  }
+}
 
-
-  const updateStatusByShopKeeper = async (id: string, payload: any) => {
+const updateStatusByShopKeeper = async (id: string, payload: any) => {
     const result = await RepairRequest.findByIdAndUpdate(id, payload, { new: true });
 
           await createNotification({
@@ -133,7 +131,7 @@ const getSingleRepairRequest = async (id: string) => {
 
 
     return result;
-  };
+};
 
 
 const addNoteByShopKeeper = async (id: string, payload: any, files: Express.Multer.File[] = []) => {
@@ -187,16 +185,13 @@ const addNoteByShopKeeper = async (id: string, payload: any, files: Express.Mult
 };
 
 
-
 const updateQuoteStatusByUser = async (id: string, payload: any) => {
       const { shopkeeperNotesId, status } = payload;
-
       const allowedStatus = ['approved', 'rejected'];
 
       if (!allowedStatus.includes(status)) {
             throw new AppError('Invalid status. Use approved or rejected', StatusCodes.BAD_REQUEST);
       }
-
 
       let mainStatus = 'quote_sent';
       let notificationTitle = '';
@@ -217,7 +212,6 @@ const updateQuoteStatusByUser = async (id: string, payload: any) => {
             notificationMessage =
                   'The customer has declined your repair quotation. You may review the request and submit a revised quote if needed.';
       }
-
 
       const result = await RepairRequest.findOneAndUpdate(
             {
@@ -249,6 +243,114 @@ const updateQuoteStatusByUser = async (id: string, payload: any) => {
       return result;
 };
 
+
+const quoteResentByUser = async (id: string, payload: any) => {
+      const { message, cost, estimatedDays } = payload;
+
+      const repairRequest = await RepairRequest.findById(id);
+      if (!repairRequest) {
+            throw new AppError('Repair request not found', StatusCodes.NOT_FOUND);
+      }
+
+      if(repairRequest.status === "completed"){
+            throw new AppError('Repair request is already completed', StatusCodes.BAD_REQUEST);
+      }
+
+      const newNote = {
+            message,
+            cost,
+            estimatedDays,
+            status: 'inProgress',
+            date: new Date(),
+      };
+
+      const result = await RepairRequest.findByIdAndUpdate(
+            id,
+            {
+                  $push: {
+                        userNotes: newNote,
+                  },
+                  $set: {
+                        status: 'quote-resent',
+                  },
+            },
+            { new: true }
+      );
+
+      if (!result) {
+            throw new AppError('Repair request not found', StatusCodes.NOT_FOUND);
+      }
+
+      await createNotification({
+            to: result.shopkeeperId,
+            type: 'RESENT_QUOTE',
+            id: new mongoose.Types.ObjectId(),
+            title: 'Resent Repair Quote',
+            message: 'Your customer has resent a new quote for your repair request. Please review the details.',
+      });
+
+      return result;
+};
+
+
+const updateQuoteStatusByShopKeeper = async (id: string, payload: any) => {
+      const { userNotesId, status } = payload;
+      const allowedStatus = ['approved', 'rejected'];
+
+      if (!allowedStatus.includes(status)) {
+            throw new AppError('Invalid status. Use approved or rejected', StatusCodes.BAD_REQUEST);
+      }
+
+      let mainStatus = 'quote_sent';
+      let notificationTitle = '';
+      let notificationMessage = '';
+
+      if (status === 'approved') {
+            mainStatus = 'quote_accepted';
+
+            notificationTitle = 'Quote Approved by Shopkeeper';
+            notificationMessage =
+                  'The shopkeeper has approved your repair request and is ready to proceed. Your item will be repaired as discussed.';
+      }
+
+      if (status === 'rejected') {
+            mainStatus = 'quote_rejected';
+
+            notificationTitle = 'Quote Rejected by Shopkeeper';
+            notificationMessage =
+                  'The shopkeeper has rejected your repair request. You may contact them for more details or try another service provider.';
+      }
+
+      const result = await RepairRequest.findOneAndUpdate(
+            {
+                  _id: id,
+                  'userNotes._id': userNotesId,
+            },
+            {
+                  $set: {
+                        'userNotes.$.status': status,
+                        status: mainStatus,
+                  },
+            },
+            { new: true }
+      );
+
+      if (!result) {
+            throw new AppError('Repair request or quote not found', StatusCodes.NOT_FOUND);
+      }
+
+      await createNotification({
+            to: result.shopkeeperId,
+            type: 'REPAIR_REQUEST',
+            id: new mongoose.Types.ObjectId(),
+            title: notificationTitle,
+            message: notificationMessage,
+      });
+
+      return result;
+};
+
+
 const repairRequestService = {
       addNewRepairRequest,
       getMyRepairRequestsHistory,
@@ -257,6 +359,8 @@ const repairRequestService = {
       updateStatusByShopKeeper,
       addNoteByShopKeeper,
       updateQuoteStatusByUser,
+      quoteResentByUser,
+      updateQuoteStatusByShopKeeper,
 };
 
 export default repairRequestService;

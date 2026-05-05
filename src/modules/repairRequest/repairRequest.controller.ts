@@ -101,6 +101,37 @@ const updateQuoteStatusByUser = catchAsync(async (req, res) => {
   });
 });
 
+
+
+const quoteResentByUser = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await repairRequestService.quoteResentByUser(id as string, req.body);
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'Repair request status updated successfully',
+    data: result,
+  });
+});
+
+
+const updateQuoteStatusByShopKeeper = catchAsync(async (req, res) => {
+      const { id } = req.params;
+      const result = await repairRequestService.updateQuoteStatusByShopKeeper(id as string, req.body);
+
+      sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: 'Repair request status updated successfully',
+            data: result,
+      });
+});
+
+
+
+
+
 const repairRequestController = {
       addNewRepairRequest,
       getMyRepairRequestsHistory,
@@ -109,6 +140,8 @@ const repairRequestController = {
       updateStatusByShopKeeper,
       addNoteByShopKeeper,
       updateQuoteStatusByUser,
+      quoteResentByUser,
+      updateQuoteStatusByShopKeeper,
 };
 
 export default repairRequestController;

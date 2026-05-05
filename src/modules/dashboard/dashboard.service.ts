@@ -5,7 +5,7 @@ const adminDashboardChart = async (query: any) => {
       const { filter = '30days' } = query;
 
       let startDate = new Date();
-      let groupFormat = '%Y-%m-%d'; // default (daily)
+      let groupFormat = '%Y-%m-%d'; 
 
       // 🔹 Filter + grouping format
       if (filter === '30days') {
@@ -61,9 +61,6 @@ const adminDashboardChart = async (query: any) => {
 
       return Object.values(chartData);
 };
-
-
-
 
 
 const dashboardService = {
