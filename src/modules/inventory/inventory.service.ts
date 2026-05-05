@@ -95,6 +95,7 @@ const extractBarcodeRowsFromFile = (filePath: string): TBarcodeBulkRow[] => {
             header: 1,
             blankrows: false,
             defval: '',
+            raw: false,
       });
 
       if (!rows.length) {
@@ -113,10 +114,13 @@ const extractBarcodeRowsFromFile = (filePath: string): TBarcodeBulkRow[] => {
       };
 
       const hasHeaderRow = Object.values(headerIndex).some((index) => index >= 0);
-      const dataRows = hasHeaderRow ? rows.slice(1) : rows;
+      const firstCell = String(rows[0]?.[0] ?? '').trim();
+      const looksLikeGenericSingleColumnHeader =
+            !hasHeaderRow && rows[0]?.length === 1 && /^[a-z]+$/i.test(firstCell) && rows.length > 1;
+      const dataRows = hasHeaderRow || looksLikeGenericSingleColumnHeader ? rows.slice(1) : rows;
 
       return dataRows.map((row, index) => ({
-            rowNumber: hasHeaderRow ? index + 2 : index + 1,
+            rowNumber: hasHeaderRow || looksLikeGenericSingleColumnHeader ? index + 2 : index + 1,
             code: String(row?.[hasHeaderRow ? headerIndex.code : 0] ?? '').trim(),
             userId: String(row?.[hasHeaderRow ? headerIndex.userId : 1] ?? '').trim(),
             imeiNumber: String(row?.[hasHeaderRow ? headerIndex.imeiNumber : 2] ?? '').trim(),
@@ -180,7 +184,7 @@ const createInventoryFromBarcode = async (
       const barcodeResult = await barcodeService.searchByBarcode(cleanCode);
       const fallbackName = barcodeResult.brand ? `${barcodeResult.brand} ${barcodeResult.name}` : barcodeResult.name;
       const itemName = fallbackName?.trim() || 'Unknown Product';
-      const imeiNumber = String(payload.imeiNumber ?? barcodeResult.barcode ?? cleanCode).trim();
+      const imeiNumber = String(payload.imeiNumber ?? '').trim() || barcodeResult.barcode || cleanCode;
       const estimatedMarketValue = estimateBarcodeValue(barcodeResult);
       const aiInsight = await getOpenAiInsight({
             imei: imeiNumber,
