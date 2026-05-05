@@ -7,7 +7,10 @@ export type RepairStatus =
       | 'approved'
       | 'rejected'
       | 'repair_in_progress'
-      | 'completed';
+      | 'completed'
+      | "quote_accepted"
+      | "quote_rejected"
+      | "quote-resent";
       
       export interface INote {
             message: string;
@@ -20,6 +23,16 @@ export type RepairStatus =
         url: string;
       }[];
       }
+
+      export interface IReSent {
+            message: string;
+            cost: number;
+            estimatedDays: number;
+            date: Date;
+            status: 'inProgress' | 'approved' | 'rejected';
+      }
+
+
 export interface IRepairRequest {
       shopkeeperId: Types.ObjectId;
       userId: Types.ObjectId;
@@ -34,6 +47,7 @@ export interface IRepairRequest {
       }[];
       status: RepairStatus;
       shopkeeperNotes?: INote;
+      userNotes?: IReSent;
       createdAt: Date;
       updatedAt: Date;
 }
