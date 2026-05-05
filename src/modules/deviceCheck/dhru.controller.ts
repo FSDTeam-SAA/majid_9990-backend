@@ -8,6 +8,7 @@ import { curatedDhruServices, normalizeServiceName } from './dhru.services.catal
 import { dhruService } from './dhru.service';
 import { getExistingScanInfoByImei, isValidImei, resolveServiceId, runImeiCheck } from './deviceCheck.helpers';
 import { creditUserBalance, debitUserBalance } from '../payment/balanceTransaction.service';
+import ScanInfo from './scanInfo.model';
 
 type SingleImeiCheckResult =
       | {
@@ -254,7 +255,7 @@ const processSingleImeiCheck = async (
             };
       }
 
-      const result = await runImeiCheck(String(imei), serviceId);
+      const result = await runImeiCheck(String(imei), serviceId, userId);
 
       if (!result.ok) {
             if (shouldCharge) {
@@ -483,4 +484,40 @@ export const getServices = async (_req: Request, res: Response) => {
                   totalCategories: services.length,
             },
       });
+};
+
+export const getRecentChecksHistory = async (req: Request, res: Response, next: NextFunction) => {
+      try {
+            const pageQuery = Number(req.query.page ?? 1);
+            const limitQuery = Number(req.query.limit ?? 10);
+            const page = Number.isFinite(pageQuery) && pageQuery > 0 ? Math.floor(pageQuery) : 1;
+            const limit = Number.isFinite(limitQuery) && limitQuery > 0 ? Math.min(Math.floor(limitQuery), 50) : 10;
+            const skip = (page - 1) * limit;
+
+            const filter = req.user?._id ? { userId: req.user._id } : {};
+
+            const [history, total] = await Promise.all([
+                  ScanInfo.find(filter)
+                        .select('userId deviceName imei deviceStatus riskMeter marketValue createdAt updatedAt')
+                        .sort({ updatedAt: -1 })
+                        .skip(skip)
+                        .limit(limit)
+                        .lean(),
+                  ScanInfo.countDocuments(filter),
+            ]);
+
+            return res.status(200).json({
+                  success: true,
+                  message: 'Recent checks fetched successfully',
+                  data: history,
+                  meta: {
+                        page,
+                        limit,
+                        total,
+                        totalPage: Math.ceil(total / limit) || 1,
+                  },
+            });
+      } catch (error) {
+            next(error);
+      }
 };

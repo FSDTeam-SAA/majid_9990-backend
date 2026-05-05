@@ -77,7 +77,7 @@ export const getRiskAnalysis = catchAsync(async (req, res) => {
       }
 
       try {
-            const refreshResult = await runImeiCheck(imei, serviceId);
+            const refreshResult = await runImeiCheck(imei, serviceId, req.user._id);
 
             if (!refreshResult.ok) {
                   throw new AppError(refreshResult.message, refreshResult.statusCode);
@@ -187,7 +187,7 @@ export const getDeviceAnalysis = catchAsync(async (req, res) => {
       }
 
       try {
-            const result = await riskAnalysisService.analyzeDeviceAnalysis(imei, serviceId);
+            const result = await riskAnalysisService.analyzeDeviceAnalysis(imei, serviceId, req.user._id);
 
             if (!('risk' in result)) {
                   if (shouldCharge) {

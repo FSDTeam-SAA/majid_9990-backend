@@ -152,7 +152,11 @@ export type ImeiCheckSuccess = {
 
 export type ImeiCheckResult = ImeiCheckSuccess | ImeiCheckFailure;
 
-export const runImeiCheck = async (imei: string, requestedServiceId: number): Promise<ImeiCheckResult> => {
+export const runImeiCheck = async (
+      imei: string,
+      requestedServiceId: number,
+      userId?: string
+): Promise<ImeiCheckResult> => {
       const { response: placeOrderResponse, usedServiceId } = await placeImeiOrderWithFallback(
             imei,
             requestedServiceId
@@ -208,7 +212,9 @@ export const runImeiCheck = async (imei: string, requestedServiceId: number): Pr
 
       const structuredInfo = await buildStructuredScanInfo(imei, providerPayload ?? {});
 
-      await ScanInfo.findOneAndUpdate({ imei }, structuredInfo, {
+      const scanPayload = userId ? { ...structuredInfo, userId } : structuredInfo;
+
+      await ScanInfo.findOneAndUpdate({ imei }, scanPayload, {
             upsert: true,
             new: true,
             runValidators: true,

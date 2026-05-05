@@ -2,6 +2,11 @@ import { model, Schema } from 'mongoose';
 
 const ScanInfoSchema = new Schema(
       {
+            userId: {
+                  type: Schema.Types.ObjectId,
+                  ref: 'User',
+                  required: false,
+            },
             deviceName: {
                   type: String,
                   required: true,
@@ -237,6 +242,8 @@ const ScanInfoSchema = new Schema(
             versionKey: false,
       }
 );
+
+ScanInfoSchema.index({ userId: 1, updatedAt: -1 });
 
 const ScanInfo = model('ScanInfo', ScanInfoSchema);
 
