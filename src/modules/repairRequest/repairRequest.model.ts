@@ -1,26 +1,35 @@
 import { Schema, model } from 'mongoose';
 import { IRepairRequest } from './repairRequest.interface';
 
-const NoteSchema = new Schema(
-      {
-            message: { type: String, required: true },
-            date: { type: Date, default: Date.now },
-            cost: { type: Number, required: true },
-            estimatedDays: { type: Number, required: true },
-            status: {
-                  type: String,
-                  enum: ['inProgress', 'approved', 'rejected'],
-                  default: 'inProgress',
-            },
-            images: [
-                  {
-                        public_id: { type: String, required: true },
-                        url: { type: String, required: true },
-                  },
-            ],
+const NoteSchema = new Schema({
+      message: { type: String, required: true },
+      date: { type: Date, default: Date.now },
+      cost: { type: Number, required: true },
+      estimatedDays: { type: Number, required: true },
+      status: {
+            type: String,
+            enum: ['inProgress', 'approved', 'rejected'],
+            default: 'inProgress',
       },
+      images: [
+            {
+                  public_id: { type: String, required: true },
+                  url: { type: String, required: true },
+            },
+      ],
+});
 
-);
+const ReSentNoteSchema = new Schema({
+      message: { type: String, required: true },
+      date: { type: Date, default: Date.now },
+      cost: { type: Number, required: true },
+      estimatedDays: { type: Number, required: true },
+      status: {
+            type: String,
+            enum: ['inProgress', 'approved', 'rejected'],
+            default: 'inProgress',
+      },
+});
 
 const ImageSchema = new Schema(
       {
@@ -50,13 +59,25 @@ const RepairRequestSchema = new Schema<IRepairRequest>(
             images: [ImageSchema],
             status: {
                   type: String,
-                  enum: ['request_submitted', 'in_review', 'quote_sent', 'quote_accepted', 'quote_rejected', 'rejected', 'repair_in_progress', 'completed'],
+                  enum: [
+                        'request_submitted',
+                        'in_review',
+                        'quote_sent',
+                        'quote_accepted',
+                        'quote_rejected',
+                        'rejected',
+                        'repair_in_progress',
+                        'completed',
+                        'quote-resent',
+                  ],
                   default: 'request_submitted',
             },
             shopkeeperNotes: [NoteSchema],
+            userNotes: [ReSentNoteSchema],
       },
       {
-            timestamps: true, versionKey: false
+            timestamps: true,
+            versionKey: false,
       }
 );
 
