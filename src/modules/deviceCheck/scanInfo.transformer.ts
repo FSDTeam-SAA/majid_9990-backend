@@ -30,6 +30,26 @@ const getField = (text: string, key: string): string | null => {
       return match?.[1]?.trim() ?? null;
 };
 
+const getFirstField = (text: string, keys: string[]): string | null => {
+      for (const key of keys) {
+            const value = getField(text, key);
+            if (value) {
+                  return value;
+            }
+      }
+
+      return null;
+};
+
+const hasMeaningfulText = (value: string | null | undefined) => {
+      if (!value) {
+            return false;
+      }
+
+      const normalized = value.trim().toLowerCase();
+      return normalized.length > 0 && normalized !== 'unknown' && normalized !== 'n/a' && normalized !== '-';
+};
+
 const toNumber = (value: string | null, fallback: number) => {
       if (!value) {
             return fallback;
@@ -219,24 +239,34 @@ export const getOpenAiInsight = async (params: {
 export const buildStructuredScanInfo = async (imei: string, providerData: ProviderPayload) => {
       const sourceText = extractTextBlock(providerData);
 
-      const model = getField(sourceText, 'Model') ?? 'Unknown Model';
-      const modelName = getField(sourceText, 'Model Name');
-      const manufacturer = getField(sourceText, 'Manufacturer');
+      const manufacturer = getFirstField(sourceText, ['Manufacturer', 'Brand']);
+      const marketingName = getFirstField(sourceText, ['Marketing Name', 'Model Name']);
+      const fullName = getFirstField(sourceText, ['Full Name', 'Device Name']);
+      const modelCode = getFirstField(sourceText, ['Model Code']);
+      const modelNumber = getFirstField(sourceText, ['Model Number']);
+      const model = getFirstField(sourceText, ['Model', 'Product']);
       const blacklistStatusRaw = getField(sourceText, 'Blacklist Status') ?? 'Unknown';
       const generalListStatus = (getField(sourceText, 'General List Status') ?? '').toLowerCase();
 
-      const deviceName = [model, modelName].filter(Boolean).join(' / ');
-      const paymentPlanActive = !(
-            generalListStatus === 'no' ||
-            generalListStatus === 'clean' ||
-            generalListStatus === 'none'
+      const candidateDeviceNames = [marketingName, fullName, model, modelCode, modelNumber, manufacturer].filter(
+            (value): value is string => hasMeaningfulText(value)
       );
+      const deviceName = candidateDeviceNames.length
+            ? Array.from(new Set(candidateDeviceNames)).slice(0, 2).join(' / ')
+            : 'Unknown Device';
+
+      const normalizedText = sourceText.toLowerCase();
+      const hasPaymentPlanSignal = /(payment\s*plan|financ|installment|contract)/.test(normalizedText);
+      const explicitNoPlanSignal = /(no\s*payment\s*plan|fully\s*paid|contract\s*ended)/.test(normalizedText);
+      const paymentPlanActive = generalListStatus
+            ? !(generalListStatus === 'no' || generalListStatus === 'clean' || generalListStatus === 'none')
+            : hasPaymentPlanSignal && !explicitNoPlanSignal;
       const fmiStatus = inferFmiStatus(sourceText);
 
       const deviceStatus = getDeviceStatus(blacklistStatusRaw, paymentPlanActive);
       const risk = getRisk(deviceStatus, paymentPlanActive, fmiStatus);
 
-      const estimatedMarketValue = estimateMarketValue(deviceName || manufacturer || model);
+      const estimatedMarketValue = estimateMarketValue(deviceName);
       const openAiInsight = await getOpenAiInsight({
             imei,
             deviceName: deviceName || manufacturer || 'Unknown Device',
@@ -262,7 +292,7 @@ export const buildStructuredScanInfo = async (imei: string, providerData: Provid
       }
 
       return {
-            deviceName: deviceName || manufacturer || 'Unknown Device',
+            deviceName,
             imei,
             deviceStatus,
             riskMeter: {

@@ -76,7 +76,9 @@ const getServiceIdCandidates = async (requestedServiceId: number) => {
             return [requestedServiceId];
       }
 
-      const serviceIds = extractServiceIds(await dhruService.getImeiServices());
+      const servicesResponse = await dhruService.getImeiServices();
+      console.log('Dhru services response:', servicesResponse);
+      const serviceIds = extractServiceIds(servicesResponse);
       return Array.from(new Set([requestedServiceId, ...serviceIds]));
 };
 
@@ -88,6 +90,7 @@ const placeImeiOrderWithFallback = async (imei: string, requestedServiceId: numb
 
       for (const serviceId of candidateServiceIds) {
             const response = await dhruService.placeImeiOrder(serviceId, imei);
+            console.log(`Dhru place order response (serviceId=${serviceId}, imei=${imei}):`, response);
             latestResponse = response;
             usedServiceId = serviceId;
 
@@ -110,6 +113,7 @@ const pollImeiOrderResult = async (orderId: string | number) => {
             await sleep(2000);
 
             const result = await dhruService.getImeiOrder(orderId);
+            console.log(`Dhru poll result (orderId=${orderId}, attempt=${i + 1}):`, result);
 
             if (result?.ERROR) {
                   return { error: result };

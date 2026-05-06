@@ -256,6 +256,7 @@ const processSingleImeiCheck = async (
       }
 
       const result = await runImeiCheck(String(imei), serviceId, userId);
+      console.log('runImeiCheck', result);
 
       if (!result.ok) {
             if (shouldCharge) {
@@ -339,6 +340,7 @@ export const checkImeiFromDhru = async (req: Request, res: Response, next: NextF
             const requestedServiceId = resolveServiceId(req.body?.serviceId);
 
             const result = await processSingleImeiCheck(userId, imei, requestedServiceId, shouldGenerateFresh);
+            console.log('processSingleImeiCheck', result);
 
             if (!result.ok) {
                   return res.status(400).json({
