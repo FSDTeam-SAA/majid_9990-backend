@@ -1,4 +1,4 @@
-import { Types } from "mongoose";
+import { Types } from 'mongoose';
 
 export type RepairStatus =
       | 'request_submitted'
@@ -8,30 +8,29 @@ export type RepairStatus =
       | 'rejected'
       | 'repair_in_progress'
       | 'completed'
-      | "quote_accepted"
-      | "quote_rejected"
-      | "quote-resent";
-      
-      export interface INote {
-            message: string;
-            cost: number;
-            estimatedDays: number;
-            date: Date;
-            status: 'inProgress' | 'approved' | 'rejected';
-            images: {
-        public_id: string;
-        url: string;
+      | 'quote_accepted'
+      | 'quote_rejected'
+      | 'quote-resent';
+
+export interface INote {
+      message: string;
+      cost: number;
+      estimatedDays: number;
+      date: Date;
+      status: 'inProgress' | 'approved' | 'rejected';
+      images: {
+            public_id: string;
+            url: string;
       }[];
-      }
+}
 
-      export interface IReSent {
-            message: string;
-            cost: number;
-            estimatedDays: number;
-            date: Date;
-            status: 'inProgress' | 'approved' | 'rejected';
-      }
-
+export interface IReSent {
+      message: string;
+      cost: number;
+      estimatedDays: number;
+      date: Date;
+      status: 'inProgress' | 'approved' | 'rejected';
+}
 
 export interface IRepairRequest {
       shopkeeperId: Types.ObjectId;
@@ -42,8 +41,8 @@ export interface IRepairRequest {
       IMEINumber: string;
       description: string;
       images: {
-        public_id: string;
-        url: string;
+            public_id: string;
+            url: string;
       }[];
       status: RepairStatus;
       shopkeeperNotes?: INote;
