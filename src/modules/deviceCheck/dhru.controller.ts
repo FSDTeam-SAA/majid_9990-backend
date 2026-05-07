@@ -329,36 +329,71 @@ const extractImeisFromWorkbook = (filePath: string) => {
       return dataRows.map((row) => normalizeImei(row?.[imeiColumnIndex] ?? row?.[0])).filter((imei) => imei.length > 0);
 };
 
-export const checkImeiFromDhru = async (req: Request, res: Response, next: NextFunction) => {
+// export const checkImeiFromDhru = async (req: Request, res: Response, next: NextFunction) => {
+//
+
+
+//! this is for multiple imei check also single imei check
+export const checkImeiFromDhru = async (
+      req: Request,
+      res: Response,
+      next: NextFunction
+) => {
       try {
             const userId = req.user._id;
-            const imei = String(req.body?.imei ?? '').trim();
+
+            // ===== IMEI NORMALIZATION =====
+            const imeiInput = req.body?.imei;
+
+            const imeiList: string[] = Array.isArray(imeiInput)
+                  ? imeiInput.map((i: string) => String(i).trim()).filter(Boolean)
+                  : [String(imeiInput ?? '').trim()].filter(Boolean);
+
+            // ===== VALIDATION =====
+            if (!imeiList.length) {
+                  return res.status(400).json({
+                        success: false,
+                        message: 'IMEI is required',
+                  });
+            }
+
+            // ===== SERVICE ID =====
+            const requestedServiceId = resolveServiceId(req.body?.serviceId);
+
+            // ===== GENERATE FLAG =====
             const shouldGenerateFresh =
                   String(req.body?.genarate ?? req.body?.generate ?? '')
                         .trim()
                         .toLowerCase() === 'new';
-            const requestedServiceId = resolveServiceId(req.body?.serviceId);
 
-            const result = await processSingleImeiCheck(userId, imei, requestedServiceId, shouldGenerateFresh);
-            console.log('processSingleImeiCheck', result);
+            // ===== PROCESS ALL IMEIs IN PARALLEL =====
+            const results = await Promise.all(
+                  imeiList.map(async (imei) => {
+                        const result = await processSingleImeiCheck(
+                              userId,
+                              imei,
+                              requestedServiceId,
+                              shouldGenerateFresh
+                        );
 
-            if (!result.ok) {
-                  return res.status(400).json({
-                        success: false,
-                        message: result.message,
-                        data: result.data,
-                  });
-            }
+                        return {
+                              imei,
+                              ...result,
+                        };
+                  })
+            );
 
+            // ===== RESPONSE =====
             return res.status(200).json({
                   success: true,
-                  message: result.message,
-                  data: result.data,
+                  message: 'IMEI check completed',
+                  data: results,
             });
       } catch (error) {
             next(error);
       }
 };
+
 
 export const checkImeisFromFile = async (req: Request, res: Response, next: NextFunction) => {
       const file = req.file;
@@ -458,6 +493,7 @@ export const checkImeisFromFile = async (req: Request, res: Response, next: Next
             await safeDeleteFile(file?.path);
       }
 };
+
 
 export const syncServices = async (_req: Request, res: Response) => {
       const result = await dhruService.getImeiServices();

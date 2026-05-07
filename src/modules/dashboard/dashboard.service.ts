@@ -64,14 +64,45 @@ const adminDashboardChart = async (query: any) => {
 
 
 const getAdminDashboardAnalytics = async () => {
-      const totalUsers = await User.countDocuments({ role: 'user' });
-      const totalShopkeepers = await User.countDocuments({ role: 'shopkeeper' });
+  const now = new Date();
 
-      return {
-            totalUsers,
-            totalShopkeepers,
-      };
-}
+  const startOfCurrentMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const startOfPrevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const endOfPrevMonth = startOfCurrentMonth;
+
+  const currentUsers = await User.countDocuments({
+    role: 'user',
+    createdAt: { $gte: startOfCurrentMonth },
+  });
+
+  const prevUsers = await User.countDocuments({
+    role: 'user',
+    createdAt: { $gte: startOfPrevMonth, $lt: endOfPrevMonth },
+  });
+
+  // ===== SHOPKEEPERS =====
+  const currentShopkeepers = await User.countDocuments({
+    role: 'shopkeeper',
+    createdAt: { $gte: startOfCurrentMonth },
+  });
+
+  const prevShopkeepers = await User.countDocuments({
+    role: 'shopkeeper',
+    createdAt: { $gte: startOfPrevMonth, $lt: endOfPrevMonth },
+  });
+
+  const calcPercent = (current: number, prev: number) => {
+    if (prev === 0) return current === 0 ? 0 : 100;
+    return ((current - prev) / prev) * 100;
+  };
+
+  return {
+    totalUsers: await User.countDocuments({ role: 'user' }),
+    totalShopkeepers: await User.countDocuments({ role: 'shopkeeper' }),
+    userGrowth: calcPercent(currentUsers, prevUsers),
+    shopkeeperGrowth: calcPercent(currentShopkeepers, prevShopkeepers),
+  };
+};
 
 
 
