@@ -27,12 +27,23 @@ const getAdminDashboardAnalytics = catchAsync(async (req, res) => {
       });
 });
 
+const getShopkeeperDashboardAnalytics = catchAsync(async (req, res) => {
+      const { id } = req.user;
+      const result = await dashboardService.getShopkeeperDashboardAnalytics(id);
 
+      sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: 'Shopkeeper dashboard analytics fetched',
+            data: result,
+      });
+});
 
 
 const dashboardController = {
       adminDashboardChart,
       getAdminDashboardAnalytics,
+      getShopkeeperDashboardAnalytics,
 };
 
 export default dashboardController;

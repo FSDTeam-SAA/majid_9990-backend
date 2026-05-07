@@ -1,3 +1,4 @@
+import { Inventory } from "../inventory/inventory.model";
 import { User } from "../user/user.model";
 
 
@@ -105,11 +106,60 @@ const getAdminDashboardAnalytics = async () => {
 };
 
 
+const getShopkeeperDashboardAnalytics = async (shopkeeperId: string) => {
+      const shopkeeper = await User.findById(shopkeeperId);
 
+      if (!shopkeeper) {
+            throw new Error('Shopkeeper not found');
+      }
+
+      const now = new Date();
+
+      // ===== CURRENT MONTH =====
+      const startOfCurrentMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+      // ===== PREVIOUS MONTH =====
+      const startOfPrevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+      const endOfPrevMonth = startOfCurrentMonth;
+
+      // ===== TOTAL INVOICES =====
+      const totalInvoices = await Inventory.countDocuments({
+            userId: shopkeeperId,
+      });
+
+      // ===== CURRENT MONTH INVOICES =====
+      const currentInvoices = await Inventory.countDocuments({
+            userId: shopkeeperId,
+            createdAt: { $gte: startOfCurrentMonth },
+      });
+
+      // ===== PREVIOUS MONTH INVOICES =====
+      const prevInvoices = await Inventory.countDocuments({
+            userId: shopkeeperId,
+            createdAt: {
+                  $gte: startOfPrevMonth,
+                  $lt: endOfPrevMonth,
+            },
+      });
+
+      // ===== % CALCULATION =====
+      const calcPercent = (current: number, prev: number) => {
+            if (prev === 0) return current === 0 ? 0 : 100;
+            return ((current - prev) / prev) * 100;
+      };
+
+      const invoiceGrowth = calcPercent(currentInvoices, prevInvoices);
+
+      return {
+            totalInvoices,
+            invoiceGrowth,
+      };
+};
 
 const dashboardService = {
       adminDashboardChart,
       getAdminDashboardAnalytics,
+      getShopkeeperDashboardAnalytics,
 };
 
 export default dashboardService;
