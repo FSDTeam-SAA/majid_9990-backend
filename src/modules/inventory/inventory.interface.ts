@@ -1,10 +1,12 @@
-import { Types } from 'mongoose';
+import { Types, model } from 'mongoose';
 
 export type TCondition = 'new' | 'good condition';
 
 export interface IInventory {
       itemName: string;
       imeiNumber: string;
+      modelNumber?: string;
+      quantity?: number;
       purchasePrice?: number;
       expectedPrice?: number;
       productDetails?: string;

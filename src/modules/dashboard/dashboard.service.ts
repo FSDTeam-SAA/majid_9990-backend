@@ -5,7 +5,7 @@ const adminDashboardChart = async (query: any) => {
       const { filter = '30days' } = query;
 
       let startDate = new Date();
-      let groupFormat = '%Y-%m-%d'; 
+      let groupFormat = '%Y-%m-%d';
 
       // 🔹 Filter + grouping format
       if (filter === '30days') {
@@ -63,8 +63,22 @@ const adminDashboardChart = async (query: any) => {
 };
 
 
+const getAdminDashboardAnalytics = async () => {
+      const totalUsers = await User.countDocuments({ role: 'user' });
+      const totalShopkeepers = await User.countDocuments({ role: 'shopkeeper' });
+
+      return {
+            totalUsers,
+            totalShopkeepers,
+      };
+}
+
+
+
+
 const dashboardService = {
-    adminDashboardChart,
+      adminDashboardChart,
+      getAdminDashboardAnalytics,
 };
 
 export default dashboardService;

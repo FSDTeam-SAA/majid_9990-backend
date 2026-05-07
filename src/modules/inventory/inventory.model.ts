@@ -13,6 +13,13 @@ const inventorySchema = new Schema<IInventory>(
                   required: true,
                   unique: true,
             },
+            modelNumber: {
+                  type: String,
+            },
+            quantity: {
+                  type: Number,
+                  default: 0,
+            },
             purchasePrice: {
                   type: Number,
             },
