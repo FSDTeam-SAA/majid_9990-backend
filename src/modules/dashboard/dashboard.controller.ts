@@ -16,8 +16,23 @@ const adminDashboardChart = catchAsync(async (req, res) => {
 });
 
 
+const getAdminDashboardAnalytics = catchAsync(async (req, res) => {
+      const result = await dashboardService.getAdminDashboardAnalytics();
+
+      sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: 'Admin dashboard analytics fetched',
+            data: result,
+      });
+});
+
+
+
+
 const dashboardController = {
-    adminDashboardChart,
+      adminDashboardChart,
+      getAdminDashboardAnalytics,
 };
 
 export default dashboardController;
