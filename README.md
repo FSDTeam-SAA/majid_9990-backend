@@ -44,6 +44,15 @@ The same `device-analysis` route is also available under `/api/v1/device/device-
 - Existing `/check` and `/risk-analysis` response shapes remain unchanged.
 
 
+## Main features based on project goals
+1. Device checks 
+2. smart invoice
+3. Inventory 
+4. Subscription and popup Payments 
+5. Barcode
+6. Ai features  
+7. Repairing feature
+
 ### Bulk Upload inventory from CSV
 post /create-from-barcode/bulk
 - Details: It accepts a CSV, XLS, or XLSX upload on the file field, reads the first worksheet, maps each row into the same payload shape used by createInventoryFromBarcode, and processes rows one by one. It supports header-based sheets with fields like code or barcode, userId, imeiNumber, purchasePrice, and currentState, and it also falls back to positional columns if there is no header row. The response returns a summary plus per-row success or failure details.
@@ -66,3 +75,8 @@ A new history API was added so the user can see balance changes, including credi
 - If balance is enough, the amount is deducted and the request continues.
 - If balance is not enough, the request fails.
 - User can view all balance activity through the history endpoint.
+
+
+
+ ## Device checks (with details)
+   

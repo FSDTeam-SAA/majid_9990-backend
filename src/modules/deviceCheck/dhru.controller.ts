@@ -242,7 +242,7 @@ const processSingleImeiCheck = async (
             }
       }
 
-      const existingScanInfo = shouldGenerateFresh ? null : await getExistingScanInfoByImei(imei);
+      const existingScanInfo = shouldGenerateFresh ? null : await getExistingScanInfoByImei(imei, serviceId);
 
       if (existingScanInfo) {
             return {

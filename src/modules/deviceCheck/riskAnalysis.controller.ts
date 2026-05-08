@@ -61,7 +61,7 @@ export const getRiskAnalysis = catchAsync(async (req, res) => {
             });
       }
 
-      const existingScanInfo = shouldGenerateFresh ? null : await getExistingScanInfoByImei(imei);
+      const existingScanInfo = shouldGenerateFresh ? null : await getExistingScanInfoByImei(imei, serviceId);
 
       if (existingScanInfo) {
             sendResponse(res, {
@@ -171,7 +171,7 @@ export const getDeviceAnalysis = catchAsync(async (req, res) => {
             });
       }
 
-      const existingScanInfo = shouldGenerateFresh ? null : await getExistingScanInfoByImei(imei);
+      const existingScanInfo = shouldGenerateFresh ? null : await getExistingScanInfoByImei(imei, serviceId);
 
       if (existingScanInfo) {
             sendResponse(res, {

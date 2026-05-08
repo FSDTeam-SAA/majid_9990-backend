@@ -134,8 +134,8 @@ export const resolveServiceId = (serviceId: unknown) => Number(serviceId ?? DEFA
 
 export const validateServiceId = (serviceId: number) => Number.isFinite(serviceId) && serviceId > 0;
 
-export const getExistingScanInfoByImei = async (imei: string) => {
-      return ScanInfo.findOne({ imei }).lean();
+export const getExistingScanInfoByImei = async (imei: string, serviceId: number) => {
+      return ScanInfo.findOne({ imei, serviceId }).sort({ updatedAt: -1 }).lean();
 };
 
 export type ImeiCheckFailure = {
@@ -216,9 +216,14 @@ export const runImeiCheck = async (
 
       const structuredInfo = await buildStructuredScanInfo(imei, providerPayload ?? {});
 
-      const scanPayload = userId ? { ...structuredInfo, userId } : structuredInfo;
+      const baseScanPayload = {
+            ...structuredInfo,
+            serviceId: requestedServiceId,
+            providerData: providerPayload ?? null,
+      };
+      const scanPayload = userId ? { ...baseScanPayload, userId } : baseScanPayload;
 
-      await ScanInfo.findOneAndUpdate({ imei }, scanPayload, {
+      await ScanInfo.findOneAndUpdate({ imei, serviceId: requestedServiceId }, scanPayload, {
             upsert: true,
             new: true,
             runValidators: true,

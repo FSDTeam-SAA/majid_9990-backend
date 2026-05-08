@@ -16,7 +16,14 @@ const ScanInfoSchema = new Schema(
                   type: String,
                   required: true,
                   trim: true,
-                  unique: true,
+            },
+            serviceId: {
+                  type: Number,
+                  required: true,
+            },
+            providerData: {
+                  type: Schema.Types.Mixed,
+                  default: null,
             },
             deviceStatus: {
                   type: String,
@@ -243,6 +250,7 @@ const ScanInfoSchema = new Schema(
       }
 );
 
+ScanInfoSchema.index({ imei: 1, serviceId: 1 }, { unique: true });
 ScanInfoSchema.index({ userId: 1, updatedAt: -1 });
 
 const ScanInfo = model('ScanInfo', ScanInfoSchema);
