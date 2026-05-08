@@ -80,3 +80,8 @@ A new history API was added so the user can see balance changes, including credi
 
  ## Device checks (with details)
    
+
+
+### get '/services'
+Now returns prices converted into the client’s local currency, with a currency field like BDT and the price field rewritten to the converted amount. I wired it through client IP detection, geo lookup, and a USD-to-local-rate fetch in src/modules/location/location.service.ts and src/modules/deviceCheck/dhru.controller.ts.
+
