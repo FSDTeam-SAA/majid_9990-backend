@@ -9,6 +9,7 @@ import { dhruService } from './dhru.service';
 import { getExistingScanInfoByImei, isValidImei, resolveServiceId, runImeiCheck } from './deviceCheck.helpers';
 import { creditUserBalance, debitUserBalance } from '../payment/balanceTransaction.service';
 import ScanInfo from './scanInfo.model';
+import locationService from '../location/location.service';
 
 type SingleImeiCheckResult =
       | {
@@ -512,14 +513,35 @@ export const syncServices = async (_req: Request, res: Response) => {
 };
 
 export const getServices = async (_req: Request, res: Response) => {
+      const clientIp = locationService.parseIp(_req);
+      const currencyCode = await locationService.getCurrencyCodeForIp(clientIp || '');
+      const exchangeRate = await locationService.getUsdToCurrencyRate(currencyCode);
       const services = await readStoredServices();
+
+      const convertedServices = services.map((group) => ({
+            ...group,
+            services: group.services.map((service) => {
+                  const basePrice = Number(service.price);
+                  const isFree = String(service.price).toUpperCase() === 'FREE' || basePrice === 0;
+                  const convertedPrice = isFree ? 0 : locationService.convertUsdAmount(basePrice, exchangeRate);
+
+                  return {
+                        ...service,
+                        price: convertedPrice,
+                        currency: currencyCode,
+                        baseCurrency: 'USD',
+                        priceLabel: isFree ? 'FREE' : `${convertedPrice} ${currencyCode}`,
+                  };
+            }),
+      }));
 
       return res.json({
             success: true,
-            data: services,
+            data: convertedServices,
             meta: {
-                  totalServices: services.reduce((count, group) => count + group.services.length, 0),
-                  totalCategories: services.length,
+                  totalServices: convertedServices.reduce((count, group) => count + group.services.length, 0),
+                  totalCategories: convertedServices.length,
+                  currency: currencyCode,
             },
       });
 };
