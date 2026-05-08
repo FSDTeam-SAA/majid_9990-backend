@@ -13,6 +13,7 @@ import announcementRouter from '../modules/announcement/announcement.router';
 import reviewRoutes from '../modules/review/review.router';
 import barcodeRouter from '../modules/barcode/barcode.router';
 import bankDetailsRouter from '../modules/bankDetails/bankDetails.router';
+import locationRouter from '../modules/location/location.router';
 
 const router = Router();
 
@@ -76,6 +77,10 @@ const moduleRoutes = [
       {
             path: '/bank-details',
             route: bankDetailsRouter,
+      },
+      {
+            path: '/location',
+            route: locationRouter,
       },
 ];
 moduleRoutes.forEach((route) => router.use(route.path, route.route));
