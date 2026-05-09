@@ -25,7 +25,6 @@ export interface INote {
 }
 
 export interface IRepairRequest {
-      shopkeeperId: Types.ObjectId;
       userId: Types.ObjectId;
       firstName: string;
       email: string;
