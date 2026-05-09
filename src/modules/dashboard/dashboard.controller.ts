@@ -1,8 +1,7 @@
-import { StatusCodes } from "http-status-codes";
-import catchAsync from "../../utils/catchAsync";
-import sendResponse from "../../utils/sendResponse";
-import dashboardService from "./dashboard.service";
-
+import { StatusCodes } from 'http-status-codes';
+import catchAsync from '../../utils/catchAsync';
+import sendResponse from '../../utils/sendResponse';
+import dashboardService from './dashboard.service';
 
 const adminDashboardChart = catchAsync(async (req, res) => {
       const result = await dashboardService.adminDashboardChart(req.query);
@@ -14,7 +13,6 @@ const adminDashboardChart = catchAsync(async (req, res) => {
             data: result,
       });
 });
-
 
 const getAdminDashboardAnalytics = catchAsync(async (req, res) => {
       const result = await dashboardService.getAdminDashboardAnalytics();
@@ -38,7 +36,6 @@ const getShopkeeperDashboardAnalytics = catchAsync(async (req, res) => {
             data: result,
       });
 });
-
 
 const dashboardController = {
       adminDashboardChart,
