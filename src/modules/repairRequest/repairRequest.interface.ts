@@ -24,14 +24,6 @@ export interface INote {
       }[];
 }
 
-export interface IReSent {
-      message: string;
-      cost: number;
-      estimatedDays: number;
-      date: Date;
-      status: 'inProgress' | 'approved' | 'rejected';
-}
-
 export interface IRepairRequest {
       shopkeeperId: Types.ObjectId;
       userId: Types.ObjectId;
@@ -46,7 +38,6 @@ export interface IRepairRequest {
       }[];
       status: RepairStatus;
       shopkeeperNotes?: INote;
-      userNotes?: IReSent;
       createdAt: Date;
       updatedAt: Date;
 }

@@ -19,18 +19,6 @@ const NoteSchema = new Schema({
       ],
 });
 
-const ReSentNoteSchema = new Schema({
-      message: { type: String, required: true },
-      date: { type: Date, default: Date.now },
-      cost: { type: Number, required: true },
-      estimatedDays: { type: Number, required: true },
-      status: {
-            type: String,
-            enum: ['inProgress', 'approved', 'rejected'],
-            default: 'inProgress',
-      },
-});
-
 const ImageSchema = new Schema(
       {
             public_id: { type: String, required: true },
@@ -73,7 +61,6 @@ const RepairRequestSchema = new Schema<IRepairRequest>(
                   default: 'request_submitted',
             },
             shopkeeperNotes: [NoteSchema],
-            userNotes: [ReSentNoteSchema],
       },
       {
             timestamps: true,
