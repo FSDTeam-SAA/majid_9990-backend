@@ -85,3 +85,33 @@ A new history API was added so the user can see balance changes, including credi
 ### get '/services'
 Now returns prices converted into the client’s local currency, with a currency field like BDT and the price field rewritten to the converted amount. I wired it through client IP detection, geo lookup, and a USD-to-local-rate fetch in src/modules/location/location.service.ts and src/modules/deviceCheck/dhru.controller.ts. ExchangeRate API implemented. 
 
+### Check devices for bundeling 
+{
+  "ok": true,
+  "message": "Bundled IMEI check completed (5/5 services)",
+  "data": {
+    "bundledServiceId": 1000,
+    "bundledServiceName": "iPhone all in one /best before buy",
+    "bundledServiceCategory": "favourite",
+    "totalChecks": 5,
+    "successfulChecks": 5,
+    "failedChecks": 0,
+    "oldGenerated": false,
+    "serviceResults": [
+      {
+        "serviceId": 2001,
+        "cached": false,
+        "provider": "dhru",
+        "data": {...}
+      }
+      // ...results from all 5 services
+    ],
+    "mergedInfo": {
+      "deviceStatus": [
+        {"serviceId": 2001, "value": "Good"},
+        {"serviceId": 2002, "value": "Good"}
+        // ...aggregated data from all services
+      ]
+    }
+  }
+}

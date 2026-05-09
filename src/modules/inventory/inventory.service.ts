@@ -315,6 +315,8 @@ const createInventoryFromBarcode = async (
             imeiNumber?: string;
             purchasePrice?: number | string;
             currentState?: IInventory['currentState'];
+            type?: IInventory['type'];
+            status?: IInventory['status'];
       },
       file?: any
 ) => {

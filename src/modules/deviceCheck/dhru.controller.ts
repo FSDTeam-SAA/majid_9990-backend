@@ -180,6 +180,154 @@ const readStoredServices = async () => {
       );
 };
 
+const processMultipleServiceCheck = async (
+      userId: string,
+      imei: string,
+      service: any,
+      serviceIds: number[],
+      shouldGenerateFresh: boolean,
+      shouldCharge: boolean,
+      servicePrice: number
+): Promise<SingleImeiCheckResult> => {
+      try {
+            // Run IMEI checks against all serviceIds in parallel
+            const checkResults = await Promise.all(
+                  serviceIds.map(async (svcId) => {
+                        const existingScanInfo = shouldGenerateFresh
+                              ? null
+                              : await getExistingScanInfoByImei(imei, svcId);
+
+                        if (existingScanInfo) {
+                              return {
+                                    serviceId: svcId,
+                                    ok: true,
+                                    cached: true,
+                                    data: existingScanInfo,
+                              };
+                        }
+
+                        const result = await runImeiCheck(String(imei), svcId, userId);
+                        return {
+                              serviceId: svcId,
+                              ok: result.ok,
+                              cached: false,
+                              provider: result.ok ? result.provider : undefined,
+                              message: result.ok ? undefined : result.message,
+                              statusCode: result.ok ? undefined : result.statusCode,
+                              data: result.ok ? result.structured : result.data,
+                              providerData: result.ok ? result.providerData : undefined,
+                        };
+                  })
+            );
+
+            console.log('processMultipleServiceCheck results:', checkResults);
+
+            // Check if all checks failed
+            const allFailed = checkResults.every((r) => !r.ok);
+            if (allFailed) {
+                  if (shouldCharge) {
+                        await creditUserBalance({
+                              userId,
+                              amount: servicePrice,
+                              currency: service.currency ?? 'USD',
+                              source: 'refund',
+                              description: `Refund for failed bundled IMEI service ${service.name}`,
+                              serviceId: service.serviceId,
+                              serviceName: service.name,
+                              imei,
+                              metadata: {
+                                    normalizedName: service.normalizedName,
+                                    reason: 'All bundled checks failed',
+                                    bundledServiceIds: serviceIds,
+                              },
+                        }).catch(() => undefined);
+                  }
+
+                  return {
+                        ok: false,
+                        statusCode: 400,
+                        message: 'All bundled IMEI checks failed',
+                        data: {
+                              bundledServiceId: service.serviceId,
+                              serviceName: service.name,
+                              results: checkResults.map((r) => ({
+                                    serviceId: r.serviceId,
+                                    ok: r.ok,
+                                    message: r.message,
+                              })),
+                        },
+                  };
+            }
+
+            // Merge successful results
+            const successfulResults = checkResults.filter((r) => r.ok);
+            const mergedData: Record<string, any> = {
+                  bundledServiceId: service.serviceId,
+                  bundledServiceName: service.name,
+                  bundledServiceCategory: service.category,
+                  totalChecks: checkResults.length,
+                  successfulChecks: successfulResults.length,
+                  failedChecks: checkResults.length - successfulResults.length,
+                  oldGenerated: successfulResults.every((r) => r.cached),
+                  serviceResults: [] as any[],
+                  mergedInfo: {} as Record<string, any>,
+            };
+
+            // Aggregate data from all successful results
+            for (const result of successfulResults) {
+                  mergedData.serviceResults.push({
+                        serviceId: result.serviceId,
+                        cached: result.cached,
+                        provider: result.provider,
+                        data: result.data,
+                  });
+
+                  // Merge common fields (if they exist in data)
+                  if (result.data && typeof result.data === 'object') {
+                        for (const [key, value] of Object.entries(result.data)) {
+                              if (key !== 'serviceId' && key !== 'imei') {
+                                    if (!mergedData.mergedInfo[key]) {
+                                          mergedData.mergedInfo[key] = [];
+                                    }
+                                    if (Array.isArray(mergedData.mergedInfo[key])) {
+                                          mergedData.mergedInfo[key].push({
+                                                serviceId: result.serviceId,
+                                                value,
+                                          });
+                                    }
+                              }
+                        }
+                  }
+            }
+
+            return {
+                  ok: true,
+                  message: `Bundled IMEI check completed (${successfulResults.length}/${checkResults.length} services)`,
+                  data: mergedData,
+            };
+      } catch (error) {
+            if (shouldCharge) {
+                  await creditUserBalance({
+                        userId,
+                        amount: servicePrice,
+                        currency: service.currency ?? 'USD',
+                        source: 'refund',
+                        description: `Refund for failed bundled IMEI service ${service.name}`,
+                        serviceId: service.serviceId,
+                        serviceName: service.name,
+                        imei,
+                        metadata: {
+                              normalizedName: service.normalizedName,
+                              reason: error instanceof Error ? error.message : 'Unknown error',
+                              bundledServiceIds: serviceIds,
+                        },
+                  }).catch(() => undefined);
+            }
+
+            throw error;
+      }
+};
+
 const processSingleImeiCheck = async (
       userId: string,
       imei: string,
@@ -241,6 +389,21 @@ const processSingleImeiCheck = async (
 
                   throw error;
             }
+      }
+
+      // Check if this is a custom bundled service with multiple serviceIds
+      const hasMultipleServices = Array.isArray(service.serviceIds) && service.serviceIds.length > 1;
+
+      if (hasMultipleServices) {
+            return await processMultipleServiceCheck(
+                  userId,
+                  imei,
+                  service,
+                  service.serviceIds,
+                  shouldGenerateFresh,
+                  shouldCharge,
+                  servicePrice
+            );
       }
 
       const existingScanInfo = shouldGenerateFresh ? null : await getExistingScanInfoByImei(imei, serviceId);
@@ -333,13 +496,8 @@ const extractImeisFromWorkbook = (filePath: string) => {
 // export const checkImeiFromDhru = async (req: Request, res: Response, next: NextFunction) => {
 //
 
-
 //! this is for multiple imei check also single imei check
-export const checkImeiFromDhru = async (
-      req: Request,
-      res: Response,
-      next: NextFunction
-) => {
+export const checkImeiFromDhru = async (req: Request, res: Response, next: NextFunction) => {
       try {
             const userId = req.user._id;
 
@@ -394,7 +552,6 @@ export const checkImeiFromDhru = async (
             next(error);
       }
 };
-
 
 export const checkImeisFromFile = async (req: Request, res: Response, next: NextFunction) => {
       const file = req.file;
@@ -494,7 +651,6 @@ export const checkImeisFromFile = async (req: Request, res: Response, next: Next
             await safeDeleteFile(file?.path);
       }
 };
-
 
 export const syncServices = async (_req: Request, res: Response) => {
       const result = await dhruService.getImeiServices();
