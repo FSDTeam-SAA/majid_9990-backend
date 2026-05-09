@@ -100,7 +100,7 @@ const deleteInventory = catchAsync(async (req, res) => {
 });
 
 const getMyInventory = catchAsync(async (req, res) => {
-      const userId = req.user._id;
+      const result = await inventoryService.getInventoryWithFilters(req.query as Record<string, unknown>);
 
       const result = await inventoryService.getMyInventory(userId);
 
@@ -109,7 +109,42 @@ const getMyInventory = catchAsync(async (req, res) => {
             success: true,
             message: 'My inventory fetched successfully',
             data: result,
+
+const getSoldInventory = catchAsync(async (req, res) => {
+      const result = await inventoryService.getSoldInventory(req.query as Record<string, unknown>);
+
+      sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
       });
+            data: result,
+      });
+});
+
+const getInventoryByStatus = catchAsync(async (req, res) => {
+      const result = await inventoryService.getInventoryByStatus(
+            req.params.status as string,
+            req.query as Record<string, unknown>
+      );
+
+      sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: 'Inventory by status fetched successfully',
+            data: result,
+      });
+});
+
+const getGroupedInventoryByGroupKey = catchAsync(async (req, res) => {
+      const result = await inventoryService.getGroupedInventoryByGroupKey(req.query as Record<string, unknown>);
+
+      sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: 'Grouped inventory fetched successfully',
+            data: result,
+      });
+});
 });
 
 const getInventoryByUserId = catchAsync(async (req, res) => {
@@ -130,6 +165,9 @@ export default {
       createInventoryFromBarcode,
       createInventoryFromBarcodeBulk,
       getAllInventory,
+      getSoldInventory,
+      getInventoryByStatus,
+      getGroupedInventoryByGroupKey,
       getSingleInventory,
       updateInventory,
       deleteInventory,

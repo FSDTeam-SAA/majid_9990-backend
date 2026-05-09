@@ -5,7 +5,8 @@ import XLSX from 'xlsx';
 import { IBarcodeSearchResult } from '../barcode/barcode.interface';
 import barcodeService from '../barcode/barcode.service';
 import { getOpenAiInsight } from '../deviceCheck/scanInfo.transformer';
-import { IInventory } from './inventory.interface';
+import { createNotification } from '../socket/notification.service';
+import { IInventory, TInventoryStatus, TInventoryType } from './inventory.interface';
 import { Inventory } from './inventory.model';
 import { uploadToCloudinary } from '../../utils/cloudinary';
 
@@ -45,6 +46,154 @@ const estimateBarcodeValue = (product: IBarcodeSearchResult) => {
 
 const normalizeCondition = (value: IInventory['currentState']) => {
       return value === 'good condition' ? 'good condition' : 'new';
+};
+
+const toQueryString = (value: unknown) => {
+      if (typeof value === 'string') {
+            return value;
+      }
+
+      if (typeof value === 'number' || typeof value === 'boolean') {
+            return String(value);
+      }
+
+      return '';
+};
+
+const normalizeInventoryType = (value: unknown): TInventoryType => {
+      return toQueryString(value).trim().toLowerCase() === 'sold' ? 'sold' : 'inventory';
+};
+
+const normalizeInventoryStatus = (value: unknown, inventoryType: TInventoryType): TInventoryStatus => {
+      const normalizedValue = toQueryString(value).trim().toLowerCase();
+
+      if (inventoryType === 'sold') {
+            return 'sold';
+      }
+
+      if (
+            normalizedValue === 'inventory' ||
+            normalizedValue === 'sold' ||
+            normalizedValue === 'due' ||
+            normalizedValue === 'draft'
+      ) {
+            return normalizedValue;
+      }
+
+      return 'inventory';
+};
+
+const syncInventoryState = (payload: Partial<IInventory>) => {
+      const type = normalizeInventoryType(payload.type ?? payload.status);
+      const status = normalizeInventoryStatus(payload.status, type);
+
+      return {
+            ...payload,
+            type,
+            status,
+      };
+};
+
+const buildInventoryFilter = (query: Record<string, unknown>) => {
+      const filter: Record<string, unknown> = {};
+
+      const userId = toQueryString(query.userId).trim();
+      const groupKey = toQueryString(query.groupKey).trim();
+      const type = toQueryString(query.type).trim().toLowerCase();
+      const status = toQueryString(query.status).trim().toLowerCase();
+      const sold = toQueryString(query.sold).trim().toLowerCase();
+      const due = toQueryString(query.due).trim().toLowerCase();
+      const draft = toQueryString(query.draft).trim().toLowerCase();
+
+      if (userId) {
+            filter.userId = userId;
+      }
+
+      if (groupKey) {
+            filter.groupKey = groupKey;
+      }
+
+      if (type === 'inventory' || type === 'sold') {
+            filter.type = type;
+      }
+
+      if (status === 'inventory' || status === 'sold' || status === 'due' || status === 'draft') {
+            filter.status = status;
+
+            if (status === 'sold') {
+                  filter.type = 'sold';
+            }
+      }
+
+      if (sold === 'true') {
+            filter.type = 'sold';
+            filter.status = 'sold';
+      }
+
+      if (due === 'true') {
+            filter.status = 'due';
+      }
+
+      if (draft === 'true') {
+            filter.status = 'draft';
+      }
+
+      return filter;
+};
+
+const groupInventoryByGroupKey = (items: Array<any>) => {
+      const grouped = new Map<
+            string,
+            {
+                  groupKey: string;
+                  totalQuantity: number;
+                  items: Array<any>;
+            }
+      >();
+
+      for (const item of items) {
+            const groupKey = String(item.groupKey ?? item._id);
+
+            if (!grouped.has(groupKey)) {
+                  grouped.set(groupKey, {
+                        groupKey,
+                        totalQuantity: 0,
+                        items: [],
+                  });
+            }
+
+            const groupedItem = grouped.get(groupKey)!;
+            groupedItem.items.push(item);
+            groupedItem.totalQuantity += Number(item.quantity ?? 0);
+      }
+
+      return Array.from(grouped.values());
+};
+
+const sendLowStockAlert = async (inventoryItem: any) => {
+      const quantity = Number(inventoryItem?.quantity ?? 0);
+      const minStockLevel = Number(inventoryItem?.minStockLevel ?? 0);
+      const recipientId = inventoryItem?.userId;
+
+      if (!recipientId || !Types.ObjectId.isValid(String(recipientId))) {
+            return;
+      }
+
+      if (!Number.isFinite(quantity) || !Number.isFinite(minStockLevel) || minStockLevel <= 0) {
+            return;
+      }
+
+      if (quantity > minStockLevel) {
+            return;
+      }
+
+      await createNotification({
+            to: new Types.ObjectId(String(recipientId)),
+            title: 'Low Stock Alert',
+            message: `${inventoryItem.itemName} is low on stock. Only ${quantity} item(s) remain and the minimum stock level is ${minStockLevel}.`,
+            type: 'LOW_STOCK',
+            id: new Types.ObjectId(String(inventoryItem._id)),
+      });
 };
 
 const assertValidObjectId = (value: string, fieldName: string) => {
@@ -132,6 +281,8 @@ const extractBarcodeRowsFromFile = (filePath: string): TBarcodeBulkRow[] => {
 };
 
 const createInventory = async (payload: Partial<IInventory>, file?: any) => {
+      const normalizedPayload = syncInventoryState(payload);
+
       if (payload.imeiNumber) {
             const existingInventory = await Inventory.findOne({ imeiNumber: payload.imeiNumber });
 
@@ -143,14 +294,17 @@ const createInventory = async (payload: Partial<IInventory>, file?: any) => {
       if (file) {
             const cloudinaryResponse = await uploadToCloudinary(file.path);
             if (cloudinaryResponse) {
-                  payload.image = {
+                  normalizedPayload.image = {
                         public_id: cloudinaryResponse.public_id,
                         url: cloudinaryResponse.secure_url,
                   };
             }
       }
 
-      const result = await Inventory.create(payload);
+      const result = await Inventory.create(normalizedPayload);
+
+      await sendLowStockAlert(result);
+
       return result;
 };
 
@@ -236,6 +390,11 @@ const createInventoryFromBarcode = async (
                   currentState: normalizeCondition(payload.currentState),
                   productDetails,
                   aiDescription,
+                  type: normalizeInventoryType(payload.type ?? payload.status),
+                  status: normalizeInventoryStatus(
+                        payload.status,
+                        normalizeInventoryType(payload.type ?? payload.status)
+                  ),
             },
             file
       );
@@ -332,7 +491,32 @@ const createInventoryFromBarcodeBulk = async (file?: Express.Multer.File, defaul
 };
 
 const getAllInventory = async () => {
-      return await Inventory.find().populate('userId');
+      return await Inventory.find().populate('userId').sort({ createdAt: -1 });
+};
+
+const getInventoryWithFilters = async (query: Record<string, unknown> = {}) => {
+      const filter = buildInventoryFilter(query);
+      const groupBy = toQueryString(query.groupBy).trim().toLowerCase();
+
+      const inventories = await Inventory.find(filter).populate('userId').sort({ createdAt: -1 });
+
+      if (groupBy === 'groupkey') {
+            return groupInventoryByGroupKey(inventories);
+      }
+
+      return inventories;
+};
+
+const getSoldInventory = async (query: Record<string, unknown> = {}) => {
+      return await getInventoryWithFilters({ ...query, type: 'sold', status: 'sold' });
+};
+
+const getInventoryByStatus = async (status: string, query: Record<string, unknown> = {}) => {
+      return await getInventoryWithFilters({ ...query, status });
+};
+
+const getGroupedInventoryByGroupKey = async (query: Record<string, unknown> = {}) => {
+      return await getInventoryWithFilters({ ...query, groupBy: 'groupKey' });
 };
 
 const getSingleInventory = async (id: string) => {
@@ -343,19 +527,28 @@ const getSingleInventory = async (id: string) => {
 const updateInventory = async (id: string, payload: Partial<IInventory>, file?: any) => {
       assertValidObjectId(id, 'id');
 
+      const normalizedPayload = syncInventoryState(payload);
+
       if (file) {
             const cloudinaryResponse = await uploadToCloudinary(file.path);
             if (cloudinaryResponse) {
-                  payload.image = {
+                  normalizedPayload.image = {
                         public_id: cloudinaryResponse.public_id,
                         url: cloudinaryResponse.secure_url,
                   };
             }
       }
 
-      return await Inventory.findByIdAndUpdate(id, payload, {
+      const updatedInventory = await Inventory.findByIdAndUpdate(id, normalizedPayload, {
             new: true,
+            runValidators: true,
       });
+
+      if (updatedInventory) {
+            await sendLowStockAlert(updatedInventory);
+      }
+
+      return updatedInventory;
 };
 
 const deleteInventory = async (id: string) => {
@@ -365,13 +558,13 @@ const deleteInventory = async (id: string) => {
 };
 
 const getMyInventory = async (userId: string) => {
-      return await Inventory.find({ userId });
+      return await Inventory.find({ userId }).populate('userId').sort({ createdAt: -1 });
 };
 
 const getInventoryByUserId = async (userId: string) => {
       assertValidObjectId(userId, 'userId');
 
-      return await Inventory.find({ userId });
+      return await Inventory.find({ userId }).populate('userId').sort({ createdAt: -1 });
 };
 
 export default {
@@ -379,6 +572,10 @@ export default {
       createInventoryFromBarcode,
       createInventoryFromBarcodeBulk,
       getAllInventory,
+      getInventoryWithFilters,
+      getSoldInventory,
+      getInventoryByStatus,
+      getGroupedInventoryByGroupKey,
       getSingleInventory,
       updateInventory,
       deleteInventory,

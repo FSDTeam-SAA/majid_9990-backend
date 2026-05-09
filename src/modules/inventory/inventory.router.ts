@@ -15,6 +15,9 @@ router.post(
 );
 
 router.get('/', protect, inventoryController.getAllInventory);
+router.get('/sold-items', protect, inventoryController.getSoldInventory);
+router.get('/grouped', protect, inventoryController.getGroupedInventoryByGroupKey);
+router.get('/status/:status', protect, inventoryController.getInventoryByStatus);
 router.get('/my-inventory', protect, inventoryController.getMyInventory);
 // ideally admin only
 router.get('/user/:userId', protect, inventoryController.getInventoryByUserId);

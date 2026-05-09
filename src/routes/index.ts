@@ -7,7 +7,6 @@ import inventoryRouter from '../modules/inventory/inventory.router';
 import paymentRouter from '../modules/payment/payment.router';
 import notificationRouter from '../modules/notification/notification.router';
 import dashboardRouter from '../modules/dashboard/dashboard.router';
-import soldProductRoutes from '../modules/soldProduct/soldProduct.router';
 import repairRequestRouter from '../modules/repairRequest/repairRequest.router';
 import announcementRouter from '../modules/announcement/announcement.router';
 import reviewRoutes from '../modules/review/review.router';
@@ -53,10 +52,6 @@ const moduleRoutes = [
       {
             path: '/dashboard',
             route: dashboardRouter,
-      },
-      {
-            path: '/sold-products',
-            route: soldProductRoutes,
       },
       {
             path: '/repair-requests',
