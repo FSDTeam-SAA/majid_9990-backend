@@ -86,6 +86,22 @@ A new history API was added so the user can see balance changes, including credi
 Now returns prices converted into the client’s local currency, with a currency field like BDT and the price field rewritten to the converted amount. I wired it through client IP detection, geo lookup, and a USD-to-local-rate fetch in src/modules/location/location.service.ts and src/modules/deviceCheck/dhru.controller.ts. ExchangeRate API implemented. 
 
 ### Check devices for bundeling 
+
+Implementation Summary:
+1. New processMultipleServiceCheck function - Handles bundled services (like your iPhone/Mac/Samsung packages):
+
+Runs IMEI checks in parallel against all serviceIds in the array
+Checks cache for each individual service
+Charges only the custom service price once (not per service)
+Refunds if all checks fail
+Merges all results into one response
+2. Modified processSingleImeiCheck function - Now detects and routes bundled services:
+
+Checks if service.serviceIds array has multiple items
+Routes to processMultipleServiceCheck if it's a bundle
+Otherwise follows the original single-service path
+
+
 {
   "ok": true,
   "message": "Bundled IMEI check completed (5/5 services)",
