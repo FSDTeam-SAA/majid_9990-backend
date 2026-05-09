@@ -1,0 +1,223 @@
+{
+      "info": {
+            "name": "Inventory API - Majid",
+            "_postman_id": "inventory-updated-collection",
+            "description": "Collection for Inventory endpoints (includes new fields, status filters, grouping, sold subset and low-stock scenarios).",
+            "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+      },
+      "variable": [
+            { "key": "baseUrl", "value": "http://localhost:3000/api/v1" },
+            { "key": "token", "value": "" },
+            { "key": "userId", "value": "" },
+            { "key": "inventoryId", "value": "" }
+      ],
+      "item": [
+            {
+                  "name": "Create Inventory",
+                  "request": {
+                        "method": "POST",
+                        "header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+                        "body": {
+                              "mode": "formdata",
+                              "formdata": [
+                                    { "key": "itemName", "value": "iPhone X", "type": "text" },
+                                    { "key": "sku", "value": "IPX-001", "type": "text" },
+                                    { "key": "brand", "value": "Apple", "type": "text" },
+                                    { "key": "color", "value": "Space Gray", "type": "text" },
+                                    { "key": "storage", "value": "64GB", "type": "text" },
+                                    { "key": "size", "value": "5.8", "type": "text" },
+                                    { "key": "imeiNumber", "value": "123456789012345", "type": "text" },
+                                    { "key": "modelNumber", "value": "A1901", "type": "text" },
+                                    { "key": "quantity", "value": "1", "type": "text" },
+                                    { "key": "purchasePrice", "value": "200", "type": "text" },
+                                    { "key": "expectedPrice", "value": "300", "type": "text" },
+                                    { "key": "productDetails", "value": "Used phone, good condition", "type": "text" },
+                                    { "key": "aiDescription", "value": "AI-generated description...", "type": "text" },
+                                    { "key": "userId", "value": "{{userId}}", "type": "text" },
+                                    { "key": "supplierId", "value": "", "type": "text" },
+                                    { "key": "storeId", "value": "", "type": "text" },
+                                    { "key": "groupKey", "value": "iphone-x-batch-1", "type": "text" },
+                                    { "key": "minStockLevel", "value": "2", "type": "text" },
+                                    { "key": "type", "value": "inventory", "type": "text" },
+                                    { "key": "status", "value": "inventory", "type": "text" },
+                                    { "key": "currentState", "value": "good condition", "type": "text" },
+                                    { "key": "image", "type": "file" }
+                              ]
+                        },
+                        "url": {
+                              "raw": "{{baseUrl}}/inventory/create",
+                              "host": ["{{baseUrl}}"],
+                              "path": ["inventory", "create"]
+                        }
+                  }
+            },
+            {
+                  "name": "Create Inventory From Barcode",
+                  "request": {
+                        "method": "POST",
+                        "header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+                        "body": {
+                              "mode": "formdata",
+                              "formdata": [
+                                    { "key": "code", "value": "0123456789012", "type": "text" },
+                                    { "key": "userId", "value": "{{userId}}", "type": "text" },
+                                    { "key": "imeiNumber", "value": "", "type": "text" },
+                                    { "key": "purchasePrice", "value": "", "type": "text" },
+                                    { "key": "currentState", "value": "new", "type": "text" },
+                                    { "key": "image", "type": "file" }
+                              ]
+                        },
+                        "url": {
+                              "raw": "{{baseUrl}}/inventory/create-from-barcode",
+                              "host": ["{{baseUrl}}"],
+                              "path": ["inventory", "create-from-barcode"]
+                        }
+                  }
+            },
+            {
+                  "name": "Create Inventory From Barcode - Bulk (file)",
+                  "request": {
+                        "method": "POST",
+                        "header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+                        "body": {
+                              "mode": "formdata",
+                              "formdata": [
+                                    { "key": "file", "type": "file" },
+                                    { "key": "userId", "value": "{{userId}}", "type": "text" }
+                              ]
+                        },
+                        "url": {
+                              "raw": "{{baseUrl}}/inventory/create-from-barcode/bulk",
+                              "host": ["{{baseUrl}}"],
+                              "path": ["inventory", "create-from-barcode", "bulk"]
+                        }
+                  }
+            },
+            {
+                  "name": "Get Inventory (with filters)",
+                  "request": {
+                        "method": "GET",
+                        "header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+                        "url": {
+                              "raw": "{{baseUrl}}/inventory?userId={{userId}}&groupKey=iphone-x-batch-1&status=inventory&type=inventory",
+                              "host": ["{{baseUrl}}"],
+                              "path": ["inventory"],
+                              "query": [
+                                    { "key": "userId", "value": "{{userId}}" },
+                                    { "key": "groupKey", "value": "iphone-x-batch-1" },
+                                    { "key": "status", "value": "inventory" },
+                                    { "key": "type", "value": "inventory" }
+                              ]
+                        }
+                  }
+            },
+            {
+                  "name": "Get Sold Items",
+                  "request": {
+                        "method": "GET",
+                        "header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+                        "url": {
+                              "raw": "{{baseUrl}}/inventory/sold-items",
+                              "host": ["{{baseUrl}}"],
+                              "path": ["inventory", "sold-items"]
+                        }
+                  }
+            },
+            {
+                  "name": "Get Grouped Inventory (by groupKey)",
+                  "request": {
+                        "method": "GET",
+                        "header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+                        "url": {
+                              "raw": "{{baseUrl}}/inventory/grouped?groupBy=groupKey",
+                              "host": ["{{baseUrl}}"],
+                              "path": ["inventory", "grouped"],
+                              "query": [{ "key": "groupBy", "value": "groupKey" }]
+                        }
+                  }
+            },
+            {
+                  "name": "Get Inventory By Status",
+                  "request": {
+                        "method": "GET",
+                        "header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+                        "url": {
+                              "raw": "{{baseUrl}}/inventory/status/due",
+                              "host": ["{{baseUrl}}"],
+                              "path": ["inventory", "status", "due"]
+                        }
+                  }
+            },
+            {
+                  "name": "Get Single Inventory",
+                  "request": {
+                        "method": "GET",
+                        "header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+                        "url": {
+                              "raw": "{{baseUrl}}/inventory/{{inventoryId}}",
+                              "host": ["{{baseUrl}}"],
+                              "path": ["inventory", "{{inventoryId}}"]
+                        }
+                  }
+            },
+            {
+                  "name": "Update Inventory",
+                  "request": {
+                        "method": "PUT",
+                        "header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+                        "body": {
+                              "mode": "formdata",
+                              "formdata": [
+                                    { "key": "itemName", "value": "iPhone X Updated", "type": "text" },
+                                    { "key": "quantity", "value": "2", "type": "text" },
+                                    { "key": "minStockLevel", "value": "1", "type": "text" },
+                                    { "key": "status", "value": "inventory", "type": "text" },
+                                    { "key": "type", "value": "inventory", "type": "text" },
+                                    { "key": "image", "type": "file" }
+                              ]
+                        },
+                        "url": {
+                              "raw": "{{baseUrl}}/inventory/{{inventoryId}}",
+                              "host": ["{{baseUrl}}"],
+                              "path": ["inventory", "{{inventoryId}}"]
+                        }
+                  }
+            },
+            {
+                  "name": "Delete Inventory",
+                  "request": {
+                        "method": "DELETE",
+                        "header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+                        "url": {
+                              "raw": "{{baseUrl}}/inventory/{{inventoryId}}",
+                              "host": ["{{baseUrl}}"],
+                              "path": ["inventory", "{{inventoryId}}"]
+                        }
+                  }
+            },
+            {
+                  "name": "Get My Inventory",
+                  "request": {
+                        "method": "GET",
+                        "header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+                        "url": {
+                              "raw": "{{baseUrl}}/inventory/my-inventory",
+                              "host": ["{{baseUrl}}"],
+                              "path": ["inventory", "my-inventory"]
+                        }
+                  }
+            },
+            {
+                  "name": "Get Inventory By UserId",
+                  "request": {
+                        "method": "GET",
+                        "header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+                        "url": {
+                              "raw": "{{baseUrl}}/inventory/user/{{userId}}",
+                              "host": ["{{baseUrl}}"],
+                              "path": ["inventory", "user", "{{userId}}"]
+                        }
+                  }
+            }
+      ]
+}
