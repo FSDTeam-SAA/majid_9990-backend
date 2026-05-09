@@ -4,8 +4,6 @@ import { uploadToCloudinary } from '../../utils/cloudinary';
 import { User } from '../user/user.model';
 import { IRepairRequest } from './repairRequest.interface';
 import RepairRequest from './repairRequest.model';
-import { createNotification } from '../socket/notification.service';
-import mongoose from 'mongoose';
 
 const addNewRepairRequest = async (payload: IRepairRequest, files: Express.Multer.File[] = [], userId: string) => {
       const user = await User.findById(userId);
@@ -25,7 +23,6 @@ const addNewRepairRequest = async (payload: IRepairRequest, files: Express.Multe
       }
 
       const newRequest = await RepairRequest.create({
-            shopkeeperId: payload.shopkeeperId,
             userId: payload.userId || user._id,
             firstName: payload.firstName,
             email: payload.email,
@@ -46,14 +43,7 @@ const getMyRepairRequestsHistory = async (userId: string, query: any) => {
 
       const filter = { userId };
 
-      const data = await RepairRequest.find(filter)
-            .populate({
-                  path: 'shopkeeperId',
-                  select: 'shopName',
-            })
-            .skip(skip)
-            .limit(limit)
-            .sort({ createdAt: -1 });
+      const data = await RepairRequest.find(filter).skip(skip).limit(limit).sort({ createdAt: -1 });
 
       const total = await RepairRequest.countDocuments(filter);
 
@@ -99,27 +89,23 @@ const getShopKeepersShopsHistory = async (shopkeeperId: string, query: any) => {
 };
 
 const getSingleRepairRequest = async (id: string) => {
-      const result = await RepairRequest.findById(id).populate({
-            path: 'shopkeeperId',
-            select: 'shopName',
-      });
-
+      const result = await RepairRequest.findById(id);
       return result;
 };
 
 const updateStatusByShopKeeper = async (id: string, payload: any) => {
       const result = await RepairRequest.findByIdAndUpdate(id, payload, { new: true });
 
-      await createNotification({
-            to: result!.userId,
-            message:
-                  result?.status === 'in_review'
-                        ? 'Your repair request has been under review'
-                        : 'Your repair request has been rejected',
-            type: 'REPAIR_REQUEST',
-            title: 'Your repair request status updated',
-            id: new mongoose.Types.ObjectId(),
-      });
+      // await createNotification({
+      //       to: result!.userId,
+      //       message:
+      //             result?.status === 'in_review'
+      //                   ? 'Your repair request has been under review'
+      //                   : 'Your repair request has been rejected',
+      //       type: 'REPAIR_REQUEST',
+      //       title: 'Your repair request status updated',
+      //       id: new mongoose.Types.ObjectId(),
+      // });
 
       return result;
 };
@@ -162,14 +148,14 @@ const addNoteByShopKeeper = async (id: string, payload: any, files: Express.Mult
             throw new AppError('Repair request not found', StatusCodes.NOT_FOUND);
       }
 
-      await createNotification({
-            to: result.userId,
-            type: 'REPAIR_REQUEST',
-            id: new mongoose.Types.ObjectId(),
+      // await createNotification({
+      //       to: result.userId,
+      //       type: 'REPAIR_REQUEST',
+      //       id: new mongoose.Types.ObjectId(),
 
-            title: 'Repair Quote Received',
-            message: 'Your repair request has received a quotation from the shopkeeper. Please review the estimated cost and timeline.',
-      });
+      //       title: 'Repair Quote Received',
+      //       message: 'Your repair request has received a quotation from the shopkeeper. Please review the estimated cost and timeline.',
+      // });
 
       return result;
 };
@@ -220,15 +206,6 @@ const updateQuoteStatusByUser = async (id: string, payload: any) => {
             throw new AppError('Repair request or quote not found', StatusCodes.NOT_FOUND);
       }
 
-      await createNotification({
-            to: result.shopkeeperId,
-            type: 'REPAIR_REQUEST',
-            id: new mongoose.Types.ObjectId(),
-
-            title: notificationTitle,
-            message: notificationMessage,
-      });
-
       return result;
 };
 
@@ -268,14 +245,6 @@ const quoteResentByUser = async (id: string, payload: any) => {
       if (!result) {
             throw new AppError('Repair request not found', StatusCodes.NOT_FOUND);
       }
-
-      await createNotification({
-            to: result.shopkeeperId,
-            type: 'RESENT_QUOTE',
-            id: new mongoose.Types.ObjectId(),
-            title: 'Resent Repair Quote',
-            message: 'Your customer has resent a new quote for your repair request. Please review the details.',
-      });
 
       return result;
 };
@@ -325,14 +294,6 @@ const updateQuoteStatusByShopKeeper = async (id: string, payload: any) => {
       if (!result) {
             throw new AppError('Repair request or quote not found', StatusCodes.NOT_FOUND);
       }
-
-      await createNotification({
-            to: result.shopkeeperId,
-            type: 'REPAIR_REQUEST',
-            id: new mongoose.Types.ObjectId(),
-            title: notificationTitle,
-            message: notificationMessage,
-      });
 
       return result;
 };
