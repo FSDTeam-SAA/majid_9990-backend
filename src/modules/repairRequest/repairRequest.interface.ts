@@ -1,27 +1,31 @@
 import { Types } from 'mongoose';
 
 export type RepairStatus =
-      | 'request_submitted'
-      | 'in_review'
-      | 'quote_sent'
+      | 'inProgress'
       | 'approved'
       | 'rejected'
-      | 'repair_in_progress'
       | 'completed'
-      | 'quote_accepted'
-      | 'quote_rejected'
-      | 'quote-resent';
+      | 'inReview'
+      | 'start-work'
+      | 'quote-sent'
+      | 'waiting-for-parts';
 
 export interface INote {
       message: string;
       cost: number;
       estimatedDays: number;
       date: Date;
-      status: 'inProgress' | 'approved' | 'rejected';
       images: {
             public_id: string;
             url: string;
       }[];
+      assignedPerson: string;
+}
+
+export interface ITechNote {
+      partName: string;
+      cost: number;
+      time: number;
 }
 
 export interface IRepairRequest {
@@ -37,6 +41,7 @@ export interface IRepairRequest {
       }[];
       status: RepairStatus;
       shopkeeperNotes?: INote;
+      technicianNotes?: ITechNote[];
       createdAt: Date;
       updatedAt: Date;
 }
