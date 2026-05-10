@@ -163,6 +163,7 @@ const addTeachNoteByTechnician = async (id: string, payload: any) => {
             {
                   $set: {
                         technicianNotes: finalNotes,
+                        status: 'waiting-for-parts',
                   },
             },
             {
