@@ -35,10 +35,6 @@ export interface IRepairRequest {
       deviceModel: string;
       IMEINumber: string;
       description: string;
-      images: {
-            public_id: string;
-            url: string;
-      }[];
       status: RepairStatus;
       shopkeeperNotes?: INote;
       technicianNotes?: ITechNote[];
