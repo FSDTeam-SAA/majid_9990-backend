@@ -107,12 +107,80 @@ const addNoteByShopKeeper = async (id: string, payload: any, files: Express.Mult
       return result;
 };
 
+const addTeachNoteByTechnician = async (id: string, payload: any) => {
+      // ✅ Normalize (single or array)
+      const incomingNotes = Array.isArray(payload) ? payload : [payload];
+
+      if (incomingNotes.length === 0) {
+            throw new Error('Payload must not be empty');
+      }
+
+      // ✅ Validate
+      incomingNotes.forEach((item) => {
+            if (!item.partName || item.cost == null || item.time == null) {
+                  throw new Error('Each technician note must have partName, cost, and time');
+            }
+      });
+
+      // ✅ Get existing document
+      const repair = await RepairRequest.findById(id);
+
+      if (!repair) {
+            throw new Error('Repair request not found');
+      }
+
+      let existingNotes: any[] = repair.technicianNotes || [];
+
+      // ✅ Convert existing to map (by partName)
+      const noteMap = new Map();
+
+      existingNotes.forEach((note) => {
+            noteMap.set(note.partName, note);
+      });
+
+      // ✅ Merge logic (update OR insert)
+      incomingNotes.forEach((newNote) => {
+            if (noteMap.has(newNote.partName)) {
+                  // 🔄 UPDATE existing
+                  const old = noteMap.get(newNote.partName);
+
+                  noteMap.set(newNote.partName, {
+                        ...(old.toObject?.() || old),
+                        ...newNote, // overwrite changed fields
+                  });
+            } else {
+                  // ➕ ADD new
+                  noteMap.set(newNote.partName, newNote);
+            }
+      });
+
+      // ✅ Convert back to array
+      const finalNotes = Array.from(noteMap.values());
+
+      // ✅ Save updated array
+      const result = await RepairRequest.findByIdAndUpdate(
+            id,
+            {
+                  $set: {
+                        technicianNotes: finalNotes,
+                  },
+            },
+            {
+                  new: true,
+                  runValidators: true,
+            }
+      );
+
+      return result;
+};
+
 const repairRequestService = {
       addNewRepairRequest,
       getMyRepairRequestsHistory,
       getSingleRepairRequest,
       updateStatusByShopKeeper,
       addNoteByShopKeeper,
+      addTeachNoteByTechnician,
 };
 
 export default repairRequestService;

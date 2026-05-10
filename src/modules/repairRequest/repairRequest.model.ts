@@ -12,15 +12,8 @@ const NoteSchema = new Schema({
                   url: { type: String, required: true },
             },
       ],
+      assignedPerson: { type: String, required: true },
 });
-
-const ImageSchema = new Schema(
-      {
-            public_id: { type: String, required: true },
-            url: { type: String, required: true },
-      },
-      { _id: false }
-);
 
 const TechNoteSchema = new Schema({
       partName: { type: String, required: true },
@@ -40,7 +33,6 @@ const RepairRequestSchema = new Schema<IRepairRequest>(
             deviceModel: { type: String, required: true },
             IMEINumber: { type: String },
             description: { type: String, required: true },
-            images: [ImageSchema],
             status: {
                   type: String,
                   enum: [

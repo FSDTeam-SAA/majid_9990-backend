@@ -66,12 +66,25 @@ const addNoteByShopKeeper = catchAsync(async (req, res) => {
       });
 });
 
+const addTeachNoteByTechnician = catchAsync(async (req, res) => {
+      const { id } = req.params;
+      const result = await repairRequestService.addTeachNoteByTechnician(id as string, req.body);
+
+      sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: 'Repair request technician note added successfully',
+            data: result,
+      });
+});
+
 const repairRequestController = {
       addNewRepairRequest,
       getMyRepairRequestsHistory,
       getSingleRepairRequest,
       updateStatusByShopKeeper,
       addNoteByShopKeeper,
+      addTeachNoteByTechnician,
 };
 
 export default repairRequestController;
