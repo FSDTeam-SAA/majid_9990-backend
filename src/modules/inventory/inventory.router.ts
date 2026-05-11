@@ -7,12 +7,8 @@ const router = Router();
 
 router.post('/create', protect, upload.single('image'), inventoryController.createInventory);
 router.post('/create-from-barcode', protect, upload.single('image'), inventoryController.createInventoryFromBarcode);
-router.post(
-      '/create-from-barcode/bulk',
-      protect,
-      upload.single('file'),
-      inventoryController.createInventoryFromBarcodeBulk
-);
+
+router.post('/create-from-barcode/bulk', protect, inventoryController.createInventoryFromBarcodeBulk);
 
 router.get('/', protect, inventoryController.getAllInventory);
 router.get('/sold-items', protect, inventoryController.getSoldInventory);

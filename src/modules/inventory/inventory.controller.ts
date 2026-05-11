@@ -45,7 +45,7 @@ const createInventoryFromBarcode = catchAsync(async (req, res) => {
 
 const createInventoryFromBarcodeBulk = catchAsync(async (req, res) => {
       const defaultUserId = String(req.body?.userId ?? req.user?._id ?? '').trim() || undefined;
-      const result = await inventoryService.createInventoryFromBarcodeBulk(req.file, defaultUserId);
+      const result = await inventoryService.createInventoryFromBarcodeBulk(req.body, defaultUserId);
 
       sendResponse(res, {
             statusCode: StatusCodes.CREATED,

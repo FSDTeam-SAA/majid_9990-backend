@@ -1,7 +1,5 @@
 import AppError from '../../errors/AppError';
-import path from 'node:path';
 import { Types } from 'mongoose';
-import XLSX from 'xlsx';
 import { IBarcodeSearchResult } from '../barcode/barcode.interface';
 import barcodeService from '../barcode/barcode.service';
 import { getOpenAiInsight } from '../deviceCheck/scanInfo.transformer';
@@ -202,82 +200,78 @@ const assertValidObjectId = (value: string, fieldName: string) => {
       }
 };
 
-type TBarcodeBulkRow = {
-      rowNumber: number;
-      code: string;
+type TBarcodeBulkInputItem = {
+      code?: string;
+      barcode?: string;
       userId?: string;
       imeiNumber?: string;
       purchasePrice?: number | string;
       currentState?: IInventory['currentState'];
 };
 
-const normalizeHeaderValue = (value: unknown) => {
-      let normalizedValue: string;
+const parseBarcodeBulkItems = (value: unknown): TBarcodeBulkInputItem[] => {
+      const normalizeItem = (item: unknown): TBarcodeBulkInputItem => {
+            if (typeof item === 'string') {
+                  return { code: item };
+            }
 
-      if (value === null || value === undefined) {
-            normalizedValue = '';
-      } else if (Array.isArray(value)) {
-            normalizedValue = value.join(' ');
-      } else if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
-            normalizedValue = String(value);
-      } else {
-            normalizedValue = '';
-      }
+            if (!item || typeof item !== 'object') {
+                  return {};
+            }
 
-      return normalizedValue
-            .trim()
-            .toLowerCase()
-            .split(/[^a-z0-9]+/g)
-            .join('');
-};
-
-const extractBarcodeRowsFromFile = (filePath: string): TBarcodeBulkRow[] => {
-      const workbook = XLSX.readFile(filePath);
-      const sheetName = workbook.SheetNames[0];
-
-      if (!sheetName) {
-            return [];
-      }
-
-      const sheet = workbook.Sheets[sheetName];
-      const rows = XLSX.utils.sheet_to_json<Array<string | number | null | undefined>>(sheet, {
-            header: 1,
-            blankrows: false,
-            defval: '',
-            raw: false,
-      });
-
-      if (!rows.length) {
-            return [];
-      }
-
-      const firstRow = rows[0].map((cell) => normalizeHeaderValue(cell));
-      const headerIndex = {
-            code: firstRow.findIndex((cell) => cell === 'code' || cell.includes('barcode')),
-            userId: firstRow.findIndex((cell) => cell === 'userid' || cell === 'user'),
-            imeiNumber: firstRow.findIndex((cell) => cell === 'imei' || cell === 'imeinumber'),
-            purchasePrice: firstRow.findIndex((cell) => cell === 'purchaseprice' || cell === 'price'),
-            currentState: firstRow.findIndex(
-                  (cell) => cell === 'currentstate' || cell === 'condition' || cell === 'state'
-            ),
+            return item as TBarcodeBulkInputItem;
       };
 
-      const hasHeaderRow = Object.values(headerIndex).some((index) => index >= 0);
-      const firstCell = String(rows[0]?.[0] ?? '').trim();
-      const looksLikeGenericSingleColumnHeader =
-            !hasHeaderRow && rows[0]?.length === 1 && /^[a-z]+$/i.test(firstCell) && rows.length > 1;
-      const dataRows = hasHeaderRow || looksLikeGenericSingleColumnHeader ? rows.slice(1) : rows;
+      const parseArray = (input: unknown): TBarcodeBulkInputItem[] => {
+            if (!Array.isArray(input)) {
+                  return [];
+            }
 
-      return dataRows.map((row, index) => ({
-            rowNumber: hasHeaderRow || looksLikeGenericSingleColumnHeader ? index + 2 : index + 1,
-            code: String(row?.[hasHeaderRow ? headerIndex.code : 0] ?? '').trim(),
-            userId: String(row?.[hasHeaderRow ? headerIndex.userId : 1] ?? '').trim(),
-            imeiNumber: String(row?.[hasHeaderRow ? headerIndex.imeiNumber : 2] ?? '').trim(),
-            purchasePrice: row?.[hasHeaderRow ? headerIndex.purchasePrice : 3] ?? '',
-            currentState: String(
-                  row?.[hasHeaderRow ? headerIndex.currentState : 4] ?? ''
-            ).trim() as IInventory['currentState'],
-      }));
+            return input.map(normalizeItem);
+      };
+
+      if (Array.isArray(value)) {
+            return parseArray(value);
+      }
+
+      if (typeof value === 'string') {
+            try {
+                  return parseArray(JSON.parse(value));
+            } catch {
+                  return [];
+            }
+      }
+
+      if (!value || typeof value !== 'object') {
+            return [];
+      }
+
+      const payload = value as Record<string, unknown>;
+      const candidates = payload.barcodes ?? payload.items ?? payload.rows ?? payload.codes;
+
+      if (Array.isArray(candidates)) {
+            return parseArray(candidates);
+      }
+
+      if (typeof candidates === 'string') {
+            try {
+                  return parseArray(JSON.parse(candidates));
+            } catch {
+                  return [];
+            }
+      }
+
+      return [];
+};
+
+const normalizeBulkCurrentState = (value: unknown): IInventory['currentState'] | undefined => {
+      const state = toQueryString(value).trim();
+
+      if (state === 'new' || state === 'good condition') {
+            return state;
+      }
+
+      return undefined;
 };
 
 const createInventory = async (payload: Partial<IInventory>, file?: any) => {
@@ -308,6 +302,8 @@ const createInventory = async (payload: Partial<IInventory>, file?: any) => {
       return result;
 };
 
+// This function creates an inventory item from a barcode. It validates inputs, fetches product details from a barcode service,
+// generates AI insights and a detailed AI description, estimates market value, formats product information, normalizes inventory fields (status/type/condition), uploads optional files, and finally saves the inventory record into the database.
 const createInventoryFromBarcode = async (
       payload: {
             code: string;
@@ -410,21 +406,34 @@ const createInventoryFromBarcode = async (
       };
 };
 
-const createInventoryFromBarcodeBulk = async (file?: Express.Multer.File, defaultUserId?: string) => {
-      if (!file) {
-            throw new AppError('A csv or excel file is required', 400);
-      }
+// This function bulk-creates inventory items from a request body barcode list. It validates each item,
+// processes them using createInventoryFromBarcode, handles row-level errors individually, and returns a summary.
 
-      const extension = path.extname(file.originalname).toLowerCase();
-
-      if (!['.csv', '.xls', '.xlsx'].includes(extension)) {
-            throw new AppError('Only csv, xls, or xlsx files are supported', 400);
-      }
-
-      const rows = extractBarcodeRowsFromFile(file.path);
+const createInventoryFromBarcodeBulk = async (payload: unknown, defaultUserId?: string) => {
+      const requestBody =
+            payload && typeof payload === 'object' && !Array.isArray(payload)
+                  ? (payload as Record<string, unknown>)
+                  : {};
+      const baseUserId = toQueryString(requestBody.userId ?? defaultUserId).trim();
+      const baseImeiNumber = toQueryString(requestBody.imeiNumber).trim();
+      const basePurchasePrice =
+            typeof requestBody.purchasePrice === 'number' || typeof requestBody.purchasePrice === 'string'
+                  ? requestBody.purchasePrice
+                  : undefined;
+      const baseCurrentState = normalizeBulkCurrentState(
+            requestBody.currentState ?? requestBody.condition ?? requestBody.state
+      );
+      const rows = parseBarcodeBulkItems(payload).map((item, index) => ({
+            rowNumber: index + 1,
+            code: String(item.code ?? item.barcode ?? '').trim(),
+            userId: String(item.userId ?? baseUserId ?? '').trim(),
+            imeiNumber: String(item.imeiNumber ?? baseImeiNumber ?? '').trim(),
+            purchasePrice: item.purchasePrice ?? basePurchasePrice,
+            currentState: item.currentState ?? baseCurrentState,
+      }));
 
       if (!rows.length) {
-            throw new AppError('No barcode rows were found in the file', 400);
+            throw new AppError('At least one barcode is required', 400);
       }
 
       const results = [] as Array<{

@@ -135,6 +135,31 @@
                               "path": ["inventory", "create-from-barcode"]
                         }
                   }
+            },
+            {
+                  "name": "Create Inventory From Barcode Bulk",
+                  "request": {
+                        "method": "POST",
+                        "header": [
+                              {
+                                    "key": "Authorization",
+                                    "value": "Bearer {{token}}"
+                              },
+                              {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                              }
+                        ],
+                        "body": {
+                              "mode": "raw",
+                              "raw": "{\n    \"userId\": \"6828f0b8c4c0f7c9d4a12345\",\n    \"imeiNumber\": \"490154203237518\",\n    \"purchasePrice\": 250,\n    \"currentState\": \"new\",\n    \"barcodes\": [\n        {\n            \"code\": \"1234567890123\",\n            \"imeiNumber\": \"490154203237518\",\n            \"purchasePrice\": 250,\n            \"currentState\": \"new\"\n        },\n        {\n            \"barcode\": \"9876543210987\",\n            \"purchasePrice\": \"300\",\n            \"currentState\": \"good condition\"\n        },\n        \"1111111111111\"\n    ]\n}"
+                        },
+                        "url": {
+                              "raw": "{{base_url}}/inventory/create-from-barcode/bulk",
+                              "host": ["{{base_url}}"],
+                              "path": ["inventory", "create-from-barcode", "bulk"]
+                        }
+                  }
             }
       ]
 }
