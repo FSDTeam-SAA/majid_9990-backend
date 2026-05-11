@@ -70,7 +70,7 @@ const inventorySchema = new Schema<IInventory>(
             },
             status: {
                   type: String,
-                  enum: ['inventory', 'sold', 'due', 'draft'],
+                  enum: ['inventory', 'sold', 'draft'],
                   default: 'inventory',
                   index: true,
             },
