@@ -1,0 +1,199 @@
+{
+    "success": true,
+    "message": "IMEI check completed",
+    "data": [
+        {
+            "imei": "357903259185365",
+            "ok": true,
+            "message": "Bundled IMEI check completed (5/5 services)",
+            "data": {
+                "bundledServiceId": 1000,
+                "bundledServiceName": "iPhone all in one /best before buy",
+                "bundledServiceCategory": "fevourite",
+                "totalChecks": 5,
+                "successfulChecks": 5,
+                "failedChecks": 0,
+                "oldGenerated": false,
+                "providerData": {
+                    "merged": {
+                        "8": {
+                            "result": "Description: IPHONE 17 PRO MAX DBLUE 256GB-SDH<br>Model: iPhone 17 Pro Max<br>IMEI: 357903259185365<br>IMEI2: 357903259233405<br>MEID: 35790325918536<br>Serial Number: GV4T1W7VL4<br>Warranty Status: Limited Warranty<br>Purchase Date: 2026-02-15<br>Replaced Device: No<br>SIM-Lock: <span style=\"COLOR:green\">Unlocked</span><br>",
+                            "imei": "357903259185365",
+                            "balance": 477.15,
+                            "price": "0.018",
+                            "id": 178679846,
+                            "status": "success",
+                            "ip": "103.186.20.3"
+                        },
+                        "54": {
+                            "result": "IMEI: 357903259185365<br>Manufacturer: APPLE<br>Marketing Name: Apple iPhone 17 Pro Max - 1TB - Cosmic Orange<br>Model: IPHONE 17 PRO MAX (A3526)<br>Operating System: IOS<br>Blacklist Status: Clean<br>",
+                            "imei": "357903259185365",
+                            "balance": 477.015,
+                            "price": "0.02",
+                            "id": 178831947,
+                            "status": "success",
+                            "ip": "103.186.20.3"
+                        },
+                        "61": {
+                            "result": "Model Description: IPHONE 17 PRO MAX DBLUE 256GB-SDH<br>IMEI: 357903259185365<br>IMEI2: 357903259233405<br>MEID: 35790325918536<br>Serial Number: GV4T1W7VL4<br>Telephone Technical Support: <font color=\"green\">Active</font><br>Telephone Technical Support Expires In: 2 Months and 26 Days<br>Telephone Technical Support Expiration Date: 2026-08-04<br>Repairs and Service Coverage: <font color=\"green\">Active</font><br>Repairs and Service Expires In: 11 Months and 27 Days<br>Repairs and Service Expiration Date: 2027-05-05<br>Estimated Purchase Date: 2026-02-15<br>Warranty Status: <font color=\"green\">Limited Warranty</font><br>iCloud Lock: <font color=\"red\">ON</font><br>iCloud Status: <font color=\"green\">Clean</font><br>Demo Unit: <font color=\"green\">No</font><br>Loaner Device: <font color=\"green\">No</font><br>Replaced Device: <font color=\"green\">No</font><br>Replacement Device: <font color=\"green\">No</font><br>Refurbished Device: <font color=\"green\">No</font><br>AppleCare Eligible: <font color=\"red\">No</font><br>Valid Purchase Date: <font color=\"green\">Yes</font><br>Activation Status: <font color=\"green\">Activated</font><br>Registration Status: <font color=\"green\">Registered</font><br>Blacklist Status: <font color=\"green\">Clean</font><br>Locked Carrier: 10 - Unlock.<br>Sim-Lock Status: <span style=\"COLOR:green\">Unlocked</span><br>",
+                            "imei": "357903259185365",
+                            "balance": 477.06,
+                            "price": "0.07",
+                            "id": 178679854,
+                            "status": "success",
+                            "ip": "103.186.20.3"
+                        },
+                        "92": {
+                            "result": "IMEI Number: 357903259185365<br>IMEI2 Number: 357903259233405<br>Model Description: IPHONE 17 PRO MAX DBLUE 256GB-SDH<br>",
+                            "imei": "357903259185365",
+                            "balance": 477.153,
+                            "price": "0.015",
+                            "id": 178679855,
+                            "status": "success",
+                            "ip": "103.186.20.3"
+                        },
+                        "101": {
+                            "result": "<img src=\"https://appleid.cdn-apple.com/static/deviceImages-15.0/iPhone/iPhone18,2-3b3b3c-47ade5/online-sourcelist__3x.png\" height=\"80\"><br>Device: iPhone 17 Pro Max<br>IMEI Number: 357903259185365<br>Serial Number: GV4T1W7VL4<br>Serial Key: 69f28c9627ae32223cde4bba<br>Coverage Benefits: Hardware Service, Chat &amp; Phone Support<br>Warranty Type: Limited Warranty<br>Warranty Expires: May 5, 2027<br>Estimated Purchase Date: May 6, 2026<br>Activation Status: Activated<br>Registration Status: Yes<br>Replaced Device: No<br>Temp Coverage: No<br>Open Repair: No<br>Notice: There are 58 days left to add coverage.<br>",
+                            "imei": "357903259185365",
+                            "balance": 477.178,
+                            "price": "0.01",
+                            "id": 178665450,
+                            "status": "success",
+                            "ip": "74.220.48.29"
+                        }
+                    },
+                    "services": [
+                        {
+                            "serviceId": 61,
+                            "cached": true,
+                            "provider": null,
+                            "data": {
+                                "result": "Model Description: IPHONE 17 PRO MAX DBLUE 256GB-SDH<br>IMEI: 357903259185365<br>IMEI2: 357903259233405<br>MEID: 35790325918536<br>Serial Number: GV4T1W7VL4<br>Telephone Technical Support: <font color=\"green\">Active</font><br>Telephone Technical Support Expires In: 2 Months and 26 Days<br>Telephone Technical Support Expiration Date: 2026-08-04<br>Repairs and Service Coverage: <font color=\"green\">Active</font><br>Repairs and Service Expires In: 11 Months and 27 Days<br>Repairs and Service Expiration Date: 2027-05-05<br>Estimated Purchase Date: 2026-02-15<br>Warranty Status: <font color=\"green\">Limited Warranty</font><br>iCloud Lock: <font color=\"red\">ON</font><br>iCloud Status: <font color=\"green\">Clean</font><br>Demo Unit: <font color=\"green\">No</font><br>Loaner Device: <font color=\"green\">No</font><br>Replaced Device: <font color=\"green\">No</font><br>Replacement Device: <font color=\"green\">No</font><br>Refurbished Device: <font color=\"green\">No</font><br>AppleCare Eligible: <font color=\"red\">No</font><br>Valid Purchase Date: <font color=\"green\">Yes</font><br>Activation Status: <font color=\"green\">Activated</font><br>Registration Status: <font color=\"green\">Registered</font><br>Blacklist Status: <font color=\"green\">Clean</font><br>Locked Carrier: 10 - Unlock.<br>Sim-Lock Status: <span style=\"COLOR:green\">Unlocked</span><br>",
+                                "imei": "357903259185365",
+                                "balance": 477.06,
+                                "price": "0.07",
+                                "id": 178679854,
+                                "status": "success",
+                                "ip": "103.186.20.3"
+                            }
+                        },
+                        {
+                            "serviceId": 8,
+                            "cached": true,
+                            "provider": null,
+                            "data": {
+                                "result": "Description: IPHONE 17 PRO MAX DBLUE 256GB-SDH<br>Model: iPhone 17 Pro Max<br>IMEI: 357903259185365<br>IMEI2: 357903259233405<br>MEID: 35790325918536<br>Serial Number: GV4T1W7VL4<br>Warranty Status: Limited Warranty<br>Purchase Date: 2026-02-15<br>Replaced Device: No<br>SIM-Lock: <span style=\"COLOR:green\">Unlocked</span><br>",
+                                "imei": "357903259185365",
+                                "balance": 477.15,
+                                "price": "0.018",
+                                "id": 178679846,
+                                "status": "success",
+                                "ip": "103.186.20.3"
+                            }
+                        },
+                        {
+                            "serviceId": 54,
+                            "cached": false,
+                            "provider": "sickw",
+                            "data": {
+                                "result": "IMEI: 357903259185365<br>Manufacturer: APPLE<br>Marketing Name: Apple iPhone 17 Pro Max - 1TB - Cosmic Orange<br>Model: IPHONE 17 PRO MAX (A3526)<br>Operating System: IOS<br>Blacklist Status: Clean<br>",
+                                "imei": "357903259185365",
+                                "balance": 477.015,
+                                "price": "0.02",
+                                "id": 178831947,
+                                "status": "success",
+                                "ip": "103.186.20.3"
+                            }
+                        },
+                        {
+                            "serviceId": 101,
+                            "cached": true,
+                            "provider": null,
+                            "data": {
+                                "result": "<img src=\"https://appleid.cdn-apple.com/static/deviceImages-15.0/iPhone/iPhone18,2-3b3b3c-47ade5/online-sourcelist__3x.png\" height=\"80\"><br>Device: iPhone 17 Pro Max<br>IMEI Number: 357903259185365<br>Serial Number: GV4T1W7VL4<br>Serial Key: 69f28c9627ae32223cde4bba<br>Coverage Benefits: Hardware Service, Chat &amp; Phone Support<br>Warranty Type: Limited Warranty<br>Warranty Expires: May 5, 2027<br>Estimated Purchase Date: May 6, 2026<br>Activation Status: Activated<br>Registration Status: Yes<br>Replaced Device: No<br>Temp Coverage: No<br>Open Repair: No<br>Notice: There are 58 days left to add coverage.<br>",
+                                "imei": "357903259185365",
+                                "balance": 477.178,
+                                "price": "0.01",
+                                "id": 178665450,
+                                "status": "success",
+                                "ip": "74.220.48.29"
+                            }
+                        },
+                        {
+                            "serviceId": 92,
+                            "cached": true,
+                            "provider": null,
+                            "data": {
+                                "result": "IMEI Number: 357903259185365<br>IMEI2 Number: 357903259233405<br>Model Description: IPHONE 17 PRO MAX DBLUE 256GB-SDH<br>",
+                                "imei": "357903259185365",
+                                "balance": 477.153,
+                                "price": "0.015",
+                                "id": 178679855,
+                                "status": "success",
+                                "ip": "103.186.20.3"
+                            }
+                        }
+                    ]
+                },
+                "aiInsight": {
+                    "title": "AI INSIGHT",
+                    "message": "Low Risk. No blacklist signal was found.",
+                    "services": [
+                        {
+                            "title": "AI INSIGHT",
+                            "message": "Low Risk. No blacklist signal was found."
+                        },
+                        {
+                            "title": "AI INSIGHT",
+                            "message": "Low Risk. Review blacklist/ownership details before purchase."
+                        },
+                        {
+                            "title": "AI INSIGHT",
+                            "message": "Low Risk. No blacklist signal was found."
+                        },
+                        {
+                            "title": "AI INSIGHT",
+                            "message": "Low Risk. Review blacklist/ownership details before purchase."
+                        },
+                        {
+                            "title": "AI INSIGHT",
+                            "message": "Low Risk. Review blacklist/ownership details before purchase."
+                        }
+                    ]
+                },
+                "riskAnalysis": {
+                    "riskLevel": "low",
+                    "score": 12,
+                    "label": "Low Risk",
+                    "services": [
+                        {
+                            "riskLevel": "low",
+                            "score": 12,
+                            "label": "Low Risk"
+                        },
+                        {
+                            "riskLevel": "low",
+                            "score": 12,
+                            "label": "Low Risk"
+                        },
+                        {
+                            "riskLevel": "low",
+                            "score": 12,
+                            "label": "Low Risk"
+                        },
+                        {
+                            "riskLevel": "low",
+                            "score": 12,
+                            "label": "Low Risk"
+                        },
+                        {
+                            "riskLevel": "low",
+                            "score": 12,
+                            "label": "Low Risk"
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}

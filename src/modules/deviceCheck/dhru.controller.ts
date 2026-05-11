@@ -189,9 +189,20 @@ const processMultipleServiceCheck = async (
       shouldCharge: boolean,
       servicePrice: number
 ): Promise<SingleImeiCheckResult> => {
+      type BundledCheckResult = {
+            serviceId: number;
+            ok: boolean;
+            cached: boolean;
+            provider?: string;
+            message?: string;
+            statusCode?: number;
+            data?: unknown;
+            providerData?: unknown;
+      };
+
       try {
             // Run IMEI checks against all serviceIds in parallel
-            const checkResults = await Promise.all(
+            const checkResults: BundledCheckResult[] = await Promise.all(
                   serviceIds.map(async (svcId) => {
                         const existingScanInfo = shouldGenerateFresh
                               ? null
@@ -259,8 +270,84 @@ const processMultipleServiceCheck = async (
                   };
             }
 
-            // Merge successful results
             const successfulResults = checkResults.filter((r) => r.ok);
+            const normalizedResults = successfulResults.map((result) => {
+                  const structuredData = (result.data && typeof result.data === 'object' ? result.data : {}) as Record<
+                        string,
+                        any
+                  >;
+                  const providerData = result.cached
+                        ? (structuredData.providerData ?? null)
+                        : (result.providerData ?? null);
+
+                  return {
+                        serviceId: result.serviceId,
+                        cached: result.cached,
+                        provider: result.provider ?? null,
+                        providerData,
+                        aiInsight: structuredData.aiInsight ?? null,
+                        riskAnalysis: structuredData.riskMeter ?? null,
+                        data: structuredData,
+                  };
+            });
+
+            const primaryResult = normalizedResults[0] ?? null;
+            const mergedProviderData = (() => {
+                  const keyValues = new Map<string, Set<any>>();
+
+                  for (const item of normalizedResults) {
+                        const pd = item.providerData as Record<string, any> | null;
+                        if (!pd || typeof pd !== 'object') continue;
+
+                        for (const [k, v] of Object.entries(pd)) {
+                              if (!keyValues.has(k)) keyValues.set(k, new Set());
+                              try {
+                                    keyValues.get(k)!.add(v);
+                              } catch {
+                                    keyValues.get(k)!.add(String(v));
+                              }
+                        }
+                  }
+
+                  const merged: Record<string, any> = {};
+
+                  for (const [k, values] of keyValues.entries()) {
+                        const list = Array.from(values).filter((x) => x !== undefined && x !== null);
+                        if (!list.length) continue;
+
+                        if (k === 'result') {
+                              // concatenate unique result strings
+                              const uniq = Array.from(new Set(list.map(String)));
+                              merged.result = uniq.join('\n\n');
+                              continue;
+                        }
+
+                        if (list.length === 1) {
+                              merged[k] = list[0];
+                        } else {
+                              merged[k] = Array.from(
+                                    new Set(list.map((v) => (typeof v === 'object' ? JSON.stringify(v) : v)))
+                              ).map((v) => {
+                                    try {
+                                          return JSON.parse(String(v));
+                                    } catch {
+                                          return v;
+                                    }
+                              });
+                        }
+                  }
+
+                  return merged;
+            })();
+
+            const mergedAiInsights = normalizedResults
+                  .map((item) => item.aiInsight)
+                  .filter((item): item is Record<string, unknown> => Boolean(item));
+
+            const mergedRiskAnalyses = normalizedResults
+                  .map((item) => item.riskAnalysis)
+                  .filter((item): item is Record<string, unknown> => Boolean(item));
+
             const mergedData: Record<string, any> = {
                   bundledServiceId: service.serviceId,
                   bundledServiceName: service.name,
@@ -269,36 +356,22 @@ const processMultipleServiceCheck = async (
                   successfulChecks: successfulResults.length,
                   failedChecks: checkResults.length - successfulResults.length,
                   oldGenerated: successfulResults.every((r) => r.cached),
-                  serviceResults: [] as any[],
-                  mergedInfo: {} as Record<string, any>,
+                  providerData: mergedProviderData,
+                  providerServices: normalizedResults.map((item) => ({
+                        serviceId: item.serviceId,
+                        cached: item.cached,
+                        provider: item.provider,
+                        data: item.providerData,
+                  })),
+                  aiInsight: {
+                        ...(primaryResult?.aiInsight ?? {}),
+                        services: mergedAiInsights,
+                  },
+                  riskAnalysis: {
+                        ...(primaryResult?.riskAnalysis ?? {}),
+                        services: mergedRiskAnalyses,
+                  },
             };
-
-            // Aggregate data from all successful results
-            for (const result of successfulResults) {
-                  mergedData.serviceResults.push({
-                        serviceId: result.serviceId,
-                        cached: result.cached,
-                        provider: result.provider,
-                        data: result.data,
-                  });
-
-                  // Merge common fields (if they exist in data)
-                  if (result.data && typeof result.data === 'object') {
-                        for (const [key, value] of Object.entries(result.data)) {
-                              if (key !== 'serviceId' && key !== 'imei') {
-                                    if (!mergedData.mergedInfo[key]) {
-                                          mergedData.mergedInfo[key] = [];
-                                    }
-                                    if (Array.isArray(mergedData.mergedInfo[key])) {
-                                          mergedData.mergedInfo[key].push({
-                                                serviceId: result.serviceId,
-                                                value,
-                                          });
-                                    }
-                              }
-                        }
-                  }
-            }
 
             return {
                   ok: true,
