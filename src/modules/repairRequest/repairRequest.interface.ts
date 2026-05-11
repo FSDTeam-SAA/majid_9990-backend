@@ -36,8 +36,16 @@ export interface IRepairRequest {
       IMEINumber: string;
       description: string;
       status: RepairStatus;
+      waitingForPartsDays?: number;
+      waitingForPartsDescription?: string;
       shopkeeperNotes?: INote;
       technicianNotes?: ITechNote[];
       createdAt: Date;
       updatedAt: Date;
+}
+
+export interface IRepairRequestStatusUpdatePayload {
+      status: RepairStatus;
+      waitingForPartsDays?: number | string;
+      waitingForPartsDescription?: string;
 }

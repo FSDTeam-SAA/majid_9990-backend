@@ -50,6 +50,8 @@ const RepairRequestSchema = new Schema<IRepairRequest>(
                   ],
                   default: 'inProgress',
             },
+            waitingForPartsDays: { type: Number },
+            waitingForPartsDescription: { type: String },
             shopkeeperNotes: [NoteSchema],
             technicianNotes: [TechNoteSchema],
       },

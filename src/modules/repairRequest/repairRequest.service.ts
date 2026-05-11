@@ -2,7 +2,7 @@ import { StatusCodes } from 'http-status-codes';
 import AppError from '../../errors/AppError';
 import { uploadToCloudinary } from '../../utils/cloudinary';
 import { User } from '../user/user.model';
-import { IRepairRequest } from './repairRequest.interface';
+import { IRepairRequest, IRepairRequestStatusUpdatePayload } from './repairRequest.interface';
 import RepairRequest from './repairRequest.model';
 
 const addNewRepairRequest = async (payload: IRepairRequest, files: Express.Multer.File[] = [], userId: string) => {
@@ -61,8 +61,45 @@ const getSingleRepairRequest = async (id: string) => {
       return result;
 };
 
-const updateStatusByShopKeeper = async (id: string, payload: any) => {
-      const result = await RepairRequest.findByIdAndUpdate(id, payload, { new: true });
+const updateStatusByShopKeeper = async (id: string, payload: IRepairRequestStatusUpdatePayload) => {
+      if (!payload.status) {
+            throw new AppError('Status is required', StatusCodes.BAD_REQUEST);
+      }
+
+      const update: {
+            $set: Record<string, unknown>;
+            $unset?: Record<string, 1>;
+      } = {
+            $set: {
+                  status: payload.status,
+            },
+      };
+
+      if (payload.status === 'waiting-for-parts') {
+            const waitingForPartsDays = Number(payload.waitingForPartsDays);
+            const waitingForPartsDescription = payload.waitingForPartsDescription?.trim();
+
+            if (!Number.isFinite(waitingForPartsDays) || waitingForPartsDays <= 0) {
+                  throw new AppError('Waiting for parts days is required', StatusCodes.BAD_REQUEST);
+            }
+
+            if (!waitingForPartsDescription) {
+                  throw new AppError('Waiting for parts description is required', StatusCodes.BAD_REQUEST);
+            }
+
+            update.$set.waitingForPartsDays = waitingForPartsDays;
+            update.$set.waitingForPartsDescription = waitingForPartsDescription;
+      } else {
+            update.$unset = {
+                  waitingForPartsDays: 1,
+                  waitingForPartsDescription: 1,
+            };
+      }
+
+      const result = await RepairRequest.findByIdAndUpdate(id, update, {
+            new: true,
+            runValidators: true,
+      });
       return result;
 };
 
