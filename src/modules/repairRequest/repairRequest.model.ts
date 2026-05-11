@@ -6,26 +6,20 @@ const NoteSchema = new Schema({
       date: { type: Date, default: Date.now },
       cost: { type: Number, required: true },
       estimatedDays: { type: Number, required: true },
-      status: {
-            type: String,
-            enum: ['inProgress', 'approved', 'rejected'],
-            default: 'inProgress',
-      },
       images: [
             {
                   public_id: { type: String, required: true },
                   url: { type: String, required: true },
             },
       ],
+      assignedPerson: { type: String, required: true },
 });
 
-const ImageSchema = new Schema(
-      {
-            public_id: { type: String, required: true },
-            url: { type: String, required: true },
-      },
-      { _id: false }
-);
+const TechNoteSchema = new Schema({
+      partName: { type: String, required: true },
+      cost: { type: Number, required: true },
+      time: { type: Number, required: true },
+});
 
 const RepairRequestSchema = new Schema<IRepairRequest>(
       {
@@ -39,23 +33,22 @@ const RepairRequestSchema = new Schema<IRepairRequest>(
             deviceModel: { type: String, required: true },
             IMEINumber: { type: String },
             description: { type: String, required: true },
-            images: [ImageSchema],
             status: {
                   type: String,
                   enum: [
-                        'request_submitted',
-                        'in_review',
+                        'inProgress',
                         'quote_sent',
-                        'quote_accepted',
-                        'quote_rejected',
+                        'approved',
                         'rejected',
-                        'repair_in_progress',
                         'completed',
-                        'quote-resent',
+                        'inReview',
+                        'start-work',
+                        'waiting-for-parts',
                   ],
-                  default: 'request_submitted',
+                  default: 'inProgress',
             },
             shopkeeperNotes: [NoteSchema],
+            technicianNotes: [TechNoteSchema],
       },
       {
             timestamps: true,
