@@ -372,3 +372,56 @@ bundeling services:
     }
   ]
 }
+
+---------------------------------------------------------
+With ai  
+{
+  "success": true,
+  "message": "IMEI check (v2) completed",
+  "data": [
+    {
+      "imei": "351297474660682",
+      "ok": true,
+      "message": "Bundled IMEI check completed (5/5 services)",
+      "data": {
+        "bundledServiceId": 1001,
+        "bundledServiceName": "Mac full check /best before buy",
+        "bundledServiceCategory": "fevourite",
+        "providerResults": {
+          "description": "IPHONE 17 PRO,ROW,256GB,BLU",
+          "model": "IPHONE 17 PRO (A3523)",
+          "imei": "351297474660682",
+          "imei2": "351297474271241",
+          "meid": "35129747466068",
+          "serial_number": "HQDQW53HTV",
+          "warranty_status": "Limited Warranty",
+          "purchase_date": "2025-11-19",
+          "replaced_device": "No",
+          "simlock": "Unlocked",
+          "icloud_lock": "OFF",
+          "manufacturer": "APPLE",
+          "marketing_name": "Apple iPhone 17 Pro - 1TB - Cosmic Orange",
+          "operating_system": "IOS",
+          "blacklist_status": "Clean",
+          "device_configuration": "IPHONE 17 PRO DEEP BLUE 256GB-SDH",
+          "model_name": "iPhone 17 Pro 256GB Deep Blue",
+          "material_number": "MG8J4QN/A",
+          "basic_material": "A3523",
+          "eid": "89049032020008884800234590892119",
+          "applecare_description": "90 DAYS PHONE SUPPORT",
+          "coverage_start_date": "21/04/26",
+          "coverage_end_date": "20/04/27",
+          "limited_warranty": "Yes",
+          "simpolicy_unlock_status": "UNLOCK",
+          "initial_activation_policy_description": "10 - Unlock. (U000 - UNLOCK)",
+          "locked_carrier": "10 - Unlock"
+        },
+        "riskMeter": 82,
+        "aiInsight": {
+          "title": "AI INSIGHT",
+          "message": "Parsed data from Mac full check /best before buy was analyzed. Review the details before purchase."
+        }
+      }
+    }
+  ]
+}

@@ -1,6 +1,7 @@
 import ScanInfo from './scanInfo.model';
 import { buildStructuredScanInfo } from './scanInfo.transformer';
 import { dhruService } from './dhru.service';
+import axios from 'axios';
 
 const DEFAULT_SERVICE_ID = Number(process.env.DHRU_SERVICE_ID ?? 6);
 const ENABLE_SERVICE_FALLBACK = String(process.env.IMEI_ENABLE_SERVICE_FALLBACK ?? 'false').toLowerCase() === 'true';
@@ -89,6 +90,134 @@ export const extractProviderDataFromHtml = (htmlString: string | null | undefine
       }
 
       return data;
+};
+
+const parseJsonObject = (value: string) => {
+      const start = value.indexOf('{');
+      const end = value.lastIndexOf('}');
+
+      if (start === -1 || end === -1 || end <= start) {
+            return null;
+      }
+
+      try {
+            return JSON.parse(value.slice(start, end + 1));
+      } catch {
+            return null;
+      }
+};
+
+export const analyzeParsedProviderDataWithAi = async (
+      imei: string,
+      parsedProviderData: Record<string, unknown>,
+      providerName?: string
+) => {
+      const sourceText = JSON.stringify(parsedProviderData ?? {});
+      const fallbackRiskMeter = (() => {
+            const text = sourceText.toLowerCase();
+
+            if (!text || text === '{}') {
+                  return 50;
+            }
+
+            if (/(blacklist|stolen|lost mode|icloud lock|mdm lock|mdm_lock|simlock|locked)/i.test(text)) {
+                  return 82;
+            }
+
+            if (/(clean|unlocked|no|off|passed|activated)/i.test(text)) {
+                  return 24;
+            }
+
+            return 50;
+      })();
+
+      const fallbackInsight = {
+            title: 'AI INSIGHT',
+            message: providerName
+                  ? `Parsed data from ${providerName} was analyzed. Review the details before purchase.`
+                  : 'Parsed provider data was analyzed. Review the details before purchase.',
+      };
+
+      const apiKey = String(process.env.OPENAI_API_KEY ?? '').trim();
+      if (!apiKey) {
+            return {
+                  riskMeter: fallbackRiskMeter,
+                  aiInsight: fallbackInsight,
+            };
+      }
+
+      const model = String(process.env.OPENAI_MODEL ?? 'gpt-4.1-mini').trim();
+
+      try {
+            const completion = await axios.post(
+                  'https://api.openai.com/v1/chat/completions',
+                  {
+                        model,
+                        temperature: 0.2,
+                        messages: [
+                              {
+                                    role: 'system',
+                                    content: 'You are an IMEI risk analyst. Return strict JSON only with keys: riskMeter, title, message. riskMeter must be a number from 1 to 100.',
+                              },
+                              {
+                                    role: 'user',
+                                    content: JSON.stringify({
+                                          imei,
+                                          providerName: providerName ?? 'unknown',
+                                          parsedProviderData,
+                                    }),
+                              },
+                        ],
+                  },
+                  {
+                        headers: {
+                              Authorization: `Bearer ${apiKey}`,
+                              'Content-Type': 'application/json',
+                        },
+                        timeout: 15000,
+                  }
+            );
+
+            const content = completion.data?.choices?.[0]?.message?.content;
+            if (typeof content !== 'string') {
+                  return {
+                        riskMeter: fallbackRiskMeter,
+                        aiInsight: fallbackInsight,
+                  };
+            }
+
+            const parsed = parseJsonObject(content);
+            if (!parsed) {
+                  return {
+                        riskMeter: fallbackRiskMeter,
+                        aiInsight: fallbackInsight,
+                  };
+            }
+
+            const parsedRiskMeter = Number((parsed as Record<string, unknown>).riskMeter);
+            const riskMeter = Number.isFinite(parsedRiskMeter)
+                  ? Math.min(100, Math.max(1, Math.round(parsedRiskMeter)))
+                  : fallbackRiskMeter;
+
+            return {
+                  riskMeter,
+                  aiInsight: {
+                        title:
+                              typeof (parsed as Record<string, unknown>).title === 'string'
+                                    ? String((parsed as Record<string, unknown>).title)
+                                    : 'AI INSIGHT',
+                        message:
+                              typeof (parsed as Record<string, unknown>).message === 'string'
+                                    ? String((parsed as Record<string, unknown>).message)
+                                    : fallbackInsight.message,
+                  },
+            };
+      } catch {
+            return {
+                  riskMeter: fallbackRiskMeter,
+                  aiInsight: fallbackInsight,
+            };
+      }
 };
 
 export const isValidImei = (imei: string): boolean => /^\d{15}$/.test(imei);

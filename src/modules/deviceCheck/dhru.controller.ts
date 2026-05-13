@@ -12,6 +12,7 @@ import {
       resolveServiceId,
       runImeiCheck,
       extractProviderDataFromHtml,
+      analyzeParsedProviderDataWithAi,
 } from './deviceCheck.helpers';
 import { creditUserBalance, debitUserBalance } from '../payment/balanceTransaction.service';
 import ScanInfo from './scanInfo.model';
@@ -807,6 +808,12 @@ export const checkImeiFromDhruV2 = async (req: Request, res: Response, next: Nex
                                     }
                               }
 
+                              const aiAnalysis = await analyzeParsedProviderDataWithAi(
+                                    String(imei),
+                                    mergedParsed,
+                                    String(service.name ?? 'unknown')
+                              );
+
                               return {
                                     ok: true,
                                     message: `Bundled IMEI check completed (${checkResults.filter((r) => r.ok).length}/${checkResults.length} services)`,
@@ -816,6 +823,8 @@ export const checkImeiFromDhruV2 = async (req: Request, res: Response, next: Nex
                                           bundledServiceCategory: service.category,
                                           // keep only the merged parsed object to avoid duplicates
                                           providerResults: mergedParsed,
+                                          riskMeter: aiAnalysis.riskMeter,
+                                          aiInsight: aiAnalysis.aiInsight,
                                     },
                               } as SingleImeiCheckResult;
                         }
@@ -860,6 +869,13 @@ export const checkImeiFromDhruV2 = async (req: Request, res: Response, next: Nex
                                     parsedProviderData: extractProviderDataFromHtml(
                                           (result.providerData as Record<string, any>)?.result ?? null
                                     ),
+                                    ...(await analyzeParsedProviderDataWithAi(
+                                          String(imei),
+                                          extractProviderDataFromHtml(
+                                                (result.providerData as Record<string, any>)?.result ?? null
+                                          ),
+                                          String(result.provider)
+                                    )),
                               },
                         } as SingleImeiCheckResult;
                   } catch (error) {
