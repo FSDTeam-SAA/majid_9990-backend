@@ -1,0 +1,328 @@
+{
+  "success": true,
+  "message": "IMEI check (v2) completed",
+  "data": [
+    {
+      "imei": "351297474660682",
+      "ok": true,
+      "message": "IMEI check completed (sickw)",
+      "data": {
+        "provider": "sickw",
+        "parsedProviderData": {
+          "image": {
+            "src": "https://appleid.cdn-apple.com/static/deviceImages-15.0/iPhone/iPhone18,1-3b3b3c-47ade5/online-sourcelist__3x.png",
+            "height": 80,
+            "html": "<img src=\"https://appleid.cdn-apple.com/static/deviceImages-15.0/iPhone/iPhone18,1-3b3b3c-47ade5/online-sourcelist__3x.png\" height=\"80\">"
+          },
+          "device": "iPhone 17 Pro",
+          "imei_number": "351297474660682",
+          "serial_number": "HQDQW53HTV",
+          "serial_key": "69ff378727ae32223c14ab41",
+          "coverage_benefits": "Hardware Service, Chat & Phone Support",
+          "warranty_type": "Limited Warranty",
+          "warranty_expires": "April 20, 2027",
+          "estimated_purchase_date": "April 21, 2026",
+          "activation_status": "Activated",
+          "registration_status": "Yes",
+          "replaced_device": "No",
+          "temp_coverage": "No",
+          "open_repair": "No",
+          "notice": "There are 39 days left to add coverage."
+        }
+      }
+    }
+  ]
+}
+
+
+
+
+------------------------------------------------------------------------------------------------------------------------------------
+
+88
+
+{
+  "success": true,
+  "message": "IMEI check (v2) completed",
+  "data": [
+    {
+      "imei": "351297474660682",
+      "ok": true,
+      "message": "IMEI check completed (sickw)",
+      "data": {
+        "provider": "sickw",
+        "parsedProviderData": {
+          "image": {
+            "src": "https://km.support.apple.com/kb/securedImage.jsp?productid=301245&size=240",
+            "html": "<img src=\"https://km.support.apple.com/kb/securedImage.jsp?productid=301245&size=240\">"
+          },
+          "description": "IPHONE 17 PRO,ROW,256GB,BLU",
+          "imei_number": "351297474660682",
+          "imei2_number": "351297474271241",
+          "meid_number": "35129747466068",
+          "serial_number": "HQDQW53HTV",
+          "lost_mode": "No",
+          "loaner_device": "No",
+          "replaced_device": "No",
+          "valid_purchase_date": "Yes",
+          "activation_status": "Activated",
+          "registration_status": "Registered",
+          "applecare_covered": "No",
+          "applecare_eligible": "No",
+          "applecare_claim_eligible": "No",
+          "applecare_claim_in_progress": "No",
+          "warranty_status": "Limited Warranty",
+          "telephone_technical_support": "Active",
+          "telephone_technical_support_expires_in": "2 Months and 7 Days",
+          "telephone_technical_support_expiration_date": "2026-07-20",
+          "repairs_and_service_coverage": "Active",
+          "repairs_and_service_expires_in": "11 Months and 7 Days",
+          "repairs_and_service_expiration_date": "2027-04-20",
+          "estimated_purchase_date": "2026-04-21",
+          "applecare_purchase_date": "2026-04-20 20:00:00"
+        }
+      }
+    }
+  ]
+}
+
+
+-----------------------------
+30
+
+{
+  "success": true,
+  "message": "IMEI check (v2) completed",
+  "data": [
+    {
+      "imei": "351297474660682",
+      "ok": true,
+      "message": "IMEI check completed (sickw)",
+      "data": {
+        "provider": "sickw",
+        "parsedProviderData": {
+          "model_description": "IPHONE 17 PRO,ROW,256GB,BLU",
+          "imei": "351297474660682",
+          "imei2": "351297474271241",
+          "meid": "35129747466068",
+          "serial_number": "HQDQW53HTV",
+          "estimated_purchase_date": "2025-11-19",
+          "warranty_status": "Limited Warranty",
+          "icloud_lock": "OFF",
+          "demo_unit": "No",
+          "loaner_device": "No",
+          "replaced_device": "No",
+          "replacement_device": "No",
+          "refurbished_device": "No",
+          "locked_carrier": "10 - Unlock",
+          "simlock_status": "Unlocked"
+        }
+      }
+    }
+  ]
+}
+
+-------------------------------
+60
+
+{
+  "success": true,
+  "message": "IMEI check (v2) completed",
+  "data": [
+    {
+      "imei": "351297474660682",
+      "ok": true,
+      "message": "IMEI check completed (sickw)",
+      "data": {
+        "provider": "sickw",
+        "parsedProviderData": {
+          "model_description": "IPHONE 17 PRO,ROW,256GB,BLU",
+          "imei": "351297474660682",
+          "imei2": "351297474271241",
+          "meid": "35129747466068",
+          "serial_number": "HQDQW53HTV",
+          "estimated_purchase_date": "2025-11-19",
+          "warranty_status": "Limited Warranty",
+          "icloud_lock": "OFF",
+          "demo_unit": "No",
+          "loaner_device": "No",
+          "replaced_device": "No",
+          "replacement_device": "No",
+          "refurbished_device": "No",
+          "locked_carrier": "10 - Unlock",
+          "simlock_status": "Unlocked"
+        }
+      }
+    }
+  ]
+}
+------------------------------
+77 
+{
+  "success": true,
+  "message": "IMEI check (v2) completed",
+  "data": [
+    {
+      "imei": "351297474660682",
+      "ok": true,
+      "message": "IMEI check completed (sickw)",
+      "data": {
+        "provider": "sickw",
+        "parsedProviderData": {
+          "serial": "HQDQW53HTV",
+          "imei": "351297474660682",
+          "imei2": "351297474271241",
+          "model": "IPHONE 17 PRO,ROW,256GB,BLU",
+          "messages": ""
+        }
+      }
+    }
+  ]
+}
+
+------------------------------
+81 
+
+{
+  "success": true,
+  "message": "IMEI check (v2) completed",
+  "data": [
+    {
+      "imei": "351297474660682",
+      "ok": true,
+      "message": "IMEI check completed (sickw)",
+      "data": {
+        "provider": "sickw",
+        "parsedProviderData": {
+          "model": "IPHONE 17 PRO DEEP BLUE 256GB-SDH",
+          "imei": "351297474660682",
+          "imei2": "351297474271241",
+          "serial_number": "HQDQW53HTV",
+          "model_number": "MG8J4QN/A",
+          "part_number": "A3523",
+          "mdm_lock": "OFF"
+        }
+      }
+    }
+  ]
+}
+-------------------------------
+bundeling services:
+
+{
+  "success": true,
+  "message": "IMEI check (v2) completed",
+  "data": [
+    {
+      "imei": "351297474660682",
+      "ok": true,
+      "message": "Bundled IMEI check completed (5/5 services)",
+      "data": {
+        "bundledServiceId": 1000,
+        "bundledServiceName": "iPhone all in one /best before buy",
+        "bundledServiceCategory": "fevourite",
+        "providerResults": [
+          {
+            "serviceId": 61,
+            "ok": true,
+            "provider": "sickw",
+            "parsedProviderData": {
+              "model_description": "IPHONE 17 PRO,ROW,256GB,BLU",
+              "imei": "351297474660682",
+              "imei2": "351297474271241",
+              "meid": "35129747466068",
+              "serial_number": "HQDQW53HTV",
+              "telephone_technical_support": "Active",
+              "telephone_technical_support_expires_in": "2 Months and 7 Days",
+              "telephone_technical_support_expiration_date": "2026-07-20",
+              "repairs_and_service_coverage": "Active",
+              "repairs_and_service_expires_in": "11 Months and 7 Days",
+              "repairs_and_service_expiration_date": "2027-04-20",
+              "estimated_purchase_date": "2025-11-19",
+              "warranty_status": "Limited Warranty",
+              "icloud_lock": "OFF",
+              "demo_unit": "No",
+              "loaner_device": "No",
+              "replaced_device": "No",
+              "replacement_device": "No",
+              "refurbished_device": "No",
+              "applecare_eligible": "No",
+              "valid_purchase_date": "Yes",
+              "activation_status": "Activated",
+              "registration_status": "Registered",
+              "blacklist_status": "Clean",
+              "locked_carrier": "10 - Unlock.",
+              "simlock_status": "Unlocked"
+            }
+          },
+          {
+            "serviceId": 8,
+            "ok": true,
+            "provider": "sickw",
+            "parsedProviderData": {
+              "description": "IPHONE 17 PRO,ROW,256GB,BLU",
+              "model": "iPhone 17 Pro",
+              "imei": "351297474660682",
+              "imei2": "351297474271241",
+              "meid": "35129747466068",
+              "serial_number": "HQDQW53HTV",
+              "warranty_status": "Limited Warranty",
+              "purchase_date": "2025-11-19",
+              "replaced_device": "No",
+              "simlock": "Unlocked"
+            }
+          },
+          {
+            "serviceId": 54,
+            "ok": true,
+            "provider": "sickw",
+            "parsedProviderData": {
+              "imei": "351297474660682",
+              "manufacturer": "APPLE",
+              "marketing_name": "Apple iPhone 17 Pro - 1TB - Cosmic Orange",
+              "model": "IPHONE 17 PRO (A3523)",
+              "operating_system": "IOS",
+              "blacklist_status": "Clean"
+            }
+          },
+          {
+            "serviceId": 101,
+            "ok": true,
+            "provider": "sickw",
+            "parsedProviderData": {
+              "image": {
+                "src": "https://appleid.cdn-apple.com/static/deviceImages-15.0/iPhone/iPhone18,1-3b3b3c-47ade5/online-sourcelist__3x.png",
+                "height": 80,
+                "html": "<img src=\"https://appleid.cdn-apple.com/static/deviceImages-15.0/iPhone/iPhone18,1-3b3b3c-47ade5/online-sourcelist__3x.png\" height=\"80\">"
+              },
+              "device": "iPhone 17 Pro",
+              "imei_number": "351297474660682",
+              "serial_number": "HQDQW53HTV",
+              "serial_key": "69ff378727ae32223c14ab41",
+              "coverage_benefits": "Hardware Service, Chat & Phone Support",
+              "warranty_type": "Limited Warranty",
+              "warranty_expires": "April 20, 2027",
+              "estimated_purchase_date": "April 21, 2026",
+              "activation_status": "Activated",
+              "registration_status": "Yes",
+              "replaced_device": "No",
+              "temp_coverage": "No",
+              "open_repair": "No",
+              "notice": "There are 39 days left to add coverage."
+            }
+          },
+          {
+            "serviceId": 92,
+            "ok": true,
+            "provider": "sickw",
+            "parsedProviderData": {
+              "imei_number": "351297474660682",
+              "imei2_number": "351297474271241",
+              "model_description": "IPHONE 17 PRO,ROW,256GB,BLU"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

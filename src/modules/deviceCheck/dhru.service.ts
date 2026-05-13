@@ -88,6 +88,8 @@ class DhruService {
                         },
                   });
 
+                  console.log('dhru service ts, placeImeiOrder___', response);
+
                   return response.data;
             }
 

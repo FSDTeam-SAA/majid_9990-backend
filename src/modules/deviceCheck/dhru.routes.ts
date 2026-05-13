@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import {
       checkImeiFromDhru,
+      checkImeiFromDhruV2,
       checkImeisFromFile,
       getRecentChecksHistory,
       getServices,
@@ -13,6 +14,7 @@ import { protect } from '../../middlewares/auth.middleware';
 const router = Router();
 
 router.post('/check', protect, checkImeiFromDhru);
+router.post('/check-v2', protect, checkImeiFromDhruV2);
 router.post('/check-batch', protect, upload.single('file'), checkImeisFromFile);
 router.post('/risk-analysis', protect, getRiskAnalysis);
 router.post('/device-analysis', protect, getDeviceAnalysis);

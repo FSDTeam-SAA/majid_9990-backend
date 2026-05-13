@@ -1,0 +1,102 @@
+{
+      "success": true,
+      "message": "IMEI check (v2) completed",
+      "data": [
+            {
+                  "imei": "351297474660682",
+                  "ok": true,
+                  "message": "IMEI check completed (sickw)",
+                  "data": {
+                        "provider": "sickw",
+                        "providerData": {
+                              "result": "<img src=\"https://appleid.cdn-apple.com/static/deviceImages-15.0/iPhone/iPhone18,1-3b3b3c-47ade5/online-sourcelist__3x.png\" height=\"80\"><br>Device: iPhone 17 Pro<br>IMEI Number: 351297474660682<br>Serial Number: HQDQW53HTV<br>Serial Key: 69ff378727ae32223c14ab41<br>Coverage Benefits: Hardware Service, Chat &amp; Phone Support<br>Warranty Type: Limited Warranty<br>Warranty Expires: April 20, 2027<br>Estimated Purchase Date: April 21, 2026<br>Activation Status: Activated<br>Registration Status: Yes<br>Replaced Device: No<br>Temp Coverage: No<br>Open Repair: No<br>Notice: There are 39 days left to add coverage.<br>",
+                              "imei": "351297474660682",
+                              "balance": 475.948,
+                              "price": "0.01",
+                              "id": 179239659,
+                              "status": "success",
+                              "ip": "103.186.20.2"
+                        },
+                        "parsedProviderData": {
+                              "device": "iPhone 17 Pro",
+                              "imei_number": "351297474660682",
+                              "serial_number": "HQDQW53HTV",
+                              "serial_key": "69ff378727ae32223c14ab41",
+                              "coverage_benefits": "Hardware Service, Chat & Phone Support",
+                              "warranty_type": "Limited Warranty",
+                              "warranty_expires": "April 20, 2027",
+                              "estimated_purchase_date": "April 21, 2026",
+                              "activation_status": "Activated",
+                              "registration_status": "Yes",
+                              "replaced_device": "No",
+                              "temp_coverage": "No",
+                              "open_repair": "No",
+                              "notice": "There are 39 days left to add coverage."
+                        },
+                        "rowData": {
+                              "device": "iPhone 17 Pro",
+                              "imei_number": "351297474660682",
+                              "serial_number": "HQDQW53HTV",
+                              "serial_key": "69ff378727ae32223c14ab41",
+                              "coverage_benefits": "Hardware Service, Chat & Phone Support",
+                              "warranty_type": "Limited Warranty",
+                              "warranty_expires": "April 20, 2027",
+                              "estimated_purchase_date": "April 21, 2026",
+                              "activation_status": "Activated",
+                              "registration_status": "Yes",
+                              "replaced_device": "No",
+                              "temp_coverage": "No",
+                              "open_repair": "No",
+                              "notice": "There are 39 days left to add coverage."
+                        }
+                  }
+            },
+            {
+                  "imei": "353806443927036",
+                  "ok": true,
+                  "message": "IMEI check completed (sickw)",
+                  "data": {
+                        "provider": "sickw",
+                        "providerData": {
+                              "result": "<img src=\"https://appleid.cdn-apple.com/static/deviceImages-15.0/iPhone/iPhone18,2-3b3b3c-dcdede/online-sourcelist__3x.png\" height=\"80\"><br>Device: iPhone 17 Pro Max<br>IMEI Number: 353806443927036<br>Serial Number: DH7RF6K9NG<br>Serial Key: 69fe088127ae32223c634f41<br>Coverage Benefits: Hardware Service, Chat &amp; Phone Support<br>Warranty Type: Limited Warranty<br>Warranty Expires: March 12, 2027<br>Estimated Purchase Date: March 13, 2026<br>Activation Status: Activated<br>Registration Status: Yes<br>Replaced Device: No<br>Temp Coverage: No<br>Open Repair: No<br>",
+                              "imei": "353806443927036",
+                              "balance": 475.948,
+                              "price": "0.01",
+                              "id": 179239658,
+                              "status": "success",
+                              "ip": "103.186.20.2"
+                        },
+                        "parsedProviderData": {
+                              "device": "iPhone 17 Pro Max",
+                              "imei_number": "353806443927036",
+                              "serial_number": "DH7RF6K9NG",
+                              "serial_key": "69fe088127ae32223c634f41",
+                              "coverage_benefits": "Hardware Service, Chat & Phone Support",
+                              "warranty_type": "Limited Warranty",
+                              "warranty_expires": "March 12, 2027",
+                              "estimated_purchase_date": "March 13, 2026",
+                              "activation_status": "Activated",
+                              "registration_status": "Yes",
+                              "replaced_device": "No",
+                              "temp_coverage": "No",
+                              "open_repair": "No"
+                        },
+                        "rowData": {
+                              "device": "iPhone 17 Pro Max",
+                              "imei_number": "353806443927036",
+                              "serial_number": "DH7RF6K9NG",
+                              "serial_key": "69fe088127ae32223c634f41",
+                              "coverage_benefits": "Hardware Service, Chat & Phone Support",
+                              "warranty_type": "Limited Warranty",
+                              "warranty_expires": "March 12, 2027",
+                              "estimated_purchase_date": "March 13, 2026",
+                              "activation_status": "Activated",
+                              "registration_status": "Yes",
+                              "replaced_device": "No",
+                              "temp_coverage": "No",
+                              "open_repair": "No"
+                        }
+                  }
+            }
+      ]
+}

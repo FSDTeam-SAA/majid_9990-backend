@@ -236,6 +236,8 @@ export const getOpenAiInsight = async (params: {
       }
 };
 
+// This function processes IMEI scan data from a provider response. It extracts device details, checks blacklist, financing, and FMI/iCloud lock status, calculates device risk and estimated market value, generates AI-based insights, and returns a structured report containing device status, risk meter, market value, verification checks, and report generation information.
+
 export const buildStructuredScanInfo = async (imei: string, providerData: ProviderPayload) => {
       const sourceText = extractTextBlock(providerData);
 

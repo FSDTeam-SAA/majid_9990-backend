@@ -6,7 +6,13 @@ import AppError from '../../errors/AppError';
 import { ImeiServiceCatalog } from './imeiService.model';
 import { curatedDhruServices, normalizeServiceName } from './dhru.services.catalog';
 import { dhruService } from './dhru.service';
-import { getExistingScanInfoByImei, isValidImei, resolveServiceId, runImeiCheck } from './deviceCheck.helpers';
+import {
+      getExistingScanInfoByImei,
+      isValidImei,
+      resolveServiceId,
+      runImeiCheck,
+      extractProviderDataFromHtml,
+} from './deviceCheck.helpers';
 import { creditUserBalance, debitUserBalance } from '../payment/balanceTransaction.service';
 import ScanInfo from './scanInfo.model';
 
@@ -618,6 +624,290 @@ export const checkImeiFromDhru = async (req: Request, res: Response, next: NextF
             return res.status(200).json({
                   success: true,
                   message: 'IMEI check completed',
+                  data: results,
+            });
+      } catch (error) {
+            next(error);
+      }
+};
+
+// V2: return raw provider rows from DHRU; do NOT use cached DB data, do NOT merge bundled results, no AI fields
+export const checkImeiFromDhruV2 = async (req: Request, res: Response, next: NextFunction) => {
+      try {
+            const userId = req.user._id;
+
+            // ===== IMEI NORMALIZATION =====
+            const imeiInput = req.body?.imei;
+
+            const imeiList: string[] = Array.isArray(imeiInput)
+                  ? imeiInput.map((i: string) => String(i).trim()).filter(Boolean)
+                  : [String(imeiInput ?? '').trim()].filter(Boolean);
+
+            // ===== VALIDATION =====
+            if (!imeiList.length) {
+                  return res.status(400).json({
+                        success: false,
+                        message: 'IMEI is required',
+                  });
+            }
+
+            // ===== SERVICE ID =====
+            const requestedServiceId = resolveServiceId(req.body?.serviceId);
+
+            // ===== GENERATE FLAG =====
+            const shouldGenerateFresh =
+                  String(req.body?.genarate ?? req.body?.generate ?? '')
+                        .trim()
+                        .toLowerCase() === 'new';
+
+            // Process one IMEI: no cache usage, no AI, and no merging for bundled services
+            const processSingleImeiCheckV2 = async (
+                  userId: string,
+                  imei: string,
+                  serviceId: number,
+                  shouldGenerateFresh: boolean
+            ) => {
+                  if (!imei || !isValidImei(imei)) {
+                        return {
+                              ok: false,
+                              statusCode: 400,
+                              message: 'Valid 15-digit imei is required',
+                        } as SingleImeiCheckResult;
+                  }
+
+                  if (!Number.isFinite(serviceId) || serviceId <= 0) {
+                        return {
+                              ok: false,
+                              statusCode: 400,
+                              message: 'Valid serviceId is required',
+                        } as SingleImeiCheckResult;
+                  }
+
+                  const service = await findServiceByServiceId(serviceId);
+
+                  if (!service) {
+                        return {
+                              ok: false,
+                              statusCode: 404,
+                              message: 'Service not found in the catalog',
+                        } as SingleImeiCheckResult;
+                  }
+
+                  const servicePrice = resolveServicePrice(service);
+                  const shouldCharge = servicePrice > 0;
+
+                  if (shouldCharge) {
+                        try {
+                              await debitUserBalance({
+                                    userId,
+                                    amount: servicePrice,
+                                    currency: service.currency ?? 'USD',
+                                    source: 'imei_service',
+                                    description: `IMEI service charge for ${service.name}`,
+                                    serviceId,
+                                    serviceName: service.name,
+                                    imei,
+                                    metadata: {
+                                          normalizedName: service.normalizedName,
+                                    },
+                              });
+                        } catch (error) {
+                              if (error instanceof AppError) {
+                                    return {
+                                          ok: false,
+                                          statusCode: error.statusCode || 400,
+                                          message: error.message,
+                                    } as SingleImeiCheckResult;
+                              }
+
+                              throw error;
+                        }
+                  }
+
+                  // If bundled (multiple serviceIds), run each provider separately and return raw rows
+                  const hasMultipleServices = Array.isArray(service.serviceIds) && service.serviceIds.length > 1;
+
+                  try {
+                        if (hasMultipleServices) {
+                              const svcIds: number[] = service.serviceIds;
+
+                              const checkResults = await Promise.all(
+                                    svcIds.map(async (svcId) => {
+                                          const result = await runImeiCheck(String(imei), svcId, userId);
+                                          return {
+                                                serviceId: svcId,
+                                                ok: result.ok,
+                                                provider: result.ok ? result.provider : null,
+                                                message: !result.ok ? result.message : undefined,
+                                                statusCode: !result.ok ? result.statusCode : undefined,
+                                                // only include parsed key/value pairs to avoid duplication
+                                                parsedProviderData: result.ok
+                                                      ? extractProviderDataFromHtml(
+                                                              (result.providerData as Record<string, any>)?.result ??
+                                                                    null
+                                                        )
+                                                      : null,
+                                          };
+                                    })
+                              );
+
+                              const allFailed = checkResults.every((r) => !r.ok);
+                              if (allFailed) {
+                                    if (shouldCharge) {
+                                          const refundServiceId = Number(service.serviceId ?? requestedServiceId);
+
+                                          await creditUserBalance({
+                                                userId,
+                                                amount: servicePrice,
+                                                currency: service.currency ?? 'USD',
+                                                source: 'refund',
+                                                description: `Refund for failed bundled IMEI service ${service.name}`,
+                                                serviceId: Number.isFinite(refundServiceId)
+                                                      ? refundServiceId
+                                                      : requestedServiceId,
+                                                serviceName: service.name,
+                                                imei,
+                                                metadata: {
+                                                      normalizedName: service.normalizedName,
+                                                      reason: 'All bundled checks failed (v2)',
+                                                      bundledServiceIds: svcIds,
+                                                },
+                                          }).catch(() => undefined);
+                                    }
+
+                                    return {
+                                          ok: false,
+                                          statusCode: 400,
+                                          message: 'All bundled IMEI checks failed',
+                                          data: {
+                                                bundledServiceId: service.serviceId,
+                                                serviceName: service.name,
+                                                results: checkResults.map((r) => ({
+                                                      serviceId: r.serviceId,
+                                                      ok: r.ok,
+                                                      message: r.message,
+                                                })),
+                                          },
+                                    } as SingleImeiCheckResult;
+                              }
+
+                              // Merge parsedProviderData across providerResults, de-duplicating identical values
+                              const mergedParsed: Record<string, any> = {};
+                              const seenValues = new Set<string>();
+
+                              for (const pr of checkResults) {
+                                    const pd = pr.parsedProviderData as Record<string, any> | null;
+                                    if (!pd || typeof pd !== 'object') continue;
+
+                                    for (const [k, v] of Object.entries(pd)) {
+                                          const valueStr = typeof v === 'object' ? JSON.stringify(v) : String(v);
+                                          if (seenValues.has(valueStr)) continue;
+                                          mergedParsed[k] = v;
+                                          seenValues.add(valueStr);
+                                    }
+                              }
+
+                              return {
+                                    ok: true,
+                                    message: `Bundled IMEI check completed (${checkResults.filter((r) => r.ok).length}/${checkResults.length} services)`,
+                                    data: {
+                                          bundledServiceId: service.serviceId,
+                                          bundledServiceName: service.name,
+                                          bundledServiceCategory: service.category,
+                                          // keep only the merged parsed object to avoid duplicates
+                                          providerResults: mergedParsed,
+                                    },
+                              } as SingleImeiCheckResult;
+                        }
+
+                        // Single serviceId: always call provider (no cache)
+                        const result = await runImeiCheck(String(imei), serviceId, userId);
+
+                        if (!result.ok) {
+                              if (shouldCharge) {
+                                    await creditUserBalance({
+                                          userId,
+                                          amount: servicePrice,
+                                          currency: service.currency ?? 'USD',
+                                          source: 'refund',
+                                          description: `Refund for failed IMEI service ${service.name}`,
+                                          serviceId,
+                                          serviceName: service.name,
+                                          imei,
+                                          metadata: {
+                                                normalizedName: service.normalizedName,
+                                                reason: result.message,
+                                          },
+                                    }).catch(() => undefined);
+                              }
+
+                              return {
+                                    ok: false,
+                                    statusCode: result.statusCode,
+                                    message: result.message,
+                                    data: result.data,
+                              } as SingleImeiCheckResult;
+                        }
+
+                        return {
+                              ok: true,
+                              message: shouldGenerateFresh
+                                    ? `IMEI check regenerated (${result.provider})`
+                                    : `IMEI check completed (${result.provider})`,
+                              data: {
+                                    // only include parsed key/value pairs to avoid duplication
+                                    provider: result.provider,
+                                    parsedProviderData: extractProviderDataFromHtml(
+                                          (result.providerData as Record<string, any>)?.result ?? null
+                                    ),
+                              },
+                        } as SingleImeiCheckResult;
+                  } catch (error) {
+                        if (shouldCharge) {
+                              const refundServiceId = Number(service.serviceId ?? requestedServiceId);
+
+                              await creditUserBalance({
+                                    userId,
+                                    amount: servicePrice,
+                                    currency: service.currency ?? 'USD',
+                                    source: 'refund',
+                                    description: `Refund for failed bundled IMEI service ${service.name}`,
+                                    serviceId: Number.isFinite(refundServiceId) ? refundServiceId : requestedServiceId,
+                                    serviceName: service.name,
+                                    imei,
+                                    metadata: {
+                                          normalizedName: service.normalizedName,
+                                          reason: error instanceof Error ? error.message : 'Unknown error',
+                                          bundledServiceIds: service.serviceIds ?? [],
+                                    },
+                              }).catch(() => undefined);
+                        }
+
+                        throw error;
+                  }
+            };
+
+            // ===== PROCESS ALL IMEIs IN PARALLEL =====
+            const results = await Promise.all(
+                  imeiList.map(async (imei) => {
+                        const result = await processSingleImeiCheckV2(
+                              userId,
+                              imei,
+                              requestedServiceId,
+                              shouldGenerateFresh
+                        );
+
+                        return {
+                              imei,
+                              ...result,
+                        };
+                  })
+            );
+
+            // ===== RESPONSE =====
+            return res.status(200).json({
+                  success: true,
+                  message: 'IMEI check (v2) completed',
                   data: results,
             });
       } catch (error) {

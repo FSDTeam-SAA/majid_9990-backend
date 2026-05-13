@@ -5,6 +5,92 @@ import { dhruService } from './dhru.service';
 const DEFAULT_SERVICE_ID = Number(process.env.DHRU_SERVICE_ID ?? 6);
 const ENABLE_SERVICE_FALLBACK = String(process.env.IMEI_ENABLE_SERVICE_FALLBACK ?? 'false').toLowerCase() === 'true';
 
+/**
+ * Decode common HTML entities
+ */
+const decodeHtmlEntities = (text: string): string => {
+      const entities: Record<string, string> = {
+            '&amp;': '&',
+            '&lt;': '<',
+            '&gt;': '>',
+            '&quot;': '"',
+            '&#39;': "'",
+      };
+
+      let decoded = text;
+      for (const [entity, char] of Object.entries(entities)) {
+            decoded = decoded.replace(new RegExp(entity, 'g'), char);
+      }
+
+      return decoded;
+};
+
+/**
+ * Extract key-value pairs from HTML result string (format: "Key: Value<br>Key: Value...")
+ * Converts keys to snake_case and decodes HTML entities
+ */
+export const extractProviderDataFromHtml = (htmlString: string | null | undefined): Record<string, unknown> => {
+      if (!htmlString || typeof htmlString !== 'string') {
+            return {};
+      }
+
+      // Extract first <img> tag attributes (src, alt, height, width) if present
+      const imageInfo: Record<string, unknown> | null = (() => {
+            const imgMatch = htmlString.match(/<img\s+[^>]*src=("|')([^"']+)("|')[^>]*>/i);
+            if (!imgMatch) return null;
+
+            const imgTag = imgMatch[0];
+            const src = imgMatch[2];
+            const altMatch = imgTag.match(/alt=("|')([^"']*)("|')/i);
+            const heightMatch = imgTag.match(/height=("|')?(\d+)("|')?/i);
+            const widthMatch = imgTag.match(/width=("|')?(\d+)("|')?/i);
+
+            return {
+                  src,
+                  alt: altMatch ? decodeHtmlEntities(altMatch[2]) : undefined,
+                  height: heightMatch ? Number(heightMatch[2]) : undefined,
+                  width: widthMatch ? Number(widthMatch[2]) : undefined,
+                  html: imgTag,
+            };
+      })();
+
+      // Remove image tags so they don't pollute the key/value parsing
+      const htmlWithoutImg = htmlString.replace(/<img[^>]*>/gi, '');
+
+      const lines = htmlWithoutImg.split(/<br\s*\/?>/gi).filter((line) => line.trim().length > 0);
+      const data: Record<string, unknown> = {};
+
+      if (imageInfo) {
+            data.image = imageInfo;
+      }
+
+      for (const line of lines) {
+            // Remove HTML tags (like <img>)
+            const cleanedLine = line.replace(/<[^>]*>/g, '').trim();
+
+            if (cleanedLine.includes(':')) {
+                  const colonIndex = cleanedLine.indexOf(':');
+                  const key = cleanedLine.substring(0, colonIndex).trim();
+                  const value = cleanedLine.substring(colonIndex + 1).trim();
+
+                  // Decode HTML entities
+                  const decodedValue = decodeHtmlEntities(value);
+
+                  // Convert key to snake_case (e.g., "IMEI Number" → "imei_number")
+                  const snakeCaseKey = key
+                        .toLowerCase()
+                        .replace(/\s+/g, '_')
+                        .replace(/[^a-z0-9_]/g, '');
+
+                  if (snakeCaseKey.length > 0) {
+                        data[snakeCaseKey] = decodedValue;
+                  }
+            }
+      }
+
+      return data;
+};
+
 export const isValidImei = (imei: string): boolean => /^\d{15}$/.test(imei);
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -189,29 +275,39 @@ export const runImeiCheck = async (
 
       if (!providerPayload) {
             if (!orderId) {
-                  return {
-                        ok: false,
-                        statusCode: 500,
-                        message: 'Order was accepted but order id not found in provider response',
-                        data: placeOrderResponse,
-                  };
+                  // Some providers return the final result HTML inside the initial response
+                  // without an order id. Treat that response as the final provider payload
+                  // when it contains a `result`, `RESULT` or `data` field.
+                  const possiblePayload =
+                        placeOrderResponse?.result ?? placeOrderResponse?.RESULT ?? placeOrderResponse?.data ?? null;
+
+                  if (possiblePayload) {
+                        providerPayload = placeOrderResponse;
+                  } else {
+                        return {
+                              ok: false,
+                              statusCode: 500,
+                              message: 'Order was accepted but order id not found in provider response',
+                              data: placeOrderResponse,
+                        };
+                  }
+            } else {
+                  const polledResult = await pollImeiOrderResult(orderId);
+
+                  if ('error' in polledResult) {
+                        return {
+                              ok: false,
+                              statusCode: 400,
+                              message:
+                                    polledResult.error.ERROR?.[0]?.FULL_DESCRIPTION ||
+                                    polledResult.error.ERROR?.[0]?.MESSAGE ||
+                                    'Provider returned an error while fetching the result',
+                              data: polledResult.error,
+                        };
+                  }
+
+                  providerPayload = polledResult.result;
             }
-
-            const polledResult = await pollImeiOrderResult(orderId);
-
-            if ('error' in polledResult) {
-                  return {
-                        ok: false,
-                        statusCode: 400,
-                        message:
-                              polledResult.error.ERROR?.[0]?.FULL_DESCRIPTION ||
-                              polledResult.error.ERROR?.[0]?.MESSAGE ||
-                              'Provider returned an error while fetching the result',
-                        data: polledResult.error,
-                  };
-            }
-
-            providerPayload = polledResult.result;
       }
 
       const structuredInfo = await buildStructuredScanInfo(imei, providerPayload ?? {});
