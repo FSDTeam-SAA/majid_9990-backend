@@ -1,0 +1,139 @@
+{
+      "info": {
+            "name": "Low Stock Alert API",
+            "description": "Collection for Low Stock Alert System APIs",
+            "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+      },
+      "item": [
+            {
+                  "name": "Create Low Stock Alert",
+                  "request": {
+                        "method": "POST",
+                        "header": [
+                              {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                              },
+                              {
+                                    "key": "Authorization",
+                                    "value": "Bearer {{token}}"
+                              }
+                        ],
+                        "body": {
+                              "mode": "raw",
+                              "raw": "{\n  \"minimumStock\": 10\n}"
+                        },
+                        "url": {
+                              "raw": "{{base_url}}/low-stock-alert/create",
+                              "host": ["{{base_url}}"],
+                              "path": ["low-stock-alert", "create"]
+                        },
+                        "description": "Create a new low stock alert for the authenticated shopkeeper"
+                  },
+                  "response": []
+            },
+            {
+                  "name": "Get My Low Stock Alert",
+                  "request": {
+                        "method": "GET",
+                        "header": [
+                              {
+                                    "key": "Authorization",
+                                    "value": "Bearer {{token}}"
+                              }
+                        ],
+                        "url": {
+                              "raw": "{{base_url}}/low-stock-alert/my-alert",
+                              "host": ["{{base_url}}"],
+                              "path": ["low-stock-alert", "my-alert"]
+                        },
+                        "description": "Get the low stock alert for the authenticated user"
+                  },
+                  "response": []
+            },
+            {
+                  "name": "Get Low Stock Alert By ID",
+                  "request": {
+                        "method": "GET",
+                        "header": [
+                              {
+                                    "key": "Authorization",
+                                    "value": "Bearer {{token}}"
+                              }
+                        ],
+                        "url": {
+                              "raw": "{{base_url}}/low-stock-alert/{{alert_id}}",
+                              "host": ["{{base_url}}"],
+                              "path": ["low-stock-alert", "{{alert_id}}"]
+                        },
+                        "description": "Get a specific low stock alert by ID"
+                  },
+                  "response": []
+            },
+            {
+                  "name": "Update Low Stock Alert",
+                  "request": {
+                        "method": "PUT",
+                        "header": [
+                              {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                              },
+                              {
+                                    "key": "Authorization",
+                                    "value": "Bearer {{token}}"
+                              }
+                        ],
+                        "body": {
+                              "mode": "raw",
+                              "raw": "{\n  \"minimumStock\": 20\n}"
+                        },
+                        "url": {
+                              "raw": "{{base_url}}/low-stock-alert/update/{{alert_id}}",
+                              "host": ["{{base_url}}"],
+                              "path": ["low-stock-alert", "update", "{{alert_id}}"]
+                        },
+                        "description": "Update an existing low stock alert"
+                  },
+                  "response": []
+            },
+            {
+                  "name": "Delete Low Stock Alert",
+                  "request": {
+                        "method": "DELETE",
+                        "header": [
+                              {
+                                    "key": "Authorization",
+                                    "value": "Bearer {{token}}"
+                              }
+                        ],
+                        "url": {
+                              "raw": "{{base_url}}/low-stock-alert/delete/{{alert_id}}",
+                              "host": ["{{base_url}}"],
+                              "path": ["low-stock-alert", "delete", "{{alert_id}}"]
+                        },
+                        "description": "Delete a low stock alert"
+                  },
+                  "response": []
+            }
+      ],
+      "variable": [
+            {
+                  "key": "base_url",
+                  "value": "http://localhost:5000/api",
+                  "type": "string"
+            },
+            {
+                  "key": "token",
+                  "value": "",
+                  "type": "string",
+                  "description": "JWT token from authentication"
+            },
+            {
+                  "key": "alert_id",
+                  "value": "",
+                  "type": "string",
+                  "description": "Low stock alert ID"
+            }
+      ]
+}

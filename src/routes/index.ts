@@ -13,6 +13,7 @@ import reviewRoutes from '../modules/review/review.router';
 import barcodeRouter from '../modules/barcode/barcode.router';
 import bankDetailsRouter from '../modules/bankDetails/bankDetails.router';
 import locationRouter from '../modules/location/location.router';
+import lowStockAlertRouter from '../modules/lowStockAlert/lowStockAlert.router';
 
 const router = Router();
 
@@ -76,6 +77,10 @@ const moduleRoutes = [
       {
             path: '/location',
             route: locationRouter,
+      },
+      {
+            path: '/low-stock-alert',
+            route: lowStockAlertRouter,
       },
 ];
 moduleRoutes.forEach((route) => router.use(route.path, route.route));
