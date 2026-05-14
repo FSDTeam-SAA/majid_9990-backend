@@ -11,7 +11,7 @@ const createLowStockAlert = async (payload: Partial<ILowStockAlert>, shopkeeperI
       });
 
       if (existingAlert) {
-            throw new AppError(StatusCodes.CONFLICT, 'Low stock alert already exists for this shopkeeper');
+            throw new AppError('Low stock alert already exists for this shopkeeper', StatusCodes.CONFLICT);
       }
 
       const alertData = {
@@ -32,11 +32,11 @@ const updateLowStockAlert = async (
       const alert = await LowStockAlert.findById(id);
 
       if (!alert) {
-            throw new AppError(StatusCodes.NOT_FOUND, 'Low stock alert not found');
+            throw new AppError('Low stock alert not found', StatusCodes.NOT_FOUND);
       }
 
       if (alert.shopkeeperId.toString() !== shopkeeperId) {
-            throw new AppError(StatusCodes.FORBIDDEN, 'You do not have permission to update this alert');
+            throw new AppError('You do not have permission to update this alert', StatusCodes.FORBIDDEN);
       }
 
       const updatedAlert = await LowStockAlert.findByIdAndUpdate(id, payload, {
@@ -45,7 +45,7 @@ const updateLowStockAlert = async (
       });
 
       if (!updatedAlert) {
-            throw new AppError(StatusCodes.NOT_FOUND, 'Low stock alert not found');
+            throw new AppError('Low stock alert not found', StatusCodes.NOT_FOUND);
       }
 
       return updatedAlert;
@@ -56,11 +56,11 @@ const deleteLowStockAlert = async (id: string, shopkeeperId: string): Promise<vo
       const alert = await LowStockAlert.findById(id);
 
       if (!alert) {
-            throw new AppError(StatusCodes.NOT_FOUND, 'Low stock alert not found');
+            throw new AppError('Low stock alert not found', StatusCodes.NOT_FOUND);
       }
 
       if (alert.shopkeeperId.toString() !== shopkeeperId) {
-            throw new AppError(StatusCodes.FORBIDDEN, 'You do not have permission to delete this alert');
+            throw new AppError('You do not have permission to delete this alert', StatusCodes.FORBIDDEN);
       }
 
       await LowStockAlert.findByIdAndDelete(id);
