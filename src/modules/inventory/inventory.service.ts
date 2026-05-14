@@ -7,6 +7,10 @@ import { createNotification } from '../socket/notification.service';
 import { IInventory, TInventoryStatus, TInventoryType } from './inventory.interface';
 import { Inventory } from './inventory.model';
 import { uploadToCloudinary } from '../../utils/cloudinary';
+import { enqueueLowStockEmail } from '../../workers/lowStockEmailWorker';
+import config from '../../config/config';
+import { LowStockAlert } from '../lowStockAlert/lowStockAlert.model';
+import { User } from '../user/user.model';
 
 const parseOptionalNumber = (value: unknown) => {
       if (value === undefined || value === null || value === '') {
@@ -185,6 +189,7 @@ const sendLowStockAlert = async (inventoryItem: any) => {
             return;
       }
 
+      // Create socket notification
       await createNotification({
             to: new Types.ObjectId(String(recipientId)),
             title: 'Low Stock Alert',
@@ -192,6 +197,49 @@ const sendLowStockAlert = async (inventoryItem: any) => {
             type: 'LOW_STOCK',
             id: new Types.ObjectId(String(inventoryItem._id)),
       });
+
+      // Send email notification if enabled
+      if (config.lowStockAlert.enableEmailNotification) {
+            try {
+                  // Fetch low stock alert configuration for this user
+                  const lowStockAlertConfig = await LowStockAlert.findOne({
+                        shopkeeperId: new Types.ObjectId(String(recipientId)),
+                  });
+
+                  // Fetch user data for email and name
+                  const user = await User.findById(recipientId).select('email firstName lastName');
+
+                  if (!user || !user.email) {
+                        console.warn(`[LowStockAlert] User ${recipientId} has no email configured`);
+                        return;
+                  }
+
+                  // Check if alert threshold is met (use user's minimumStock or item's minStockLevel)
+                  const alertThreshold = lowStockAlertConfig?.minimumStock ?? minStockLevel;
+
+                  if (quantity > alertThreshold) {
+                        return;
+                  }
+
+                  // Enqueue email sending in worker thread
+                  await enqueueLowStockEmail({
+                        userId: String(recipientId),
+                        email: user.email,
+                        shopkeeperName: `${user.firstName} ${user.lastName}`.trim() || 'Shopkeeper',
+                        lowStockItems: [
+                              {
+                                    itemName: inventoryItem.itemName,
+                                    quantity: quantity,
+                                    minimumStock: alertThreshold,
+                                    imeiNumber: inventoryItem.imeiNumber,
+                              },
+                        ],
+                  });
+            } catch (error: any) {
+                  console.error('[LowStockAlert] Error enqueueing email:', error.message);
+                  // Don't throw - let system continue even if email fails
+            }
+      }
 };
 
 const assertValidObjectId = (value: string, fieldName: string) => {

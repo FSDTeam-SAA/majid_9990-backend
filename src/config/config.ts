@@ -22,4 +22,9 @@ export default {
       stripe_webhook_secret: process.env.STRIPE_WEBHOOK_SECRET,
       stripe_public_key: process.env.STRIPE_PUBLIC_KEY,
       frontend_url: process.env.FRONTEND_URL,
+      lowStockAlert: {
+            enableEmailNotification: process.env.LOW_STOCK_ENABLE_EMAIL !== 'false',
+            workerCount: parseInt(process.env.LOW_STOCK_EMAIL_WORKERS || '4', 10),
+            emailBatchSize: parseInt(process.env.LOW_STOCK_EMAIL_BATCH_SIZE || '5', 10),
+      },
 };
