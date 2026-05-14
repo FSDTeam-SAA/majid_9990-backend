@@ -37,20 +37,20 @@ export const extractProviderDataFromHtml = (htmlString: string | null | undefine
 
       // Extract first <img> tag attributes (src, alt, height, width) if present
       const imageInfo: Record<string, unknown> | null = (() => {
-            const imgMatch = htmlString.match(/<img\s+[^>]*src=("|')([^"']+)("|')[^>]*>/i);
+            const imgMatch = /<img\s+[^>]*src=['"]([^'"]+)['"][^>]*>/i.exec(htmlString);
             if (!imgMatch) return null;
 
             const imgTag = imgMatch[0];
-            const src = imgMatch[2];
-            const altMatch = imgTag.match(/alt=("|')([^"']*)("|')/i);
-            const heightMatch = imgTag.match(/height=("|')?(\d+)("|')?/i);
-            const widthMatch = imgTag.match(/width=("|')?(\d+)("|')?/i);
+            const src = imgMatch[1];
+            const altMatch = /alt=['"]([^'"]*)['"]/i.exec(imgTag);
+            const heightMatch = /height=['"]?(\d+)['"]?/i.exec(imgTag);
+            const widthMatch = /width=['"]?(\d+)['"]?/i.exec(imgTag);
 
             return {
                   src,
-                  alt: altMatch ? decodeHtmlEntities(altMatch[2]) : undefined,
-                  height: heightMatch ? Number(heightMatch[2]) : undefined,
-                  width: widthMatch ? Number(widthMatch[2]) : undefined,
+                  alt: altMatch ? decodeHtmlEntities(altMatch[1]) : undefined,
+                  height: heightMatch ? Number(heightMatch[1]) : undefined,
+                  width: widthMatch ? Number(widthMatch[1]) : undefined,
                   html: imgTag,
             };
       })();
@@ -107,36 +107,128 @@ const parseJsonObject = (value: string) => {
       }
 };
 
+const normalizeText = (value: unknown) => {
+      if (value == null) {
+            return '';
+      }
+
+      if (typeof value === 'object') {
+            try {
+                  return JSON.stringify(value).replace(/\s+/g, ' ').trim().toLowerCase();
+            } catch {
+                  return '';
+            }
+      }
+
+      if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+            return String(value).replace(/\s+/g, ' ').trim().toLowerCase();
+      }
+
+      return '';
+};
+
+const collectTextValues = (value: unknown, output: string[] = []) => {
+      if (value == null) {
+            return output;
+      }
+
+      if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+            const text = normalizeText(value);
+            if (text) {
+                  output.push(text);
+            }
+            return output;
+      }
+
+      if (Array.isArray(value)) {
+            for (const item of value) {
+                  collectTextValues(item, output);
+            }
+
+            return output;
+      }
+
+      if (typeof value === 'object') {
+            for (const [key, nestedValue] of Object.entries(value as Record<string, unknown>)) {
+                  const keyText = normalizeText(key);
+                  if (keyText) {
+                        output.push(keyText);
+                  }
+
+                  collectTextValues(nestedValue, output);
+            }
+      }
+
+      return output;
+};
+
+const buildProviderSignalText = (parsedProviderData: Record<string, unknown>) => {
+      const textValues = Array.from(new Set(collectTextValues(parsedProviderData)));
+      return textValues.join(' | ');
+};
+
+const scoreProviderSignals = (signalText: string) => {
+      const text = signalText.toLowerCase();
+
+      const has = (pattern: RegExp) => pattern.test(text);
+
+      if (!text || text === '{}') {
+            return 50;
+      }
+
+      let score = 35;
+
+      if (has(/blacklist|blacklisted|stolen|lost\s*mode|reported\s*stolen|fraud|blocked/)) {
+            score += 45;
+      }
+
+      if (has(/icloud\s*lock|fmi\s*on|mdm\s*lock|activation\s*lock|find\s*my\s*iphone|simlock|locked/)) {
+            score += 25;
+      }
+
+      if (has(/finance|financed|payment\s*plan|installment|contract|balance\s*due|remaining\s*amount/)) {
+            score += 18;
+      }
+
+      if (has(/clean|clear|unlocked|no\s*lock|off|passed|activated|available/)) {
+            score -= 20;
+      }
+
+      if (has(/unknown|n\/a|not\s*available|unable\s*to\s*determine|no\s*data/)) {
+            score += 6;
+      }
+
+      return Math.max(1, Math.min(100, Math.round(score)));
+};
+
+const buildFallbackInsight = (providerName: string | undefined, riskMeter: number) => {
+      let title = 'AI INSIGHT';
+      let riskBand = 'low';
+
+      if (riskMeter >= 75) {
+            title = 'HIGH RISK ALERT';
+            riskBand = 'high';
+      } else if (riskMeter >= 40) {
+            title = 'RISK REVIEW';
+            riskBand = 'moderate';
+      }
+
+      return {
+            title,
+            message: providerName
+                  ? `Parsed data from ${providerName} suggests a ${riskBand} risk profile. Review the provider fields before purchase.`
+                  : `Parsed provider data suggests a ${riskBand} risk profile. Review the provider fields before purchase.`,
+      };
+};
+
 export const analyzeParsedProviderDataWithAi = async (
       imei: string,
       parsedProviderData: Record<string, unknown>,
       providerName?: string
 ) => {
-      const sourceText = JSON.stringify(parsedProviderData ?? {});
-      const fallbackRiskMeter = (() => {
-            const text = sourceText.toLowerCase();
-
-            if (!text || text === '{}') {
-                  return 50;
-            }
-
-            if (/(blacklist|stolen|lost mode|icloud lock|mdm lock|mdm_lock|simlock|locked)/i.test(text)) {
-                  return 82;
-            }
-
-            if (/(clean|unlocked|no|off|passed|activated)/i.test(text)) {
-                  return 24;
-            }
-
-            return 50;
-      })();
-
-      const fallbackInsight = {
-            title: 'AI INSIGHT',
-            message: providerName
-                  ? `Parsed data from ${providerName} was analyzed. Review the details before purchase.`
-                  : 'Parsed provider data was analyzed. Review the details before purchase.',
-      };
+      const providerSignalText = buildProviderSignalText(parsedProviderData ?? {});
+      const fallbackRiskMeter = scoreProviderSignals(providerSignalText);
+      const fallbackInsight = buildFallbackInsight(providerName, fallbackRiskMeter);
 
       const apiKey = String(process.env.OPENAI_API_KEY ?? '').trim();
       if (!apiKey) {
@@ -153,18 +245,52 @@ export const analyzeParsedProviderDataWithAi = async (
                   'https://api.openai.com/v1/chat/completions',
                   {
                         model,
-                        temperature: 0.2,
+                        temperature: 0.1,
+                        response_format: { type: 'json_object' },
                         messages: [
                               {
                                     role: 'system',
-                                    content: 'You are an IMEI risk analyst. Return strict JSON only with keys: riskMeter, title, message. riskMeter must be a number from 1 to 100.',
+                                    content: 'You are an IMEI risk analyst. Return strict JSON only with keys: riskMeter, title, message. riskMeter must be an integer from 1 to 100. Base the result only on the provided provider data signals, not on general assumptions.',
                               },
                               {
                                     role: 'user',
                                     content: JSON.stringify({
                                           imei,
                                           providerName: providerName ?? 'unknown',
+                                          providerSignalText,
                                           parsedProviderData,
+                                          scoringHints: {
+                                                blacklistSignals: [
+                                                      'blacklist',
+                                                      'blacklisted',
+                                                      'stolen',
+                                                      'lost mode',
+                                                      'reported stolen',
+                                                ],
+                                                lockSignals: [
+                                                      'icloud lock',
+                                                      'fmi on',
+                                                      'mdm lock',
+                                                      'activation lock',
+                                                      'simlock',
+                                                      'locked',
+                                                ],
+                                                financeSignals: [
+                                                      'finance',
+                                                      'financed',
+                                                      'payment plan',
+                                                      'installment',
+                                                      'contract',
+                                                ],
+                                                positiveSignals: [
+                                                      'clean',
+                                                      'clear',
+                                                      'unlocked',
+                                                      'off',
+                                                      'passed',
+                                                      'activated',
+                                                ],
+                                          },
                                     }),
                               },
                         ],
@@ -198,18 +324,25 @@ export const analyzeParsedProviderDataWithAi = async (
             const riskMeter = Number.isFinite(parsedRiskMeter)
                   ? Math.min(100, Math.max(1, Math.round(parsedRiskMeter)))
                   : fallbackRiskMeter;
+            const safeRiskMeter = Math.abs(riskMeter - fallbackRiskMeter) > 35 ? fallbackRiskMeter : riskMeter;
+
+            const title =
+                  typeof (parsed as Record<string, unknown>).title === 'string' &&
+                  String((parsed as Record<string, unknown>).title).trim().length > 0
+                        ? String((parsed as Record<string, unknown>).title).trim()
+                        : fallbackInsight.title;
+
+            const message =
+                  typeof (parsed as Record<string, unknown>).message === 'string' &&
+                  String((parsed as Record<string, unknown>).message).trim().length > 0
+                        ? String((parsed as Record<string, unknown>).message).trim()
+                        : fallbackInsight.message;
 
             return {
-                  riskMeter,
+                  riskMeter: safeRiskMeter,
                   aiInsight: {
-                        title:
-                              typeof (parsed as Record<string, unknown>).title === 'string'
-                                    ? String((parsed as Record<string, unknown>).title)
-                                    : 'AI INSIGHT',
-                        message:
-                              typeof (parsed as Record<string, unknown>).message === 'string'
-                                    ? String((parsed as Record<string, unknown>).message)
-                                    : fallbackInsight.message,
+                        title,
+                        message,
                   },
             };
       } catch {
