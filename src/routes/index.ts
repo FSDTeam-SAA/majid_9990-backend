@@ -14,6 +14,7 @@ import barcodeRouter from '../modules/barcode/barcode.router';
 import bankDetailsRouter from '../modules/bankDetails/bankDetails.router';
 import locationRouter from '../modules/location/location.router';
 import lowStockAlertRouter from '../modules/lowStockAlert/lowStockAlert.router';
+import invoiceRouter from '../modules/invoice/invoice.router';
 
 const router = Router();
 
@@ -81,6 +82,10 @@ const moduleRoutes = [
       {
             path: '/low-stock-alert',
             route: lowStockAlertRouter,
+      },
+      {
+            path: '/invoices',
+            route: invoiceRouter,
       },
 ];
 moduleRoutes.forEach((route) => router.use(route.path, route.route));
