@@ -1,0 +1,147 @@
+{
+      "success": true,
+      "message": "Invoices fetched successfully",
+      "statusCode": 200,
+      "data": [
+            {
+                  "invoice": {
+                        "public_id": "jps7axfif2bydsg2z8az",
+                        "url": "https://res.cloudinary.com/dat3kh4o6/image/upload/v1778934551/jps7axfif2bydsg2z8az.pdf",
+                        "resource_type": "raw"
+                  },
+                  "_id": "6a0863184c68b5abd71cbd0e",
+                  "shopkeeperId": {
+                        "_id": "69efe37f774a05ee91ff7244",
+                        "firstName": "Muhammad",
+                        "lastName": "Majid",
+                        "email": "shopkeeper2@gmail.com",
+                        "role": "shopkeeper",
+                        "shopName": "Mobile kit Distribution ",
+                        "phone": "07777787771"
+                  },
+                  "type": "Custom invoice",
+                  "createdAt": "2026-05-16T12:29:12.093Z",
+                  "updatedAt": "2026-05-16T12:29:12.093Z"
+            },
+            {
+                  "invoice": {
+                        "public_id": "atw4rgrrdvldktviiahv",
+                        "url": "https://res.cloudinary.com/dat3kh4o6/image/upload/v1778933441/atw4rgrrdvldktviiahv.pdf",
+                        "resource_type": "raw"
+                  },
+                  "_id": "6a085ec24c68b5abd71cbc6a",
+                  "shopkeeperId": {
+                        "_id": "69efe37f774a05ee91ff7244",
+                        "firstName": "Muhammad",
+                        "lastName": "Majid",
+                        "email": "shopkeeper2@gmail.com",
+                        "role": "shopkeeper",
+                        "shopName": "Mobile kit Distribution ",
+                        "phone": "07777787771"
+                  },
+                  "type": "Custom invoice",
+                  "createdAt": "2026-05-16T12:10:42.217Z",
+                  "updatedAt": "2026-05-16T12:10:42.217Z"
+            },
+            {
+                  "invoice": {
+                        "public_id": "v4zyn0ysrojphqx88nm4",
+                        "url": "https://res.cloudinary.com/dat3kh4o6/image/upload/v1778933035/v4zyn0ysrojphqx88nm4.pdf",
+                        "resource_type": "raw"
+                  },
+                  "_id": "6a085d2c4c68b5abd71cbbc5",
+                  "shopkeeperId": {
+                        "_id": "69efe37f774a05ee91ff7244",
+                        "firstName": "Muhammad",
+                        "lastName": "Majid",
+                        "email": "shopkeeper2@gmail.com",
+                        "role": "shopkeeper",
+                        "shopName": "Mobile kit Distribution ",
+                        "phone": "07777787771"
+                  },
+                  "type": "Custom invoice",
+                  "createdAt": "2026-05-16T12:03:56.375Z",
+                  "updatedAt": "2026-05-16T12:03:56.375Z"
+            },
+            {
+                  "invoice": {
+                        "public_id": "a9ktli7pgfv93o7tfpew",
+                        "url": "https://res.cloudinary.com/dat3kh4o6/image/upload/v1778870984/a9ktli7pgfv93o7tfpew.pdf",
+                        "resource_type": "raw"
+                  },
+                  "_id": "6a076ac802a99dc0e887c3b6",
+                  "shopkeeperId": {
+                        "_id": "69efe37f774a05ee91ff7244",
+                        "firstName": "Muhammad",
+                        "lastName": "Majid",
+                        "email": "shopkeeper2@gmail.com",
+                        "role": "shopkeeper",
+                        "shopName": "Mobile kit Distribution ",
+                        "phone": "07777787771"
+                  },
+                  "type": "Custom invoice",
+                  "createdAt": "2026-05-15T18:49:44.981Z",
+                  "updatedAt": "2026-05-15T18:49:44.981Z"
+            },
+            {
+                  "invoice": {
+                        "public_id": "uxyi0abu11uowlvqz2qd",
+                        "url": "https://res.cloudinary.com/dat3kh4o6/image/upload/v1778870966/uxyi0abu11uowlvqz2qd.pdf",
+                        "resource_type": "raw"
+                  },
+                  "_id": "6a076ab702a99dc0e887c3a9",
+                  "shopkeeperId": {
+                        "_id": "69efe37f774a05ee91ff7244",
+                        "firstName": "Muhammad",
+                        "lastName": "Majid",
+                        "email": "shopkeeper2@gmail.com",
+                        "role": "shopkeeper",
+                        "shopName": "Mobile kit Distribution ",
+                        "phone": "07777787771"
+                  },
+                  "type": "Custom invoice",
+                  "createdAt": "2026-05-15T18:49:27.014Z",
+                  "updatedAt": "2026-05-15T18:49:27.014Z"
+            },
+            {
+                  "invoice": {
+                        "public_id": "msjbgfuawvqmibfhq6fw",
+                        "url": "https://res.cloudinary.com/dat3kh4o6/image/upload/v1778870966/msjbgfuawvqmibfhq6fw.pdf",
+                        "resource_type": "raw"
+                  },
+                  "_id": "6a076ab602a99dc0e887c3a7",
+                  "shopkeeperId": {
+                        "_id": "69efe37f774a05ee91ff7244",
+                        "firstName": "Muhammad",
+                        "lastName": "Majid",
+                        "email": "shopkeeper2@gmail.com",
+                        "role": "shopkeeper",
+                        "shopName": "Mobile kit Distribution ",
+                        "phone": "07777787771"
+                  },
+                  "type": "Custom invoice",
+                  "createdAt": "2026-05-15T18:49:26.839Z",
+                  "updatedAt": "2026-05-15T18:49:26.839Z"
+            },
+            {
+                  "invoice": {
+                        "public_id": "bqgju9uodmopasrojrow",
+                        "url": "https://res.cloudinary.com/dat3kh4o6/image/upload/v1778861800/bqgju9uodmopasrojrow.pdf",
+                        "resource_type": "raw"
+                  },
+                  "_id": "6a0746e983d011f966dd9f07",
+                  "shopkeeperId": {
+                        "_id": "69efe37f774a05ee91ff7244",
+                        "firstName": "Muhammad",
+                        "lastName": "Majid",
+                        "email": "shopkeeper2@gmail.com",
+                        "role": "shopkeeper",
+                        "shopName": "Mobile kit Distribution ",
+                        "phone": "07777787771"
+                  },
+                  "type": "Custom invoice",
+                  "createdAt": "2026-05-15T16:16:41.426Z",
+                  "updatedAt": "2026-05-15T16:16:41.426Z"
+            }
+      ]
+}
