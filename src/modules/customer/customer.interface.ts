@@ -7,7 +7,8 @@ export interface ICustomer {
       phone?: string;
       address?: string;
       shopkeeperId?: Types.ObjectId;
-      addedBy: Types.ObjectId;
+      salesMethod?: string;
+      actualSalePrice?: number;
       createdAt?: Date;
       updatedAt?: Date;
 }

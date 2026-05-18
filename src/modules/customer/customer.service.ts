@@ -12,35 +12,32 @@ const createCustomer = async (payload: Partial<ICustomer>, userId: string) => {
             }
       }
 
-      const result = await Customer.create({
-            ...payload,
-            addedBy: userId,
-      });
+      const result = await Customer.create(payload);
 
       return result;
 };
 
 const updateCustomer = async (id: string, payload: Partial<ICustomer>, userId: string) => {
-      const existing = await Customer.findOne({ _id: id, addedBy: userId });
+      const existing = await Customer.findOne({ _id: id });
 
       if (!existing) {
             throw new AppError('Customer not found', StatusCodes.NOT_FOUND);
       }
 
-      return await Customer.findOneAndUpdate({ _id: id, addedBy: userId }, payload, {
+      return await Customer.findOneAndUpdate({ _id: id }, payload, {
             new: true,
             runValidators: true,
       });
 };
 
 const deleteCustomer = async (id: string, userId: string) => {
-      const existing = await Customer.findOne({ _id: id, addedBy: userId });
+      const existing = await Customer.findOne({ _id: id });
 
       if (!existing) {
             throw new AppError('Customer not found', StatusCodes.NOT_FOUND);
       }
 
-      await Customer.findOneAndDelete({ _id: id, addedBy: userId });
+      await Customer.findOneAndDelete({ _id: id });
 
       return null;
 };
