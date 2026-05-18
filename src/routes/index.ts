@@ -12,6 +12,7 @@ import announcementRouter from '../modules/announcement/announcement.router';
 import reviewRoutes from '../modules/review/review.router';
 import barcodeRouter from '../modules/barcode/barcode.router';
 import bankDetailsRouter from '../modules/bankDetails/bankDetails.router';
+import customerRouter from '../modules/customer/customer.router';
 import locationRouter from '../modules/location/location.router';
 import lowStockAlertRouter from '../modules/lowStockAlert/lowStockAlert.router';
 import invoiceRouter from '../modules/invoice/invoice.router';
@@ -74,6 +75,10 @@ const moduleRoutes = [
       {
             path: '/bank-details',
             route: bankDetailsRouter,
+      },
+      {
+            path: '/customers',
+            route: customerRouter,
       },
       {
             path: '/location',
