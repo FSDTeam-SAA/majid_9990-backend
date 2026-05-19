@@ -3,7 +3,7 @@ import AppError from '../../errors/AppError';
 import { ICustomer } from './customer.interface';
 import { Customer } from './customer.model';
 
-const createCustomer = async (payload: Partial<ICustomer>, userId: string) => {
+const createCustomer = async (userId: string, payload: Partial<ICustomer> = {}) => {
       // Optional: prevent duplicate by phone or email
       if (payload.email) {
             const exists = await Customer.findOne({ email: payload.email });
@@ -12,7 +12,10 @@ const createCustomer = async (payload: Partial<ICustomer>, userId: string) => {
             }
       }
 
-      const result = await Customer.create(payload);
+      const result = await Customer.create({
+            ...payload,
+            shopkeeperId: payload.shopkeeperId ?? userId,
+      });
 
       return result;
 };

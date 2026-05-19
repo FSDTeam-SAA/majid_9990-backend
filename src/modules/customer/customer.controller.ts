@@ -4,8 +4,8 @@ import sendResponse from '../../utils/sendResponse';
 import customerService from './customer.service';
 
 const createCustomer = catchAsync(async (req, res) => {
-      const userId = req.user._id as string;
-      const result = await customerService.createCustomer(req.body, userId);
+      const userId = req.user._id;
+      const result = await customerService.createCustomer(userId, req.body ?? {});
 
       sendResponse(res, {
             statusCode: StatusCodes.CREATED,
@@ -16,7 +16,7 @@ const createCustomer = catchAsync(async (req, res) => {
 });
 
 const updateCustomer = catchAsync(async (req, res) => {
-      const userId = req.user._id as string;
+      const userId = req.user._id;
       const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
 
       const result = await customerService.updateCustomer(id, req.body, userId);
@@ -30,7 +30,7 @@ const updateCustomer = catchAsync(async (req, res) => {
 });
 
 const deleteCustomer = catchAsync(async (req, res) => {
-      const userId = req.user._id as string;
+      const userId = req.user._id;
       const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
 
       await customerService.deleteCustomer(id, userId);
