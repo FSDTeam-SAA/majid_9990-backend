@@ -1,0 +1,36 @@
+{
+      "info": {
+            "_postman_id": "ocr-api-collection",
+            "name": "OCR + OpenAI IMEI Extraction API",
+            "description": "API for extracting IMEI numbers from images using Tesseract OCR and OpenAI",
+            "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+      },
+      "item": [
+            {
+                  "name": "Extract IMEI from Image",
+                  "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                              "mode": "formdata",
+                              "formdata": [
+                                    {
+                                          "key": "image",
+                                          "type": "file",
+                                          "src": "/path/to/your/image.jpg",
+                                          "description": "Image file containing IMEI text (JPEG, PNG, WebP, AVIF)"
+                                    }
+                              ]
+                        },
+                        "url": {
+                              "raw": "http://localhost:5000/api/ocr/extract-imei",
+                              "protocol": "http",
+                              "host": ["localhost"],
+                              "port": "5000",
+                              "path": ["api", "ocr", "extract-imei"]
+                        },
+                        "description": "Upload an image and extract IMEI numbers from it\n\n**Request:**\n- Method: POST\n- Body: form-data with 'image' file field\n\n**Response:**\n```json\n{\n  \"success\": true,\n  \"message\": \"IMEI extraction completed successfully\",\n  \"data\": {\n    \"rawText\": \"Extracted text from image...\",\n    \"imeiNumbers\": [\"123456789012345\", \"987654321098765\"],\n    \"confidence\": \"high\",\n    \"processingTime\": 2500\n  }\n}\n```"
+                  }
+            }
+      ]
+}

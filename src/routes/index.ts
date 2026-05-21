@@ -17,6 +17,7 @@ import locationRouter from '../modules/location/location.router';
 import lowStockAlertRouter from '../modules/lowStockAlert/lowStockAlert.router';
 import invoiceRouter from '../modules/invoice/invoice.router';
 import addToCartRouter from '../modules/addToCart/addToCart.router';
+import ocrRouter from '../modules/ocr/ocr.router';
 
 const router = Router();
 
@@ -100,6 +101,10 @@ const moduleRoutes = [
       {
             path: '/customer',
             route: customerRouter,
+      },
+      {
+            path: '/ocr',
+            route: ocrRouter,
       },
 ];
 moduleRoutes.forEach((route) => router.use(route.path, route.route));

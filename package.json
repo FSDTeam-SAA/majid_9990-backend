@@ -28,10 +28,12 @@
             "mongoose": "^8.13.2",
             "multer": "^2.0.1",
             "nodemailer": "^7.0.3",
+            "openai": "^6.38.0",
             "prettier": "^3.6.2",
             "qs": "^6.15.1",
             "socket.io": "^4.8.3",
             "stripe": "^22.1.0",
+            "tesseract.js": "^7.0.0",
             "xlsx": "^0.18.5",
             "zod": "^3.25.64"
       },
