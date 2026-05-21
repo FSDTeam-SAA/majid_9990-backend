@@ -72,6 +72,7 @@ class OCRService {
             try {
                   // Step 1: Extract text from image
                   const rawText = await this.extractTextFromImage(imagePath);
+                  console.log( "raw text:___",rawText)
 
                   if (!rawText || rawText.trim().length === 0) {
                         return {

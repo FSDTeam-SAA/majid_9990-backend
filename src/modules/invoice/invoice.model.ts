@@ -31,6 +31,16 @@ const invoiceSchema = new Schema<IInvoice>(
                   required: true,
                   trim: true,
             },
+            customerInfo: {
+                  type: Schema.Types.ObjectId,
+                  ref: 'Customer',
+                  default: null,
+            },
+            itemsIds: {
+                  type: [Schema.Types.ObjectId],
+                  ref: 'Inventory',
+                  default: [],
+            },
       },
       {
             timestamps: true,

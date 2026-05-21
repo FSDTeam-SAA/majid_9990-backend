@@ -72,12 +72,16 @@ const getInvoiceByShopkeeperId = async (shopkeeperId: string) => {
 
       return await Invoice.find({ shopkeeperId: trimmedShopkeeperId })
             .populate('shopkeeperId', 'firstName lastName email phone role shopName')
+            .populate('customerInfo', 'firstName lastName email phone address')
+            .populate('itemsIds', 'itemName imeiNumber expectedPrice image')
             .sort({ createdAt: -1 });
 };
 
 const getAllInvoices = async () => {
       return await Invoice.find()
             .populate('shopkeeperId', 'firstName lastName email phone role shopName')
+            .populate('customerInfo', 'firstName lastName email phone address')
+            .populate('itemsIds', 'itemName imeiNumber expectedPrice image')
             .sort({ createdAt: -1 });
 };
 
@@ -88,7 +92,7 @@ const updateInvoice = async (id: string, payload: IInvoicePayload, file?: Expres
             throw new AppError('Invoice not found', StatusCodes.NOT_FOUND);
       }
 
-      const updateData: Partial<Pick<IInvoice, 'shopkeeperId' | 'type'>> & {
+      const updateData: Partial<Pick<IInvoice, 'shopkeeperId' | 'type' | 'customerInfo' | 'itemsIds'>> & {
             invoice?: IInvoice['invoice'];
       } = {};
 
@@ -102,6 +106,20 @@ const updateInvoice = async (id: string, payload: IInvoicePayload, file?: Expres
             updateData.type = type;
       }
 
+      if (payload.customerInfo) {
+            const customerInfo = String(payload.customerInfo ?? '').trim();
+            if (customerInfo && Types.ObjectId.isValid(customerInfo)) {
+                  updateData.customerInfo = new Types.ObjectId(customerInfo);
+            }
+      }
+
+      if (payload.itemsIds && Array.isArray(payload.itemsIds)) {
+            updateData.itemsIds = payload.itemsIds
+                  .map(id => String(id ?? '').trim())
+                  .filter(id => id && Types.ObjectId.isValid(id))
+                  .map(id => new Types.ObjectId(id));
+      }
+
       if (file) {
             await deleteFromCloudinary(invoice.invoice.public_id, invoice.invoice.resource_type || 'raw');
             updateData.invoice = await buildInvoiceFile(file);
@@ -110,7 +128,10 @@ const updateInvoice = async (id: string, payload: IInvoicePayload, file?: Expres
       const result = await Invoice.findByIdAndUpdate(id, updateData, {
             new: true,
             runValidators: true,
-      }).populate('shopkeeperId', 'firstName lastName email phone role shopName');
+      })
+            .populate('shopkeeperId', 'firstName lastName email phone role shopName')
+            .populate('customerInfo', 'firstName lastName email phone address')
+            .populate('itemsIds', 'itemName imeiNumber expectedPrice image');
 
       return result;
 };
