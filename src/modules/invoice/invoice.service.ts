@@ -98,16 +98,16 @@ const getInvoiceByShopkeeperId = async (shopkeeperId: string) => {
       }
 
       return await Invoice.find({ shopkeeperId: trimmedShopkeeperId })
-            .populate('shopkeeperId', 'firstName lastName email phone role shopName')
-            .populate('customerInfo', 'firstName lastName email phone address')
+            .populate('shopkeeperId')
+            .populate('customerInfo')
             .populate('itemsIds', 'itemName imeiNumber expectedPrice image')
             .sort({ createdAt: -1 });
 };
 
 const getAllInvoices = async () => {
       return await Invoice.find()
-            .populate('shopkeeperId', 'firstName lastName email phone role shopName')
-            .populate('customerInfo', 'firstName lastName email phone address')
+            .populate('shopkeeperId')
+            .populate('customerInfo' )
             .populate('itemsIds', 'itemName imeiNumber expectedPrice image')
             .sort({ createdAt: -1 });
 };
