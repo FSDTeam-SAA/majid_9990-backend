@@ -573,11 +573,30 @@ export const runImeiCheck = async (
       }
 
       const structuredInfo = await buildStructuredScanInfo(imei, providerPayload ?? {});
+      const providerPayloadRecord = providerPayload as Record<string, any> | null;
+      const providerHtml =
+            typeof providerPayloadRecord?.result === 'string'
+                  ? providerPayloadRecord.result
+                  : typeof providerPayloadRecord?.RESULT === 'string'
+                    ? providerPayloadRecord.RESULT
+                    : typeof providerPayloadRecord?.data === 'string'
+                      ? providerPayloadRecord.data
+                      : null;
+      const parsedProviderData = extractProviderDataFromHtml(providerHtml);
+      let providerDataRaw: string | null = null;
+
+      try {
+            providerDataRaw = JSON.stringify(providerPayload ?? null);
+      } catch {
+            providerDataRaw = null;
+      }
 
       const baseScanPayload = {
             ...structuredInfo,
             serviceId: requestedServiceId,
             providerData: providerPayload ?? null,
+            providerDataRaw,
+            parsedProviderData,
       };
       const scanPayload = userId ? { ...baseScanPayload, userId } : baseScanPayload;
 

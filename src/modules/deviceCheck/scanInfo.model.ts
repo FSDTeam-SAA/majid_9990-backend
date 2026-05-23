@@ -25,6 +25,14 @@ const ScanInfoSchema = new Schema(
                   type: Schema.Types.Mixed,
                   default: null,
             },
+            providerDataRaw: {
+                  type: String,
+                  default: null,
+            },
+            parsedProviderData: {
+                  type: Schema.Types.Mixed,
+                  default: null,
+            },
             deviceStatus: {
                   type: String,
                   enum: ['clean', 'blacklisted', 'financed', 'locked', 'unknown'],
