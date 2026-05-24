@@ -19,16 +19,16 @@ import ScanInfo from './scanInfo.model';
 
 type SingleImeiCheckResult =
       | {
-            ok: true;
-            message: string;
-            data: Record<string, unknown>;
-      }
+              ok: true;
+              message: string;
+              data: Record<string, unknown>;
+        }
       | {
-            ok: false;
-            statusCode: number;
-            message: string;
-            data?: unknown;
-      };
+              ok: false;
+              statusCode: number;
+              message: string;
+              data?: unknown;
+        };
 
 type BatchImeiItemResult = {
       rowNumber: number;
@@ -563,9 +563,9 @@ const extractImeisFromWorkbook = (filePath: string) => {
       const headerLooksLikeImeiColumn = firstRow.some((cell) => cell === 'imei' || cell.includes('imei'));
       const imeiColumnIndex = headerLooksLikeImeiColumn
             ? Math.max(
-                  firstRow.findIndex((cell) => cell === 'imei' || cell.includes('imei')),
-                  0
-            )
+                    firstRow.findIndex((cell) => cell === 'imei' || cell.includes('imei')),
+                    0
+              )
             : 0;
       const dataRows = headerLooksLikeImeiColumn ? rows.slice(1) : rows;
 
@@ -635,7 +635,7 @@ export const checkImeiFromDhru = async (req: Request, res: Response, next: NextF
 // V2: return raw provider rows from DHRU; do NOT use cached DB data, do NOT merge bundled results, no AI fields
 export const checkImeiFromDhruV2 = async (req: Request, res: Response, next: NextFunction) => {
       try {
-            const userId = req.user._id;
+            const userId = req.user?._id?.toString();
 
             // ===== IMEI NORMALIZATION =====
             const imeiInput = req.body?.imei;
@@ -663,7 +663,7 @@ export const checkImeiFromDhruV2 = async (req: Request, res: Response, next: Nex
 
             // Process one IMEI: no cache usage, no AI, and no merging for bundled services
             const processSingleImeiCheckV2 = async (
-                  userId: string,
+                  userId: string | undefined,
                   imei: string,
                   serviceId: number,
                   shouldGenerateFresh: boolean
@@ -697,7 +697,15 @@ export const checkImeiFromDhruV2 = async (req: Request, res: Response, next: Nex
                   const servicePrice = resolveServicePrice(service);
                   const shouldCharge = servicePrice > 0;
 
-                  if (shouldCharge) {
+                  if (shouldCharge && !userId) {
+                        return {
+                              ok: false,
+                              statusCode: 401,
+                              message: 'Authentication required for paid services',
+                        } as SingleImeiCheckResult;
+                  }
+
+                  if (shouldCharge && userId) {
                         try {
                               await debitUserBalance({
                                     userId,
@@ -796,7 +804,7 @@ export const checkImeiFromDhruV2 = async (req: Request, res: Response, next: Nex
 
                               const allFailed = checkResults.every((r) => !r.ok);
                               if (allFailed) {
-                                    if (shouldCharge) {
+                                    if (shouldCharge && userId) {
                                           const refundServiceId = Number(service.serviceId ?? requestedServiceId);
 
                                           await creditUserBalance({
@@ -905,7 +913,7 @@ export const checkImeiFromDhruV2 = async (req: Request, res: Response, next: Nex
                         const result = await runImeiCheck(String(imei), serviceId, userId);
 
                         if (!result.ok) {
-                              if (shouldCharge) {
+                              if (shouldCharge && userId) {
                                     await creditUserBalance({
                                           userId,
                                           amount: servicePrice,
@@ -955,7 +963,7 @@ export const checkImeiFromDhruV2 = async (req: Request, res: Response, next: Nex
                               },
                         } as SingleImeiCheckResult;
                   } catch (error) {
-                        if (shouldCharge) {
+                        if (shouldCharge && userId) {
                               const refundServiceId = Number(service.serviceId ?? requestedServiceId);
 
                               await creditUserBalance({
