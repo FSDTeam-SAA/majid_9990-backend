@@ -9,12 +9,12 @@ import {
 } from './dhru.controller';
 import { upload } from '../../middlewares/multer.middleware';
 import { getDeviceAnalysis, getRiskAnalysis } from './riskAnalysis.controller';
-import { protect } from '../../middlewares/auth.middleware';
+import { optionalProtect, protect } from '../../middlewares/auth.middleware';
 
 const router = Router();
 
 router.post('/check', protect, checkImeiFromDhru);
-router.post('/check-v2', protect, checkImeiFromDhruV2);
+router.post('/check-v2', optionalProtect, checkImeiFromDhruV2);
 router.post('/check-batch', protect, upload.single('file'), checkImeisFromFile);
 router.post('/risk-analysis', protect, getRiskAnalysis);
 router.post('/device-analysis', protect, getDeviceAnalysis);

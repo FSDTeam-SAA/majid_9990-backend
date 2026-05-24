@@ -21,6 +21,22 @@ export const protect = async (req: Request, res: Response, next: NextFunction) =
       }
 };
 
+export const optionalProtect = async (req: Request, res: Response, next: NextFunction) => {
+      const token = req.headers.authorization?.split(' ')[1];
+      if (!token) return next();
+
+      try {
+            const decoded = (await jwt.verify(token, process.env.JWT_SECRET!)) as JwtPayload;
+            const user = await User.findById(decoded._id);
+            if (user && (await User.isOTPVerified(user._id))) {
+                  req.user = user;
+            }
+            return next();
+      } catch (err) {
+            return next();
+      }
+};
+
 export const isAdmin = (req: Request, res: Response, next: NextFunction): void => {
       if (req.user?.role !== 'admin') {
             throw new AppError('Access denied. You are not an admin.', StatusCodes.FORBIDDEN);

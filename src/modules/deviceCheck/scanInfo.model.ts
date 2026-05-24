@@ -5,7 +5,6 @@ const ScanInfoSchema = new Schema(
             userId: {
                   type: Schema.Types.ObjectId,
                   ref: 'User',
-                  required: false,
             },
             deviceName: {
                   type: String,
