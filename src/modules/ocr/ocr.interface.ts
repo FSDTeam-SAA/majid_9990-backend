@@ -10,3 +10,10 @@ export interface IOCRResponse {
       data: IOCRResult;
       message?: string;
 }
+
+export interface INIDResult {
+      nidNumber: string | null;
+      isValid: boolean;
+      message: string;
+      processingTime: number;
+}
