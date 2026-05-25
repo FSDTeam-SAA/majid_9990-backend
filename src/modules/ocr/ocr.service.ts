@@ -2,7 +2,7 @@ import Tesseract from 'tesseract.js';
 import { OpenAI } from 'openai';
 import * as fs from 'fs';
 import * as path from 'path';
-import { IOCRResult } from './ocr.interface';
+import { IOCRResult, INIDResult } from './ocr.interface';
 
 const openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY,
@@ -97,6 +97,56 @@ class OCRService {
                   };
             } catch (error) {
                   console.error('Error in processImageForIMEI:', error);
+                  throw error;
+            }
+      }
+
+      /**
+       * Extract NID number candidates from text
+       */
+      extractNIDFromText(text: string): string | null {
+            const digitsOnly = text.replace(/\D/g, ' ');
+            const candidates = digitsOnly
+                  .split(/\s+/)
+                  .filter(Boolean)
+                  .filter((value) => value.length === 10 || value.length === 13 || value.length === 17);
+
+            if (candidates.length === 0) {
+                  return null;
+            }
+
+            // Prefer longer NID numbers when multiple candidates exist
+            const sorted = candidates.sort((a, b) => b.length - a.length);
+            return sorted[0];
+      }
+
+      /**
+       * Process one or two NID images and extract NID number
+       */
+      async processImagesForNID(frontPath?: string, backPath?: string): Promise<INIDResult> {
+            const startTime = Date.now();
+
+            try {
+                  const texts: string[] = [];
+
+                  if (frontPath) {
+                        texts.push(await this.extractTextFromImage(frontPath));
+                  }
+                  if (backPath) {
+                        texts.push(await this.extractTextFromImage(backPath));
+                  }
+
+                  const combinedText = texts.join('\n');
+                  const nidNumber = this.extractNIDFromText(combinedText);
+
+                  return {
+                        nidNumber,
+                        isValid: Boolean(nidNumber),
+                        message: nidNumber ? 'NID number extracted successfully' : 'No valid NID number found',
+                        processingTime: Date.now() - startTime,
+                  };
+            } catch (error) {
+                  console.error('Error in processImagesForNID:', error);
                   throw error;
             }
       }
