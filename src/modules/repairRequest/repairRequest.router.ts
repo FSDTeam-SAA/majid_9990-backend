@@ -12,6 +12,7 @@ router.put('/update-status/:id', protect, repairRequestController.updateStatusBy
 router.put('/add-note/:id', protect, upload.array('images', 6), repairRequestController.addNoteByShopKeeper);
 
 router.put('/tech-note/:id', protect, repairRequestController.addTeachNoteByTechnician);
+router.post('/technician-feedback/:id', protect, repairRequestController.generateTechnicianFeedback);
 
 const repairRequestRouter = router;
 export default repairRequestRouter;

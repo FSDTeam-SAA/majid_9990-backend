@@ -78,6 +78,18 @@ const addTeachNoteByTechnician = catchAsync(async (req, res) => {
       });
 });
 
+const generateTechnicianFeedback = catchAsync(async (req, res) => {
+      const { id } = req.params;
+      const result = await repairRequestService.generateTechnicianFeedbackByRequest(id as string);
+
+      sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: 'Technician feedback generated successfully',
+            data: result,
+      });
+});
+
 const repairRequestController = {
       addNewRepairRequest,
       getMyRepairRequestsHistory,
@@ -85,6 +97,7 @@ const repairRequestController = {
       updateStatusByShopKeeper,
       addNoteByShopKeeper,
       addTeachNoteByTechnician,
+      generateTechnicianFeedback,
 };
 
 export default repairRequestController;

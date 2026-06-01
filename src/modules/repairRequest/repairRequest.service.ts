@@ -1,9 +1,22 @@
 import { StatusCodes } from 'http-status-codes';
+import { Types } from 'mongoose';
 import AppError from '../../errors/AppError';
 import { uploadToCloudinary } from '../../utils/cloudinary';
+import { generateTechnicianFeedback } from '../../utils/technicianFeedback';
 import { User } from '../user/user.model';
 import { IRepairRequest, IRepairRequestStatusUpdatePayload } from './repairRequest.interface';
 import RepairRequest from './repairRequest.model';
+
+const getCustomerFullName = (user: { firstName?: string; lastName?: string } | null) => {
+      const fullName = [user?.firstName, user?.lastName].filter(Boolean).join(' ').trim();
+      return fullName || user?.firstName || 'Customer';
+};
+
+const assertValidRepairRequestId = (id: string) => {
+      if (!Types.ObjectId.isValid(id)) {
+            throw new AppError('Valid repair request id is required', StatusCodes.BAD_REQUEST);
+      }
+};
 
 const addNewRepairRequest = async (payload: IRepairRequest, files: Express.Multer.File[] = [], userId: string) => {
       const user = await User.findById(userId);
@@ -57,11 +70,54 @@ const getMyRepairRequestsHistory = async (userId: string, query: any) => {
 };
 
 const getSingleRepairRequest = async (id: string) => {
+      assertValidRepairRequestId(id);
       const result = await RepairRequest.findById(id);
       return result;
 };
 
+const generateAndSaveTechnicianFeedback = async (id: string) => {
+      assertValidRepairRequestId(id);
+
+      const repair = await RepairRequest.findById(id);
+
+      if (!repair) {
+            throw new AppError('Repair request not found', StatusCodes.NOT_FOUND);
+      }
+
+      const user = await User.findById(repair.userId).select('firstName lastName');
+      if (!user) {
+            throw new AppError('User not found', StatusCodes.UNAUTHORIZED);
+      }
+
+      const feedback = await generateTechnicianFeedback({
+            customerName: getCustomerFullName(user),
+            deviceModel: repair.deviceModel,
+            issueReported: repair.description,
+      });
+
+      const result = await RepairRequest.findByIdAndUpdate(
+            id,
+            {
+                  $set: {
+                        technicianFeedback: feedback,
+                  },
+            },
+            {
+                  new: true,
+                  runValidators: true,
+            }
+      );
+
+      if (!result) {
+            throw new AppError('Repair request not found', StatusCodes.NOT_FOUND);
+      }
+
+      return result;
+};
+
 const updateStatusByShopKeeper = async (id: string, payload: IRepairRequestStatusUpdatePayload) => {
+      assertValidRepairRequestId(id);
+
       if (!payload.status) {
             throw new AppError('Status is required', StatusCodes.BAD_REQUEST);
       }
@@ -100,10 +156,21 @@ const updateStatusByShopKeeper = async (id: string, payload: IRepairRequestStatu
             new: true,
             runValidators: true,
       });
+
+      if (!result) {
+            throw new AppError('Repair request not found', StatusCodes.NOT_FOUND);
+      }
+
+      if (payload.status === 'completed') {
+            return generateAndSaveTechnicianFeedback(id);
+      }
+
       return result;
 };
 
 const addNoteByShopKeeper = async (id: string, payload: any, files: Express.Multer.File[] = []) => {
+      assertValidRepairRequestId(id);
+
       const { message, cost, estimatedDays, assignedPerson } = payload;
 
       // Upload images to Cloudinary if provided
@@ -145,6 +212,8 @@ const addNoteByShopKeeper = async (id: string, payload: any, files: Express.Mult
 };
 
 const addTeachNoteByTechnician = async (id: string, payload: any) => {
+      assertValidRepairRequestId(id);
+
       // ✅ Normalize (single or array)
       const incomingNotes = Array.isArray(payload) ? payload : [payload];
 
@@ -212,6 +281,10 @@ const addTeachNoteByTechnician = async (id: string, payload: any) => {
       return result;
 };
 
+const generateTechnicianFeedbackByRequest = async (id: string) => {
+      return generateAndSaveTechnicianFeedback(id);
+};
+
 const repairRequestService = {
       addNewRepairRequest,
       getMyRepairRequestsHistory,
@@ -219,6 +292,7 @@ const repairRequestService = {
       updateStatusByShopKeeper,
       addNoteByShopKeeper,
       addTeachNoteByTechnician,
+      generateTechnicianFeedbackByRequest,
 };
 
 export default repairRequestService;
