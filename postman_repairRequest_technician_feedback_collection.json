@@ -1,0 +1,31 @@
+{
+      "info": {
+            "_postman_id": "repair-request-technician-feedback-collection",
+            "name": "Repair Request Technician Feedback API",
+            "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+            "description": "Postman collection for generating technician feedback on a repair request when it is completed."
+      },
+      "item": [
+            {
+                  "name": "Generate Technician Feedback",
+                  "request": {
+                        "method": "POST",
+                        "header": [
+                              { "key": "Authorization", "value": "Bearer {{authToken}}" },
+                              { "key": "accept", "value": "*/*" }
+                        ],
+                        "url": {
+                              "raw": "{{baseUrl}}/repair-requests/technician-feedback/:id",
+                              "host": ["{{baseUrl}}"],
+                              "path": ["repair-requests", "technician-feedback", ":id"],
+                              "variable": [{ "key": "id", "value": "<repairRequestId>" }]
+                        },
+                        "description": "Generates and saves AI-powered technician feedback for the given repair request. The id must be a valid MongoDB ObjectId."
+                  }
+            }
+      ],
+      "variable": [
+            { "key": "baseUrl", "value": "http://localhost:5000/api/v1" },
+            { "key": "authToken", "value": "" }
+      ]
+}
