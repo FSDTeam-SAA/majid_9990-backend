@@ -2,7 +2,7 @@
       "info": {
             "name": "Inventory API - Majid",
             "_postman_id": "inventory-updated-collection",
-            "description": "Collection for Inventory endpoints (includes new fields, status filters, grouping, sold subset and low-stock scenarios).",
+            "description": "Collection for Inventory endpoints (includes new fields, status filters, grouping, sold subset, low-stock scenarios, and CSV import/template endpoints).",
             "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
       },
       "variable": [
@@ -91,6 +91,39 @@
                               "host": ["{{baseUrl}}"],
                               "path": ["inventory", "create-from-barcode", "bulk"]
                         }
+                  }
+            },
+            {
+                  "name": "Import Inventory From CSV",
+                  "request": {
+                        "method": "POST",
+                        "header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+                        "body": {
+                              "mode": "formdata",
+                              "formdata": [
+                                    { "key": "file", "type": "file" },
+                                    { "key": "userId", "value": "{{userId}}", "type": "text" }
+                              ]
+                        },
+                        "url": {
+                              "raw": "{{baseUrl}}/inventory/import-csv",
+                              "host": ["{{baseUrl}}"],
+                              "path": ["inventory", "import-csv"]
+                        },
+                        "description": "Upload a CSV file with inventory rows. The file should use the same columns as the template endpoint. Each row is imported individually and the response includes per-row success or failure results."
+                  }
+            },
+            {
+                  "name": "Download Inventory CSV Template",
+                  "request": {
+                        "method": "GET",
+                        "header": [{ "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }],
+                        "url": {
+                              "raw": "{{baseUrl}}/inventory/import-csv/template",
+                              "host": ["{{baseUrl}}"],
+                              "path": ["inventory", "import-csv", "template"]
+                        },
+                        "description": "Download a CSV template showing the expected inventory columns and an example row."
                   }
             },
             {
