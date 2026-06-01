@@ -7,6 +7,8 @@ const router = Router();
 
 router.post('/create', protect, upload.single('image'), inventoryController.createInventory);
 router.post('/create-from-barcode', protect, upload.single('image'), inventoryController.createInventoryFromBarcode);
+router.post('/import-csv', protect, upload.single('file'), inventoryController.importInventoriesFromCsv);
+router.get('/import-csv/template', protect, inventoryController.getInventoryCsvTemplate);
 
 router.post('/create-from-barcode/bulk', protect, inventoryController.createInventoryFromBarcodeBulk);
 

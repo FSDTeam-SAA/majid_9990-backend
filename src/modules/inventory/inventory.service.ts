@@ -1,3 +1,5 @@
+import fs from 'node:fs/promises';
+import XLSX from 'xlsx';
 import AppError from '../../errors/AppError';
 import { Types } from 'mongoose';
 import { IBarcodeSearchResult } from '../barcode/barcode.interface';
@@ -19,6 +21,188 @@ const parseOptionalNumber = (value: unknown) => {
 
       const parsed = Number(value);
       return Number.isFinite(parsed) ? parsed : undefined;
+};
+
+const normalizeCsvHeader = (value: string) =>
+      value
+            .trim()
+            .toLowerCase()
+            .replace(/[^a-z0-9]/g, '');
+
+const getCsvValue = (row: Record<string, unknown>, aliases: string[]) => {
+      const normalizedAliases = aliases.map((alias) => normalizeCsvHeader(alias));
+
+      for (const [key, value] of Object.entries(row)) {
+            if (normalizedAliases.includes(key)) {
+                  return value;
+            }
+      }
+
+      return undefined;
+};
+
+const parseObjectId = (value: unknown, fieldName: string) => {
+      const id = toQueryString(value).trim();
+
+      if (!id) {
+            return undefined;
+      }
+
+      if (!Types.ObjectId.isValid(id)) {
+            throw new AppError(`Invalid ${fieldName}`, 400);
+      }
+
+      return new Types.ObjectId(id);
+};
+
+const escapeCsvValue = (value: unknown) => {
+      const text = toQueryString(value);
+
+      if (!text) {
+            return '';
+      }
+
+      if (/[",\n\r]/.test(text)) {
+            return `"${text.replace(/"/g, '""')}"`;
+      }
+
+      return text;
+};
+
+const inventoryCsvHeaders = [
+      'itemName',
+      'sku',
+      'brand',
+      'color',
+      'storage',
+      'size',
+      'imeiNumber',
+      'modelNumber',
+      'quantity',
+      'purchasePrice',
+      'expectedPrice',
+      'productDetails',
+      'aiDescription',
+      'groupKey',
+      'minStockLevel',
+      'type',
+      'status',
+      'currentState',
+      'userId',
+      'supplierId',
+      'storeId',
+];
+
+const inventoryCsvTemplateRows = [
+      [
+            'Sample iPhone 13',
+            'SKU-IPH13-256-BLK',
+            'Apple',
+            'Black',
+            '256GB',
+            '6.1',
+            '356789012345678',
+            'A2633',
+            5,
+            500,
+            750,
+            'Premium smartphone in excellent condition',
+            'Ready for sale',
+            'GROUP-001',
+            2,
+            'inventory',
+            'inventory',
+            'new',
+            'USER_OBJECT_ID',
+            'SUPPLIER_OBJECT_ID',
+            'STORE_OBJECT_ID',
+      ],
+];
+
+const buildInventoryCsvTemplate = () => {
+      const headerLine = inventoryCsvHeaders.join(',');
+      const dataLines = inventoryCsvTemplateRows.map((row) => row.map(escapeCsvValue).join(','));
+
+      return [headerLine, ...dataLines].join('\n');
+};
+
+const parseInventoryCsvRows = (filePath: string) => {
+      const workbook = XLSX.readFile(filePath);
+      const sheetName = workbook.SheetNames[0];
+
+      if (!sheetName) {
+            return [] as Array<Record<string, unknown> & { rowNumber: number }>;
+      }
+
+      const sheet = workbook.Sheets[sheetName];
+      const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, {
+            blankrows: false,
+            defval: '',
+      });
+
+      return rows.map((row, index) => {
+            const normalizedRow = Object.entries(row).reduce<Record<string, unknown>>((acc, [key, value]) => {
+                  acc[normalizeCsvHeader(key)] = value;
+                  return acc;
+            }, {});
+
+            return {
+                  rowNumber: index + 2,
+                  ...normalizedRow,
+            };
+      });
+};
+
+const buildInventoryPayloadFromCsvRow = (
+      row: Record<string, unknown> & { rowNumber: number },
+      defaultUserId?: string
+) => {
+      const itemName = toQueryString(getCsvValue(row, ['itemName', 'name', 'productName', 'title'])).trim();
+      const imeiNumber = toQueryString(getCsvValue(row, ['imeiNumber', 'imei', 'serialNumber'])).trim();
+      const userIdValue =
+            toQueryString(getCsvValue(row, ['userId', 'ownerId', 'user'])).trim() || String(defaultUserId ?? '').trim();
+      const type = normalizeInventoryType(getCsvValue(row, ['type']));
+      const status = normalizeInventoryStatus(getCsvValue(row, ['status']), type);
+
+      if (!itemName) {
+            throw new AppError(`Row ${row.rowNumber}: itemName is required`, 400);
+      }
+
+      if (!imeiNumber) {
+            throw new AppError(`Row ${row.rowNumber}: imeiNumber is required`, 400);
+      }
+
+      if (!userIdValue) {
+            throw new AppError(`Row ${row.rowNumber}: userId is required`, 400);
+      }
+
+      const userId = parseObjectId(userIdValue, 'userId');
+      const supplierId = parseObjectId(getCsvValue(row, ['supplierId']), 'supplierId');
+      const storeId = parseObjectId(getCsvValue(row, ['storeId']), 'storeId');
+
+      return {
+            itemName,
+            sku: toQueryString(getCsvValue(row, ['sku'])).trim() || undefined,
+            brand: toQueryString(getCsvValue(row, ['brand'])).trim() || undefined,
+            color: toQueryString(getCsvValue(row, ['color'])).trim() || undefined,
+            storage: toQueryString(getCsvValue(row, ['storage'])).trim() || undefined,
+            size: toQueryString(getCsvValue(row, ['size'])).trim() || undefined,
+            imeiNumber,
+            modelNumber: toQueryString(getCsvValue(row, ['modelNumber', 'model'])).trim() || undefined,
+            quantity: parseOptionalNumber(getCsvValue(row, ['quantity'])),
+            purchasePrice: parseOptionalNumber(getCsvValue(row, ['purchasePrice', 'costPrice'])),
+            expectedPrice: parseOptionalNumber(getCsvValue(row, ['expectedPrice', 'salePrice'])),
+            productDetails: toQueryString(getCsvValue(row, ['productDetails', 'details'])).trim() || undefined,
+            aiDescription: toQueryString(getCsvValue(row, ['aiDescription', 'description'])).trim() || undefined,
+            groupKey: toQueryString(getCsvValue(row, ['groupKey'])).trim() || undefined,
+            minStockLevel: parseOptionalNumber(getCsvValue(row, ['minStockLevel', 'minStock'])),
+            type,
+            status,
+            currentState: normalizeBulkCurrentState(getCsvValue(row, ['currentState', 'condition', 'state'])),
+            userId,
+            supplierId,
+            storeId,
+      };
 };
 
 const estimateBarcodeValue = (product: IBarcodeSearchResult) => {
@@ -350,6 +534,62 @@ const createInventory = async (payload: Partial<IInventory>, file?: any) => {
       return result;
 };
 
+const importInventoriesFromCsv = async (filePath?: string, defaultUserId?: string) => {
+      if (!filePath) {
+            throw new AppError('CSV file is required', 400);
+      }
+
+      try {
+            const rows = parseInventoryCsvRows(filePath);
+
+            if (!rows.length) {
+                  throw new AppError('CSV file must contain at least one data row', 400);
+            }
+
+            const results = [] as Array<{
+                  rowNumber: number;
+                  ok: boolean;
+                  message: string;
+                  data?: unknown;
+            }>;
+
+            for (const row of rows) {
+                  try {
+                        const payload = buildInventoryPayloadFromCsvRow(row, defaultUserId);
+                        const created = await createInventory(payload);
+
+                        results.push({
+                              rowNumber: row.rowNumber,
+                              ok: true,
+                              message: 'Inventory created successfully',
+                              data: created,
+                        });
+                  } catch (error) {
+                        results.push({
+                              rowNumber: row.rowNumber,
+                              ok: false,
+                              message: error instanceof Error ? error.message : 'Failed to create inventory',
+                        });
+                  }
+            }
+
+            const successCount = results.filter((result) => result.ok).length;
+
+            return {
+                  summary: {
+                        totalRows: results.length,
+                        successCount,
+                        failureCount: results.length - successCount,
+                  },
+                  results,
+            };
+      } finally {
+            await fs.unlink(filePath).catch(() => undefined);
+      }
+};
+
+const getInventoryCsvTemplate = () => buildInventoryCsvTemplate();
+
 // This function creates an inventory item from a barcode. It validates inputs, fetches product details from a barcode service,
 // generates AI insights and a detailed AI description, estimates market value, formats product information, normalizes inventory fields (status/type/condition), uploads optional files, and finally saves the inventory record into the database.
 const createInventoryFromBarcode = async (
@@ -630,6 +870,8 @@ export default {
       createInventory,
       createInventoryFromBarcode,
       createInventoryFromBarcodeBulk,
+      importInventoriesFromCsv,
+      getInventoryCsvTemplate,
       getAllInventory,
       getInventoryWithFilters,
       getSoldInventory,

@@ -55,6 +55,26 @@ const createInventoryFromBarcodeBulk = catchAsync(async (req, res) => {
       });
 });
 
+const importInventoriesFromCsv = catchAsync(async (req, res) => {
+      const defaultUserId = String(req.body?.userId ?? req.user?._id ?? '').trim() || undefined;
+      const result = await inventoryService.importInventoriesFromCsv(req.file?.path, defaultUserId);
+
+      sendResponse(res, {
+            statusCode: StatusCodes.CREATED,
+            success: true,
+            message: 'Inventory imported from CSV successfully',
+            data: result,
+      });
+});
+
+const getInventoryCsvTemplate = catchAsync(async (_req, res) => {
+      const template = inventoryService.getInventoryCsvTemplate();
+
+      res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+      res.setHeader('Content-Disposition', 'attachment; filename="inventory-template.csv"');
+      res.status(StatusCodes.OK).send(template);
+});
+
 const getAllInventory = catchAsync(async (req, res) => {
       const result = await inventoryService.getAllInventory();
 
@@ -165,6 +185,8 @@ export default {
       createInventory,
       createInventoryFromBarcode,
       createInventoryFromBarcodeBulk,
+      importInventoriesFromCsv,
+      getInventoryCsvTemplate,
       getAllInventory,
       getSoldInventory,
       getInventoryByStatus,
