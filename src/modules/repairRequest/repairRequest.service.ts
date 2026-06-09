@@ -7,10 +7,6 @@ import { User } from '../user/user.model';
 import { IRepairRequest, IRepairRequestStatusUpdatePayload } from './repairRequest.interface';
 import RepairRequest from './repairRequest.model';
 
-const getCustomerFullName = (user: { firstName?: string; lastName?: string } | null) => {
-      const fullName = [user?.firstName, user?.lastName].filter(Boolean).join(' ').trim();
-      return fullName || user?.firstName || 'Customer';
-};
 
 const assertValidRepairRequestId = (id: string) => {
       if (!Types.ObjectId.isValid(id)) {
@@ -84,16 +80,11 @@ const generateAndSaveTechnicianFeedback = async (id: string) => {
             throw new AppError('Repair request not found', StatusCodes.NOT_FOUND);
       }
 
-      const user = await User.findById(repair.userId).select('firstName lastName');
-      if (!user) {
-            throw new AppError('User not found', StatusCodes.UNAUTHORIZED);
-      }
-
-      const feedback = await generateTechnicianFeedback({
-            customerName: getCustomerFullName(user),
-            deviceModel: repair.deviceModel,
-            issueReported: repair.description,
-      });
+const feedback = await generateTechnicianFeedback({
+      customerName: repair.firstName,
+      deviceModel: repair.deviceModel,
+      issueReported: repair.description,
+});
 
       const result = await RepairRequest.findByIdAndUpdate(
             id,
@@ -285,6 +276,25 @@ const generateTechnicianFeedbackByRequest = async (id: string) => {
       return generateAndSaveTechnicianFeedback(id);
 };
 
+const getUserDescriptions = async (userId: string) => {
+      if (!Types.ObjectId.isValid(userId)) {
+            throw new AppError('Valid user id is required', StatusCodes.BAD_REQUEST);
+      }
+
+      const repairRequests = await RepairRequest.find(
+            { userId },
+            {
+                  description: 1,
+                  deviceModel: 1,
+                  status: 1,
+                  createdAt: 1,
+            }
+      ).sort({ createdAt: -1 });
+
+      return repairRequests;
+};
+
+
 const repairRequestService = {
       addNewRepairRequest,
       getMyRepairRequestsHistory,
@@ -293,6 +303,7 @@ const repairRequestService = {
       addNoteByShopKeeper,
       addTeachNoteByTechnician,
       generateTechnicianFeedbackByRequest,
+      getUserDescriptions,
 };
 
 export default repairRequestService;

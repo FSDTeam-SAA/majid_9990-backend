@@ -90,6 +90,21 @@ const generateTechnicianFeedback = catchAsync(async (req, res) => {
       });
 });
 
+
+const getUserDescriptions = catchAsync(async (req, res) => {
+      const { userId } = req.params;
+
+      const result = await repairRequestService.getUserDescriptions(userId as string);
+
+      sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: 'User descriptions retrieved successfully',
+            data: result,
+      });
+});
+
+
 const repairRequestController = {
       addNewRepairRequest,
       getMyRepairRequestsHistory,
@@ -98,6 +113,7 @@ const repairRequestController = {
       addNoteByShopKeeper,
       addTeachNoteByTechnician,
       generateTechnicianFeedback,
+      getUserDescriptions
 };
 
 export default repairRequestController;

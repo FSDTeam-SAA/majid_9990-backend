@@ -14,5 +14,11 @@ router.put('/add-note/:id', protect, upload.array('images', 6), repairRequestCon
 router.put('/tech-note/:id', protect, repairRequestController.addTeachNoteByTechnician);
 router.post('/technician-feedback/:id', protect, repairRequestController.generateTechnicianFeedback);
 
+router.get(
+  '/user/:userId/descriptions',
+  protect,
+  repairRequestController.getUserDescriptions
+);
+
 const repairRequestRouter = router;
 export default repairRequestRouter;
