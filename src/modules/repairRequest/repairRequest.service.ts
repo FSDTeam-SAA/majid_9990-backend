@@ -7,10 +7,6 @@ import { User } from '../user/user.model';
 import { IRepairRequest, IRepairRequestStatusUpdatePayload } from './repairRequest.interface';
 import RepairRequest from './repairRequest.model';
 
-const getCustomerFullName = (user: { firstName?: string; lastName?: string } | null) => {
-      const fullName = [user?.firstName, user?.lastName].filter(Boolean).join(' ').trim();
-      return fullName || user?.firstName || 'Customer';
-};
 
 const assertValidRepairRequestId = (id: string) => {
       if (!Types.ObjectId.isValid(id)) {
@@ -84,16 +80,11 @@ const generateAndSaveTechnicianFeedback = async (id: string) => {
             throw new AppError('Repair request not found', StatusCodes.NOT_FOUND);
       }
 
-      const user = await User.findById(repair.userId).select('firstName lastName');
-      if (!user) {
-            throw new AppError('User not found', StatusCodes.UNAUTHORIZED);
-      }
-
-      const feedback = await generateTechnicianFeedback({
-            customerName: getCustomerFullName(user),
-            deviceModel: repair.deviceModel,
-            issueReported: repair.description,
-      });
+const feedback = await generateTechnicianFeedback({
+      customerName: repair.firstName,
+      deviceModel: repair.deviceModel,
+      issueReported: repair.description,
+});
 
       const result = await RepairRequest.findByIdAndUpdate(
             id,
