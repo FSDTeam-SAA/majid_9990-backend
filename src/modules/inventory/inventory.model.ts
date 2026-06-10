@@ -12,6 +12,11 @@ const inventorySchema = new Schema<IInventory>(
                   type: String,
                   trim: true,
             },
+            categoryId: {
+                  type: Schema.Types.ObjectId,
+                  ref: 'Category',
+                  index: true,
+            },
             brand: {
                   type: String,
                   trim: true,

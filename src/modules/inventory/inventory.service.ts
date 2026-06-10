@@ -13,6 +13,7 @@ import { enqueueLowStockEmail } from '../../workers/lowStockEmailWorker';
 import config from '../../config/config';
 import { LowStockAlert } from '../lowStockAlert/lowStockAlert.model';
 import { User } from '../user/user.model';
+import categoryService from './category/category.service';
 
 const parseOptionalNumber = (value: unknown) => {
       if (value === undefined || value === null || value === '') {
@@ -290,6 +291,7 @@ const buildInventoryFilter = (query: Record<string, unknown>) => {
       const sold = toQueryString(query.sold).trim().toLowerCase();
       const due = toQueryString(query.due).trim().toLowerCase();
       const draft = toQueryString(query.draft).trim().toLowerCase();
+      const categoryId = toQueryString(query.categoryId).trim();
 
       if (userId) {
             filter.userId = userId;
@@ -297,6 +299,10 @@ const buildInventoryFilter = (query: Record<string, unknown>) => {
 
       if (groupKey) {
             filter.groupKey = groupKey;
+      }
+
+      if (categoryId && Types.ObjectId.isValid(categoryId)) {
+            filter.categoryId = new Types.ObjectId(categoryId);
       }
 
       if (type === 'inventory' || type === 'sold') {
@@ -528,6 +534,10 @@ const createInventory = async (payload: Partial<IInventory>, file?: any) => {
       }
 
       const result = await Inventory.create(normalizedPayload);
+      // Update category total items if categoryId is provided
+      if (result.categoryId) {
+            await categoryService.updateInventoryCategoryCount(result.categoryId);
+      }
 
       await sendLowStockAlert(result);
 
@@ -826,6 +836,9 @@ const getSingleInventory = async (id: string) => {
 const updateInventory = async (id: string, payload: Partial<IInventory>, file?: any) => {
       assertValidObjectId(id, 'id');
 
+      // Get old inventory to check category change
+      const oldInventory = await Inventory.findById(id);
+
       const normalizedPayload = syncInventoryState(payload);
 
       if (file) {
@@ -844,6 +857,18 @@ const updateInventory = async (id: string, payload: Partial<IInventory>, file?: 
       });
 
       if (updatedInventory) {
+            const oldCategoryId = oldInventory?.categoryId?.toString();
+            const newCategoryId = updatedInventory.categoryId?.toString();
+
+            if (oldCategoryId !== newCategoryId) {
+                  if (oldCategoryId && Types.ObjectId.isValid(oldCategoryId)) {
+                        await categoryService.updateInventoryCategoryCount(new Types.ObjectId(oldCategoryId));
+                  }
+                  if (newCategoryId && Types.ObjectId.isValid(newCategoryId)) {
+                        await categoryService.updateInventoryCategoryCount(new Types.ObjectId(newCategoryId));
+                  }
+            }
+
             await sendLowStockAlert(updatedInventory);
       }
 
@@ -853,8 +878,18 @@ const updateInventory = async (id: string, payload: Partial<IInventory>, file?: 
 const deleteInventory = async (id: string) => {
       assertValidObjectId(id, 'id');
 
-      return await Inventory.findByIdAndDelete(id);
+      const inventory = await Inventory.findById(id);
+
+      const result = await Inventory.findByIdAndDelete(id);
+
+      // Update category total items if category existed
+      if (inventory?.categoryId) {
+            await categoryService.updateInventoryCategoryCount(inventory.categoryId);
+      }
+
+      return result;
 };
+
 
 const getMyInventory = async (userId: string) => {
       return await Inventory.find({ userId }).populate('userId').sort({ createdAt: -1 });

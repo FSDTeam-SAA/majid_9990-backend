@@ -6,6 +6,7 @@ export type TInventoryStatus = 'inventory' | 'sold' | 'due' | 'draft';
 
 export interface IInventory {
       itemName: string;
+      categoryId?: Types.ObjectId;
       sku?: string;
       brand?: string;
       color?: string;
