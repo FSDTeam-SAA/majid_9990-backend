@@ -301,8 +301,8 @@ const buildInventoryFilter = (query: Record<string, unknown>) => {
             filter.groupKey = groupKey;
       }
 
-      if (categoryId && Types.ObjectId.isValid(categoryId)) {
-            filter.categoryId = new Types.ObjectId(categoryId);
+      if (categoryId) {
+            filter.categoryId = parseObjectId(categoryId, 'categoryId');
       }
 
       if (type === 'inventory' || type === 'sold') {
@@ -799,8 +799,8 @@ const createInventoryFromBarcodeBulk = async (payload: unknown, defaultUserId?: 
       };
 };
 
-const getAllInventory = async () => {
-      return await Inventory.find().populate('userId').sort({ createdAt: -1 });
+const getAllInventory = async (query: Record<string, unknown> = {}) => {
+      return await getInventoryWithFilters(query);
 };
 
 const getInventoryWithFilters = async (query: Record<string, unknown> = {}) => {

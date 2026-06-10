@@ -76,7 +76,7 @@ const getInventoryCsvTemplate = catchAsync(async (_req, res) => {
 });
 
 const getAllInventory = catchAsync(async (req, res) => {
-      const result = await inventoryService.getAllInventory();
+      const result = await inventoryService.getAllInventory(req.query as Record<string, unknown>);
 
       sendResponse(res, {
             statusCode: StatusCodes.OK,
