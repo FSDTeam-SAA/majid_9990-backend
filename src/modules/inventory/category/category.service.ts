@@ -1,9 +1,9 @@
 import { Types } from 'mongoose';
-import AppError from '../../errors/AppError';
-import { uploadToCloudinary, deleteFromCloudinary } from '../../utils/cloudinary';
 import { Category } from './category.model';
 import { ICategory } from './category.interface';
-import { Inventory } from '../inventory/inventory.model';
+import AppError from '../../../errors/AppError';
+import { Inventory } from '../inventory.model';
+import { uploadToCloudinary, deleteFromCloudinary } from '../../../utils/cloudinary';
 
 class CategoryService {
       private async updateTotalItems(categoryId: Types.ObjectId): Promise<void> {

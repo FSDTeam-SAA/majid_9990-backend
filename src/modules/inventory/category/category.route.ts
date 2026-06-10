@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { protect, restrictTo } from '../../middlewares/auth.middleware';
-import { upload } from '../../middlewares/multer.middleware';
+import { upload } from '../../../middlewares/multer.middleware'; 
 import categoryController from './category.controller';
+import { protect } from '../../../middlewares/auth.middleware';
 
 const router = Router();
 
@@ -14,7 +14,6 @@ router.get('/:id', protect, categoryController.getCategoryById);
 router.post(
       '/',
       protect,
-      restrictTo('admin', 'super-admin'),
       upload.single('image'),
       categoryController.createCategory
 );
@@ -22,13 +21,12 @@ router.post(
 router.put(
       '/:id',
       protect,
-      restrictTo('admin', 'super-admin'),
       upload.single('image'),
       categoryController.updateCategory
 );
 
-router.delete('/:id', protect, restrictTo('admin', 'super-admin'), categoryController.deleteCategory);
+router.delete('/:id', protect, categoryController.deleteCategory);
 
-router.post('/bulk-update-count', protect, restrictTo('admin', 'super-admin'), categoryController.bulkUpdateTotalItems);
+router.post('/bulk-update-count', protect, categoryController.bulkUpdateTotalItems);
 
 export default router;

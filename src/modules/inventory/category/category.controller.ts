@@ -1,7 +1,7 @@
 import { StatusCodes } from 'http-status-codes';
-import catchAsync from '../../utils/catchAsync';
-import sendResponse from '../../utils/sendResponse';
 import categoryService from './category.service';
+import catchAsync from '../../../utils/catchAsync';
+import sendResponse from '../../../utils/sendResponse';
 
 const createCategory = catchAsync(async (req, res) => {
       const result = await categoryService.createCategory(req.body, req.file);
@@ -26,7 +26,7 @@ const getAllCategories = catchAsync(async (req, res) => {
 });
 
 const getCategoryById = catchAsync(async (req, res) => {
-      const result = await categoryService.getCategoryById(req.params.id);
+      const result = await categoryService.getCategoryById(req.params.id as string);
 
       sendResponse(res, {
             statusCode: StatusCodes.OK,
@@ -37,7 +37,7 @@ const getCategoryById = catchAsync(async (req, res) => {
 });
 
 const updateCategory = catchAsync(async (req, res) => {
-      const result = await categoryService.updateCategory(req.params.id, req.body, req.file);
+      const result = await categoryService.updateCategory(req.params.id as string, req.body, req.file);
 
       sendResponse(res, {
             statusCode: StatusCodes.OK,
@@ -48,7 +48,7 @@ const updateCategory = catchAsync(async (req, res) => {
 });
 
 const deleteCategory = catchAsync(async (req, res) => {
-      await categoryService.deleteCategory(req.params.id);
+      await categoryService.deleteCategory(req.params.id as string);
 
       sendResponse(res, {
             statusCode: StatusCodes.OK,
