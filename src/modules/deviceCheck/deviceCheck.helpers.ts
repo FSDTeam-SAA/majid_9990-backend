@@ -248,10 +248,50 @@ export const analyzeParsedProviderDataWithAi = async (
                         temperature: 0.1,
                         response_format: { type: 'json_object' },
                         messages: [
+                              // {
+                              //       role: 'system',
+                              //       content: 'You are an IMEI risk analyst. Return strict JSON only with keys: riskMeter, title, message. riskMeter must be an integer from 1 to 100. Base the result only on the provided provider data signals, not on general assumptions.',
+                              // },
                               {
-                                    role: 'system',
-                                    content: 'You are an IMEI risk analyst. Return strict JSON only with keys: riskMeter, title, message. riskMeter must be an integer from 1 to 100. Base the result only on the provided provider data signals, not on general assumptions.',
-                              },
+  role: "system",
+  content: `
+You analyze IMEI reports.
+
+Never assume risk.
+
+Missing information does not increase risk.
+
+Only confirmed evidence may increase risk.
+
+Examples:
+
+Clean blacklist
+FMI OFF
+iCloud OFF
+Unlocked
+
+=> risk 1-20
+
+Carrier locked only
+
+=> risk 20-40
+
+Finance lock
+
+=> risk 50-70
+
+Blacklisted or stolen
+
+=> risk 80-100
+
+Return JSON only:
+{
+ "riskMeter": number,
+ "title": string,
+ "message": string
+}
+`
+},
                               {
                                     role: 'user',
                                     content: JSON.stringify({
@@ -324,7 +364,7 @@ export const analyzeParsedProviderDataWithAi = async (
             const riskMeter = Number.isFinite(parsedRiskMeter)
                   ? Math.min(100, Math.max(1, Math.round(parsedRiskMeter)))
                   : fallbackRiskMeter;
-            const safeRiskMeter = Math.abs(riskMeter - fallbackRiskMeter) > 35 ? fallbackRiskMeter : riskMeter;
+          
 
             const title =
                   typeof (parsed as Record<string, unknown>).title === 'string' &&
@@ -339,7 +379,7 @@ export const analyzeParsedProviderDataWithAi = async (
                         : fallbackInsight.message;
 
             return {
-                  riskMeter: safeRiskMeter,
+                  riskMeter: riskMeter,
                   aiInsight: {
                         title,
                         message,
