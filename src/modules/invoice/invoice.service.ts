@@ -85,6 +85,12 @@ const createInvoice = async (payload: IInvoicePayload, file?: Express.Multer.Fil
             type,
             customerInfo,
             itemsIds,
+
+            totalAmount: payload.totalAmount,
+            dueAmount: payload.dueAmount,
+            repairRequestId: normalizeObjectId(payload.repairRequestId),
+            tax: payload.tax,
+            paymentMethod: payload.paymentMethod?.trim(),
       });
 
       return result;
@@ -119,9 +125,46 @@ const updateInvoice = async (id: string, payload: IInvoicePayload, file?: Expres
             throw new AppError('Invoice not found', StatusCodes.NOT_FOUND);
       }
 
-      const updateData: Partial<Pick<IInvoice, 'shopkeeperId' | 'type' | 'customerInfo' | 'itemsIds'>> & {
+      const updateData: Partial<
+            Pick<
+                  IInvoice,
+                  | 'shopkeeperId'
+                  | 'type'
+                  | 'customerInfo'
+                  | 'itemsIds'
+                  | 'totalAmount'
+                  | 'dueAmount'
+                  | 'repairRequestId'
+                  | 'tax'
+                  | 'paymentMethod'
+            >
+      > & {
             invoice?: IInvoice['invoice'];
       } = {};
+
+      if (payload.totalAmount !== undefined) {
+            updateData.totalAmount = payload.totalAmount;
+      }
+
+      if (payload.dueAmount !== undefined) {
+            updateData.dueAmount = payload.dueAmount;
+      }
+
+      if (payload.tax !== undefined) {
+            updateData.tax = payload.tax;
+      }
+
+      if (payload.paymentMethod !== undefined) {
+            updateData.paymentMethod = payload.paymentMethod?.trim();
+      }
+
+      if (payload.repairRequestId !== undefined) {
+            const repairRequestId = normalizeObjectId(payload.repairRequestId);
+
+            if (repairRequestId !== null) {
+                  updateData.repairRequestId = repairRequestId;
+            }
+      }
 
       if (payload.shopkeeperId) {
             updateData.shopkeeperId = await resolveShopkeeperId(payload.shopkeeperId);

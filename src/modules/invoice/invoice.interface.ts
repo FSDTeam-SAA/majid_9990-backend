@@ -14,11 +14,22 @@ export interface IInvoice {
       itemsIds?: Types.ObjectId[];
       createdAt?: Date;
       updatedAt?: Date;
+      totalAmount?: number;
+      dueAmount?: number;
+      repairRequestId?: Types.ObjectId;
+      tax?: number;
+      paymentMethod?: string;
 }
 
 export interface IInvoicePayload {
       shopkeeperId?: string;
       type?: string;
-      customerInfo?: string | null;
-      itemsIds?: string | string[];
+      customerInfo?: string;
+      itemsIds?: string[];
+
+      totalAmount?: number;
+      dueAmount?: number;
+      repairRequestId?: string;
+      tax?: number;
+      paymentMethod?: string;
 }

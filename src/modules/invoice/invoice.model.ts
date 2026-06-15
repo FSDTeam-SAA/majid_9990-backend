@@ -41,6 +41,32 @@ const invoiceSchema = new Schema<IInvoice>(
                   ref: 'Inventory',
                   default: [],
             },
+            totalAmount: {
+                  type: Number,
+                  default: null,
+            },
+
+            dueAmount: {
+                  type: Number,
+                  default: null,
+            },
+
+            repairRequestId: {
+                  type: Schema.Types.ObjectId,
+                  ref: 'RepairRequest',
+                  default: null,
+            },
+
+            tax: {
+                  type: Number,
+                  default: null,
+            },
+
+            paymentMethod: {
+                  type: String,
+                  trim: true,
+                  default: null,
+            },
       },
       {
             timestamps: true,
