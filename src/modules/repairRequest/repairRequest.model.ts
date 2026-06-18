@@ -30,6 +30,8 @@ const RepairRequestSchema = new Schema<IRepairRequest>(
             },
             firstName: { type: String, required: true },
             email: { type: String, required: true },
+            phoneNumber: { type: String, required: true }, // ✅ ADDED
+            price: { type: Number, default: 0 }, // ✅ ADDED
             deviceModel: { type: String, required: true },
             IMEINumber: { type: String },
             description: { type: String, required: true },

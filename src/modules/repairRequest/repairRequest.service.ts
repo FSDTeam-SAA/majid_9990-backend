@@ -1,12 +1,11 @@
 import { StatusCodes } from 'http-status-codes';
-import { Types } from 'mongoose';
+import { FilterQuery, Types } from 'mongoose';
 import AppError from '../../errors/AppError';
 import { uploadToCloudinary } from '../../utils/cloudinary';
 import { generateTechnicianFeedback } from '../../utils/technicianFeedback';
 import { User } from '../user/user.model';
 import { IRepairRequest, IRepairRequestStatusUpdatePayload } from './repairRequest.interface';
 import RepairRequest from './repairRequest.model';
-
 
 const assertValidRepairRequestId = (id: string) => {
       if (!Types.ObjectId.isValid(id)) {
@@ -20,6 +19,7 @@ const addNewRepairRequest = async (payload: IRepairRequest, files: Express.Multe
 
       if (!payload.firstName) throw new AppError('First name is required', StatusCodes.BAD_REQUEST);
       if (!payload.email) throw new AppError('Email is required', StatusCodes.BAD_REQUEST);
+      if (!payload.phoneNumber) throw new AppError('Phone number is required', StatusCodes.BAD_REQUEST); // ✅ ADDED
       if (!payload.deviceModel) throw new AppError('Device model is required', StatusCodes.BAD_REQUEST);
       if (!payload.description) throw new AppError('Description is required', StatusCodes.BAD_REQUEST);
 
@@ -35,6 +35,8 @@ const addNewRepairRequest = async (payload: IRepairRequest, files: Express.Multe
             userId: payload.userId || user._id,
             firstName: payload.firstName,
             email: payload.email,
+            phoneNumber: payload.phoneNumber, // ✅ ADDED
+            price: payload.price || 0, // ✅ ADDED
             deviceModel: payload.deviceModel,
             IMEINumber: payload.IMEINumber,
             description: payload.description,
@@ -80,11 +82,11 @@ const generateAndSaveTechnicianFeedback = async (id: string) => {
             throw new AppError('Repair request not found', StatusCodes.NOT_FOUND);
       }
 
-const feedback = await generateTechnicianFeedback({
-      customerName: repair.firstName,
-      deviceModel: repair.deviceModel,
-      issueReported: repair.description,
-});
+      const feedback = await generateTechnicianFeedback({
+            customerName: repair.firstName,
+            deviceModel: repair.deviceModel,
+            issueReported: repair.description,
+      });
 
       const result = await RepairRequest.findByIdAndUpdate(
             id,
@@ -294,6 +296,30 @@ const getUserDescriptions = async (userId: string) => {
       return repairRequests;
 };
 
+// Add this method to the repairRequestService object
+const getCompletedRepairRequests = async (userId: string, query: any) => {
+      const page = Number(query.page) || 1;
+      const limit = Number(query.limit) || 10;
+      const skip = (page - 1) * limit;
+
+      const filter: FilterQuery<IRepairRequest> = { 
+            userId, 
+            status: 'completed' 
+      };
+      
+      const data = await RepairRequest.find(filter).skip(skip).limit(limit).sort({ createdAt: -1 });
+      const total = await RepairRequest.countDocuments(filter);
+
+      return {
+            data,
+            meta: {
+                  page,
+                  limit,
+                  total,
+                  totalPage: Math.ceil(total / limit),
+            },
+      };
+};
 
 const repairRequestService = {
       addNewRepairRequest,
@@ -304,6 +330,7 @@ const repairRequestService = {
       addTeachNoteByTechnician,
       generateTechnicianFeedbackByRequest,
       getUserDescriptions,
+      getCompletedRepairRequests,
 };
 
 export default repairRequestService;

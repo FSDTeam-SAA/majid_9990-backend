@@ -104,6 +104,19 @@ const getUserDescriptions = catchAsync(async (req, res) => {
       });
 });
 
+const getCompletedRepairRequests = catchAsync(async (req, res) => {
+      const { id } = req.user;
+      const result = await repairRequestService.getCompletedRepairRequests(id, req.query);
+
+      sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: 'Completed repair requests retrieved successfully',
+            data: result.data,
+            meta: result.meta,
+      });
+});
+
 
 const repairRequestController = {
       addNewRepairRequest,
@@ -113,7 +126,8 @@ const repairRequestController = {
       addNoteByShopKeeper,
       addTeachNoteByTechnician,
       generateTechnicianFeedback,
-      getUserDescriptions
+      getUserDescriptions,
+      getCompletedRepairRequests,
 };
 
 export default repairRequestController;
