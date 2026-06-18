@@ -33,6 +33,8 @@ export interface IRepairRequest {
       firstName: string;
       email: string;
       deviceModel: string;
+      phoneNumber: string; 
+      price?: number; 
       IMEINumber: string;
       description: string;
       technicianFeedback?: string;
