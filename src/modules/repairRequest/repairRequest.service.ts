@@ -1,5 +1,5 @@
 import { StatusCodes } from 'http-status-codes';
-import { Types } from 'mongoose';
+import { FilterQuery, Types } from 'mongoose';
 import AppError from '../../errors/AppError';
 import { uploadToCloudinary } from '../../utils/cloudinary';
 import { generateTechnicianFeedback } from '../../utils/technicianFeedback';
@@ -296,6 +296,31 @@ const getUserDescriptions = async (userId: string) => {
       return repairRequests;
 };
 
+// Add this method to the repairRequestService object
+const getCompletedRepairRequests = async (userId: string, query: any) => {
+      const page = Number(query.page) || 1;
+      const limit = Number(query.limit) || 10;
+      const skip = (page - 1) * limit;
+
+      const filter: FilterQuery<IRepairRequest> = { 
+            userId, 
+            status: 'completed' 
+      };
+      
+      const data = await RepairRequest.find(filter).skip(skip).limit(limit).sort({ createdAt: -1 });
+      const total = await RepairRequest.countDocuments(filter);
+
+      return {
+            data,
+            meta: {
+                  page,
+                  limit,
+                  total,
+                  totalPage: Math.ceil(total / limit),
+            },
+      };
+};
+
 const repairRequestService = {
       addNewRepairRequest,
       getMyRepairRequestsHistory,
@@ -305,6 +330,7 @@ const repairRequestService = {
       addTeachNoteByTechnician,
       generateTechnicianFeedbackByRequest,
       getUserDescriptions,
+      getCompletedRepairRequests,
 };
 
 export default repairRequestService;

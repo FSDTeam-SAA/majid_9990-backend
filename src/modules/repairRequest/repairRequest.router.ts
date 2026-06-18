@@ -6,6 +6,7 @@ import repairRequestController from './repairRequest.controller';
 const router = Router();
 
 router.post('/add', protect, upload.array('images', 6), repairRequestController.addNewRepairRequest);
+router.get('/completed', protect, repairRequestController.getCompletedRepairRequests); 
 router.get('/my-history', protect, repairRequestController.getMyRepairRequestsHistory);
 router.get('/:id', repairRequestController.getSingleRepairRequest);
 router.put('/update-status/:id', protect, repairRequestController.updateStatusByShopKeeper);
