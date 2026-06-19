@@ -1,6 +1,7 @@
+// utils/sendEmail.ts
+
 import nodemailer from 'nodemailer';
 import config from '../config/config';
-
 
 interface SendEmailParams {
       to: string;
@@ -10,11 +11,17 @@ interface SendEmailParams {
 
 interface SendEmailResponse {
       success: boolean;
+      messageId?: string;
       error?: string;
 }
 
 const sendEmail = async ({ to, subject, html }: SendEmailParams): Promise<SendEmailResponse> => {
       try {
+            // Validate email configuration
+            if (!config.email?.emailAddress || !config.email?.emailPass) {
+                  throw new Error('Email configuration is missing');
+            }
+
             const transporter = nodemailer.createTransport({
                   host: 'smtp.gmail.com',
                   port: 587,
@@ -28,19 +35,30 @@ const sendEmail = async ({ to, subject, html }: SendEmailParams): Promise<SendEm
                   },
             });
 
+            // Verify connection configuration
+            await transporter.verify();
+
             const mailOptions = {
-                  from: config.email.emailAddress,
+                  from: `"Repair Service" <${config.email.emailAddress}>`,
                   to,
                   subject,
                   html,
             };
 
-            await transporter.sendMail(mailOptions);
+            const info = await transporter.sendMail(mailOptions);
 
-            console.log("email is send");
-            return { success: true };
+            console.log('Email sent successfully:', info.messageId);
+
+            return {
+                  success: true,
+                  messageId: info.messageId,
+            };
       } catch (error: any) {
-            return { success: false, error: error.message };
+            console.error('Email sending failed:', error);
+            return {
+                  success: false,
+                  error: error.message || 'Failed to send email',
+            };
       }
 };
 
