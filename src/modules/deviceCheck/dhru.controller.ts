@@ -19,16 +19,16 @@ import ScanInfo from './scanInfo.model';
 
 type SingleImeiCheckResult =
       | {
-              ok: true;
-              message: string;
-              data: Record<string, unknown>;
-        }
+            ok: true;
+            message: string;
+            data: Record<string, unknown>;
+      }
       | {
-              ok: false;
-              statusCode: number;
-              message: string;
-              data?: unknown;
-        };
+            ok: false;
+            statusCode: number;
+            message: string;
+            data?: unknown;
+      };
 
 type BatchImeiItemResult = {
       rowNumber: number;
@@ -417,7 +417,7 @@ const processSingleImeiCheck = async (
             return {
                   ok: false,
                   statusCode: 400,
-                  message: 'Valid 15-digit imei is required',
+                  message: 'Valid 15-digit IMEI or Serial Number is required',
             };
       }
 
@@ -563,9 +563,9 @@ const extractImeisFromWorkbook = (filePath: string) => {
       const headerLooksLikeImeiColumn = firstRow.some((cell) => cell === 'imei' || cell.includes('imei'));
       const imeiColumnIndex = headerLooksLikeImeiColumn
             ? Math.max(
-                    firstRow.findIndex((cell) => cell === 'imei' || cell.includes('imei')),
-                    0
-              )
+                  firstRow.findIndex((cell) => cell === 'imei' || cell.includes('imei')),
+                  0
+            )
             : 0;
       const dataRows = headerLooksLikeImeiColumn ? rows.slice(1) : rows;
 
@@ -672,7 +672,7 @@ export const checkImeiFromDhruV2 = async (req: Request, res: Response, next: Nex
                         return {
                               ok: false,
                               statusCode: 400,
-                              message: 'Valid 15-digit imei is required',
+                              message: 'Valid 15-digit IMEI or Serial Number is required',
                         } as SingleImeiCheckResult;
                   }
 

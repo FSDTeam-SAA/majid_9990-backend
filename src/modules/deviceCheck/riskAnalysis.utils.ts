@@ -317,4 +317,6 @@ export const getDeviceChecks = async (imei: string): Promise<DeviceChecksRespons
       };
 };
 
-export const isValidImei = (imei: string): boolean => /^\d{15}$/.test(imei);
+export const isValidImei = (imei: string): boolean => /^\d{15}$/.test(imei) || /^[A-Za-z0-9]{4,}$/.test(imei);
+
+export const isSerialNumber = (imei: string): boolean => /^[A-Za-z0-9]{4,}$/.test(imei) && !/^\d{15}$/.test(imei);
