@@ -536,7 +536,7 @@ const createInventory = async (payload: Partial<IInventory>, file?: any) => {
       const result = await Inventory.create(normalizedPayload);
       // Update category total items if categoryId is provided
       if (result.categoryId) {
-            await categoryService.updateInventoryCategoryCount(result.categoryId);
+            await categoryService.updateInventoryCategoryCount(result.categoryId, result.userId);
       }
 
       await sendLowStockAlert(result);
@@ -862,10 +862,16 @@ const updateInventory = async (id: string, payload: Partial<IInventory>, file?: 
 
             if (oldCategoryId !== newCategoryId) {
                   if (oldCategoryId && Types.ObjectId.isValid(oldCategoryId)) {
-                        await categoryService.updateInventoryCategoryCount(new Types.ObjectId(oldCategoryId));
+                        await categoryService.updateInventoryCategoryCount(
+                              new Types.ObjectId(oldCategoryId),
+                              updatedInventory.userId
+                        );
                   }
                   if (newCategoryId && Types.ObjectId.isValid(newCategoryId)) {
-                        await categoryService.updateInventoryCategoryCount(new Types.ObjectId(newCategoryId));
+                        await categoryService.updateInventoryCategoryCount(
+                              new Types.ObjectId(newCategoryId),
+                              updatedInventory.userId
+                        );
                   }
             }
 
@@ -884,12 +890,11 @@ const deleteInventory = async (id: string) => {
 
       // Update category total items if category existed
       if (inventory?.categoryId) {
-            await categoryService.updateInventoryCategoryCount(inventory.categoryId);
+            await categoryService.updateInventoryCategoryCount(inventory.categoryId, inventory.userId);
       }
 
       return result;
 };
-
 
 const getMyInventory = async (userId: string) => {
       return await Inventory.find({ userId }).populate('userId').sort({ createdAt: -1 });

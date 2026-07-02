@@ -20,6 +20,7 @@ import addToCartRouter from '../modules/addToCart/addToCart.router';
 import ocrRouter from '../modules/ocr/ocr.router';
 import categoryRouter from '../modules/inventory/category/category.route';
 import cashManagementRouter from '../modules/cashManagement/cashManagement.route';
+import supplierRouter from '../modules/supplier/supplier.router';
 
 const router = Router();
 
@@ -115,6 +116,10 @@ const moduleRoutes = [
       {
             path: '/cash-management',
             route: cashManagementRouter,
+      },
+      {
+            path: '/suppliers',
+            route: supplierRouter,
       },
 ];
 moduleRoutes.forEach((route) => router.use(route.path, route.route));

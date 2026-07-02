@@ -1,0 +1,137 @@
+{
+  "info": {
+    "_postman_id": "9a1b2c3d-4e5f-6a7b-8c9d-0e1f2a3b4c5d",
+    "name": "Majid Backend - Suppliers",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Create Supplier",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Tech Distributors Ltd\",\n  \"phone\": \"+8801712345678\",\n  \"email\": \"info@techdist.com\",\n  \"address\": \"123 Gulshan Avenue, Dhaka\",\n  \"notes\": \"Premium electronics supplier\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/suppliers/create",
+          "host": ["{{base_url}}"],
+          "path": ["suppliers", "create"]
+        }
+      }
+    },
+    {
+      "name": "Get All Suppliers",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/suppliers?page=1&limit=10&isActive=true&search=Tech",
+          "host": ["{{base_url}}"],
+          "path": ["suppliers"],
+          "query": [
+            { "key": "page", "value": "1" },
+            { "key": "limit", "value": "10" },
+            { "key": "isActive", "value": "true" },
+            { "key": "search", "value": "Tech" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Get Supplier Details",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/suppliers/{{supplier_id}}",
+          "host": ["{{base_url}}"],
+          "path": ["suppliers", "{{supplier_id}}"]
+        }
+      }
+    },
+    {
+      "name": "Update Supplier",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Tech Distributors Ltd (Updated)\",\n  \"phone\": \"+8801712349999\",\n  \"notes\": \"Updated supplier info\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/suppliers/{{supplier_id}}",
+          "host": ["{{base_url}}"],
+          "path": ["suppliers", "{{supplier_id}}"]
+        }
+      }
+    },
+    {
+      "name": "Delete / Deactivate Supplier",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/suppliers/{{supplier_id}}",
+          "host": ["{{base_url}}"],
+          "path": ["suppliers", "{{supplier_id}}"]
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:5000/api/v1"
+    },
+    {
+      "key": "token",
+      "value": "YOUR_JWT_TOKEN_HERE"
+    },
+    {
+      "key": "supplier_id",
+      "value": "REPLACE_WITH_ACTUAL_ID"
+    }
+  ]
+}

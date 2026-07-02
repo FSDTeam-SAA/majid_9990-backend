@@ -4,7 +4,7 @@ import catchAsync from '../../../utils/catchAsync';
 import sendResponse from '../../../utils/sendResponse';
 
 const createCategory = catchAsync(async (req, res) => {
-      const result = await categoryService.createCategory(req.body, req.file);
+      const result = await categoryService.createCategory(req.body, req.file, req.user._id);
 
       sendResponse(res, {
             statusCode: StatusCodes.CREATED,
@@ -15,7 +15,7 @@ const createCategory = catchAsync(async (req, res) => {
 });
 
 const getAllCategories = catchAsync(async (req, res) => {
-      const result = await categoryService.getAllCategories();
+      const result = await categoryService.getAllCategories(req.user._id);
 
       sendResponse(res, {
             statusCode: StatusCodes.OK,
@@ -26,7 +26,7 @@ const getAllCategories = catchAsync(async (req, res) => {
 });
 
 const getCategoryById = catchAsync(async (req, res) => {
-      const result = await categoryService.getCategoryById(req.params.id as string);
+      const result = await categoryService.getCategoryById(req.params.id as string, req.user._id);
 
       sendResponse(res, {
             statusCode: StatusCodes.OK,
@@ -37,7 +37,7 @@ const getCategoryById = catchAsync(async (req, res) => {
 });
 
 const updateCategory = catchAsync(async (req, res) => {
-      const result = await categoryService.updateCategory(req.params.id as string, req.body, req.file);
+      const result = await categoryService.updateCategory(req.params.id as string, req.body, req.file, req.user._id);
 
       sendResponse(res, {
             statusCode: StatusCodes.OK,
@@ -48,7 +48,7 @@ const updateCategory = catchAsync(async (req, res) => {
 });
 
 const deleteCategory = catchAsync(async (req, res) => {
-      await categoryService.deleteCategory(req.params.id as string);
+      await categoryService.deleteCategory(req.params.id as string, req.user._id);
 
       sendResponse(res, {
             statusCode: StatusCodes.OK,
@@ -59,7 +59,7 @@ const deleteCategory = catchAsync(async (req, res) => {
 });
 
 const getCategoriesWithItemCount = catchAsync(async (req, res) => {
-      const result = await categoryService.getCategoriesWithItemCount();
+      const result = await categoryService.getCategoriesWithItemCount(req.user._id);
 
       sendResponse(res, {
             statusCode: StatusCodes.OK,
@@ -70,7 +70,7 @@ const getCategoriesWithItemCount = catchAsync(async (req, res) => {
 });
 
 const bulkUpdateTotalItems = catchAsync(async (req, res) => {
-      await categoryService.bulkUpdateTotalItems();
+      await categoryService.bulkUpdateTotalItems(req.user._id);
 
       sendResponse(res, {
             statusCode: StatusCodes.OK,

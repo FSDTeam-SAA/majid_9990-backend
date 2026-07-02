@@ -27,7 +27,7 @@ export const getRiskAnalysis = catchAsync(async (req, res) => {
                   .toLowerCase() === 'new';
 
       if (!isValidImei(imei)) {
-            throw new AppError('Valid 15-digit IMEI is required', 400);
+            throw new AppError('Valid 15-digit IMEI or Serial Number is required', 400);
       }
 
       const serviceId = resolveServiceId(req.body?.serviceId);
@@ -130,7 +130,7 @@ export const getDeviceAnalysis = catchAsync(async (req, res) => {
       if (!isValidImei(imei)) {
             return res.status(400).json({
                   success: false,
-                  message: 'Valid 15-digit IMEI is required',
+                  message: 'Valid 15-digit IMEI or Serial Number is required',
             });
       }
 

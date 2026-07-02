@@ -78,12 +78,15 @@ class DhruService {
       }
 
       async placeImeiOrder(serviceId: string | number, imei: string) {
+            const isSerial = /^[A-Za-z0-9]{4,}$/.test(imei) && !/^\d{15}$/.test(imei);
+
             if (this.provider === 'sickw') {
                   const response = await this.client.get('/api.php', {
                         params: {
                               format: this.sickwFormat,
                               key: this.apiKey,
                               imei,
+                              ...(isSerial ? { sn: imei, serial: imei } : {}),
                               service: serviceId,
                         },
                   });
@@ -96,6 +99,7 @@ class DhruService {
             return this.request('placeimeiorder', {
                   serviceid: serviceId,
                   imei,
+                  ...(isSerial ? { sn: imei, serial: imei } : {}),
             });
       }
 

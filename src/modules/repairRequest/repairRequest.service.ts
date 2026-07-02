@@ -3,6 +3,7 @@ import { FilterQuery, Types } from 'mongoose';
 import AppError from '../../errors/AppError';
 import { uploadToCloudinary } from '../../utils/cloudinary';
 import { generateTechnicianFeedback } from '../../utils/technicianFeedback';
+import { sendRepairCompletionEmail } from '../../utils/email/email.service';
 import { User } from '../user/user.model';
 import { IRepairRequest, IRepairRequestStatusUpdatePayload } from './repairRequest.interface';
 import RepairRequest from './repairRequest.model';
@@ -154,11 +155,53 @@ const updateStatusByShopKeeper = async (id: string, payload: IRepairRequestStatu
             throw new AppError('Repair request not found', StatusCodes.NOT_FOUND);
       }
 
+      // ✅ If status is completed, generate feedback AND send email
       if (payload.status === 'completed') {
-            return generateAndSaveTechnicianFeedback(id);
+            // Generate technician feedback first
+            const updatedWithFeedback = await generateAndSaveTechnicianFeedback(id);
+
+            if (updatedWithFeedback) {
+                  // Send email notification
+                  await sendCompletionEmail(updatedWithFeedback);
+            }
+
+            return updatedWithFeedback;
       }
 
       return result;
+};
+
+// ✅ New helper function to send completion email
+const sendCompletionEmail = async (repairRequest: IRepairRequest) => {
+      try {
+            const emailData = {
+                  customerName: repairRequest.firstName,
+                  deviceModel: repairRequest.deviceModel,
+                  description: repairRequest.description,
+                  price: repairRequest.price,
+                  technicianFeedback: repairRequest.technicianFeedback,
+                  completionDate: new Date().toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                  }),
+                  requestId: (repairRequest as any)._id.toString().slice(-6).toUpperCase(),
+            };
+
+            const result = await sendRepairCompletionEmail(repairRequest.email, emailData);
+
+            if (!result.success) {
+                  console.error('Failed to send completion email:', result.error);
+                  // Don't throw error - email failure shouldn't stop the status update
+            } else {
+                  console.log('Completion email sent successfully to:', repairRequest.email);
+            }
+
+            return result;
+      } catch (error) {
+            console.error('Error in sendCompletionEmail:', error);
+            // Don't throw - just log the error
+      }
 };
 
 const addNoteByShopKeeper = async (id: string, payload: any, files: Express.Multer.File[] = []) => {
@@ -302,11 +345,11 @@ const getCompletedRepairRequests = async (userId: string, query: any) => {
       const limit = Number(query.limit) || 10;
       const skip = (page - 1) * limit;
 
-      const filter: FilterQuery<IRepairRequest> = { 
-            userId, 
-            status: 'completed' 
+      const filter: FilterQuery<IRepairRequest> = {
+            userId,
+            status: 'completed',
       };
-      
+
       const data = await RepairRequest.find(filter).skip(skip).limit(limit).sort({ createdAt: -1 });
       const total = await RepairRequest.countDocuments(filter);
 
@@ -331,6 +374,7 @@ const repairRequestService = {
       generateTechnicianFeedbackByRequest,
       getUserDescriptions,
       getCompletedRepairRequests,
+      sendCompletionEmail,
 };
 
 export default repairRequestService;
