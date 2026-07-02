@@ -7,7 +7,12 @@ const categorySchema = new Schema<ICategory>(
                   type: String,
                   required: true,
                   trim: true,
-                  unique: true,
+            },
+            shopkeeperId: {
+                  type: Schema.Types.ObjectId,
+                  ref: 'User',
+                  required: true,
+                  index: true,
             },
             image: {
                   public_id: String,
@@ -24,5 +29,7 @@ const categorySchema = new Schema<ICategory>(
             versionKey: false,
       }
 );
+
+categorySchema.index({ name: 1, shopkeeperId: 1 }, { unique: true });
 
 export const Category = model<ICategory>('Category', categorySchema);

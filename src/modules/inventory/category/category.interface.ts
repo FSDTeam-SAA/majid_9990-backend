@@ -3,6 +3,7 @@ import { Types } from 'mongoose';
 export interface ICategory {
       _id?: Types.ObjectId;
       name: string;
+      shopkeeperId: Types.ObjectId;
       image?: {
             public_id: string;
             url: string;
