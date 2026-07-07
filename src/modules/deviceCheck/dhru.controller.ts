@@ -19,16 +19,16 @@ import ScanInfo from './scanInfo.model';
 
 type SingleImeiCheckResult =
       | {
-            ok: true;
-            message: string;
-            data: Record<string, unknown>;
-      }
+              ok: true;
+              message: string;
+              data: Record<string, unknown>;
+        }
       | {
-            ok: false;
-            statusCode: number;
-            message: string;
-            data?: unknown;
-      };
+              ok: false;
+              statusCode: number;
+              message: string;
+              data?: unknown;
+        };
 
 type BatchImeiItemResult = {
       rowNumber: number;
@@ -563,9 +563,9 @@ const extractImeisFromWorkbook = (filePath: string) => {
       const headerLooksLikeImeiColumn = firstRow.some((cell) => cell === 'imei' || cell.includes('imei'));
       const imeiColumnIndex = headerLooksLikeImeiColumn
             ? Math.max(
-                  firstRow.findIndex((cell) => cell === 'imei' || cell.includes('imei')),
-                  0
-            )
+                    firstRow.findIndex((cell) => cell === 'imei' || cell.includes('imei')),
+                    0
+              )
             : 0;
       const dataRows = headerLooksLikeImeiColumn ? rows.slice(1) : rows;
 
@@ -632,7 +632,7 @@ export const checkImeiFromDhru = async (req: Request, res: Response, next: NextF
       }
 };
 
-// V2: return raw provider rows from DHRU; do NOT use cached DB data, do NOT merge bundled results, no AI fields
+// V2: IMEI response with parsed provider data and AI risk/price enrichment
 export const checkImeiFromDhruV2 = async (req: Request, res: Response, next: NextFunction) => {
       try {
             const userId = req.user?._id?.toString();
@@ -798,6 +798,7 @@ export const checkImeiFromDhruV2 = async (req: Request, res: Response, next: Nex
                                                 parsedProviderData: parsed,
                                                 aiInsight: aiAnalysis.aiInsight,
                                                 riskMeter: aiAnalysis.riskMeter,
+                                                marketValue: aiAnalysis.marketValue,
                                           };
                                     })
                               );
@@ -883,6 +884,7 @@ export const checkImeiFromDhruV2 = async (req: Request, res: Response, next: Nex
                                           providerResults: mergedParsed,
                                           riskMeter: aiAnalysis.riskMeter,
                                           aiInsight: aiAnalysis.aiInsight,
+                                          marketValue: aiAnalysis.marketValue,
                                           oldGenerated,
                                     },
                               } as SingleImeiCheckResult;
@@ -894,16 +896,25 @@ export const checkImeiFromDhruV2 = async (req: Request, res: Response, next: Nex
                               : await getExistingScanInfoByImei(imei, serviceId);
 
                         if (existingScanInfo) {
+                              const parsedProviderData = extractProviderDataFromHtml(
+                                    (existingScanInfo.providerData as Record<string, any>)?.result ?? null
+                              );
+
+                              const aiAnalysis = await analyzeParsedProviderDataWithAi(
+                                    String(imei),
+                                    parsedProviderData,
+                                    String(service.name ?? 'unknown')
+                              );
+
                               return {
                                     ok: true,
                                     message: 'IMEI data fetched from database',
                                     data: {
                                           provider: null,
-                                          parsedProviderData: extractProviderDataFromHtml(
-                                                (existingScanInfo.providerData as Record<string, any>)?.result ?? null
-                                          ),
-                                          riskMeter: existingScanInfo.riskMeter ?? null,
-                                          aiInsight: existingScanInfo.aiInsight ?? null,
+                                          parsedProviderData,
+                                          riskMeter: existingScanInfo.riskMeter ?? aiAnalysis.riskMeter,
+                                          aiInsight: aiAnalysis.aiInsight ?? existingScanInfo.aiInsight ?? null,
+                                          marketValue: aiAnalysis.marketValue ?? existingScanInfo.marketValue ?? null,
                                           oldGenerated: true,
                                     },
                               } as SingleImeiCheckResult;
