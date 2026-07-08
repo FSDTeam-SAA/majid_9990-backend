@@ -1,6 +1,7 @@
 import Stripe from 'stripe';
 import config from '../../config/config';
 import AppError from '../../errors/AppError';
+import { User } from '../user/user.model';
 import { Payment } from './payment.model';
 import { creditUserBalance } from './balanceTransaction.service';
 
@@ -83,8 +84,23 @@ const handleStripeWebhook = async (event: any) => {
             );
 
             if (payment) {
+                  const user = await User.findById(payment.userId);
+
+                  let creditUserId = payment.userId.toString();
+
+                  if (user) {
+                        if (user.role === 'user') {
+                              await User.findByIdAndUpdate(payment.userId, { role: 'shopkeeper' });
+                        } else if (user.role === 'staff') {
+                              if (!user.shopkeeperId) {
+                                    throw new AppError('Staff user has no associated shopkeeper', 400);
+                              }
+                              creditUserId = user.shopkeeperId.toString();
+                        }
+                  }
+
                   await creditUserBalance({
-                        userId: payment.userId.toString(),
+                        userId: creditUserId,
                         amount: payment.amount,
                         currency: payment.currency,
                         source: 'payment',
