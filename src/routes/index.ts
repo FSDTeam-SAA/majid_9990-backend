@@ -17,6 +17,7 @@ import locationRouter from '../modules/location/location.router';
 import lowStockAlertRouter from '../modules/lowStockAlert/lowStockAlert.router';
 import invoiceRouter from '../modules/invoice/invoice.router';
 import addToCartRouter from '../modules/addToCart/addToCart.router';
+import customerDiscountRouter from '../modules/customerDiscount/customerDiscount.router';
 import ocrRouter from '../modules/ocr/ocr.router';
 import categoryRouter from '../modules/inventory/category/category.route';
 import cashManagementRouter from '../modules/cashManagement/cashManagement.route';
@@ -104,6 +105,10 @@ const moduleRoutes = [
       {
             path: '/customer',
             route: customerRouter,
+      },
+      {
+            path: '/customer-discounts',
+            route: customerDiscountRouter,
       },
       {
             path: '/ocr',
