@@ -67,6 +67,19 @@ const invoiceSchema = new Schema<IInvoice>(
                   trim: true,
                   default: null,
             },
+            discountName: {
+                  type: String,
+                  trim: true,
+                  default: null,
+            },
+            discountPercentage: {
+                  type: Number,
+                  default: null,
+            },
+            discountAmount: {
+                  type: Number,
+                  default: null,
+            },
       },
       {
             timestamps: true,
