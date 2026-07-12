@@ -11,7 +11,7 @@ app.use(express.json());
 app.disable('x-powered-by');
 
 const corsOptions = {
-      origin: ['https://majid-website-two.vercel.app', 'https://majid-dashboard.vercel.app', 'http://localhost:3000'],
+      origin: ['https://majid-website-two.vercel.app', 'https://majid-dashboard.vercel.app', 'http://localhost:3000','https://majiddashboard.vercel.app',],
 
       methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
       credentials: true,
