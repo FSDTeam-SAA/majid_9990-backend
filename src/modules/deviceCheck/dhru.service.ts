@@ -10,6 +10,7 @@ class DhruService {
       private readonly baseUrl: string;
       private readonly provider: ProviderType;
       private readonly sickwFormat: string;
+      private readonly configured: boolean;
 
       constructor() {
             this.baseUrl = String(process.env.DHRU_BASE_URL ?? '').trim();
@@ -24,19 +25,12 @@ class DhruService {
             this.sickwFormat = String(process.env.SICKW_RESPONSE_FORMAT ?? 'json')
                   .trim()
                   .toLowerCase();
-
-            if (!this.baseUrl || !this.apiKey) {
-                  throw new Error('Missing IMEI provider configuration: DHRU_BASE_URL, DHRU_API_KEY');
-            }
-
-            if (this.provider === 'dhru' && !this.username) {
-                  throw new Error('Missing DHRU configuration: DHRU_USERNAME is required for provider=dhru');
-            }
+            this.configured = Boolean(this.baseUrl && this.apiKey);
 
             const timeoutMs = Number(process.env.DHRU_TIMEOUT_MS ?? 60000);
 
             this.client = axios.create({
-                  baseURL: this.baseUrl,
+                  baseURL: this.baseUrl || undefined,
                   headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
                   },
@@ -54,6 +48,10 @@ class DhruService {
       }
 
       private async request(action: string, extraData: Record<string, unknown> = {}) {
+            if (!this.configured) {
+                  throw new Error('IMEI provider not configured');
+            }
+
             if (this.provider === 'sickw') {
                   const response = await this.client.get('/api.php', {
                         params: {
