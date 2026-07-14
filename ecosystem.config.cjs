@@ -1,7 +1,7 @@
 module.exports = {
   apps: [
     {
-      name: "majid-backend",
+      name: "imoscan-backend",
       cwd: __dirname,
       script: "dist/server.js",
       env: {
