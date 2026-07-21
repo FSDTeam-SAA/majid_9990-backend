@@ -1,9 +1,9 @@
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 
 export interface IUser {
       _id: string;
       firstName: string;
-      lastName: string;
+      lastName?: string;
       email: string;
       phone: string;
       password: string;
@@ -25,8 +25,16 @@ export interface IUser {
       shopName?: string;
       shopAddress?: string;
       whatsappNumber?: string;
+      wageType?: 'per-day' | 'per-hour' | string;
+      wageAmount?: number;
+      workingDays?: string[];
+      weekendDays?: string[];
+      idVerificationStatus?: 'pending' | 'verified' | 'rejected' | string;
+      idNumber?: string;
       totalReviews?: number;
       averageRating?: number;
+      shopkeeperId?: Types.ObjectId | string;
+      currency?: string;
       createdAt?: Date;
       updatedAt?: Date;
 }

@@ -19,6 +19,9 @@ export interface IInvoice {
       repairRequestId?: Types.ObjectId;
       tax?: number;
       paymentMethod?: string;
+      discountName?: string;
+      discountPercentage?: number;
+      discountAmount?: number;
 }
 
 export interface IInvoicePayload {
@@ -32,4 +35,7 @@ export interface IInvoicePayload {
       repairRequestId?: string;
       tax?: number;
       paymentMethod?: string;
+      discountName?: string;
+      discountPercentage?: number;
+      discountAmount?: number;
 }

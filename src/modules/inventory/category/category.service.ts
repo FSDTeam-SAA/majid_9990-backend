@@ -6,17 +6,28 @@ import { Inventory } from '../inventory.model';
 import { uploadToCloudinary, deleteFromCloudinary } from '../../../utils/cloudinary';
 
 class CategoryService {
-      private async updateTotalItems(categoryId: Types.ObjectId): Promise<void> {
+      private getOwnerId(ownerId: string | Types.ObjectId) {
+            const resolvedOwnerId = ownerId instanceof Types.ObjectId ? ownerId : new Types.ObjectId(ownerId);
+
+            return resolvedOwnerId;
+      }
+
+      private async updateTotalItems(categoryId: Types.ObjectId, shopkeeperId: Types.ObjectId): Promise<void> {
             const itemCount = await Inventory.countDocuments({
                   categoryId: categoryId,
                   status: 'inventory', // Only count active inventory items
             });
 
-            await Category.findByIdAndUpdate(categoryId, { totalItems: itemCount });
+            await Category.findOneAndUpdate({ _id: categoryId, shopkeeperId }, { totalItems: itemCount });
       }
 
-      async createCategory(payload: Partial<ICategory>, file?: any): Promise<ICategory> {
+      async createCategory(
+            payload: Partial<ICategory>,
+            file?: any,
+            shopkeeperId?: string | Types.ObjectId
+      ): Promise<ICategory> {
             const name = payload.name?.trim();
+            const ownerId = this.getOwnerId(shopkeeperId ?? payload.shopkeeperId!);
 
             if (!name) {
                   throw new AppError('Category name is required', 400);
@@ -25,6 +36,7 @@ class CategoryService {
             // Check for existing category (case-insensitive)
             const existingCategory = await Category.findOne({
                   name: { $regex: new RegExp(`^${name}$`, 'i') },
+                  shopkeeperId: ownerId,
             });
 
             if (existingCategory) {
@@ -44,6 +56,7 @@ class CategoryService {
 
             const category = await Category.create({
                   name,
+                  shopkeeperId: ownerId,
                   image: imageData,
                   totalItems: 0,
             });
@@ -51,17 +64,19 @@ class CategoryService {
             return category;
       }
 
-      async getAllCategories(): Promise<ICategory[]> {
-            const categories = await Category.find().sort({ createdAt: -1 });
+      async getAllCategories(shopkeeperId: string | Types.ObjectId): Promise<ICategory[]> {
+            const ownerId = this.getOwnerId(shopkeeperId);
+            const categories = await Category.find({ shopkeeperId: ownerId }).sort({ createdAt: -1 });
             return categories;
       }
 
-      async getCategoryById(id: string): Promise<ICategory | null> {
+      async getCategoryById(id: string, shopkeeperId: string | Types.ObjectId): Promise<ICategory | null> {
             if (!Types.ObjectId.isValid(id)) {
                   throw new AppError('Invalid category ID', 400);
             }
 
-            const category = await Category.findById(id);
+            const ownerId = this.getOwnerId(shopkeeperId);
+            const category = await Category.findOne({ _id: id, shopkeeperId: ownerId });
 
             if (!category) {
                   throw new AppError('Category not found', 404);
@@ -70,12 +85,18 @@ class CategoryService {
             return category;
       }
 
-      async updateCategory(id: string, payload: Partial<ICategory>, file?: any): Promise<ICategory | null> {
+      async updateCategory(
+            id: string,
+            payload: Partial<ICategory>,
+            file?: any,
+            shopkeeperId?: string | Types.ObjectId
+      ): Promise<ICategory | null> {
             if (!Types.ObjectId.isValid(id)) {
                   throw new AppError('Invalid category ID', 400);
             }
 
-            const category = await Category.findById(id);
+            const ownerId = this.getOwnerId(shopkeeperId ?? payload.shopkeeperId!);
+            const category = await Category.findOne({ _id: id, shopkeeperId: ownerId });
             if (!category) {
                   throw new AppError('Category not found', 404);
             }
@@ -102,6 +123,7 @@ class CategoryService {
                   const existingCategory = await Category.findOne({
                         name: { $regex: new RegExp(`^${name}$`, 'i') },
                         _id: { $ne: id },
+                        shopkeeperId: ownerId,
                   });
 
                   if (existingCategory) {
@@ -111,17 +133,21 @@ class CategoryService {
                   payload.name = name;
             }
 
-            const updatedCategory = await Category.findByIdAndUpdate(id, payload, { new: true, runValidators: true });
+            const updatedCategory = await Category.findOneAndUpdate({ _id: id, shopkeeperId: ownerId }, payload, {
+                  new: true,
+                  runValidators: true,
+            });
 
             return updatedCategory;
       }
 
-      async deleteCategory(id: string): Promise<void> {
+      async deleteCategory(id: string, shopkeeperId: string | Types.ObjectId): Promise<void> {
             if (!Types.ObjectId.isValid(id)) {
                   throw new AppError('Invalid category ID', 400);
             }
 
-            const category = await Category.findById(id);
+            const ownerId = this.getOwnerId(shopkeeperId);
+            const category = await Category.findOne({ _id: id, shopkeeperId: ownerId });
             if (!category) {
                   throw new AppError('Category not found', 404);
             }
@@ -143,12 +169,18 @@ class CategoryService {
             await Category.findByIdAndDelete(id);
       }
 
-      async updateInventoryCategoryCount(categoryId: Types.ObjectId): Promise<void> {
-            await this.updateTotalItems(categoryId);
+      async updateInventoryCategoryCount(categoryId: Types.ObjectId, shopkeeperId: Types.ObjectId): Promise<void> {
+            await this.updateTotalItems(categoryId, shopkeeperId);
       }
 
-      async getCategoriesWithItemCount(): Promise<any[]> {
+      async getCategoriesWithItemCount(shopkeeperId: string | Types.ObjectId): Promise<any[]> {
+            const ownerId = this.getOwnerId(shopkeeperId);
             const categories = await Category.aggregate([
+                  {
+                        $match: {
+                              shopkeeperId: ownerId,
+                        },
+                  },
                   {
                         $lookup: {
                               from: 'inventories',
@@ -175,8 +207,9 @@ class CategoryService {
             return categories;
       }
 
-      async bulkUpdateTotalItems(): Promise<void> {
-            const categories = await Category.find();
+      async bulkUpdateTotalItems(shopkeeperId: string | Types.ObjectId): Promise<void> {
+            const ownerId = this.getOwnerId(shopkeeperId);
+            const categories = await Category.find({ shopkeeperId: ownerId });
 
             for (const category of categories) {
                   const itemCount = await Inventory.countDocuments({
@@ -184,7 +217,10 @@ class CategoryService {
                         status: 'inventory',
                   });
 
-                  await Category.findByIdAndUpdate(category._id, { totalItems: itemCount });
+                  await Category.findOneAndUpdate(
+                        { _id: category._id, shopkeeperId: ownerId },
+                        { totalItems: itemCount }
+                  );
             }
       }
 }

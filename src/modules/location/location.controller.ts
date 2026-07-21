@@ -49,8 +49,32 @@ const getCountryCode = catchAsync(async (req, res) => {
       });
 });
 
+const getCurrencyInfo = catchAsync(async (req, res) => {
+      const testIp = req.query.testIp as string;
+      const ip = testIp || parseIp(req);
+
+      if (!ip) {
+            sendResponse(res, {
+                  statusCode: StatusCodes.BAD_REQUEST,
+                  success: false,
+                  message: 'Unable to determine client IP address',
+            });
+            return;
+      }
+
+      const info = await locationService.getCurrencyInfo(ip);
+
+      sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: 'Currency info fetched',
+            data: info,
+      });
+});
+
 const locationController = {
       getCountryCode,
+      getCurrencyInfo,
 };
 
 export default locationController;

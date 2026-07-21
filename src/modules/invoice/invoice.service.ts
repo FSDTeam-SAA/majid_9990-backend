@@ -91,6 +91,9 @@ const createInvoice = async (payload: IInvoicePayload, file?: Express.Multer.Fil
             repairRequestId: normalizeObjectId(payload.repairRequestId),
             tax: payload.tax,
             paymentMethod: payload.paymentMethod?.trim(),
+            discountName: payload.discountName?.trim(),
+            discountPercentage: payload.discountPercentage,
+            discountAmount: payload.discountAmount,
       });
 
       return result;
@@ -137,6 +140,9 @@ const updateInvoice = async (id: string, payload: IInvoicePayload, file?: Expres
                   | 'repairRequestId'
                   | 'tax'
                   | 'paymentMethod'
+                  | 'discountName'
+                  | 'discountPercentage'
+                  | 'discountAmount'
             >
       > & {
             invoice?: IInvoice['invoice'];
@@ -156,6 +162,18 @@ const updateInvoice = async (id: string, payload: IInvoicePayload, file?: Expres
 
       if (payload.paymentMethod !== undefined) {
             updateData.paymentMethod = payload.paymentMethod?.trim();
+      }
+
+      if (payload.discountName !== undefined) {
+            updateData.discountName = payload.discountName?.trim();
+      }
+
+      if (payload.discountPercentage !== undefined) {
+            updateData.discountPercentage = payload.discountPercentage;
+      }
+
+      if (payload.discountAmount !== undefined) {
+            updateData.discountAmount = payload.discountAmount;
       }
 
       if (payload.repairRequestId !== undefined) {

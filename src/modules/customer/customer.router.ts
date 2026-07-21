@@ -1,10 +1,11 @@
 import { Router } from 'express';
-import { protect } from '../../middlewares/auth.middleware';
+import { isShopkeeperOrStaff, protect } from '../../middlewares/auth.middleware';
 import customerController from './customer.controller';
 
 const router = Router();
 
 router.post('/create', protect, customerController.createCustomer);
+router.post('/send-email', protect, isShopkeeperOrStaff, customerController.sendEmailToCustomers);
 router.put('/update/:id', protect, customerController.updateCustomer);
 router.delete('/delete/:id', protect, customerController.deleteCustomer);
 router.get('/shopkeeper/:shopkeeperId', protect, customerController.getByShopkeeperId);

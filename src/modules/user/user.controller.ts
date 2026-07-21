@@ -120,6 +120,40 @@ const getAllShopkeepers = catchAsync(async (req, res) => {
       });
 });
 
+const createStaff = catchAsync(async (req, res) => {
+      const result = await userService.createStaff(req.body);
+
+      sendResponse(res, {
+            statusCode: StatusCodes.CREATED,
+            success: true,
+            message: 'Staff account created successfully.',
+            data: result,
+      });
+});
+
+const getAllStaffByShopkeeper = catchAsync(async (req, res) => {
+      const shopkeeperId = Array.isArray(req.params.shopkeeperId) ? req.params.shopkeeperId[0] : req.params.shopkeeperId;
+      const result = await userService.getAllStaffByShopkeeper(shopkeeperId);
+
+      sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: 'Staff members retrieved successfully.',
+            data: result,
+      });
+});
+
+const getMyShopkeeperData = catchAsync(async (req, res) => {
+      const result = await userService.getMyShopkeeperData(req.user._id);
+
+      sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: 'Shopkeeper data retrieved successfully.',
+            data: result,
+      });
+});
+
 const userController = {
       registerUser,
       verifyEmail,
@@ -131,6 +165,9 @@ const userController = {
       deleteUser,
       getAllShopkeepers,
       getBalanceHistory,
+      createStaff,
+      getAllStaffByShopkeeper,
+      getMyShopkeeperData,
 };
 
 export default userController;

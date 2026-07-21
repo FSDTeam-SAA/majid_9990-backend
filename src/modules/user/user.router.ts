@@ -1,6 +1,6 @@
 import { Router } from 'express';
 
-import { protect } from '../../middlewares/auth.middleware';
+import { protect, isAdminOrShopkeeper } from '../../middlewares/auth.middleware';
 import { upload } from '../../middlewares/multer.middleware';
 import userController from './user.controller';
 
@@ -21,6 +21,11 @@ router.put('/update-profile', upload.single('image'), protect, userController.up
 
 router.get('/admin_id', protect, userController.getAdminId);
 router.delete('/delete-user/:userId', protect, userController.deleteUser);
+
+// Staff routes
+router.post('/create-staff', protect, isAdminOrShopkeeper, userController.createStaff);
+router.get('/staff/:shopkeeperId', protect, userController.getAllStaffByShopkeeper);
+router.get('/my-shopkeeper-data', protect, userController.getMyShopkeeperData);
 
 const userRouter = router;
 export default userRouter;

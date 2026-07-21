@@ -4,7 +4,7 @@ import sendResponse from '../../utils/sendResponse';
 import repairRequestService from './repairRequest.service';
 
 const addNewRepairRequest = catchAsync(async (req, res) => {
-      const { id } = req.user;
+      const id = req.user.role === 'staff' && req.user.shopkeeperId ? req.user.shopkeeperId.toString() : req.user.id;
       const files = req.files as Express.Multer.File[];
       const result = await repairRequestService.addNewRepairRequest(req.body, files, id);
 
@@ -17,7 +17,7 @@ const addNewRepairRequest = catchAsync(async (req, res) => {
 });
 
 const getMyRepairRequestsHistory = catchAsync(async (req, res) => {
-      const { id } = req.user;
+      const id = req.user.role === 'staff' && req.user.shopkeeperId ? req.user.shopkeeperId.toString() : req.user.id;
       const result = await repairRequestService.getMyRepairRequestsHistory(id, req.query);
 
       sendResponse(res, {
@@ -105,7 +105,7 @@ const getUserDescriptions = catchAsync(async (req, res) => {
 });
 
 const getCompletedRepairRequests = catchAsync(async (req, res) => {
-      const { id } = req.user;
+      const id = req.user.role === 'staff' && req.user.shopkeeperId ? req.user.shopkeeperId.toString() : req.user.id;
       const result = await repairRequestService.getCompletedRepairRequests(id, req.query);
 
       sendResponse(res, {

@@ -21,14 +21,18 @@ const inventorySchema = new Schema<IInventory>(
                   type: String,
                   trim: true,
             },
-            color: {
-                  type: String,
-                  trim: true,
-            },
-            storage: {
-                  type: String,
-                  trim: true,
-            },
+            color: [
+                  {
+                        type: String,
+                        trim: true,
+                  },
+            ],
+            storage: [
+                  {
+                        type: String,
+                        trim: true,
+                  },
+            ],
             size: {
                   type: String,
                   trim: true,

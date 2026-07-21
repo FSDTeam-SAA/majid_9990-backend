@@ -4,7 +4,10 @@ import sendResponse from '../../utils/sendResponse';
 import customerService from './customer.service';
 
 const createCustomer = catchAsync(async (req, res) => {
-      const userId = req.user._id;
+      const userId = req.user.role === 'staff' && req.user.shopkeeperId ? req.user.shopkeeperId : req.user._id;
+      if (req.user.role === 'staff' && req.user.shopkeeperId) {
+            req.body.shopkeeperId = req.user.shopkeeperId;
+      }
       const result = await customerService.createCustomer(userId, req.body ?? {});
 
       sendResponse(res, {
@@ -44,9 +47,10 @@ const deleteCustomer = catchAsync(async (req, res) => {
 });
 
 const getByShopkeeperId = catchAsync(async (req, res) => {
-      const shopkeeperId = Array.isArray(req.params.shopkeeperId)
-            ? req.params.shopkeeperId[0]
-            : req.params.shopkeeperId;
+      let shopkeeperId = Array.isArray(req.params.shopkeeperId) ? req.params.shopkeeperId[0] : req.params.shopkeeperId;
+      if (req.user.role === 'staff' && req.user.shopkeeperId) {
+            shopkeeperId = req.user.shopkeeperId.toString();
+      }
       const result = await customerService.getByShopkeeperId(shopkeeperId);
 
       sendResponse(res, {
@@ -68,12 +72,26 @@ const getAll = catchAsync(async (req, res) => {
       });
 });
 
+const sendEmailToCustomers = catchAsync(async (req, res) => {
+      const shopkeeperId =
+            req.user.role === 'staff' && req.user.shopkeeperId ? req.user.shopkeeperId.toString() : req.user._id;
+      const result = await customerService.sendEmailToCustomers(shopkeeperId, req.body ?? {});
+
+      sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: 'Email sent successfully',
+            data: result,
+      });
+});
+
 const customerController = {
       createCustomer,
       updateCustomer,
       deleteCustomer,
       getByShopkeeperId,
       getAll,
+      sendEmailToCustomers,
 };
 
 export default customerController;

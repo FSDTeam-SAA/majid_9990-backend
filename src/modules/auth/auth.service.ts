@@ -27,11 +27,15 @@ const login = async (payload: { email: string; password: string }) => {
   if (!isPasswordValid)
     throw new AppError("Invalid password", StatusCodes.UNAUTHORIZED);
 
-  const tokenPayload = {
+  const tokenPayload: Record<string, unknown> = {
     _id: user._id,
     email: user.email,
     role: user.role,
   };
+
+  if (user.role === 'staff' && user.shopkeeperId) {
+    tokenPayload.shopkeeperId = user.shopkeeperId;
+  }
 
   const accessToken = createToken(
     tokenPayload,
@@ -60,6 +64,7 @@ const login = async (payload: { email: string; password: string }) => {
       location: user.location,
       postalCode: user.postalCode,
       dateOfBirth: user.dateOfBirth,
+      shopkeeperId: user.role === 'staff' ? user.shopkeeperId : undefined,
     },
   };
 };

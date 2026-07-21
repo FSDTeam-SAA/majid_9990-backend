@@ -4,6 +4,9 @@ import sendResponse from '../../utils/sendResponse';
 import addToCartService from './addToCart.service';
 
 const createAddToCart = catchAsync(async (req, res) => {
+      if (req.user.role === 'staff' && req.user.shopkeeperId) {
+            req.body.shopkeeperId = req.user.shopkeeperId;
+      }
       const result = await addToCartService.createAddToCart(req.body);
 
       sendResponse(res, {

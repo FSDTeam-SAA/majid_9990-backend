@@ -4,7 +4,8 @@ import sendResponse from '../../utils/sendResponse';
 import cashManagementService from './cashManagement.service';
 
 const createOrUpdateCashManagement = catchAsync(async (req, res) => {
-      const { shopkeeperId, startingDayCash, banked, cashInDrawer } = req.body;
+      const shopkeeperId = req.user.role === 'staff' && req.user.shopkeeperId ? req.user.shopkeeperId : req.body.shopkeeperId;
+      const { startingDayCash, banked, cashInDrawer } = req.body;
 
       const result = await cashManagementService.createOrUpdateCashManagement({
             shopkeeperId,

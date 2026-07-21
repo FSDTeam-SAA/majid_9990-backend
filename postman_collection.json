@@ -1,0 +1,1091 @@
+{
+      "info": {
+            "name": "Majid 9990 Backend API - Staff Role",
+            "description": "Complete Postman collection with all existing endpoints + new Staff role feature.\n\nBase URL: http://localhost:5000/api/v1",
+            "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+      },
+      "variable": [
+            {
+                  "key": "baseUrl",
+                  "value": "http://localhost:5000/api/v1"
+            },
+            {
+                  "key": "token",
+                  "value": ""
+            },
+            {
+                  "key": "shopkeeperId",
+                  "value": ""
+            },
+            {
+                  "key": "staffToken",
+                  "value": ""
+            },
+            {
+                  "key": "customerDiscountId",
+                  "value": ""
+            }
+      ],
+      "item": [
+            {
+                  "name": "Auth",
+                  "item": [
+                        {
+                              "name": "Login",
+                              "event": [
+                                    {
+                                          "listen": "test",
+                                          "script": {
+                                                "exec": [
+                                                      "var jsonData = pm.response.json();",
+                                                      "if (jsonData.data && jsonData.data.accessToken) {",
+                                                      "    pm.collectionVariables.set('token', jsonData.data.accessToken);",
+                                                      "    if (jsonData.data.user && jsonData.data.user.role === 'staff' && jsonData.data.user.shopkeeperId) {",
+                                                      "        pm.collectionVariables.set('shopkeeperId', jsonData.data.user.shopkeeperId);",
+                                                      "    } else if (jsonData.data.user && jsonData.data.user.id) {",
+                                                      "        pm.collectionVariables.set('shopkeeperId', jsonData.data.user.id);",
+                                                      "    }",
+                                                      "}"
+                                                ]
+                                          }
+                                    }
+                              ],
+                              "request": {
+                                    "method": "POST",
+                                    "header": [{ "key": "Content-Type", "value": "application/json" }],
+                                    "body": {
+                                          "mode": "raw",
+                                          "raw": "{\n  \"email\": \"shopkeeper@example.com\",\n  \"password\": \"password123\"\n}"
+                                    },
+                                    "url": {
+                                          "raw": "{{baseUrl}}/auth/login",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["auth", "login"]
+                                    }
+                              }
+                        },
+                        {
+                              "name": "Refresh Token",
+                              "request": {
+                                    "method": "POST",
+                                    "header": [{ "key": "Content-Type", "value": "application/json" }],
+                                    "body": {
+                                          "mode": "raw",
+                                          "raw": "{\n  \"refreshToken\": \"your-refresh-token-here\"\n}"
+                                    },
+                                    "url": {
+                                          "raw": "{{baseUrl}}/auth/refresh-token",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["auth", "refresh-token"]
+                                    }
+                              }
+                        },
+                        {
+                              "name": "Forgot Password",
+                              "request": {
+                                    "method": "POST",
+                                    "header": [{ "key": "Content-Type", "value": "application/json" }],
+                                    "body": {
+                                          "mode": "raw",
+                                          "raw": "{\n  \"email\": \"user@example.com\"\n}"
+                                    },
+                                    "url": {
+                                          "raw": "{{baseUrl}}/auth/forgot-password",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["auth", "forgot-password"]
+                                    }
+                              }
+                        },
+                        {
+                              "name": "Verify OTP (Forgot Password)",
+                              "request": {
+                                    "method": "POST",
+                                    "header": [
+                                          { "key": "Authorization", "value": "Bearer {{token}}" },
+                                          { "key": "Content-Type", "value": "application/json" }
+                                    ],
+                                    "body": {
+                                          "mode": "raw",
+                                          "raw": "{\n  \"otp\": \"123456\"\n}"
+                                    },
+                                    "url": {
+                                          "raw": "{{baseUrl}}/auth/verify-otp",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["auth", "verify-otp"]
+                                    }
+                              }
+                        },
+                        {
+                              "name": "Reset Password",
+                              "request": {
+                                    "method": "POST",
+                                    "header": [
+                                          { "key": "Authorization", "value": "Bearer {{token}}" },
+                                          { "key": "Content-Type", "value": "application/json" }
+                                    ],
+                                    "body": {
+                                          "mode": "raw",
+                                          "raw": "{\n  \"newPassword\": \"newPassword123\"\n}"
+                                    },
+                                    "url": {
+                                          "raw": "{{baseUrl}}/auth/reset-password",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["auth", "reset-password"]
+                                    }
+                              }
+                        },
+                        {
+                              "name": "Change Password",
+                              "request": {
+                                    "method": "POST",
+                                    "header": [
+                                          { "key": "Authorization", "value": "Bearer {{token}}" },
+                                          { "key": "Content-Type", "value": "application/json" }
+                                    ],
+                                    "body": {
+                                          "mode": "raw",
+                                          "raw": "{\n  \"currentPassword\": \"oldPassword123\",\n  \"newPassword\": \"newPassword123\"\n}"
+                                    },
+                                    "url": {
+                                          "raw": "{{baseUrl}}/auth/change-password",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["auth", "change-password"]
+                                    }
+                              }
+                        }
+                  ]
+            },
+            {
+                  "name": "User Management",
+                  "item": [
+                        {
+                              "name": "Register User (Customer)",
+                              "request": {
+                                    "method": "POST",
+                                    "header": [{ "key": "Content-Type", "value": "application/json" }],
+                                    "body": {
+                                          "mode": "raw",
+                                          "raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"email\": \"customer@example.com\",\n  \"password\": \"password123\",\n  \"phone\": \"+1234567890\",\n  \"role\": \"user\"\n}"
+                                    },
+                                    "url": {
+                                          "raw": "{{baseUrl}}/user/register",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["user", "register"]
+                                    }
+                              }
+                        },
+                        {
+                              "name": "Register Shopkeeper",
+                              "request": {
+                                    "method": "POST",
+                                    "header": [{ "key": "Content-Type", "value": "application/json" }],
+                                    "body": {
+                                          "mode": "raw",
+                                          "raw": "{\n  \"firstName\": \"Shop\",\n  \"lastName\": \"Keeper\",\n  \"email\": \"shopkeeper@example.com\",\n  \"password\": \"password123\",\n  \"phone\": \"+1234567890\",\n  \"role\": \"shopkeeper\",\n  \"shopName\": \"My Electronics Shop\",\n  \"shopAddress\": \"123 Main Street, City\",\n  \"whatsappNumber\": \"+1234567890\"\n}"
+                                    },
+                                    "url": {
+                                          "raw": "{{baseUrl}}/user/register",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["user", "register"]
+                                    }
+                              }
+                        },
+                        {
+                              "name": "Verify Email (OTP)",
+                              "request": {
+                                    "method": "POST",
+                                    "header": [
+                                          { "key": "Authorization", "value": "Bearer {{token}}" },
+                                          { "key": "Content-Type", "value": "application/json" }
+                                    ],
+                                    "body": {
+                                          "mode": "raw",
+                                          "raw": "{\n  \"otp\": \"123456\"\n}"
+                                    },
+                                    "url": {
+                                          "raw": "{{baseUrl}}/user/verify-email",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["user", "verify-email"]
+                                    }
+                              }
+                        },
+                        {
+                              "name": "Resend OTP",
+                              "request": {
+                                    "method": "POST",
+                                    "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                                    "url": {
+                                          "raw": "{{baseUrl}}/user/resend-otp",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["user", "resend-otp"]
+                                    }
+                              }
+                        },
+                        {
+                              "name": "Get My Profile",
+                              "request": {
+                                    "method": "GET",
+                                    "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                                    "url": {
+                                          "raw": "{{baseUrl}}/user/my-profile",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["user", "my-profile"]
+                                    }
+                              }
+                        },
+                        {
+                              "name": "Update Profile",
+                              "request": {
+                                    "method": "PUT",
+                                    "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                                    "body": {
+                                          "mode": "raw",
+                                          "raw": "{\n  \"firstName\": \"Updated\",\n  \"phone\": \"+9876543210\"\n}"
+                                    },
+                                    "url": {
+                                          "raw": "{{baseUrl}}/user/update-profile",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["user", "update-profile"]
+                                    }
+                              }
+                        },
+                        {
+                              "name": "Get All Users",
+                              "request": {
+                                    "method": "GET",
+                                    "url": {
+                                          "raw": "{{baseUrl}}/user/all-users",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["user", "all-users"]
+                                    }
+                              }
+                        },
+                        {
+                              "name": "Get All Shopkeepers",
+                              "request": {
+                                    "method": "GET",
+                                    "url": {
+                                          "raw": "{{baseUrl}}/user/shopkeeper?page=1&limit=10",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["user", "shopkeeper"]
+                                    }
+                              }
+                        },
+                        {
+                              "name": "Get Admin ID",
+                              "request": {
+                                    "method": "GET",
+                                    "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                                    "url": {
+                                          "raw": "{{baseUrl}}/user/admin_id",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["user", "admin_id"]
+                                    }
+                              }
+                        },
+                        {
+                              "name": "Get Balance History",
+                              "request": {
+                                    "method": "GET",
+                                    "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                                    "url": {
+                                          "raw": "{{baseUrl}}/user/balance-history",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["user", "balance-history"]
+                                    }
+                              }
+                        },
+                        {
+                              "name": "Delete User",
+                              "request": {
+                                    "method": "DELETE",
+                                    "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                                    "url": {
+                                          "raw": "{{baseUrl}}/user/delete-user/:userId",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["user", "delete-user", ":userId"],
+                                          "variable": [{ "key": "userId", "value": "USER_ID_HERE" }]
+                                    }
+                              }
+                        },
+                        {
+                              "name": "STAFF: Create Staff",
+                              "description": "Creates a staff user under a shopkeeper. Only admins or shopkeepers can create staff. Staff is auto-verified (no email needed).",
+                              "request": {
+                                    "method": "POST",
+                                    "header": [
+                                          { "key": "Authorization", "value": "Bearer {{token}}" },
+                                          { "key": "Content-Type", "value": "application/json" }
+                                    ],
+                                    "body": {
+                                          "mode": "raw",
+                                          "raw": "{\n  \"firstName\": \"Staff\",\n  \"lastName\": \"Member\",\n  \"email\": \"staff@example.com\",\n  \"password\": \"password123\",\n  \"phone\": \"+1234567890\",\n  \"shopkeeperId\": \"{{shopkeeperId}}\"\n}"
+                                    },
+                                    "url": {
+                                          "raw": "{{baseUrl}}/user/create-staff",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["user", "create-staff"]
+                                    }
+                              }
+                        },
+                        {
+                              "name": "STAFF: Login as Staff",
+                              "event": [
+                                    {
+                                          "listen": "test",
+                                          "script": {
+                                                "exec": [
+                                                      "var jsonData = pm.response.json();",
+                                                      "if (jsonData.data && jsonData.data.accessToken) {",
+                                                      "    pm.collectionVariables.set('staffToken', jsonData.data.accessToken);",
+                                                      "    if (jsonData.data.user && jsonData.data.user.shopkeeperId) {",
+                                                      "        pm.collectionVariables.set('shopkeeperId', jsonData.data.user.shopkeeperId);",
+                                                      "    }",
+                                                      "}"
+                                                ]
+                                          }
+                                    }
+                              ],
+                              "request": {
+                                    "method": "POST",
+                                    "header": [{ "key": "Content-Type", "value": "application/json" }],
+                                    "body": {
+                                          "mode": "raw",
+                                          "raw": "{\n  \"email\": \"staff@example.com\",\n  \"password\": \"password123\"\n}"
+                                    },
+                                    "url": {
+                                          "raw": "{{baseUrl}}/auth/login",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["auth", "login"]
+                                    }
+                              }
+                        },
+                        {
+                              "name": "STAFF: Get Staff List by Shopkeeper",
+                              "request": {
+                                    "method": "GET",
+                                    "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                                    "url": {
+                                          "raw": "{{baseUrl}}/user/staff/:shopkeeperId",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["user", "staff", ":shopkeeperId"],
+                                          "variable": [{ "key": "shopkeeperId", "value": "{{shopkeeperId}}" }]
+                                    }
+                              }
+                        },
+                        {
+                              "name": "STAFF: Get My Shopkeeper Data",
+                              "description": "For staff users only. Returns the shopkeeper's profile that this staff belongs to.",
+                              "request": {
+                                    "method": "GET",
+                                    "header": [{ "key": "Authorization", "value": "Bearer {{staffToken}}" }],
+                                    "url": {
+                                          "raw": "{{baseUrl}}/user/my-shopkeeper-data",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["user", "my-shopkeeper-data"]
+                                    }
+                              }
+                        }
+                  ]
+            },
+            {
+                  "name": "Inventory",
+                  "item": [
+                        {
+                              "name": "Create Inventory",
+                              "request": {
+                                    "method": "POST",
+                                    "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                                    "body": {
+                                          "mode": "formdata",
+                                          "formdata": [
+                                                { "key": "itemName", "value": "iPhone 13", "type": "text" },
+                                                { "key": "imeiNumber", "value": "356789012345678", "type": "text" },
+                                                { "key": "brand", "value": "Apple", "type": "text" },
+                                                { "key": "modelNumber", "value": "A2633", "type": "text" },
+                                                { "key": "purchasePrice", "value": "500", "type": "text" },
+                                                { "key": "expectedPrice", "value": "750", "type": "text" },
+                                                { "key": "quantity", "value": "1", "type": "text" },
+                                                { "key": "image", "type": "file" }
+                                          ]
+                                    },
+                                    "url": {
+                                          "raw": "{{baseUrl}}/inventory/create",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["inventory", "create"]
+                                    }
+                              }
+                        },
+                        {
+                              "name": "Create Inventory from Barcode",
+                              "request": {
+                                    "method": "POST",
+                                    "header": [
+                                          { "key": "Authorization", "value": "Bearer {{token}}" },
+                                          { "key": "Content-Type", "value": "application/json" }
+                                    ],
+                                    "body": {
+                                          "mode": "raw",
+                                          "raw": "{\n  \"code\": \"8901234567890\",\n  \"userId\": \"{{shopkeeperId}}\",\n  \"imeiNumber\": \"356789012345679\",\n  \"purchasePrice\": 450,\n  \"currentState\": \"new\"\n}"
+                                    },
+                                    "url": {
+                                          "raw": "{{baseUrl}}/inventory/create-from-barcode",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["inventory", "create-from-barcode"]
+                                    }
+                              }
+                        },
+                        {
+                              "name": "Create Inventory from Barcode (Bulk)",
+                              "request": {
+                                    "method": "POST",
+                                    "header": [
+                                          { "key": "Authorization", "value": "Bearer {{token}}" },
+                                          { "key": "Content-Type", "value": "application/json" }
+                                    ],
+                                    "body": {
+                                          "mode": "raw",
+                                          "raw": "{\n  \"userId\": \"{{shopkeeperId}}\",\n  \"barcodes\": [\n    { \"code\": \"8901234567890\", \"imeiNumber\": \"356789012345680\", \"purchasePrice\": 450 },\n    { \"code\": \"8901234567891\", \"imeiNumber\": \"356789012345681\", \"purchasePrice\": 500 }\n  ]\n}"
+                                    },
+                                    "url": {
+                                          "raw": "{{baseUrl}}/inventory/create-from-barcode/bulk",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["inventory", "create-from-barcode", "bulk"]
+                                    }
+                              }
+                        },
+                        {
+                              "name": "Get All Inventory",
+                              "request": {
+                                    "method": "GET",
+                                    "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                                    "url": {
+                                          "raw": "{{baseUrl}}/inventory?type=inventory&status=inventory",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["inventory"]
+                                    }
+                              }
+                        },
+                        {
+                              "name": "Get My Inventory",
+                              "description": "Returns inventory items for the authenticated user. If user is staff, returns the shopkeeper's inventory.",
+                              "request": {
+                                    "method": "GET",
+                                    "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                                    "url": {
+                                          "raw": "{{baseUrl}}/inventory/my-inventory",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["inventory", "my-inventory"]
+                                    }
+                              }
+                        },
+                        {
+                              "name": "Get Inventory by User ID",
+                              "request": {
+                                    "method": "GET",
+                                    "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                                    "url": {
+                                          "raw": "{{baseUrl}}/inventory/user/:userId",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["inventory", "user", ":userId"],
+                                          "variable": [{ "key": "userId", "value": "{{shopkeeperId}}" }]
+                                    }
+                              }
+                        },
+                        {
+                              "name": "Get Single Inventory",
+                              "request": {
+                                    "method": "GET",
+                                    "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                                    "url": {
+                                          "raw": "{{baseUrl}}/inventory/:id",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["inventory", ":id"],
+                                          "variable": [{ "key": "id", "value": "INVENTORY_ID_HERE" }]
+                                    }
+                              }
+                        },
+                        {
+                              "name": "Update Inventory",
+                              "request": {
+                                    "method": "PUT",
+                                    "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                                    "body": {
+                                          "mode": "formdata",
+                                          "formdata": [
+                                                { "key": "itemName", "value": "Updated iPhone 13", "type": "text" },
+                                                { "key": "expectedPrice", "value": "800", "type": "text" }
+                                          ]
+                                    },
+                                    "url": {
+                                          "raw": "{{baseUrl}}/inventory/:id",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["inventory", ":id"],
+                                          "variable": [{ "key": "id", "value": "INVENTORY_ID_HERE" }]
+                                    }
+                              }
+                        },
+                        {
+                              "name": "Delete Inventory",
+                              "request": {
+                                    "method": "DELETE",
+                                    "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                                    "url": {
+                                          "raw": "{{baseUrl}}/inventory/:id",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["inventory", ":id"],
+                                          "variable": [{ "key": "id", "value": "INVENTORY_ID_HERE" }]
+                                    }
+                              }
+                        },
+                        {
+                              "name": "Get Sold Inventory",
+                              "request": {
+                                    "method": "GET",
+                                    "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                                    "url": {
+                                          "raw": "{{baseUrl}}/inventory/sold-items",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["inventory", "sold-items"]
+                                    }
+                              }
+                        },
+                        {
+                              "name": "Get Inventory by Status",
+                              "request": {
+                                    "method": "GET",
+                                    "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                                    "url": {
+                                          "raw": "{{baseUrl}}/inventory/status/:status",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["inventory", "status", ":status"],
+                                          "variable": [{ "key": "status", "value": "due" }]
+                                    }
+                              }
+                        },
+                        {
+                              "name": "Import CSV",
+                              "request": {
+                                    "method": "POST",
+                                    "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                                    "body": {
+                                          "mode": "formdata",
+                                          "formdata": [{ "key": "file", "type": "file" }]
+                                    },
+                                    "url": {
+                                          "raw": "{{baseUrl}}/inventory/import-csv",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["inventory", "import-csv"]
+                                    }
+                              }
+                        }
+                  ]
+            },
+            {
+                  "name": "Invoices",
+                  "item": [
+                        {
+                              "name": "Create Invoice",
+                              "description": "If user is staff, shopkeeperId is auto-set to their associated shopkeeper.",
+                              "request": {
+                                    "method": "POST",
+                                    "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                                    "body": {
+                                          "mode": "formdata",
+                                          "formdata": [
+                                                { "key": "shopkeeperId", "value": "{{shopkeeperId}}", "type": "text" },
+                                                { "key": "type", "value": "sale", "type": "text" },
+                                                { "key": "totalAmount", "value": "750", "type": "text" },
+                                                { "key": "dueAmount", "value": "0", "type": "text" },
+                                                { "key": "paymentMethod", "value": "cash", "type": "text" },
+                                                { "key": "customerInfo", "value": "CUSTOMER_ID", "type": "text" },
+                                                { "key": "invoice", "type": "file" }
+                                          ]
+                                    },
+                                    "url": {
+                                          "raw": "{{baseUrl}}/invoices/create",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["invoices", "create"]
+                                    }
+                              }
+                        },
+                        {
+                              "name": "Get Invoices by Shopkeeper",
+                              "request": {
+                                    "method": "GET",
+                                    "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                                    "url": {
+                                          "raw": "{{baseUrl}}/invoices/shopkeeper/:shopkeeperId",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["invoices", "shopkeeper", ":shopkeeperId"],
+                                          "variable": [{ "key": "shopkeeperId", "value": "{{shopkeeperId}}" }]
+                                    }
+                              }
+                        },
+                        {
+                              "name": "Get All Invoices",
+                              "request": {
+                                    "method": "GET",
+                                    "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                                    "url": {
+                                          "raw": "{{baseUrl}}/invoices/all",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["invoices", "all"]
+                                    }
+                              }
+                        },
+                        {
+                              "name": "Update Invoice",
+                              "request": {
+                                    "method": "PUT",
+                                    "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                                    "body": {
+                                          "mode": "formdata",
+                                          "formdata": [
+                                                { "key": "totalAmount", "value": "800", "type": "text" },
+                                                { "key": "dueAmount", "value": "100", "type": "text" }
+                                          ]
+                                    },
+                                    "url": {
+                                          "raw": "{{baseUrl}}/invoices/:id",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["invoices", ":id"],
+                                          "variable": [{ "key": "id", "value": "INVOICE_ID_HERE" }]
+                                    }
+                              }
+                        },
+                        {
+                              "name": "Delete Invoice",
+                              "request": {
+                                    "method": "DELETE",
+                                    "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                                    "url": {
+                                          "raw": "{{baseUrl}}/invoices/:id",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["invoices", ":id"],
+                                          "variable": [{ "key": "id", "value": "INVOICE_ID_HERE" }]
+                                    }
+                              }
+                        }
+                  ]
+            },
+            {
+                  "name": "Customers",
+                  "item": [
+                        {
+                              "name": "Create Customer",
+                              "description": "If user is staff, shopkeeperId is auto-set to their associated shopkeeper.",
+                              "request": {
+                                    "method": "POST",
+                                    "header": [
+                                          { "key": "Authorization", "value": "Bearer {{token}}" },
+                                          { "key": "Content-Type", "value": "application/json" }
+                                    ],
+                                    "body": {
+                                          "mode": "raw",
+                                          "raw": "{\n  \"firstName\": \"Customer\",\n  \"lastName\": \"Name\",\n  \"email\": \"customer@example.com\",\n  \"phone\": \"+1234567890\",\n  \"shopkeeperId\": \"{{shopkeeperId}}\"\n}"
+                                    },
+                                    "url": {
+                                          "raw": "{{baseUrl}}/customers/create",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["customers", "create"]
+                                    }
+                              }
+                        },
+                        {
+                              "name": "Get Customers by Shopkeeper",
+                              "request": {
+                                    "method": "GET",
+                                    "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                                    "url": {
+                                          "raw": "{{baseUrl}}/customers/shopkeeper/:shopkeeperId",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["customers", "shopkeeper", ":shopkeeperId"],
+                                          "variable": [{ "key": "shopkeeperId", "value": "{{shopkeeperId}}" }]
+                                    }
+                              }
+                        },
+                        {
+                              "name": "Update Customer",
+                              "request": {
+                                    "method": "PUT",
+                                    "header": [
+                                          { "key": "Authorization", "value": "Bearer {{token}}" },
+                                          { "key": "Content-Type", "value": "application/json" }
+                                    ],
+                                    "body": {
+                                          "mode": "raw",
+                                          "raw": "{\n  \"firstName\": \"Updated\",\n  \"phone\": \"+9876543210\"\n}"
+                                    },
+                                    "url": {
+                                          "raw": "{{baseUrl}}/customers/update/:id",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["customers", "update", ":id"],
+                                          "variable": [{ "key": "id", "value": "CUSTOMER_ID_HERE" }]
+                                    }
+                              }
+                        },
+                        {
+                              "name": "Delete Customer",
+                              "request": {
+                                    "method": "DELETE",
+                                    "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                                    "url": {
+                                          "raw": "{{baseUrl}}/customers/delete/:id",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["customers", "delete", ":id"],
+                                          "variable": [{ "key": "id", "value": "CUSTOMER_ID_HERE" }]
+                                    }
+                              }
+                        },
+                        {
+                              "name": "Get All Customers",
+                              "request": {
+                                    "method": "GET",
+                                    "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                                    "url": {
+                                          "raw": "{{baseUrl}}/customers/all",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["customers", "all"]
+                                    }
+                              }
+                        }
+                  ]
+            },
+            {
+                  "name": "Customer Discounts",
+                  "item": [
+                        {
+                              "name": "Create Customer Discount",
+                              "description": "Creates a discount for a customer. usageLimit defaults to 1 when omitted. If the user is staff, shopkeeperId is set from the authenticated shopkeeper.",
+                              "request": {
+                                    "method": "POST",
+                                    "header": [
+                                          { "key": "Authorization", "value": "Bearer {{token}}" },
+                                          { "key": "Content-Type", "value": "application/json" }
+                                    ],
+                                    "body": {
+                                          "mode": "raw",
+                                          "raw": "{\n  \"discountName\": \"Festive Discount\",\n  \"percentage\": 15,\n  \"validFrom\": \"2026-07-10T00:00:00.000Z\",\n  \"until\": \"2026-12-31T23:59:59.000Z\",\n  \"shopkeeperId\": \"{{shopkeeperId}}\",\n  \"status\": \"active\",\n  \"customerId\": \"CUSTOMER_ID_HERE\"\n}"
+                                    },
+                                    "url": {
+                                          "raw": "{{baseUrl}}/customer-discounts/create",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["customer-discounts", "create"]
+                                    }
+                              }
+                        },
+                        {
+                              "name": "Get Discounts by Customer ID",
+                              "description": "Fetches all discount records linked to a specific customer.",
+                              "request": {
+                                    "method": "GET",
+                                    "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                                    "url": {
+                                          "raw": "{{baseUrl}}/customer-discounts/customer/:customerId",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["customer-discounts", "customer", ":customerId"],
+                                          "variable": [{ "key": "customerId", "value": "CUSTOMER_ID_HERE" }]
+                                    }
+                              }
+                        },
+                        {
+                              "name": "Update Customer Discount",
+                              "description": "Updates any editable discount fields such as discountName, percentage, usageLimit, validFrom, until, status, or customerId.",
+                              "request": {
+                                    "method": "PUT",
+                                    "header": [
+                                          { "key": "Authorization", "value": "Bearer {{token}}" },
+                                          { "key": "Content-Type", "value": "application/json" }
+                                    ],
+                                    "body": {
+                                          "mode": "raw",
+                                          "raw": "{\n  \"discountName\": \"Updated Festive Discount\",\n  \"percentage\": 20,\n  \"usageLimit\": 3,\n  \"status\": \"active\"\n}"
+                                    },
+                                    "url": {
+                                          "raw": "{{baseUrl}}/customer-discounts/update/:id",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["customer-discounts", "update", ":id"],
+                                          "variable": [{ "key": "id", "value": "CUSTOMER_DISCOUNT_ID_HERE" }]
+                                    }
+                              }
+                        },
+                        {
+                              "name": "Delete Customer Discount",
+                              "description": "Deletes a customer discount record permanently.",
+                              "request": {
+                                    "method": "DELETE",
+                                    "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                                    "url": {
+                                          "raw": "{{baseUrl}}/customer-discounts/delete/:id",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["customer-discounts", "delete", ":id"],
+                                          "variable": [{ "key": "id", "value": "CUSTOMER_DISCOUNT_ID_HERE" }]
+                                    }
+                              }
+                        },
+                        {
+                              "name": "Reset Customer Discount",
+                              "description": "Resets a customer discount back to its default state using the reset endpoint.",
+                              "request": {
+                                    "method": "PATCH",
+                                    "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                                    "url": {
+                                          "raw": "{{baseUrl}}/customer-discounts/reset/:id",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["customer-discounts", "reset", ":id"],
+                                          "variable": [{ "key": "id", "value": "CUSTOMER_DISCOUNT_ID_HERE" }]
+                                    }
+                              }
+                        }
+                  ]
+            },
+            {
+                  "name": "Add To Cart",
+                  "item": [
+                        {
+                              "name": "Add Item to Cart",
+                              "description": "If user is staff, shopkeeperId is auto-set to their associated shopkeeper.",
+                              "request": {
+                                    "method": "POST",
+                                    "header": [
+                                          { "key": "Authorization", "value": "Bearer {{token}}" },
+                                          { "key": "Content-Type", "value": "application/json" }
+                                    ],
+                                    "body": {
+                                          "mode": "raw",
+                                          "raw": "{\n  \"shopkeeperId\": \"{{shopkeeperId}}\",\n  \"itemId\": \"INVENTORY_ITEM_ID\",\n  \"quantity\": 1\n}"
+                                    },
+                                    "url": {
+                                          "raw": "{{baseUrl}}/add-to-cart/create",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["add-to-cart", "create"]
+                                    }
+                              }
+                        },
+                        {
+                              "name": "Get Cart by Shopkeeper",
+                              "request": {
+                                    "method": "GET",
+                                    "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                                    "url": {
+                                          "raw": "{{baseUrl}}/add-to-cart/shopkeeper/:shopkeeperId",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["add-to-cart", "shopkeeper", ":shopkeeperId"],
+                                          "variable": [{ "key": "shopkeeperId", "value": "{{shopkeeperId}}" }]
+                                    }
+                              }
+                        },
+                        {
+                              "name": "Update Cart Item",
+                              "request": {
+                                    "method": "PUT",
+                                    "header": [
+                                          { "key": "Authorization", "value": "Bearer {{token}}" },
+                                          { "key": "Content-Type", "value": "application/json" }
+                                    ],
+                                    "body": {
+                                          "mode": "raw",
+                                          "raw": "{\n  \"quantity\": 2\n}"
+                                    },
+                                    "url": {
+                                          "raw": "{{baseUrl}}/add-to-cart/update/:id",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["add-to-cart", "update", ":id"],
+                                          "variable": [{ "key": "id", "value": "CART_ITEM_ID_HERE" }]
+                                    }
+                              }
+                        },
+                        {
+                              "name": "Delete Cart Item",
+                              "request": {
+                                    "method": "DELETE",
+                                    "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                                    "url": {
+                                          "raw": "{{baseUrl}}/add-to-cart/delete/:id",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["add-to-cart", "delete", ":id"],
+                                          "variable": [{ "key": "id", "value": "CART_ITEM_ID_HERE" }]
+                                    }
+                              }
+                        },
+                        {
+                              "name": "Delete All Cart by Shopkeeper",
+                              "request": {
+                                    "method": "DELETE",
+                                    "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                                    "url": {
+                                          "raw": "{{baseUrl}}/add-to-cart/delete-all/shopkeeper/:shopkeeperId",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["add-to-cart", "delete-all", "shopkeeper", ":shopkeeperId"],
+                                          "variable": [{ "key": "shopkeeperId", "value": "{{shopkeeperId}}" }]
+                                    }
+                              }
+                        }
+                  ]
+            },
+            {
+                  "name": "Cash Management",
+                  "item": [
+                        {
+                              "name": "Create or Update Cash Management",
+                              "description": "If user is staff, shopkeeperId is auto-set to their associated shopkeeper.",
+                              "request": {
+                                    "method": "POST",
+                                    "header": [
+                                          { "key": "Authorization", "value": "Bearer {{token}}" },
+                                          { "key": "Content-Type", "value": "application/json" }
+                                    ],
+                                    "body": {
+                                          "mode": "raw",
+                                          "raw": "{\n  \"shopkeeperId\": \"{{shopkeeperId}}\",\n  \"startingDayCash\": 1000,\n  \"banked\": 800,\n  \"cashInDrawer\": 200\n}"
+                                    },
+                                    "url": {
+                                          "raw": "{{baseUrl}}/cash-management",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["cash-management"]
+                                    }
+                              }
+                        },
+                        {
+                              "name": "Get Cash Management by Shopkeeper",
+                              "request": {
+                                    "method": "GET",
+                                    "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                                    "url": {
+                                          "raw": "{{baseUrl}}/cash-management/shopkeeper/:shopkeeperId",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["cash-management", "shopkeeper", ":shopkeeperId"],
+                                          "variable": [{ "key": "shopkeeperId", "value": "{{shopkeeperId}}" }]
+                                    }
+                              }
+                        },
+                        {
+                              "name": "Get Cash Management Stats",
+                              "request": {
+                                    "method": "GET",
+                                    "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                                    "url": {
+                                          "raw": "{{baseUrl}}/cash-management/shopkeeper/:shopkeeperId/stats",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["cash-management", "shopkeeper", ":shopkeeperId", "stats"],
+                                          "variable": [{ "key": "shopkeeperId", "value": "{{shopkeeperId}}" }]
+                                    }
+                              }
+                        },
+                        {
+                              "name": "Get All Cash Management Records",
+                              "request": {
+                                    "method": "GET",
+                                    "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                                    "url": {
+                                          "raw": "{{baseUrl}}/cash-management",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["cash-management"]
+                                    }
+                              }
+                        },
+                        {
+                              "name": "Delete Cash Management",
+                              "request": {
+                                    "method": "DELETE",
+                                    "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                                    "url": {
+                                          "raw": "{{baseUrl}}/cash-management/:shopkeeperId",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["cash-management", ":shopkeeperId"],
+                                          "variable": [{ "key": "shopkeeperId", "value": "{{shopkeeperId}}" }]
+                                    }
+                              }
+                        }
+                  ]
+            },
+            {
+                  "name": "Dashboard",
+                  "item": [
+                        {
+                              "name": "Get Dashboard Stats",
+                              "description": "Optional shopkeeperId query param to filter by shopkeeper. If user is staff, they can pass their associated shopkeeperId.",
+                              "request": {
+                                    "method": "GET",
+                                    "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                                    "url": {
+                                          "raw": "{{baseUrl}}/dashboard/stats?shopkeeperId={{shopkeeperId}}&filter=monthly",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["dashboard", "stats"],
+                                          "query": [
+                                                { "key": "shopkeeperId", "value": "{{shopkeeperId}}" },
+                                                { "key": "filter", "value": "monthly" }
+                                          ]
+                                    }
+                              }
+                        }
+                  ]
+            },
+            {
+                  "name": "Repair Requests",
+                  "item": [
+                        {
+                              "name": "Update Status by Shopkeeper",
+                              "request": {
+                                    "method": "PUT",
+                                    "header": [
+                                          { "key": "Authorization", "value": "Bearer {{token}}" },
+                                          { "key": "Content-Type", "value": "application/json" }
+                                    ],
+                                    "body": {
+                                          "mode": "raw",
+                                          "raw": "{\n  \"status\": \"completed\"\n}"
+                                    },
+                                    "url": {
+                                          "raw": "{{baseUrl}}/repair-requests/update-status/:id",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["repair-requests", "update-status", ":id"],
+                                          "variable": [{ "key": "id", "value": "REPAIR_REQUEST_ID" }]
+                                    }
+                              }
+                        },
+                        {
+                              "name": "Add Note by Shopkeeper",
+                              "request": {
+                                    "method": "PUT",
+                                    "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                                    "body": {
+                                          "mode": "formdata",
+                                          "formdata": [
+                                                {
+                                                      "key": "note",
+                                                      "value": "Device repaired successfully",
+                                                      "type": "text"
+                                                }
+                                          ]
+                                    },
+                                    "url": {
+                                          "raw": "{{baseUrl}}/repair-requests/add-note/:id",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["repair-requests", "add-note", ":id"],
+                                          "variable": [{ "key": "id", "value": "REPAIR_REQUEST_ID" }]
+                                    }
+                              }
+                        }
+                  ]
+            },
+            {
+                  "name": "Low Stock Alert",
+                  "item": [
+                        {
+                              "name": "Get My Alert Config",
+                              "request": {
+                                    "method": "GET",
+                                    "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                                    "url": {
+                                          "raw": "{{baseUrl}}/low-stock-alert/my-alert",
+                                          "host": ["{{baseUrl}}"],
+                                          "path": ["low-stock-alert", "my-alert"]
+                                    }
+                              }
+                        }
+                  ]
+            }
+      ]
+}

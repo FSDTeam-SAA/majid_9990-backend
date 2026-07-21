@@ -221,6 +221,104 @@ const buildFallbackInsight = (providerName: string | undefined, riskMeter: numbe
       };
 };
 
+const getFirstNonEmptyField = (source: Record<string, unknown>, keys: string[]): string | null => {
+      for (const key of keys) {
+            const value = source[key];
+            if (typeof value === 'string' && value.trim().length > 0) {
+                  return value.trim();
+            }
+
+            if (typeof value === 'number' || typeof value === 'boolean') {
+                  return String(value).trim();
+            }
+      }
+
+      return null;
+};
+
+const extractPricingHints = (parsedProviderData: Record<string, unknown>) => {
+      const deviceName = getFirstNonEmptyField(parsedProviderData, [
+            'device_name',
+            'full_name',
+            'marketing_name',
+            'model_name',
+            'model',
+            'product_name',
+            'device',
+      ]);
+
+      const deviceDescription = getFirstNonEmptyField(parsedProviderData, [
+            'device_description',
+            'description',
+            'model_description',
+            'product_description',
+            'product_details',
+      ]);
+
+      const deviceConfiguration = getFirstNonEmptyField(parsedProviderData, ['device_configuration']);
+      const modelName = getFirstNonEmptyField(parsedProviderData, ['model_name']);
+
+      const resolvedDeviceName = deviceName ?? modelName;
+      const resolvedDeviceDescription = deviceDescription ?? deviceConfiguration;
+
+      return {
+            deviceName: resolvedDeviceName,
+            deviceDescription: resolvedDeviceDescription,
+      };
+};
+
+const estimateMarketValueFromHints = (deviceName: string | null, deviceDescription: string | null): number | null => {
+      const combined = `${deviceName ?? ''} ${deviceDescription ?? ''}`.toLowerCase().trim();
+      if (!combined) {
+            return null;
+      }
+
+      let value = 300;
+
+      if (combined.includes('iphone')) {
+            value = 920;
+      } else if (combined.includes('macbook pro')) {
+            // Base pricing tuned for approximate used-market values.
+            if (/\b14\s*(inch|in|"|')\b/.test(combined) || /\b14\b/.test(combined)) {
+                  value = 1519;
+            } else if (/\b16\s*(inch|in|"|')\b/.test(combined) || /\b16\b/.test(combined)) {
+                  value = 2199;
+            } else {
+                  value = 1699;
+            }
+      } else if (combined.includes('macbook air')) {
+            value = 1199;
+      } else if (combined.includes('macbook')) {
+            value = 1299;
+      } else if (combined.includes('samsung') || combined.includes('galaxy')) {
+            value = 540;
+      } else if (combined.includes('pixel')) {
+            value = 480;
+      } else if (combined.includes('xiaomi') || combined.includes('redmi')) {
+            value = 260;
+      }
+
+      if (/\b(128)\s*gb\b/.test(combined)) {
+            value += 40;
+      } else if (/\b(256)\s*gb\b/.test(combined)) {
+            value += 90;
+      } else if (/\b(512)\s*gb\b/.test(combined)) {
+            value += 180;
+      } else if (/\b(1)\s*tb\b/.test(combined)) {
+            value += 280;
+      }
+
+      if (/\b(32)\s*gb\b/.test(combined)) {
+            value += 150;
+      } else if (/\b(24)\s*gb\b/.test(combined)) {
+            value += 100;
+      } else if (/\b(16)\s*gb\b/.test(combined)) {
+            value += 50;
+      }
+
+      return Number(value.toFixed(2));
+};
+
 export const analyzeParsedProviderDataWithAi = async (
       imei: string,
       parsedProviderData: Record<string, unknown>,
@@ -229,12 +327,18 @@ export const analyzeParsedProviderDataWithAi = async (
       const providerSignalText = buildProviderSignalText(parsedProviderData ?? {});
       const fallbackRiskMeter = scoreProviderSignals(providerSignalText);
       const fallbackInsight = buildFallbackInsight(providerName, fallbackRiskMeter);
+      const { deviceName, deviceDescription } = extractPricingHints(parsedProviderData ?? {});
+      const fallbackEstimatedPrice = estimateMarketValueFromHints(deviceName, deviceDescription);
 
       const apiKey = String(process.env.OPENAI_API_KEY ?? '').trim();
       if (!apiKey) {
             return {
                   riskMeter: fallbackRiskMeter,
                   aiInsight: fallbackInsight,
+                  marketValue: {
+                        amount: fallbackEstimatedPrice,
+                        currency: 'USD',
+                  },
             };
       }
 
@@ -253,8 +357,8 @@ export const analyzeParsedProviderDataWithAi = async (
                               //       content: 'You are an IMEI risk analyst. Return strict JSON only with keys: riskMeter, title, message. riskMeter must be an integer from 1 to 100. Base the result only on the provided provider data signals, not on general assumptions.',
                               // },
                               {
-  role: "system",
-  content: `
+                                    role: 'system',
+                                    content: `
 You analyze IMEI reports.
 
 Never assume risk.
@@ -284,21 +388,38 @@ Blacklisted or stolen
 
 => risk 80-100
 
+For device pricing, use ONLY these fields when available:
+- deviceName
+- deviceDescription
+
+Fallback mapping before pricing:
+- if deviceName is missing, use modelName
+- if deviceDescription is missing, use deviceConfiguration
+
+Do not use any other fields for estimatedDevicePriceUSD.
+If both are missing or insufficient, set estimatedDevicePriceUSD to null.
+
 Return JSON only:
 {
  "riskMeter": number,
  "title": string,
- "message": string
+ "message": string,
+ "estimatedDevicePriceUSD": number | null
 }
-`
-},
+`,
+                              },
                               {
                                     role: 'user',
                                     content: JSON.stringify({
                                           imei,
                                           providerName: providerName ?? 'unknown',
                                           providerSignalText,
-                                          parsedProviderData,
+                                          deviceName,
+                                          deviceDescription,
+                                          modelName: getFirstNonEmptyField(parsedProviderData ?? {}, ['model_name']),
+                                          deviceConfiguration: getFirstNonEmptyField(parsedProviderData ?? {}, [
+                                                'device_configuration',
+                                          ]),
                                           scoringHints: {
                                                 blacklistSignals: [
                                                       'blacklist',
@@ -349,6 +470,10 @@ Return JSON only:
                   return {
                         riskMeter: fallbackRiskMeter,
                         aiInsight: fallbackInsight,
+                        marketValue: {
+                              amount: fallbackEstimatedPrice,
+                              currency: 'USD',
+                        },
                   };
             }
 
@@ -357,6 +482,10 @@ Return JSON only:
                   return {
                         riskMeter: fallbackRiskMeter,
                         aiInsight: fallbackInsight,
+                        marketValue: {
+                              amount: fallbackEstimatedPrice,
+                              currency: 'USD',
+                        },
                   };
             }
 
@@ -364,7 +493,6 @@ Return JSON only:
             const riskMeter = Number.isFinite(parsedRiskMeter)
                   ? Math.min(100, Math.max(1, Math.round(parsedRiskMeter)))
                   : fallbackRiskMeter;
-          
 
             const title =
                   typeof (parsed as Record<string, unknown>).title === 'string' &&
@@ -378,22 +506,38 @@ Return JSON only:
                         ? String((parsed as Record<string, unknown>).message).trim()
                         : fallbackInsight.message;
 
+            const rawEstimatedDevicePrice = Number((parsed as Record<string, unknown>).estimatedDevicePriceUSD);
+            const estimatedDevicePrice =
+                  Number.isFinite(rawEstimatedDevicePrice) && rawEstimatedDevicePrice > 0
+                        ? Number(rawEstimatedDevicePrice.toFixed(2))
+                        : fallbackEstimatedPrice;
+
             return {
                   riskMeter: riskMeter,
                   aiInsight: {
                         title,
                         message,
                   },
+                  marketValue: {
+                        amount: estimatedDevicePrice,
+                        currency: 'USD',
+                  },
             };
       } catch {
             return {
                   riskMeter: fallbackRiskMeter,
                   aiInsight: fallbackInsight,
+                  marketValue: {
+                        amount: fallbackEstimatedPrice,
+                        currency: 'USD',
+                  },
             };
       }
 };
 
-export const isValidImei = (imei: string): boolean => /^\d{15}$/.test(imei);
+export const isValidImei = (imei: string): boolean => /^\d{15}$/.test(imei) || /^[A-Za-z0-9]{4,}$/.test(imei);
+
+export const isSerialNumber = (imei: string): boolean => /^[A-Za-z0-9]{4,}$/.test(imei) && !/^\d{15}$/.test(imei);
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 

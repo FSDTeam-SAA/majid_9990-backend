@@ -4,6 +4,9 @@ import sendResponse from '../../utils/sendResponse';
 import invoiceService from './invoice.service';
 
 const createInvoice = catchAsync(async (req, res) => {
+      if (req.user.role === 'staff' && req.user.shopkeeperId) {
+            req.body.shopkeeperId = req.user.shopkeeperId;
+      }
       const result = await invoiceService.createInvoice(req.body, req.file);
 
       sendResponse(res, {
@@ -15,9 +18,12 @@ const createInvoice = catchAsync(async (req, res) => {
 });
 
 const getInvoiceByShopkeeperId = catchAsync(async (req, res) => {
-      const shopkeeperId = Array.isArray(req.params.shopkeeperId)
+      let shopkeeperId = Array.isArray(req.params.shopkeeperId)
             ? req.params.shopkeeperId[0]
             : req.params.shopkeeperId;
+      if (req.user.role === 'staff' && req.user.shopkeeperId) {
+            shopkeeperId = req.user.shopkeeperId.toString();
+      }
       const result = await invoiceService.getInvoiceByShopkeeperId(shopkeeperId);
 
       sendResponse(res, {

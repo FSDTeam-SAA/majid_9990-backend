@@ -417,7 +417,7 @@ const processSingleImeiCheck = async (
             return {
                   ok: false,
                   statusCode: 400,
-                  message: 'Valid 15-digit imei is required',
+                  message: 'Valid 15-digit IMEI or Serial Number is required',
             };
       }
 
@@ -632,7 +632,7 @@ export const checkImeiFromDhru = async (req: Request, res: Response, next: NextF
       }
 };
 
-// V2: return raw provider rows from DHRU; do NOT use cached DB data, do NOT merge bundled results, no AI fields
+// V2: IMEI response with parsed provider data and AI risk/price enrichment
 export const checkImeiFromDhruV2 = async (req: Request, res: Response, next: NextFunction) => {
       try {
             const userId = req.user?._id?.toString();
@@ -672,7 +672,7 @@ export const checkImeiFromDhruV2 = async (req: Request, res: Response, next: Nex
                         return {
                               ok: false,
                               statusCode: 400,
-                              message: 'Valid 15-digit imei is required',
+                              message: 'Valid 15-digit IMEI or Serial Number is required',
                         } as SingleImeiCheckResult;
                   }
 
@@ -798,6 +798,7 @@ export const checkImeiFromDhruV2 = async (req: Request, res: Response, next: Nex
                                                 parsedProviderData: parsed,
                                                 aiInsight: aiAnalysis.aiInsight,
                                                 riskMeter: aiAnalysis.riskMeter,
+                                                marketValue: aiAnalysis.marketValue,
                                           };
                                     })
                               );
@@ -883,6 +884,7 @@ export const checkImeiFromDhruV2 = async (req: Request, res: Response, next: Nex
                                           providerResults: mergedParsed,
                                           riskMeter: aiAnalysis.riskMeter,
                                           aiInsight: aiAnalysis.aiInsight,
+                                          marketValue: aiAnalysis.marketValue,
                                           oldGenerated,
                                     },
                               } as SingleImeiCheckResult;
@@ -894,16 +896,25 @@ export const checkImeiFromDhruV2 = async (req: Request, res: Response, next: Nex
                               : await getExistingScanInfoByImei(imei, serviceId);
 
                         if (existingScanInfo) {
+                              const parsedProviderData = extractProviderDataFromHtml(
+                                    (existingScanInfo.providerData as Record<string, any>)?.result ?? null
+                              );
+
+                              const aiAnalysis = await analyzeParsedProviderDataWithAi(
+                                    String(imei),
+                                    parsedProviderData,
+                                    String(service.name ?? 'unknown')
+                              );
+
                               return {
                                     ok: true,
                                     message: 'IMEI data fetched from database',
                                     data: {
                                           provider: null,
-                                          parsedProviderData: extractProviderDataFromHtml(
-                                                (existingScanInfo.providerData as Record<string, any>)?.result ?? null
-                                          ),
-                                          riskMeter: existingScanInfo.riskMeter ?? null,
-                                          aiInsight: existingScanInfo.aiInsight ?? null,
+                                          parsedProviderData,
+                                          riskMeter: existingScanInfo.riskMeter ?? aiAnalysis.riskMeter,
+                                          aiInsight: aiAnalysis.aiInsight ?? existingScanInfo.aiInsight ?? null,
+                                          marketValue: aiAnalysis.marketValue ?? existingScanInfo.marketValue ?? null,
                                           oldGenerated: true,
                                     },
                               } as SingleImeiCheckResult;
@@ -1155,7 +1166,9 @@ export const getRecentChecksHistory = async (req: Request, res: Response, next: 
 
             const [history, total] = await Promise.all([
                   ScanInfo.find(filter)
-                        .select('userId deviceName imei deviceStatus riskMeter marketValue createdAt updatedAt')
+                        .select(
+                              'userId deviceName imei deviceStatus riskMeter marketValue createdAt updatedAt serviceId'
+                        )
                         .sort({ updatedAt: -1 })
                         .skip(skip)
                         .limit(limit)

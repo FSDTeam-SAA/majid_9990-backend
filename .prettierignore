@@ -1,0 +1,5 @@
+dist
+node_modules
+uploads
+swagger-output.json
+testing datas

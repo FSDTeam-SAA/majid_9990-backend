@@ -185,8 +185,12 @@ const buildInventoryPayloadFromCsvRow = (
             itemName,
             sku: toQueryString(getCsvValue(row, ['sku'])).trim() || undefined,
             brand: toQueryString(getCsvValue(row, ['brand'])).trim() || undefined,
-            color: toQueryString(getCsvValue(row, ['color'])).trim() || undefined,
-            storage: toQueryString(getCsvValue(row, ['storage'])).trim() || undefined,
+            color: toQueryString(getCsvValue(row, ['color'])).trim()
+                  ? toQueryString(getCsvValue(row, ['color'])).split(',').map((c: string) => c.trim()).filter(Boolean)
+                  : undefined,
+            storage: toQueryString(getCsvValue(row, ['storage'])).trim()
+                  ? toQueryString(getCsvValue(row, ['storage'])).split(',').map((s: string) => s.trim()).filter(Boolean)
+                  : undefined,
             size: toQueryString(getCsvValue(row, ['size'])).trim() || undefined,
             imeiNumber,
             modelNumber: toQueryString(getCsvValue(row, ['modelNumber', 'model'])).trim() || undefined,
@@ -229,6 +233,50 @@ const estimateBarcodeValue = (product: IBarcodeSearchResult) => {
       }
 
       return 300;
+};
+
+const COMMON_COLORS = [
+      'black', 'white', 'blue', 'green', 'red', 'gold', 'silver', 'grey', 'gray',
+      'purple', 'pink', 'orange', 'yellow', 'midnight', 'space gray', 'rose gold',
+      'starlight', 'graphite', 'sierra blue', 'alpine green', 'deep purple',
+      'coral', 'navy', 'mint', 'lavender', 'teal', 'bronze', 'titanium',
+      'phantom black', 'phantom green', 'phantom violet', 'phantom white',
+      'ice blue', 'cream', 'bronze', 'charcoal', 'forest green', 'chocolate',
+      'obsidian', 'cloud', 'frost', 'nebula', 'aurora', 'sunrise', 'sunset',
+];
+
+const extractColorsFromName = (name: string): string[] => {
+      const lower = name.toLowerCase();
+      const found: string[] = [];
+
+      for (const color of COMMON_COLORS) {
+            if (lower.includes(color)) {
+                  found.push(color.replace(/\b\w/g, (c) => c.toUpperCase()));
+            }
+      }
+
+      const dashMatch = name.match(/[-–]\s*([A-Za-z][A-Za-z\s]+?)(?:\s*\(|$)/);
+      if (dashMatch) {
+            const candidate = dashMatch[1].trim();
+            if (candidate.length <= 25 && !found.some((c) => candidate.toLowerCase().includes(c.toLowerCase()))) {
+                  found.push(candidate);
+            }
+      }
+
+      return [...new Set(found)];
+};
+
+const extractStorageFromName = (name: string): string[] => {
+      const storagePattern = /\b(\d+\s*(?:GB|TB|MB))\b/gi;
+      const matches: string[] = [];
+      let match;
+      while ((match = storagePattern.exec(name)) !== null) {
+            const value = match[1].replace(/\s+/g, '').toUpperCase();
+            if (!matches.includes(value)) {
+                  matches.push(value);
+            }
+      }
+      return matches;
 };
 
 const normalizeCondition = (value: IInventory['currentState']) => {
@@ -536,7 +584,7 @@ const createInventory = async (payload: Partial<IInventory>, file?: any) => {
       const result = await Inventory.create(normalizedPayload);
       // Update category total items if categoryId is provided
       if (result.categoryId) {
-            await categoryService.updateInventoryCategoryCount(result.categoryId);
+            await categoryService.updateInventoryCategoryCount(result.categoryId, result.userId);
       }
 
       await sendLowStockAlert(result);
@@ -648,10 +696,16 @@ const createInventoryFromBarcode = async (
       const purchasePrice = parseOptionalNumber(payload.purchasePrice);
       const expectedPrice = parseOptionalNumber(aiInsight?.estimatedMarketValueUSD) ?? estimatedMarketValue;
 
+      const brand = barcodeResult.brand || undefined;
+      const colorVariants = extractColorsFromName(itemName);
+      const storageVariants = extractStorageFromName(itemName);
+
       const productDetails = (() => {
             const parts: string[] = [];
             parts.push(itemName);
-            if (barcodeResult.brand) parts.push(`Brand: ${barcodeResult.brand}`);
+            if (brand) parts.push(`Brand: ${brand}`);
+            if (colorVariants.length) parts.push(`Color: ${colorVariants.join(', ')}`);
+            if (storageVariants.length) parts.push(`Storage: ${storageVariants.join(', ')}`);
             if (barcodeResult.category) parts.push(`Category: ${barcodeResult.category}`);
             if (barcodeResult.description) parts.push(String(barcodeResult.description));
             const rawData = barcodeResult?.rawData;
@@ -662,23 +716,23 @@ const createInventoryFromBarcode = async (
             return parts.join('. ');
       })();
 
-      const generateComprehensiveDescription = (): string => {
-            const purchasePriceStr = purchasePrice ? `$${purchasePrice}` : 'Not specified';
-            const conditionDesc =
-                  normalizeCondition(payload.currentState) === 'new'
-                        ? 'This item is in pristine, factory-sealed condition, never opened or used, maintaining all original packaging and documentation.'
-                        : 'This item is in excellent working condition with minimal signs of use, fully functional with no defects or issues.';
+      const generateAiDescription = (): string => {
             const conditionUpper = normalizeCondition(payload.currentState).toUpperCase();
-            const aiMessage = aiInsight?.message || '';
+            const colorStr = colorVariants.length ? colorVariants.join(', ') : 'N/A';
+            const storageStr = storageVariants.length ? storageVariants.join(', ') : 'N/A';
+            const aiMessage = aiInsight?.message || 'Device appears consistent with provider records.';
 
-            return `PRODUCT OVERVIEW:\n${itemName} is a premium device brought to your inventory from verified sources. This item represents an excellent addition to your product lineup, offering both reliability and market appeal.\n\nBRAND & MANUFACTURER:\nBrand: ${barcodeResult.brand || 'Unknown'}\nThis manufacturer is renowned for producing high-quality electronics with stringent quality control measures and excellent build standards. Their products are widely recognized in the global market for durability and innovation.\n\nCATEGORY & CLASSIFICATION:\nProduct Category: ${barcodeResult.category || 'Unspecified'}\nThis product falls within a highly sought-after category in the current market, with consistent demand from consumers and businesses alike.\n\nCONDITION ASSESSMENT:\nDevice Condition: ${conditionUpper}\n${conditionDesc}\n\nAUTHENTICATION & IDENTIFICATION:\nIMEI Number: ${imeiNumber}\nBarcode: ${barcodeResult.barcode || cleanCode}\nThe IMEI number has been verified and authenticated, confirming the legitimacy of this device. All identification markers match manufacturer specifications.\n\nMARKET VALUATION:\nEstimated Current Market Value: ${expectedPrice}\nPurchase Price: ${purchasePriceStr}\nMarket Position: This product is positioned competitively within its segment, with strong demand indicators and stable pricing trends throughout the market.\n\nQUALITY METRICS:\nThis device has been assessed for authenticity, functionality, and overall quality. All components are functioning at optimal levels, and no defects have been detected. The product meets all international quality standards and certifications.\n\nINVESTMENT & RESALE POTENTIAL:\nThis product demonstrates strong resale value retention, making it an attractive investment. Historical data suggests sustained demand for this device category, with consistent pricing levels across major markets. Resale potential remains high due to brand reputation and device functionality.\n\nAI ANALYSIS & RECOMMENDATIONS:\n${aiMessage || 'Device appears consistent with provider records. Proceed with normal due diligence.'}\n\nCOMPLIANCE & DOCUMENTATION:\nThis product is fully compliant with international regulations and standards. All necessary certifications and documentation are included or available. The device is cleared for sale and distribution in all major markets.\n\nFINAL RECOMMENDATIONS:\nThis product is highly recommended for buyers seeking a reliable, authenticated device at competitive pricing. The combination of condition, authenticity verification, and market value positioning makes this an excellent choice for both individual consumers and business resellers. Expected inventory turnover is strong given current market conditions. This item has passed all quality assurance checks and is ready for immediate sale or further distribution.`;
+            return `${itemName} by ${brand || 'Unknown'} in ${colorStr}, ${storageStr} storage. Condition: ${conditionUpper}. IMEI: ${imeiNumber}. Estimated value: $${expectedPrice}. ${aiMessage}`;
       };
 
-      const aiDescription = generateComprehensiveDescription();
+      const aiDescription = generateAiDescription();
 
       const result = await createInventory(
             {
                   itemName,
+                  brand,
+                  color: colorVariants.length ? colorVariants : undefined,
+                  storage: storageVariants.length ? storageVariants : undefined,
                   imeiNumber,
                   userId: userObjectId,
                   purchasePrice,
@@ -862,10 +916,16 @@ const updateInventory = async (id: string, payload: Partial<IInventory>, file?: 
 
             if (oldCategoryId !== newCategoryId) {
                   if (oldCategoryId && Types.ObjectId.isValid(oldCategoryId)) {
-                        await categoryService.updateInventoryCategoryCount(new Types.ObjectId(oldCategoryId));
+                        await categoryService.updateInventoryCategoryCount(
+                              new Types.ObjectId(oldCategoryId),
+                              updatedInventory.userId
+                        );
                   }
                   if (newCategoryId && Types.ObjectId.isValid(newCategoryId)) {
-                        await categoryService.updateInventoryCategoryCount(new Types.ObjectId(newCategoryId));
+                        await categoryService.updateInventoryCategoryCount(
+                              new Types.ObjectId(newCategoryId),
+                              updatedInventory.userId
+                        );
                   }
             }
 
@@ -884,12 +944,11 @@ const deleteInventory = async (id: string) => {
 
       // Update category total items if category existed
       if (inventory?.categoryId) {
-            await categoryService.updateInventoryCategoryCount(inventory.categoryId);
+            await categoryService.updateInventoryCategoryCount(inventory.categoryId, inventory.userId);
       }
 
       return result;
 };
-
 
 const getMyInventory = async (userId: string) => {
       return await Inventory.find({ userId }).populate('userId').sort({ createdAt: -1 });

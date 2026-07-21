@@ -4,9 +4,22 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { IOCRResult, INIDResult } from './ocr.interface';
 
-const openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-});
+let openai: OpenAI | null = null;
+
+const getOpenAIClient = () => {
+      if (openai) {
+            return openai;
+      }
+
+      const apiKey = process.env.OPENAI_API_KEY;
+
+      if (!apiKey) {
+            throw new Error('OpenAI API key is not configured');
+      }
+
+      openai = new OpenAI({ apiKey });
+      return openai;
+};
 
 class OCRService {
       /**
@@ -30,7 +43,8 @@ class OCRService {
        */
       async extractIMEIFromText(text: string): Promise<string[]> {
             try {
-                  const message = await openai.chat.completions.create({
+                  const client = getOpenAIClient();
+                  const message = await client.chat.completions.create({
                         model: 'gpt-3.5-turbo',
                         messages: [
                               {

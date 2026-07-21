@@ -9,8 +9,8 @@ export interface IInventory {
       categoryId?: Types.ObjectId;
       sku?: string;
       brand?: string;
-      color?: string;
-      storage?: string;
+      color?: string[];
+      storage?: string[];
       size?: string;
       imeiNumber: string;
       modelNumber?: string;

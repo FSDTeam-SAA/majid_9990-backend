@@ -11,7 +11,7 @@ const userSchema = new Schema<IUser>(
             },
             lastName: {
                   type: String,
-                  required: true,
+                  default: '',
             },
             email: {
                   type: String,
@@ -44,7 +44,7 @@ const userSchema = new Schema<IUser>(
             },
             role: {
                   type: String,
-                  enum: ['user', 'admin', 'shopkeeper'],
+                  enum: ['user', 'admin', 'shopkeeper', 'staff'],
                   default: 'user',
             },
             image: {
@@ -62,8 +62,43 @@ const userSchema = new Schema<IUser>(
             shopName: { type: String, default: '' },
             shopAddress: { type: String, default: '' },
             whatsappNumber: { type: String, default: '' },
+            wageType: {
+                  type: String,
+                  enum: ['per-day', 'per-hour'],
+            },
+            wageAmount: {
+                  type: Number,
+                  min: 0,
+            },
+            workingDays: {
+                  type: [String],
+                  default: [],
+            },
+            weekendDays: {
+                  type: [String],
+                  default: [],
+            },
+            idVerificationStatus: {
+                  type: String,
+                  enum: ['pending', 'verified', 'rejected'],
+                  default: 'pending',
+            },
+            idNumber: {
+                  type: String,
+                  default: '',
+            },
+            shopkeeperId: {
+                  type: Schema.Types.ObjectId,
+                  ref: 'User',
+                  default: null,
+            },
             totalReviews: { type: Number, default: 0 },
             averageRating: { type: Number, default: 0 },
+            currency: {
+                  type: String,
+                  default: 'USD',
+                  uppercase: true,
+            },
             otp: { type: String, default: null },
             otpExpires: { type: Date, default: null },
             resetPasswordOtp: { type: String, default: null },

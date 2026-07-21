@@ -10,6 +10,17 @@ const app = express();
 app.use(express.json());
 app.disable('x-powered-by');
 
+const allowedOrigins = [
+      'https://imoscan.com',
+      'https://www.imoscan.com',
+      'https://admin.imoscan.com',
+      'https://api.imoscan.com',
+      'https://majid-website-two.vercel.app',
+      'https://majid-dashboard.vercel.app',
+      'https://majiddashboard.vercel.app',
+      'http://localhost:3000',
+];
+
 const corsOptions = {
       origin: [
             'https://majid-website-two.vercel.app',

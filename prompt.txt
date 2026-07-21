@@ -1,0 +1,19 @@
+1. authenticaiton system neet to update I'm telling you the flow we have 'user', 'admin', 'shopkeeper roles in the site, you need to add another role that is stuff
+---> in the user model add that role also 
+---> if the user is a stuff role then there will be a another field shopkeeperId (this is the one who is creating adding the stuff)
+---> is the role is stuff it will be auto validated no need to send email to the user for email validation. 
+---> when a stuff login they will show all the all shopkeeper datas that a shopkeeper will show 
+example: I need to showing all the datas that a shopkeeper when log in can see. 
+also if a stuff login and do some changes or create new things example a invoice, search report, add cash or add cusotmer 
+or other thigns all the changes will be visible for the shopkeeper end. 
+
+many exixing things are made. the stuff feaute has is new need to add. so do the thing and a updated postman json colleciton so i can implement in the frontend. and tell me what done by making a mark down 
+
+
+-------------------------------2 ----------------------------
+majid_9990-backend/src/modules/deviceCheck$  in here you can see a api /check-v2', optionalProtect, checkImeiFromDhruV2 
+in here there is a part the open ai genarate a price of the device. this need to updated it will only pussing the Device Name, Device Description, if those are here based on those
+the ai model will get the device price and send 
+
+
+-------------------3 ------------------------------

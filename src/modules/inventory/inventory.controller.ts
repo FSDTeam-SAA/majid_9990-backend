@@ -4,7 +4,7 @@ import sendResponse from '../../utils/sendResponse';
 import inventoryService from './inventory.service';
 
 const createInventory = catchAsync(async (req, res) => {
-      const userId = req.user._id;
+      const userId = req.user.role === 'staff' && req.user.shopkeeperId ? req.user.shopkeeperId : req.user._id;
 
       const payload = {
             ...req.body,
@@ -22,7 +22,8 @@ const createInventory = catchAsync(async (req, res) => {
 });
 
 const createInventoryFromBarcode = catchAsync(async (req, res) => {
-      const { code, userId, imeiNumber, purchasePrice, currentState } = req.body;
+      const effectiveUserId = req.user.role === 'staff' && req.user.shopkeeperId ? req.user.shopkeeperId : undefined;
+      const { code, userId = effectiveUserId, imeiNumber, purchasePrice, currentState } = req.body;
 
       const result = await inventoryService.createInventoryFromBarcode(
             {
@@ -44,7 +45,9 @@ const createInventoryFromBarcode = catchAsync(async (req, res) => {
 });
 
 const createInventoryFromBarcodeBulk = catchAsync(async (req, res) => {
-      const defaultUserId = String(req.body?.userId ?? req.user?._id ?? '').trim() || undefined;
+      const defaultUserId = req.user.role === 'staff' && req.user.shopkeeperId
+            ? String(req.user.shopkeeperId)
+            : String(req.body?.userId ?? req.user?._id ?? '').trim() || undefined;
       const result = await inventoryService.createInventoryFromBarcodeBulk(req.body, defaultUserId);
 
       sendResponse(res, {
@@ -56,7 +59,9 @@ const createInventoryFromBarcodeBulk = catchAsync(async (req, res) => {
 });
 
 const importInventoriesFromCsv = catchAsync(async (req, res) => {
-      const defaultUserId = String(req.body?.userId ?? req.user?._id ?? '').trim() || undefined;
+      const defaultUserId = req.user.role === 'staff' && req.user.shopkeeperId
+            ? String(req.user.shopkeeperId)
+            : String(req.body?.userId ?? req.user?._id ?? '').trim() || undefined;
       const result = await inventoryService.importInventoriesFromCsv(req.file?.path, defaultUserId);
 
       sendResponse(res, {
@@ -120,7 +125,7 @@ const deleteInventory = catchAsync(async (req, res) => {
 });
 
 const getMyInventory = catchAsync(async (req, res) => {
-      const userId = req.user._id;
+      const userId = req.user.role === 'staff' && req.user.shopkeeperId ? req.user.shopkeeperId : req.user._id;
 
       const result = await inventoryService.getMyInventory(userId);
 

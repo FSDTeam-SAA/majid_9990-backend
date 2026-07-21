@@ -4,7 +4,8 @@ import catchAsync from '../../../utils/catchAsync';
 import sendResponse from '../../../utils/sendResponse';
 
 const createCategory = catchAsync(async (req, res) => {
-      const result = await categoryService.createCategory(req.body, req.file);
+      const shopkeeperId = req.user.role === 'staff' && req.user.shopkeeperId ? req.user.shopkeeperId : req.user._id;
+      const result = await categoryService.createCategory(req.body, req.file, shopkeeperId);
 
       sendResponse(res, {
             statusCode: StatusCodes.CREATED,
@@ -15,7 +16,8 @@ const createCategory = catchAsync(async (req, res) => {
 });
 
 const getAllCategories = catchAsync(async (req, res) => {
-      const result = await categoryService.getAllCategories();
+      const shopkeeperId = req.user.role === 'staff' && req.user.shopkeeperId ? req.user.shopkeeperId : req.user._id;
+      const result = await categoryService.getAllCategories(shopkeeperId);
 
       sendResponse(res, {
             statusCode: StatusCodes.OK,
@@ -26,7 +28,8 @@ const getAllCategories = catchAsync(async (req, res) => {
 });
 
 const getCategoryById = catchAsync(async (req, res) => {
-      const result = await categoryService.getCategoryById(req.params.id as string);
+      const shopkeeperId = req.user.role === 'staff' && req.user.shopkeeperId ? req.user.shopkeeperId : req.user._id;
+      const result = await categoryService.getCategoryById(req.params.id as string, shopkeeperId);
 
       sendResponse(res, {
             statusCode: StatusCodes.OK,
@@ -37,7 +40,8 @@ const getCategoryById = catchAsync(async (req, res) => {
 });
 
 const updateCategory = catchAsync(async (req, res) => {
-      const result = await categoryService.updateCategory(req.params.id as string, req.body, req.file);
+      const shopkeeperId = req.user.role === 'staff' && req.user.shopkeeperId ? req.user.shopkeeperId : req.user._id;
+      const result = await categoryService.updateCategory(req.params.id as string, req.body, req.file, shopkeeperId);
 
       sendResponse(res, {
             statusCode: StatusCodes.OK,
@@ -48,7 +52,8 @@ const updateCategory = catchAsync(async (req, res) => {
 });
 
 const deleteCategory = catchAsync(async (req, res) => {
-      await categoryService.deleteCategory(req.params.id as string);
+      const shopkeeperId = req.user.role === 'staff' && req.user.shopkeeperId ? req.user.shopkeeperId : req.user._id;
+      await categoryService.deleteCategory(req.params.id as string, shopkeeperId);
 
       sendResponse(res, {
             statusCode: StatusCodes.OK,
@@ -59,7 +64,8 @@ const deleteCategory = catchAsync(async (req, res) => {
 });
 
 const getCategoriesWithItemCount = catchAsync(async (req, res) => {
-      const result = await categoryService.getCategoriesWithItemCount();
+      const shopkeeperId = req.user.role === 'staff' && req.user.shopkeeperId ? req.user.shopkeeperId : req.user._id;
+      const result = await categoryService.getCategoriesWithItemCount(shopkeeperId);
 
       sendResponse(res, {
             statusCode: StatusCodes.OK,
@@ -70,7 +76,8 @@ const getCategoriesWithItemCount = catchAsync(async (req, res) => {
 });
 
 const bulkUpdateTotalItems = catchAsync(async (req, res) => {
-      await categoryService.bulkUpdateTotalItems();
+      const shopkeeperId = req.user.role === 'staff' && req.user.shopkeeperId ? req.user.shopkeeperId : req.user._id;
+      await categoryService.bulkUpdateTotalItems(shopkeeperId);
 
       sendResponse(res, {
             statusCode: StatusCodes.OK,
