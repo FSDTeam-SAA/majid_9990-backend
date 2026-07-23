@@ -22,7 +22,12 @@ const allowedOrigins = [
 ];
 
 const corsOptions = {
-      origin: allowedOrigins,
+      origin: [
+            'https://majid-website-two.vercel.app',
+            'https://majid-dashboard.vercel.app',
+            'http://localhost:3000',
+            'https://majiddashboard.vercel.app',
+      ],
 
       methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
       credentials: true,

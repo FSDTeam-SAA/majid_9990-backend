@@ -59,9 +59,33 @@ const getAllPayments = catchAsync(async (req, res) => {
       });
 });
 
+const updatePaymentStatus = catchAsync(async (req, res) => {
+      const result = await paymentService.updatePaymentStatus(req.params.id, req.body?.paymentStatus);
+
+      sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: 'Payment status updated',
+            data: result,
+      });
+});
+
+const deletePayment = catchAsync(async (req, res) => {
+      const result = await paymentService.deletePayment(req.params.id);
+
+      sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: 'Payment deleted',
+            data: result,
+      });
+});
+
 export default {
       createPayment,
       stripeWebhook,
       getMyPayments,
       getAllPayments,
+      updatePaymentStatus,
+      deletePayment,
 };
