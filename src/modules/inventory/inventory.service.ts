@@ -24,6 +24,63 @@ const parseOptionalNumber = (value: unknown) => {
       return Number.isFinite(parsed) ? parsed : undefined;
 };
 
+const parseStringArray = (value: unknown) => {
+      if (Array.isArray(value)) {
+            return value.filter((item): item is string => typeof item === 'string' && item.trim().length > 0).map((item) => item.trim());
+      }
+
+      if (typeof value === 'string') {
+            try {
+                  const parsed = JSON.parse(value);
+                  if (Array.isArray(parsed)) {
+                        return parsed
+                              .filter((item): item is string => typeof item === 'string' && item.trim().length > 0)
+                              .map((item) => item.trim());
+                  }
+            } catch {
+                  return value
+                        .split(',')
+                        .map((item) => item.trim())
+                        .filter(Boolean);
+            }
+      }
+
+      return [];
+};
+
+const extractMarketValue = (product: IBarcodeSearchResult) => {
+      const rawData =
+            product?.rawData && typeof product.rawData === 'object'
+                  ? (product.rawData as Record<string, unknown>)
+                  : {};
+
+      const numericCandidates: number[] = [];
+      const directKeys = ['price', 'avg_price', 'lowest_recorded_price', 'highest_recorded_price', 'msrp'];
+
+      for (const key of directKeys) {
+            const value = parseOptionalNumber(rawData[key]);
+            if (value !== undefined && value > 0) {
+                  numericCandidates.push(value);
+            }
+      }
+
+      if (Array.isArray(rawData.stores)) {
+            for (const store of rawData.stores) {
+                  if (!store || typeof store !== 'object') continue;
+                  const price = parseOptionalNumber((store as Record<string, unknown>).price);
+                  if (price !== undefined && price > 0) {
+                        numericCandidates.push(price);
+                  }
+            }
+      }
+
+      if (numericCandidates.length) {
+            return Math.round(numericCandidates.sort((a, b) => a - b)[0]);
+      }
+
+      return estimateBarcodeValue(product);
+};
+
 const normalizeCsvHeader = (value: string) =>
       value
             .trim()
@@ -562,6 +619,28 @@ const normalizeBulkCurrentState = (value: unknown): IInventory['currentState'] |
 
 const createInventory = async (payload: Partial<IInventory>, file?: any) => {
       const normalizedPayload = syncInventoryState(payload);
+      const inventoryImages = parseStringArray(payload.images);
+      const sourceImageUrls = parseStringArray(payload.sourceImageUrls);
+      const payloadImageUrl =
+            typeof payload.image === 'object' && payload.image !== null && typeof payload.image.url === 'string'
+                  ? payload.image.url.trim()
+                  : '';
+      const normalizedSourceImageUrl =
+            typeof payload.sourceImageUrl === 'string' && payload.sourceImageUrl.trim()
+                  ? payload.sourceImageUrl.trim()
+                  : sourceImageUrls[0] || inventoryImages[0] || payloadImageUrl;
+      const normalizedSalePrice = parseOptionalNumber(payload.salePrice);
+      const normalizedExpectedPrice = parseOptionalNumber(payload.expectedPrice);
+
+      if (normalizedSalePrice !== undefined) {
+            normalizedPayload.salePrice = normalizedSalePrice;
+      } else if (normalizedExpectedPrice !== undefined) {
+            normalizedPayload.salePrice = normalizedExpectedPrice;
+      }
+
+      if (normalizedExpectedPrice !== undefined) {
+            normalizedPayload.expectedPrice = normalizedExpectedPrice;
+      }
 
       if (payload.imeiNumber) {
             const existingInventory = await Inventory.findOne({ imeiNumber: payload.imeiNumber });
@@ -569,6 +648,18 @@ const createInventory = async (payload: Partial<IInventory>, file?: any) => {
             if (existingInventory) {
                   throw new AppError(`Inventory with IMEI ${payload.imeiNumber} already exists`, 409);
             }
+      }
+
+      if (normalizedSourceImageUrl) {
+            normalizedPayload.sourceImageUrl = normalizedSourceImageUrl;
+      }
+
+      if (inventoryImages.length) {
+            normalizedPayload.images = inventoryImages;
+      } else if (sourceImageUrls.length) {
+            normalizedPayload.images = sourceImageUrls;
+      } else if (normalizedSourceImageUrl) {
+            normalizedPayload.images = [normalizedSourceImageUrl];
       }
 
       if (file) {
@@ -579,6 +670,17 @@ const createInventory = async (payload: Partial<IInventory>, file?: any) => {
                         url: cloudinaryResponse.secure_url,
                   };
             }
+      } else if (normalizedSourceImageUrl) {
+            normalizedPayload.image = {
+                  public_id: '',
+                  url: normalizedSourceImageUrl,
+            };
+      }
+
+      if (sourceImageUrls.length) {
+            normalizedPayload.sourceImageUrls = sourceImageUrls;
+      } else if (normalizedSourceImageUrl) {
+            normalizedPayload.sourceImageUrls = [normalizedSourceImageUrl];
       }
 
       const result = await Inventory.create(normalizedPayload);
@@ -659,6 +761,10 @@ const createInventoryFromBarcode = async (
             currentState?: IInventory['currentState'];
             type?: IInventory['type'];
             status?: IInventory['status'];
+            categoryId?: string;
+            images?: string[] | string;
+            sourceImageUrl?: string;
+            sourceImageUrls?: string[] | string;
       },
       file?: any
 ) => {
@@ -680,10 +786,20 @@ const createInventoryFromBarcode = async (
       const userObjectId = new Types.ObjectId(userId);
 
       const barcodeResult = await barcodeService.searchByBarcode(cleanCode);
-      const fallbackName = barcodeResult.brand ? `${barcodeResult.brand} ${barcodeResult.name}` : barcodeResult.name;
+      const rawData =
+            barcodeResult?.rawData && typeof barcodeResult.rawData === 'object'
+                  ? (barcodeResult.rawData as Record<string, unknown>)
+                  : {};
+      const resolvedTitle =
+            typeof rawData.title === 'string' && rawData.title.trim()
+                  ? rawData.title.trim()
+                  : typeof barcodeResult.name === 'string' && barcodeResult.name.trim()
+                        ? barcodeResult.name.trim()
+                        : '';
+      const fallbackName = resolvedTitle || (barcodeResult.brand ? `${barcodeResult.brand} ${barcodeResult.name}` : barcodeResult.name);
       const itemName = fallbackName?.trim() || 'Unknown Product';
       const imeiNumber = String(payload.imeiNumber ?? '').trim() || barcodeResult.barcode || cleanCode;
-      const estimatedMarketValue = estimateBarcodeValue(barcodeResult);
+      const estimatedMarketValue = extractMarketValue(barcodeResult);
       const aiInsight = await getOpenAiInsight({
             imei: imeiNumber,
             deviceName: itemName,
@@ -727,6 +843,18 @@ const createInventoryFromBarcode = async (
 
       const aiDescription = generateAiDescription();
 
+      const barcodeImages =
+            Array.isArray(barcodeResult.images) && barcodeResult.images.length
+                  ? barcodeResult.images
+                  : barcodeResult.image
+                        ? [barcodeResult.image]
+                        : [];
+
+      const primaryBarcodeImage =
+            typeof barcodeResult.image === 'string' && barcodeResult.image.trim()
+                  ? barcodeResult.image.trim()
+                  : barcodeImages[0] || '';
+
       const result = await createInventory(
             {
                   itemName,
@@ -740,6 +868,20 @@ const createInventoryFromBarcode = async (
                   currentState: normalizeCondition(payload.currentState),
                   productDetails,
                   aiDescription,
+                  images:
+                        parseStringArray(payload.images).length
+                              ? parseStringArray(payload.images)
+                              : parseStringArray(payload.sourceImageUrls).length
+                                    ? parseStringArray(payload.sourceImageUrls)
+                                    : barcodeImages,
+                  sourceImageUrl:
+                        typeof payload.sourceImageUrl === 'string' && payload.sourceImageUrl.trim()
+                              ? payload.sourceImageUrl.trim()
+                              : primaryBarcodeImage,
+                  sourceImageUrls: parseStringArray(payload.sourceImageUrls).length
+                        ? parseStringArray(payload.sourceImageUrls)
+                        : barcodeImages,
+                  categoryId: payload.categoryId ? parseObjectId(payload.categoryId, 'categoryId') : undefined,
                   type: normalizeInventoryType(payload.type ?? payload.status),
                   status: normalizeInventoryStatus(
                         payload.status,
@@ -890,10 +1032,44 @@ const getSingleInventory = async (id: string) => {
 const updateInventory = async (id: string, payload: Partial<IInventory>, file?: any) => {
       assertValidObjectId(id, 'id');
 
-      // Get old inventory to check category change
+      // Get old inventory to check category change and image fallbacks
       const oldInventory = await Inventory.findById(id);
 
       const normalizedPayload = syncInventoryState(payload);
+      const inventoryImages = parseStringArray(payload.images);
+      const sourceImageUrls = parseStringArray(payload.sourceImageUrls);
+      const payloadImageUrl =
+            typeof payload.image === 'object' && payload.image !== null && typeof payload.image.url === 'string'
+                  ? payload.image.url.trim()
+                  : '';
+      const normalizedSourceImageUrl =
+            typeof payload.sourceImageUrl === 'string' && payload.sourceImageUrl.trim()
+                  ? payload.sourceImageUrl.trim()
+                  : sourceImageUrls[0] || inventoryImages[0] || payloadImageUrl || oldInventory?.sourceImageUrl || oldInventory?.image?.url || oldInventory?.images?.[0];
+      const normalizedSalePrice = parseOptionalNumber(payload.salePrice);
+      const normalizedExpectedPrice = parseOptionalNumber(payload.expectedPrice);
+
+      if (normalizedSalePrice !== undefined) {
+            normalizedPayload.salePrice = normalizedSalePrice;
+      } else if (normalizedExpectedPrice !== undefined) {
+            normalizedPayload.salePrice = normalizedExpectedPrice;
+      }
+
+      if (normalizedExpectedPrice !== undefined) {
+            normalizedPayload.expectedPrice = normalizedExpectedPrice;
+      }
+
+      if (normalizedSourceImageUrl) {
+            normalizedPayload.sourceImageUrl = normalizedSourceImageUrl;
+      }
+
+      if (inventoryImages.length) {
+            normalizedPayload.images = inventoryImages;
+      } else if (sourceImageUrls.length) {
+            normalizedPayload.images = sourceImageUrls;
+      } else if (normalizedSourceImageUrl) {
+            normalizedPayload.images = [normalizedSourceImageUrl];
+      }
 
       if (file) {
             const cloudinaryResponse = await uploadToCloudinary(file.path);
@@ -903,6 +1079,17 @@ const updateInventory = async (id: string, payload: Partial<IInventory>, file?: 
                         url: cloudinaryResponse.secure_url,
                   };
             }
+      } else if (normalizedSourceImageUrl) {
+            normalizedPayload.image = {
+                  public_id: '',
+                  url: normalizedSourceImageUrl,
+            };
+      }
+
+      if (sourceImageUrls.length) {
+            normalizedPayload.sourceImageUrls = sourceImageUrls;
+      } else if (normalizedSourceImageUrl) {
+            normalizedPayload.sourceImageUrls = [normalizedSourceImageUrl];
       }
 
       const updatedInventory = await Inventory.findByIdAndUpdate(id, normalizedPayload, {

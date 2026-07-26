@@ -13,17 +13,54 @@ const BARCODE_LOOKUP_TOKEN = process.env.BARCODE_LOOKUP_TOKEN || 'm6l7qhj3cnx0po
 
 // Remove all MCP-related types and functions since we're using REST API directly
 
+const extractBarcodeValue = (product: any, fallback: string) => {
+      const directCandidates = [
+            product?.barcode,
+            product?.barcode_number,
+            product?.ean,
+            product?.ean13,
+            product?.upc,
+            product?.gtin,
+            product?.mpn,
+      ];
+
+      for (const candidate of directCandidates) {
+            if (typeof candidate === 'string' && candidate.trim() && candidate.trim().toUpperCase() !== 'N/A') {
+                  return candidate.trim();
+            }
+      }
+
+      if (typeof product?.barcode_formats === 'string' && product.barcode_formats.trim()) {
+            const match = product.barcode_formats.match(/\b(\d{8,14})\b/);
+            if (match?.[1]) {
+                  return match[1];
+            }
+      }
+
+      return fallback;
+};
+
 /**
  * Format API response to match our standard interface
  */
 const formatBarcodeResult = (product: any, barcode: string): IBarcodeSearchResult => {
+      const images = Array.isArray(product?.images)
+            ? product.images.filter((value: unknown): value is string => typeof value === 'string' && value.trim().length > 0)
+            : typeof product?.image === 'string' && product.image.trim()
+                  ? [product.image.trim()]
+                  : [];
+      const resolvedBarcode = extractBarcodeValue(product, barcode);
+
       return {
-            name: product?.product_name || product?.name || 'Unknown Product',
+            name: product?.title || product?.product_name || product?.name || 'Unknown Product',
             brand: product?.brand || product?.manufacturer || undefined,
             category: product?.category || product?.category_name || undefined,
             description: product?.description || product?.short_description || undefined,
-            barcode: barcode,
-            image: product?.images?.[0] || product?.image || undefined,
+            color: product?.color || undefined,
+            size: product?.size || product?.storage || undefined,
+            barcode: resolvedBarcode,
+            image: images[0] || undefined,
+            images,
             rawData: product,
       };
 };
@@ -47,7 +84,7 @@ const callBarcodeLookupByBarcode = async (code: string): Promise<IBarcodeSearchR
                   const product = response.data.products[0];
 
                   // Extract barcode from response or use the one we searched for
-                  const foundBarcode = product?.barcode || product?.ean || product?.upc || code;
+                  const foundBarcode = extractBarcodeValue(product, code);
 
                   return formatBarcodeResult(product, foundBarcode);
             }
@@ -65,7 +102,7 @@ const callBarcodeLookupByBarcode = async (code: string): Promise<IBarcodeSearchR
 
                   if (prefixResponse.data?.products && prefixResponse.data.products.length > 0) {
                         const product = prefixResponse.data.products[0];
-                        const foundBarcode = product?.barcode || product?.ean || product?.upc || code;
+                        const foundBarcode = extractBarcodeValue(product, code);
                         return formatBarcodeResult(product, foundBarcode);
                   }
             }
@@ -99,7 +136,7 @@ const callBarcodeLookupByName = async (query: string): Promise<IBarcodeSearchRes
 
             // Format all results
             return response.data.products.map((product: any) => {
-                  const barcode = product?.barcode || product?.ean || product?.upc || 'N/A';
+                  const barcode = extractBarcodeValue(product, 'N/A');
                   return formatBarcodeResult(product, barcode);
             });
       } catch (error: any) {

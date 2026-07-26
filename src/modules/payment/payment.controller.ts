@@ -60,7 +60,7 @@ const getAllPayments = catchAsync(async (req, res) => {
 });
 
 const updatePaymentStatus = catchAsync(async (req, res) => {
-      const result = await paymentService.updatePaymentStatus(req.params.id, req.body?.paymentStatus);
+      const result = await paymentService.updatePaymentStatus(req.params.id as string, req.body?.paymentStatus);
 
       sendResponse(res, {
             statusCode: StatusCodes.OK,
@@ -71,7 +71,7 @@ const updatePaymentStatus = catchAsync(async (req, res) => {
 });
 
 const deletePayment = catchAsync(async (req, res) => {
-      const result = await paymentService.deletePayment(req.params.id);
+      const result = await paymentService.deletePayment(req.params.id as string);
 
       sendResponse(res, {
             statusCode: StatusCodes.OK,
