@@ -3,8 +3,11 @@ export interface IBarcodeSearchResult {
       brand?: string;
       category?: string;
       description?: string;
+      color?: string;
+      size?: string;
       barcode: string;
       image?: string;
+      images?: string[];
       rawData?: any;
 }
 

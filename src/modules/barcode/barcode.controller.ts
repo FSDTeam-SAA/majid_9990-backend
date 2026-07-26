@@ -53,7 +53,7 @@ const searchByName = catchAsync(async (req, res) => {
 const fallbackSearch = catchAsync(async (req, res) => {
       const { code } = req.params;
 
-      const result = await barcodeService.fallbackRestSearch(code as string);
+      const result = await barcodeService.searchByBarcode(code as string);
 
       sendResponse(res, {
             statusCode: StatusCodes.OK,
