@@ -22,18 +22,21 @@ const allowedOrigins = [
 ];
 
 const corsOptions = {
-      origin: [
-            'https://majid-website-two.vercel.app',
-            'https://majid-dashboard.vercel.app',
-            'http://localhost:3000',
-            'https://majiddashboard.vercel.app',
-      ],
+      origin: (origin: string | undefined, callback: (error: Error | null, allow?: boolean) => void) => {
+            // Allow same-server requests, curl/postman, and the configured browser origins.
+            if (!origin || allowedOrigins.includes(origin)) {
+                  callback(null, true);
+                  return;
+            }
 
-      methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
+            callback(new Error(`CORS blocked for origin: ${origin}`));
+      },
+      methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
       credentials: true,
 };
 
 app.use(cors(corsOptions));
+app.options('/{*corsPreflight}', cors(corsOptions));
 
 app.get('/api-docs.json', async (_req, res, next) => {
       try {

@@ -25,6 +25,7 @@ export interface IUser {
       shopName?: string;
       shopAddress?: string;
       whatsappNumber?: string;
+      googleReviewPageUrl?: string;
       wageType?: 'per-day' | 'per-hour' | string;
       wageAmount?: number;
       workingDays?: string[];

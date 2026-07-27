@@ -62,6 +62,7 @@ const userSchema = new Schema<IUser>(
             shopName: { type: String, default: '' },
             shopAddress: { type: String, default: '' },
             whatsappNumber: { type: String, default: '' },
+            googleReviewPageUrl: { type: String, default: '' },
             wageType: {
                   type: String,
                   enum: ['per-day', 'per-hour'],
