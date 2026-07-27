@@ -17,17 +17,27 @@ export interface IInventory {
       quantity?: number;
       purchasePrice?: number;
       expectedPrice?: number;
+      salePrice?: number;
+      saleQuantity?: number;
+      saleMethod?: string;
       productDetails?: string;
       aiDescription?: string;
       image?: {
             public_id: string;
             url: string;
       };
+      images?: string[];
+      sourceImageUrl?: string;
+      sourceImageUrls?: string[];
       userId: Types.ObjectId;
       supplierId?: Types.ObjectId;
       storeId?: Types.ObjectId;
       groupKey?: string;
       minStockLevel?: number;
+      customerName?: string;
+      customerEmail?: string;
+      customerPhone?: string;
+      customerAddress?: string;
       type?: TInventoryType;
       status?: TInventoryStatus;
       currentState?: TCondition;

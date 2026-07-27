@@ -23,7 +23,18 @@ const createInventory = catchAsync(async (req, res) => {
 
 const createInventoryFromBarcode = catchAsync(async (req, res) => {
       const effectiveUserId = req.user.role === 'staff' && req.user.shopkeeperId ? req.user.shopkeeperId : undefined;
-      const { code, userId = effectiveUserId, imeiNumber, purchasePrice, currentState } = req.body;
+      const {
+            code,
+            userId = effectiveUserId,
+            imeiNumber,
+            purchasePrice,
+            currentState,
+            categoryId,
+            images,
+            sourceImageUrl,
+            sourceImageUrls,
+      } =
+            req.body;
 
       const result = await inventoryService.createInventoryFromBarcode(
             {
@@ -32,6 +43,10 @@ const createInventoryFromBarcode = catchAsync(async (req, res) => {
                   imeiNumber,
                   purchasePrice,
                   currentState,
+                  categoryId,
+                  images,
+                  sourceImageUrl,
+                  sourceImageUrls,
             },
             req.file
       );

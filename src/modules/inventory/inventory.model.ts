@@ -55,6 +55,17 @@ const inventorySchema = new Schema<IInventory>(
             expectedPrice: {
                   type: Number,
             },
+            salePrice: {
+                  type: Number,
+            },
+            saleQuantity: {
+                  type: Number,
+                  default: 1,
+            },
+            saleMethod: {
+                  type: String,
+                  trim: true,
+            },
             productDetails: {
                   type: String,
             },
@@ -87,6 +98,22 @@ const inventorySchema = new Schema<IInventory>(
                   public_id: String,
                   url: String,
             },
+            images: [
+                  {
+                        type: String,
+                        trim: true,
+                  },
+            ],
+            sourceImageUrl: {
+                  type: String,
+                  trim: true,
+            },
+            sourceImageUrls: [
+                  {
+                        type: String,
+                        trim: true,
+                  },
+            ],
             userId: {
                   type: Schema.Types.ObjectId,
                   ref: 'User',
@@ -102,6 +129,22 @@ const inventorySchema = new Schema<IInventory>(
                   type: String,
                   enum: ['new', 'good condition'],
                   default: 'new',
+            },
+            customerName: {
+                  type: String,
+                  trim: true,
+            },
+            customerEmail: {
+                  type: String,
+                  trim: true,
+            },
+            customerPhone: {
+                  type: String,
+                  trim: true,
+            },
+            customerAddress: {
+                  type: String,
+                  trim: true,
             },
       },
       {
