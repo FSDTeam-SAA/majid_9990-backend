@@ -3,7 +3,7 @@ import { Types } from 'mongoose';
 import AppError from '../../errors/AppError';
 import { deleteFromCloudinary, uploadToCloudinary } from '../../utils/cloudinary';
 import { User } from '../user/user.model';
-import { IInvoice, IInvoicePayload } from './invoice.interface';
+import { IInvoice, IInvoiceOrderDetails, IInvoicePayload, IInvoicePaymentDetails } from './invoice.interface';
 import { Invoice } from './invoice.model';
 
 const resolveShopkeeperId = async (shopkeeperId?: string) => {
@@ -67,17 +67,118 @@ const normalizeObjectIdArray = (value?: string | string[]) => {
             .map((item) => new Types.ObjectId(item));
 };
 
+const parseJsonObject = <T>(value: T | string | undefined, fieldName: string): T | undefined => {
+      if (value === undefined || value === null || value === '') {
+            return undefined;
+      }
+
+      if (typeof value !== 'string') {
+            return value;
+      }
+
+      try {
+            const parsed = JSON.parse(value);
+
+            if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+                  throw new Error('Expected an object');
+            }
+
+            return parsed as T;
+      } catch {
+            throw new AppError(`${fieldName} must be valid JSON`, StatusCodes.BAD_REQUEST);
+      }
+};
+
+const normalizeOptionalNumber = (value: unknown, fieldName: string) => {
+      if (value === undefined || value === null || value === '') {
+            return undefined;
+      }
+
+      const parsed = Number(value);
+
+      if (!Number.isFinite(parsed) || parsed < 0) {
+            throw new AppError(`${fieldName} must be a non-negative number`, StatusCodes.BAD_REQUEST);
+      }
+
+      return parsed;
+};
+
+const normalizePaymentDetails = (value: IInvoicePayload['paymentDetails']): IInvoicePaymentDetails | undefined => {
+      const details = parseJsonObject<IInvoicePaymentDetails>(value, 'paymentDetails');
+
+      if (!details) {
+            return undefined;
+      }
+
+      const dueDate = details.dueDate ? new Date(details.dueDate) : undefined;
+
+      if (dueDate && Number.isNaN(dueDate.getTime())) {
+            throw new AppError('paymentDetails.dueDate must be a valid date', StatusCodes.BAD_REQUEST);
+      }
+
+      return {
+            amountReceived: normalizeOptionalNumber(details.amountReceived, 'paymentDetails.amountReceived'),
+            changeGiven: normalizeOptionalNumber(details.changeGiven, 'paymentDetails.changeGiven'),
+            cardholderName: String(details.cardholderName ?? '').trim() || undefined,
+            cardLastFour: String(details.cardLastFour ?? '').trim() || undefined,
+            bankName: String(details.bankName ?? '').trim() || undefined,
+            accountLastFour: String(details.accountLastFour ?? '').trim() || undefined,
+            transactionReference: String(details.transactionReference ?? '').trim() || undefined,
+            amountPaid: normalizeOptionalNumber(details.amountPaid, 'paymentDetails.amountPaid'),
+            dueAmount: normalizeOptionalNumber(details.dueAmount, 'paymentDetails.dueAmount'),
+            dueDate,
+            notes: String(details.notes ?? '').trim() || undefined,
+      };
+};
+
+const normalizeOrderDetails = (value: IInvoicePayload['orderDetails']): IInvoiceOrderDetails | undefined => {
+      const details = parseJsonObject<IInvoiceOrderDetails>(value, 'orderDetails');
+
+      if (!details) {
+            return undefined;
+      }
+
+      return {
+            checkoutMode: String(details.checkoutMode ?? '').trim() || undefined,
+            marketplace: String(details.marketplace ?? '').trim() || undefined,
+            orderNumber: String(details.orderNumber ?? '').trim() || undefined,
+            deliveryFrom: String(details.deliveryFrom ?? '').trim() || undefined,
+            deliveryTo: String(details.deliveryTo ?? '').trim() || undefined,
+      };
+};
+
 const createInvoice = async (payload: IInvoicePayload, file?: Express.Multer.File): Promise<IInvoice> => {
       const shopkeeperId = await resolveShopkeeperId(payload.shopkeeperId);
-      const invoiceFile = await buildInvoiceFile(file);
-
       const type = String(payload.type ?? '').trim();
       const customerInfo = normalizeObjectId(payload.customerInfo ?? undefined);
       const itemsIds = normalizeObjectIdArray(payload.itemsIds);
+      const paymentMethod =
+            String(payload.paymentMethod ?? '')
+                  .trim()
+                  .toLowerCase() || undefined;
+      const paymentDetails = normalizePaymentDetails(payload.paymentDetails);
+      const orderDetails = normalizeOrderDetails(payload.orderDetails);
+      const totalAmount = normalizeOptionalNumber(payload.totalAmount, 'totalAmount');
+      const dueAmount = normalizeOptionalNumber(payload.dueAmount, 'dueAmount');
+      const amountPaid = normalizeOptionalNumber(payload.amountPaid, 'amountPaid');
 
       if (!type) {
             throw new AppError('type is required', StatusCodes.BAD_REQUEST);
       }
+
+      if (payload.customerInfo && !customerInfo) {
+            throw new AppError('Invalid customerInfo', StatusCodes.BAD_REQUEST);
+      }
+
+      if (payload.paymentStatus && !['paid', 'partial', 'due'].includes(payload.paymentStatus)) {
+            throw new AppError('Invalid paymentStatus', StatusCodes.BAD_REQUEST);
+      }
+
+      if (paymentMethod === 'card' && paymentDetails?.cardLastFour && !/^\d{4}$/.test(paymentDetails.cardLastFour)) {
+            throw new AppError('Card last four digits must contain exactly 4 numbers', StatusCodes.BAD_REQUEST);
+      }
+
+      const invoiceFile = await buildInvoiceFile(file);
 
       const result = await Invoice.create({
             shopkeeperId,
@@ -86,14 +187,23 @@ const createInvoice = async (payload: IInvoicePayload, file?: Express.Multer.Fil
             customerInfo,
             itemsIds,
 
-            totalAmount: payload.totalAmount,
-            dueAmount: payload.dueAmount,
+            totalAmount,
+            dueAmount,
             repairRequestId: normalizeObjectId(payload.repairRequestId),
-            tax: payload.tax,
-            paymentMethod: payload.paymentMethod?.trim(),
+            tax: normalizeOptionalNumber(payload.tax, 'tax'),
+            paymentMethod,
+            paymentStatus: payload.paymentStatus,
+            paymentDetails,
+            amountPaid,
+            invoiceNumber: String(payload.invoiceNumber ?? '').trim() || undefined,
+            currency:
+                  String(payload.currency ?? '')
+                        .trim()
+                        .toUpperCase() || undefined,
+            orderDetails,
             discountName: payload.discountName?.trim(),
-            discountPercentage: payload.discountPercentage,
-            discountAmount: payload.discountAmount,
+            discountPercentage: normalizeOptionalNumber(payload.discountPercentage, 'discountPercentage'),
+            discountAmount: normalizeOptionalNumber(payload.discountAmount, 'discountAmount'),
       });
 
       return result;
@@ -140,6 +250,12 @@ const updateInvoice = async (id: string, payload: IInvoicePayload, file?: Expres
                   | 'repairRequestId'
                   | 'tax'
                   | 'paymentMethod'
+                  | 'paymentStatus'
+                  | 'paymentDetails'
+                  | 'amountPaid'
+                  | 'invoiceNumber'
+                  | 'currency'
+                  | 'orderDetails'
                   | 'discountName'
                   | 'discountPercentage'
                   | 'discountAmount'
@@ -161,7 +277,31 @@ const updateInvoice = async (id: string, payload: IInvoicePayload, file?: Expres
       }
 
       if (payload.paymentMethod !== undefined) {
-            updateData.paymentMethod = payload.paymentMethod?.trim();
+            updateData.paymentMethod = payload.paymentMethod?.trim().toLowerCase();
+      }
+
+      if (payload.paymentStatus !== undefined) {
+            updateData.paymentStatus = payload.paymentStatus;
+      }
+
+      if (payload.paymentDetails !== undefined) {
+            updateData.paymentDetails = normalizePaymentDetails(payload.paymentDetails);
+      }
+
+      if (payload.amountPaid !== undefined) {
+            updateData.amountPaid = normalizeOptionalNumber(payload.amountPaid, 'amountPaid');
+      }
+
+      if (payload.invoiceNumber !== undefined) {
+            updateData.invoiceNumber = payload.invoiceNumber?.trim();
+      }
+
+      if (payload.currency !== undefined) {
+            updateData.currency = payload.currency?.trim().toUpperCase();
+      }
+
+      if (payload.orderDetails !== undefined) {
+            updateData.orderDetails = normalizeOrderDetails(payload.orderDetails);
       }
 
       if (payload.discountName !== undefined) {

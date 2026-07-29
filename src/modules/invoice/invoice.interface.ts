@@ -6,6 +6,30 @@ export interface IInvoiceFile {
       resource_type: 'raw';
 }
 
+export type InvoicePaymentStatus = 'paid' | 'partial' | 'due';
+
+export interface IInvoicePaymentDetails {
+      amountReceived?: number;
+      changeGiven?: number;
+      cardholderName?: string;
+      cardLastFour?: string;
+      bankName?: string;
+      accountLastFour?: string;
+      transactionReference?: string;
+      amountPaid?: number;
+      dueAmount?: number;
+      dueDate?: Date;
+      notes?: string;
+}
+
+export interface IInvoiceOrderDetails {
+      checkoutMode?: string;
+      marketplace?: string;
+      orderNumber?: string;
+      deliveryFrom?: string;
+      deliveryTo?: string;
+}
+
 export interface IInvoice {
       shopkeeperId: Types.ObjectId;
       invoice: IInvoiceFile;
@@ -19,6 +43,12 @@ export interface IInvoice {
       repairRequestId?: Types.ObjectId;
       tax?: number;
       paymentMethod?: string;
+      paymentStatus?: InvoicePaymentStatus;
+      paymentDetails?: IInvoicePaymentDetails;
+      amountPaid?: number;
+      invoiceNumber?: string;
+      currency?: string;
+      orderDetails?: IInvoiceOrderDetails;
       discountName?: string;
       discountPercentage?: number;
       discountAmount?: number;
@@ -35,6 +65,12 @@ export interface IInvoicePayload {
       repairRequestId?: string;
       tax?: number;
       paymentMethod?: string;
+      paymentStatus?: InvoicePaymentStatus;
+      paymentDetails?: IInvoicePaymentDetails | string;
+      amountPaid?: number;
+      invoiceNumber?: string;
+      currency?: string;
+      orderDetails?: IInvoiceOrderDetails | string;
       discountName?: string;
       discountPercentage?: number;
       discountAmount?: number;
