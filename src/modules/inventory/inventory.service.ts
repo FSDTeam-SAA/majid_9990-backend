@@ -14,6 +14,7 @@ import config from '../../config/config';
 import { LowStockAlert } from '../lowStockAlert/lowStockAlert.model';
 import { User } from '../user/user.model';
 import categoryService from './category/category.service';
+import locationService from '../location/location.service';
 
 const parseOptionalNumber = (value: unknown) => {
       if (value === undefined || value === null || value === '') {
@@ -48,37 +49,111 @@ const parseStringArray = (value: unknown) => {
       return [];
 };
 
-const extractMarketValue = (product: IBarcodeSearchResult) => {
+type MarketValue = {
+      amount: number;
+      currency: string;
+      sourceAmount: number;
+      sourceCurrency: string;
+};
+
+type MarketPricing = {
+      expected: MarketValue;
+      sale: MarketValue;
+};
+
+const extractMarketPricing = async (product: IBarcodeSearchResult, targetCurrency: string): Promise<MarketPricing> => {
       const rawData =
             product?.rawData && typeof product.rawData === 'object'
                   ? (product.rawData as Record<string, unknown>)
                   : {};
 
-      const numericCandidates: number[] = [];
+      const normalizedTargetCurrency = String(targetCurrency || 'USD').trim().toUpperCase();
+      const defaultSourceCurrency =
+            typeof rawData.currency === 'string' && rawData.currency.trim()
+                  ? rawData.currency.trim().toUpperCase()
+                  : 'USD';
+      const expectedCandidates: Array<{ amount: number; currency: string }> = [];
+      const saleCandidates: Array<{ amount: number; currency: string }> = [];
       const directKeys = ['price', 'avg_price', 'lowest_recorded_price', 'highest_recorded_price', 'msrp'];
 
       for (const key of directKeys) {
             const value = parseOptionalNumber(rawData[key]);
             if (value !== undefined && value > 0) {
-                  numericCandidates.push(value);
+                  expectedCandidates.push({ amount: value, currency: defaultSourceCurrency });
             }
+      }
+      const directSalePrice = parseOptionalNumber(rawData.sale_price);
+      if (directSalePrice !== undefined && directSalePrice > 0) {
+            saleCandidates.push({ amount: directSalePrice, currency: defaultSourceCurrency });
       }
 
       if (Array.isArray(rawData.stores)) {
             for (const store of rawData.stores) {
                   if (!store || typeof store !== 'object') continue;
-                  const price = parseOptionalNumber((store as Record<string, unknown>).price);
+                  const storeData = store as Record<string, unknown>;
+                  const price = parseOptionalNumber(storeData.price);
+                  const salePrice = parseOptionalNumber(storeData.sale_price);
+                  const currency =
+                        typeof storeData.currency === 'string' && storeData.currency.trim()
+                              ? storeData.currency.trim().toUpperCase()
+                              : defaultSourceCurrency;
                   if (price !== undefined && price > 0) {
-                        numericCandidates.push(price);
+                        expectedCandidates.push({ amount: price, currency });
+                  }
+                  if (salePrice !== undefined && salePrice > 0) {
+                        saleCandidates.push({ amount: salePrice, currency });
+                  } else if (price !== undefined && price > 0) {
+                        saleCandidates.push({ amount: price, currency });
                   }
             }
       }
 
-      if (numericCandidates.length) {
-            return Math.round(numericCandidates.sort((a, b) => a - b)[0]);
+      if (!expectedCandidates.length) {
+            expectedCandidates.push({ amount: estimateBarcodeValue(product), currency: 'USD' });
+      }
+      if (!saleCandidates.length) {
+            saleCandidates.push(...expectedCandidates);
       }
 
-      return estimateBarcodeValue(product);
+      const allCandidates = [...expectedCandidates, ...saleCandidates];
+      const requiresConversion = allCandidates.some((candidate) => candidate.currency !== normalizedTargetCurrency);
+      const rates = requiresConversion ? await locationService.getExchangeRates() : null;
+      const convertAndChooseLowest = (candidates: Array<{ amount: number; currency: string }>) => {
+            const convertedCandidates = candidates
+                  .map((candidate) => {
+                        const convertedAmount = locationService.convertCurrencyAmount(
+                              candidate.amount,
+                              rates,
+                              candidate.currency,
+                              normalizedTargetCurrency
+                        );
+
+                        return convertedAmount === null
+                              ? null
+                              : {
+                                      amount: Number(convertedAmount.toFixed(2)),
+                                      currency: normalizedTargetCurrency,
+                                      sourceAmount: candidate.amount,
+                                      sourceCurrency: candidate.currency,
+                                };
+                  })
+                  .filter((candidate): candidate is MarketValue => candidate !== null)
+                  .sort((a, b) => a.amount - b.amount);
+
+            if (!convertedCandidates.length) {
+                  throw new AppError(
+                        `Unable to convert barcode price to ${normalizedTargetCurrency}. Please enter the selling price manually.`,
+                        502
+                  );
+            }
+
+            return convertedCandidates[0];
+      };
+
+      return {
+            expected: convertAndChooseLowest(expectedCandidates),
+            sale: convertAndChooseLowest(saleCandidates),
+      };
 };
 
 const normalizeCsvHeader = (value: string) =>
@@ -784,6 +859,11 @@ const createInventoryFromBarcode = async (
       }
 
       const userObjectId = new Types.ObjectId(userId);
+      const inventoryOwner = await User.findById(userObjectId).select('currency').lean();
+      if (!inventoryOwner) {
+            throw new AppError('User not found', 404);
+      }
+      const inventoryCurrency = String(inventoryOwner.currency || 'USD').trim().toUpperCase();
 
       const barcodeResult = await barcodeService.searchByBarcode(cleanCode);
       const rawData =
@@ -799,18 +879,20 @@ const createInventoryFromBarcode = async (
       const fallbackName = resolvedTitle || (barcodeResult.brand ? `${barcodeResult.brand} ${barcodeResult.name}` : barcodeResult.name);
       const itemName = fallbackName?.trim() || 'Unknown Product';
       const imeiNumber = String(payload.imeiNumber ?? '').trim() || barcodeResult.barcode || cleanCode;
-      const estimatedMarketValue = extractMarketValue(barcodeResult);
+      const marketPricing = await extractMarketPricing(barcodeResult, inventoryCurrency);
       const aiInsight = await getOpenAiInsight({
             imei: imeiNumber,
             deviceName: itemName,
             deviceStatus: 'clean',
             riskLabel: 'Low Risk',
             sourceText: JSON.stringify(barcodeResult),
-            estimatedMarketValue,
+            estimatedMarketValue: marketPricing.expected.amount,
+            currency: marketPricing.expected.currency,
       });
 
       const purchasePrice = parseOptionalNumber(payload.purchasePrice);
-      const expectedPrice = parseOptionalNumber(aiInsight?.estimatedMarketValueUSD) ?? estimatedMarketValue;
+      const expectedPrice = marketPricing.expected.amount;
+      const salePrice = marketPricing.sale.amount;
 
       const brand = barcodeResult.brand || undefined;
       const colorVariants = extractColorsFromName(itemName);
@@ -838,7 +920,7 @@ const createInventoryFromBarcode = async (
             const storageStr = storageVariants.length ? storageVariants.join(', ') : 'N/A';
             const aiMessage = aiInsight?.message || 'Device appears consistent with provider records.';
 
-            return `${itemName} by ${brand || 'Unknown'} in ${colorStr}, ${storageStr} storage. Condition: ${conditionUpper}. IMEI: ${imeiNumber}. Estimated value: $${expectedPrice}. ${aiMessage}`;
+            return `${itemName} by ${brand || 'Unknown'} in ${colorStr}, ${storageStr} storage. Condition: ${conditionUpper}. IMEI: ${imeiNumber}. Estimated value: ${expectedPrice} ${marketPricing.expected.currency}. ${aiMessage}`;
       };
 
       const aiDescription = generateAiDescription();
@@ -865,6 +947,7 @@ const createInventoryFromBarcode = async (
                   userId: userObjectId,
                   purchasePrice,
                   expectedPrice,
+                  salePrice,
                   currentState: normalizeCondition(payload.currentState),
                   productDetails,
                   aiDescription,
@@ -897,6 +980,7 @@ const createInventoryFromBarcode = async (
             aiDescription,
             barcodeResult,
             aiInsight,
+            marketValue: marketPricing,
       };
 };
 
