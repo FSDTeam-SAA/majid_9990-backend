@@ -349,7 +349,7 @@ export const buildStructuredScanInfo = async (imei: string, providerData: Provid
             },
             reportActions: {
                   smartInvoiceCreated: false,
-                  pdfCertificateUrl: null,
+                  pdfCertificateUrl: null as string | null,
                   isPdfGenerated: false,
             },
       };

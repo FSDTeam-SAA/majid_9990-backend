@@ -16,6 +16,7 @@ import {
 } from './deviceCheck.helpers';
 import { creditUserBalance, debitUserBalance } from '../payment/balanceTransaction.service';
 import ScanInfo from './scanInfo.model';
+import { ensureSavedScanReportPdf, getSavedScanReportPdfPath } from './scanReportPdf.service';
 
 type SingleImeiCheckResult =
       | {
@@ -212,7 +213,7 @@ const processMultipleServiceCheck = async (
                   serviceIds.map(async (svcId) => {
                         const existingScanInfo = shouldGenerateFresh
                               ? null
-                              : await getExistingScanInfoByImei(imei, svcId);
+                              : await getExistingScanInfoByImei(imei, svcId, userId);
 
                         if (existingScanInfo) {
                               return {
@@ -485,7 +486,7 @@ const processSingleImeiCheck = async (
             );
       }
 
-      const existingScanInfo = shouldGenerateFresh ? null : await getExistingScanInfoByImei(imei, serviceId);
+      const existingScanInfo = shouldGenerateFresh ? null : await getExistingScanInfoByImei(imei, serviceId, userId);
 
       if (existingScanInfo) {
             return {
@@ -744,7 +745,11 @@ export const checkImeiFromDhruV2 = async (req: Request, res: Response, next: Nex
                                     svcIds.map(async (svcId) => {
                                           // Try DB cache first unless fresh generation requested
                                           if (!shouldGenerateFresh) {
-                                                const existingScanInfo = await getExistingScanInfoByImei(imei, svcId);
+                                                const existingScanInfo = await getExistingScanInfoByImei(
+                                                      imei,
+                                                      svcId,
+                                                      userId
+                                                );
                                                 if (existingScanInfo) {
                                                       return {
                                                             serviceId: svcId,
@@ -759,6 +764,7 @@ export const checkImeiFromDhruV2 = async (req: Request, res: Response, next: Nex
                                                             // surface cached AI/risk when available so V2 responses remain rich
                                                             aiInsight: existingScanInfo.aiInsight ?? null,
                                                             riskMeter: existingScanInfo.riskMeter ?? null,
+                                                            reportId: existingScanInfo._id.toString(),
                                                       };
                                                 }
                                           }
@@ -799,6 +805,7 @@ export const checkImeiFromDhruV2 = async (req: Request, res: Response, next: Nex
                                                 aiInsight: aiAnalysis.aiInsight,
                                                 riskMeter: aiAnalysis.riskMeter,
                                                 marketValue: aiAnalysis.marketValue,
+                                                reportId: result.reportId,
                                           };
                                     })
                               );
@@ -886,6 +893,7 @@ export const checkImeiFromDhruV2 = async (req: Request, res: Response, next: Nex
                                           aiInsight: aiAnalysis.aiInsight,
                                           marketValue: aiAnalysis.marketValue,
                                           oldGenerated,
+                                          reportId: successfulResults[0]?.reportId,
                                     },
                               } as SingleImeiCheckResult;
                         }
@@ -893,7 +901,7 @@ export const checkImeiFromDhruV2 = async (req: Request, res: Response, next: Nex
                         // Single serviceId: try cache first unless fresh requested
                         const existingScanInfo = shouldGenerateFresh
                               ? null
-                              : await getExistingScanInfoByImei(imei, serviceId);
+                              : await getExistingScanInfoByImei(imei, serviceId, userId);
 
                         if (existingScanInfo) {
                               const parsedProviderData = extractProviderDataFromHtml(
@@ -916,6 +924,7 @@ export const checkImeiFromDhruV2 = async (req: Request, res: Response, next: Nex
                                           aiInsight: aiAnalysis.aiInsight ?? existingScanInfo.aiInsight ?? null,
                                           marketValue: aiAnalysis.marketValue ?? existingScanInfo.marketValue ?? null,
                                           oldGenerated: true,
+                                          _id: existingScanInfo._id.toString(),
                                     },
                               } as SingleImeiCheckResult;
                         }
@@ -970,6 +979,7 @@ export const checkImeiFromDhruV2 = async (req: Request, res: Response, next: Nex
                                           ),
                                           String(result.provider)
                                     )),
+                                    _id: result.reportId,
                                     oldGenerated: false,
                               },
                         } as SingleImeiCheckResult;
@@ -1187,6 +1197,140 @@ export const getRecentChecksHistory = async (req: Request, res: Response, next: 
                         totalPage: Math.ceil(total / limit) || 1,
                   },
             });
+      } catch (error) {
+            next(error);
+      }
+};
+
+/**
+ * Returns the complete, persisted report for one item in a user's search
+ * history. This is intentionally separate from the paginated history route:
+ * the list only needs summary fields, while the report page needs the saved
+ * provider response and all generated report fields.
+ */
+export const getCheckHistoryReport = async (req: Request, res: Response, next: NextFunction) => {
+      try {
+            const reportId = String(req.params.reportId ?? '').trim();
+
+            if (!reportId) {
+                  return res.status(400).json({
+                        success: false,
+                        message: 'Report id is required',
+                  });
+            }
+
+            const report = await ScanInfo.findOne({
+                  _id: reportId,
+                  userId: req.user._id,
+            }).lean();
+
+            if (!report) {
+                  return res.status(404).json({
+                        success: false,
+                        message: 'Saved IMEI report not found',
+                  });
+            }
+
+            return res.status(200).json({
+                  success: true,
+                  message: 'Saved IMEI report fetched successfully',
+                  data: report,
+            });
+      } catch (error) {
+            next(error);
+      }
+};
+
+/** Saves the browser-rendered report PDF so history shows the same layout. */
+export const saveCheckHistoryReportPdf = async (req: Request, res: Response, next: NextFunction) => {
+      const file = req.file;
+      let fileMoved = false;
+
+      try {
+            if (!file || file.mimetype !== 'application/pdf') {
+                  return res.status(400).json({
+                        success: false,
+                        message: 'A PDF report file is required',
+                  });
+            }
+
+            const reportId = String(req.params.reportId ?? '').trim();
+            const report = await ScanInfo.findOne({
+                  _id: reportId,
+                  userId: req.user._id,
+            }).lean();
+
+            if (!report) {
+                  return res.status(404).json({
+                        success: false,
+                        message: 'Saved IMEI report not found',
+                  });
+            }
+
+            const pdfPath = getSavedScanReportPdfPath(report._id.toString());
+            await fs.mkdir(path.dirname(pdfPath), { recursive: true });
+            await fs.rename(file.path, pdfPath);
+            fileMoved = true;
+
+            const pdfCertificateUrl = `/imei/history/${report._id}/pdf`;
+            await ScanInfo.updateOne(
+                  { _id: report._id },
+                  {
+                        $set: {
+                              'reportActions.pdfCertificateUrl': pdfCertificateUrl,
+                              'reportActions.isPdfGenerated': true,
+                        },
+                  }
+            );
+
+            return res.status(200).json({
+                  success: true,
+                  message: 'Report PDF saved successfully',
+                  data: { pdfCertificateUrl },
+            });
+      } catch (error) {
+            next(error);
+      } finally {
+            if (!fileMoved) {
+                  await safeDeleteFile(file?.path);
+            }
+      }
+};
+
+/** Returns the immutable PDF that was saved for a user's scan report. */
+export const getCheckHistoryReportPdf = async (req: Request, res: Response, next: NextFunction) => {
+      try {
+            const reportId = String(req.params.reportId ?? '').trim();
+            const report = await ScanInfo.findOne({
+                  _id: reportId,
+                  userId: req.user._id,
+            }).lean();
+
+            if (!report) {
+                  return res.status(404).json({
+                        success: false,
+                        message: 'Saved IMEI report not found',
+                  });
+            }
+
+            const pdfPath = await ensureSavedScanReportPdf(report);
+            const pdfCertificateUrl = `/imei/history/${report._id}/pdf`;
+
+            if (!report.reportActions?.isPdfGenerated || report.reportActions.pdfCertificateUrl !== pdfCertificateUrl) {
+                  await ScanInfo.updateOne(
+                        { _id: report._id },
+                        {
+                              $set: {
+                                    'reportActions.pdfCertificateUrl': pdfCertificateUrl,
+                                    'reportActions.isPdfGenerated': true,
+                              },
+                        }
+                  );
+            }
+
+            res.type('application/pdf');
+            res.setHeader('Content-Disposition', `inline; filename="IMEI-Report-${report.imei}.pdf"`);
+            return res.sendFile(pdfPath);
       } catch (error) {
             next(error);
       }
