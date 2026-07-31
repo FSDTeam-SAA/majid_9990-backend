@@ -169,6 +169,7 @@ export const getOpenAiInsight = async (params: {
       riskLabel: string;
       sourceText: string;
       estimatedMarketValue: number;
+      currency?: string;
 }) => {
       const apiKey = String(process.env.OPENAI_API_KEY ?? '').trim();
       if (!apiKey) {
@@ -186,7 +187,7 @@ export const getOpenAiInsight = async (params: {
                         messages: [
                               {
                                     role: 'system',
-                                    content: 'You are an IMEI risk analyst. Return strict JSON only with keys: title, message, estimatedMarketValueUSD.',
+                                    content: 'You are an IMEI risk analyst. Return strict JSON only with keys: title and message. Do not calculate or change prices.',
                               },
                               {
                                     role: 'user',
@@ -195,7 +196,10 @@ export const getOpenAiInsight = async (params: {
                                           deviceName: params.deviceName,
                                           deviceStatus: params.deviceStatus,
                                           riskLabel: params.riskLabel,
-                                          estimatedMarketValueUSD: params.estimatedMarketValue,
+                                          marketValue: {
+                                                amount: params.estimatedMarketValue,
+                                                currency: params.currency ?? 'USD',
+                                          },
                                           providerSummary: params.sourceText,
                                     }),
                               },
@@ -226,10 +230,10 @@ export const getOpenAiInsight = async (params: {
                         typeof parsed.message === 'string'
                               ? parsed.message
                               : 'Device appears consistent with provider records. Proceed with normal due diligence.',
-                  estimatedMarketValueUSD:
-                        typeof parsed.estimatedMarketValueUSD === 'number'
-                              ? parsed.estimatedMarketValueUSD
-                              : params.estimatedMarketValue,
+                  marketValue: {
+                        amount: params.estimatedMarketValue,
+                        currency: params.currency ?? 'USD',
+                  },
             };
       } catch {
             return null;
@@ -279,7 +283,7 @@ export const buildStructuredScanInfo = async (imei: string, providerData: Provid
       });
 
       const finalMarketValue = toNumber(
-            String(openAiInsight?.estimatedMarketValueUSD ?? estimatedMarketValue),
+            String(openAiInsight?.marketValue.amount ?? estimatedMarketValue),
             estimatedMarketValue
       );
 
@@ -345,7 +349,7 @@ export const buildStructuredScanInfo = async (imei: string, providerData: Provid
             },
             reportActions: {
                   smartInvoiceCreated: false,
-                  pdfCertificateUrl: null,
+                  pdfCertificateUrl: null as string | null,
                   isPdfGenerated: false,
             },
       };

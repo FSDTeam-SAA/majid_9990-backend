@@ -3,6 +3,8 @@ import type { Request } from 'express';
 
 const GEO_API = 'https://ipapi.co';
 const FX_API = 'https://open.er-api.com/v6/latest/USD';
+const FX_CACHE_TTL = 60 * 60 * 1000;
+let fxRatesCache: { rates: Record<string, number>; timestamp: number } | null = null;
 
 const CURRENCY_SYMBOLS: Record<string, string> = {
       USD: '$',
@@ -130,6 +132,57 @@ const getUsdToCurrencyRate = async (currencyCode: string) => {
       }
 };
 
+const getExchangeRates = async () => {
+      if (fxRatesCache && Date.now() - fxRatesCache.timestamp < FX_CACHE_TTL) {
+            return fxRatesCache.rates;
+      }
+
+      try {
+            const { data } = await axios.get(FX_API, { timeout: 5000 });
+            const rates = data?.rates;
+
+            if (!rates || typeof rates !== 'object') {
+                  return null;
+            }
+
+            fxRatesCache = {
+                  rates: rates as Record<string, number>,
+                  timestamp: Date.now(),
+            };
+
+            return fxRatesCache.rates;
+      } catch {
+            return null;
+      }
+};
+
+const convertCurrencyAmount = (
+      amount: number,
+      rates: Record<string, number> | null,
+      fromCurrency: string,
+      toCurrency: string
+) => {
+      const from = String(fromCurrency || 'USD').trim().toUpperCase();
+      const to = String(toCurrency || 'USD').trim().toUpperCase();
+
+      if (!Number.isFinite(amount)) {
+            return null;
+      }
+
+      if (from === to) {
+            return amount;
+      }
+
+      const usdToFrom = from === 'USD' ? 1 : Number(rates?.[from]);
+      const usdToTo = to === 'USD' ? 1 : Number(rates?.[to]);
+
+      if (!Number.isFinite(usdToFrom) || usdToFrom <= 0 || !Number.isFinite(usdToTo) || usdToTo <= 0) {
+            return null;
+      }
+
+      return (amount / usdToFrom) * usdToTo;
+};
+
 const convertUsdAmount = (amount: number, rate: number) => {
       const safeRate = Number.isFinite(rate) && rate > 0 ? rate : 1;
       return Number((amount * safeRate).toFixed(3));
@@ -142,6 +195,8 @@ const locationService = {
       getCurrencySymbol,
       getCurrencyInfo,
       getUsdToCurrencyRate,
+      getExchangeRates,
+      convertCurrencyAmount,
       convertUsdAmount,
       CURRENCY_SYMBOLS,
 };

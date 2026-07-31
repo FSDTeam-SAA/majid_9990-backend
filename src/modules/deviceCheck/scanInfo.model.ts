@@ -257,7 +257,10 @@ const ScanInfoSchema = new Schema(
       }
 );
 
-ScanInfoSchema.index({ imei: 1, serviceId: 1 }, { unique: true });
+// A scan belongs to the user who performed it. Keeping this uniqueness scoped
+// to the user prevents one shopkeeper's cached scan from replacing or hiding
+// another shopkeeper's history item.
+ScanInfoSchema.index({ userId: 1, imei: 1, serviceId: 1 }, { unique: true, name: 'userId_1_imei_1_serviceId_1' });
 ScanInfoSchema.index({ userId: 1, updatedAt: -1 });
 
 const ScanInfo = model('ScanInfo', ScanInfoSchema);

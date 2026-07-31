@@ -1,4 +1,5 @@
 import ScanInfo from './scanInfo.model';
+import { ensureSavedScanReportPdf } from './scanReportPdf.service';
 import { buildStructuredScanInfo } from './scanInfo.transformer';
 import { dhruService } from './dhru.service';
 import axios from 'axios';
@@ -666,8 +667,72 @@ export const resolveServiceId = (serviceId: unknown) => Number(serviceId ?? DEFA
 
 export const validateServiceId = (serviceId: number) => Number.isFinite(serviceId) && serviceId > 0;
 
-export const getExistingScanInfoByImei = async (imei: string, serviceId: number) => {
-      return ScanInfo.findOne({ imei, serviceId }).sort({ updatedAt: -1 }).lean();
+export const getExistingScanInfoByImei = async (imei: string, serviceId: number, userId?: string) => {
+      if (!userId) {
+            return ScanInfo.findOne({ imei, serviceId }).sort({ updatedAt: -1 }).lean();
+      }
+
+      const userScan = await ScanInfo.findOne({ imei, serviceId, userId }).sort({ updatedAt: -1 }).lean();
+      if (userScan) {
+            return userScan;
+      }
+
+      // Preserve the existing provider-cache behaviour while creating a
+      // history record owned by the current user. That way a cached result is
+      // still visible in search history instead of being returned anonymously.
+      const cachedScan = await ScanInfo.findOne({ imei, serviceId }).sort({ updatedAt: -1 }).lean();
+      if (!cachedScan) {
+            return null;
+      }
+
+      const {
+            _id: _sourceId,
+            userId: _sourceUserId,
+            createdAt: _createdAt,
+            updatedAt: _updatedAt,
+            ...scanData
+      } = cachedScan;
+      const copiedScan = await ScanInfo.findOneAndUpdate(
+            { imei, serviceId, userId },
+            {
+                  $set: {
+                        ...scanData,
+                        userId,
+                        reportActions: {
+                              ...scanData.reportActions,
+                              pdfCertificateUrl: null,
+                              isPdfGenerated: false,
+                        },
+                  },
+            },
+            {
+                  upsert: true,
+                  new: true,
+                  runValidators: true,
+                  setDefaultsOnInsert: true,
+            }
+      ).lean();
+
+      if (copiedScan) {
+            const pdfCertificateUrl = `/imei/history/${copiedScan._id}/pdf`;
+
+            try {
+                  await ensureSavedScanReportPdf(copiedScan);
+                  await ScanInfo.updateOne(
+                        { _id: copiedScan._id },
+                        {
+                              $set: {
+                                    'reportActions.pdfCertificateUrl': pdfCertificateUrl,
+                                    'reportActions.isPdfGenerated': true,
+                              },
+                        }
+                  );
+            } catch (error) {
+                  console.error('Failed to save cached IMEI report PDF:', error);
+            }
+      }
+
+      return copiedScan;
 };
 
 export type ImeiCheckFailure = {
@@ -682,6 +747,7 @@ export type ImeiCheckSuccess = {
       imei: string;
       serviceId: number;
       provider: string;
+      reportId?: string;
       structured: Awaited<ReturnType<typeof buildStructuredScanInfo>>;
       providerData: unknown;
 };
@@ -784,19 +850,57 @@ export const runImeiCheck = async (
       };
       const scanPayload = userId ? { ...baseScanPayload, userId } : baseScanPayload;
 
-      await ScanInfo.findOneAndUpdate({ imei, serviceId: requestedServiceId }, scanPayload, {
+      const scanFilter = userId
+            ? { imei, serviceId: requestedServiceId, userId }
+            : { imei, serviceId: requestedServiceId, userId: { $exists: false } };
+      const savedScanInfo = await ScanInfo.findOneAndUpdate(scanFilter, scanPayload, {
             upsert: true,
             new: true,
             runValidators: true,
             setDefaultsOnInsert: true,
       });
 
+      let reportActions: {
+            smartInvoiceCreated: boolean;
+            pdfCertificateUrl: string | null;
+            isPdfGenerated: boolean;
+      } = structuredInfo.reportActions;
+
+      if (userId && savedScanInfo) {
+            const pdfCertificateUrl = `/imei/history/${savedScanInfo._id}/pdf`;
+
+            try {
+                  await ensureSavedScanReportPdf(savedScanInfo.toObject());
+                  await ScanInfo.updateOne(
+                        { _id: savedScanInfo._id },
+                        {
+                              $set: {
+                                    'reportActions.pdfCertificateUrl': pdfCertificateUrl,
+                                    'reportActions.isPdfGenerated': true,
+                              },
+                        }
+                  );
+                  reportActions = {
+                        ...structuredInfo.reportActions,
+                        pdfCertificateUrl,
+                        isPdfGenerated: true,
+                  };
+            } catch (error) {
+                  // The scan itself is still valid. A history request can retry PDF creation from the saved report.
+                  console.error('Failed to save IMEI report PDF:', error);
+            }
+      }
+
       return {
             ok: true,
             imei,
             serviceId: usedServiceId,
             provider: dhruService.getProvider(),
-            structured: structuredInfo,
+            reportId: savedScanInfo?._id?.toString(),
+            structured: {
+                  ...structuredInfo,
+                  reportActions,
+            },
             providerData: providerPayload,
       };
 };
