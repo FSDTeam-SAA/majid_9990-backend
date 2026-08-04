@@ -24,13 +24,14 @@ const getInvoiceByShopkeeperId = catchAsync(async (req, res) => {
       if (req.user.role === 'staff' && req.user.shopkeeperId) {
             shopkeeperId = req.user.shopkeeperId.toString();
       }
-      const result = await invoiceService.getInvoiceByShopkeeperId(shopkeeperId);
+      const result = await invoiceService.getInvoiceByShopkeeperId(shopkeeperId, req.query);
 
       sendResponse(res, {
             statusCode: StatusCodes.OK,
             success: true,
             message: 'Invoices fetched successfully',
-            data: result,
+            data: Array.isArray(result) ? result : result.data,
+            meta: Array.isArray(result) ? undefined : result.meta,
       });
 });
 

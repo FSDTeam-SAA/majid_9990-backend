@@ -14,6 +14,19 @@ const assertValidRepairRequestId = (id: string) => {
       }
 };
 
+const getPagination = (query: { page?: unknown; limit?: unknown }) => {
+      const requestedPage = Number.parseInt(String(query.page ?? ''), 10);
+      const requestedLimit = Number.parseInt(String(query.limit ?? ''), 10);
+      const page = Number.isFinite(requestedPage) && requestedPage > 0 ? requestedPage : 1;
+      const limit = Number.isFinite(requestedLimit) && requestedLimit > 0 ? Math.min(requestedLimit, 100) : 10;
+
+      return {
+            page,
+            limit,
+            skip: (page - 1) * limit,
+      };
+};
+
 const addNewRepairRequest = async (payload: IRepairRequest, files: Express.Multer.File[] = [], userId: string) => {
       const user = await User.findById(userId);
       if (!user) throw new AppError('User not found', StatusCodes.UNAUTHORIZED);
@@ -49,12 +62,10 @@ const addNewRepairRequest = async (payload: IRepairRequest, files: Express.Multe
 };
 
 const getMyRepairRequestsHistory = async (userId: string, query: any) => {
-      const page = Number(query.page) || 1;
-      const limit = Number(query.limit) || 10;
-      const skip = (page - 1) * limit;
+      const { page, limit, skip } = getPagination(query);
 
       const filter = { userId };
-      const data = await RepairRequest.find(filter).skip(skip).limit(limit).sort({ createdAt: -1 });
+      const data = await RepairRequest.find(filter).skip(skip).limit(limit).sort({ createdAt: -1, _id: -1 });
       const total = await RepairRequest.countDocuments(filter);
 
       return {
@@ -63,7 +74,7 @@ const getMyRepairRequestsHistory = async (userId: string, query: any) => {
                   page,
                   limit,
                   total,
-                  totalPage: Math.ceil(total / limit),
+                  totalPage: Math.max(1, Math.ceil(total / limit)),
             },
       };
 };

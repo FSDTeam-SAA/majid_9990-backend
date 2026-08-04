@@ -209,18 +209,54 @@ const createInvoice = async (payload: IInvoicePayload, file?: Express.Multer.Fil
       return result;
 };
 
-const getInvoiceByShopkeeperId = async (shopkeeperId: string) => {
+type InvoicePaginationQuery = {
+      page?: unknown;
+      limit?: unknown;
+};
+
+const getInvoiceByShopkeeperId = async (shopkeeperId: string, query: InvoicePaginationQuery = {}) => {
       const trimmedShopkeeperId = String(shopkeeperId ?? '').trim();
 
       if (!Types.ObjectId.isValid(trimmedShopkeeperId)) {
             throw new AppError('Invalid shopkeeperId', StatusCodes.BAD_REQUEST);
       }
 
-      return await Invoice.find({ shopkeeperId: trimmedShopkeeperId })
+      const shouldPaginate = query.page !== undefined || query.limit !== undefined;
+
+      if (!shouldPaginate) {
+            return await Invoice.find({ shopkeeperId: trimmedShopkeeperId })
+                  .populate('shopkeeperId')
+                  .populate('customerInfo')
+                  .populate('itemsIds', 'itemName imeiNumber expectedPrice image')
+                  .sort({ createdAt: -1, _id: -1 });
+      }
+
+      const requestedPage = Number.parseInt(String(query.page ?? ''), 10);
+      const requestedLimit = Number.parseInt(String(query.limit ?? ''), 10);
+      const page = Number.isFinite(requestedPage) && requestedPage > 0 ? requestedPage : 1;
+      const limit = Number.isFinite(requestedLimit) && requestedLimit > 0 ? Math.min(requestedLimit, 100) : 10;
+      const filter = { shopkeeperId: trimmedShopkeeperId };
+
+      const [data, total] = await Promise.all([
+            Invoice.find(filter)
             .populate('shopkeeperId')
             .populate('customerInfo')
             .populate('itemsIds', 'itemName imeiNumber expectedPrice image')
-            .sort({ createdAt: -1 });
+            .sort({ createdAt: -1, _id: -1 })
+            .skip((page - 1) * limit)
+            .limit(limit),
+            Invoice.countDocuments(filter),
+      ]);
+
+      return {
+            data,
+            meta: {
+                  page,
+                  limit,
+                  total,
+                  totalPage: Math.max(1, Math.ceil(total / limit)),
+            },
+      };
 };
 
 const getAllInvoices = async () => {
