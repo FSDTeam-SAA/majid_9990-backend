@@ -8,6 +8,7 @@ const router = Router();
 router.post('/add', protect, upload.array('images', 6), repairRequestController.addNewRepairRequest);
 router.get('/completed', protect, repairRequestController.getCompletedRepairRequests); 
 router.get('/my-history', protect, repairRequestController.getMyRepairRequestsHistory);
+router.get('/technicians', protect, repairRequestController.getTechnicians);
 router.get('/:id', repairRequestController.getSingleRepairRequest);
 router.put('/update-status/:id', protect, repairRequestController.updateStatusByShopKeeper);
 router.put('/add-note/:id', protect, upload.array('images', 6), repairRequestController.addNoteByShopKeeper);

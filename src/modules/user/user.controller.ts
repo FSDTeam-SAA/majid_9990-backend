@@ -2,6 +2,7 @@ import { StatusCodes } from 'http-status-codes';
 import catchAsync from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
 import userService from './user.service';
+import { createContactVCard, getContactCardFilename } from './user.vcard';
 
 const registerUser = catchAsync(async (req, res) => {
       const result = await userService.registerUser(req.body);
@@ -70,6 +71,21 @@ const getMyProfile = catchAsync(async (req, res) => {
             message: 'Your profile has been retrieved successfully.',
             data: result,
       });
+});
+
+const downloadShopkeeperContact = catchAsync(async (req, res) => {
+      const shopkeeperId = Array.isArray(req.params.shopkeeperId)
+            ? req.params.shopkeeperId[0]
+            : req.params.shopkeeperId;
+      const contact = await userService.getShopkeeperContact(shopkeeperId);
+      const filename = getContactCardFilename(contact);
+
+      res.status(StatusCodes.OK).set({
+            'Content-Type': 'text/vcard; charset=utf-8',
+            'Content-Disposition': `attachment; filename="${filename}"; filename*=UTF-8''${encodeURIComponent(filename)}`,
+            'Cache-Control': 'private, no-store',
+      });
+      res.send(createContactVCard(contact));
 });
 
 const updateUserProfile = catchAsync(async (req, res) => {
@@ -160,6 +176,7 @@ const userController = {
       resendOtpCode,
       getAllUsers,
       getMyProfile,
+      downloadShopkeeperContact,
       updateUserProfile,
       getAdminId,
       deleteUser,

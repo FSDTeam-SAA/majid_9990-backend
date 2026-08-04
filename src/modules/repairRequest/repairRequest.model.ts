@@ -35,6 +35,7 @@ const RepairRequestSchema = new Schema<IRepairRequest>(
             deviceModel: { type: String, required: true },
             IMEINumber: { type: String },
             description: { type: String, required: true },
+            technician: { type: String, trim: true, default: '' },
             technicianFeedback: { type: String, default: '' },
             status: {
                   type: String,

@@ -13,6 +13,7 @@ router.post('/verify-email', protect, userController.verifyEmail);
 router.post('/resend-otp', protect, userController.resendOtpCode);
 
 router.get('/all-users', userController.getAllUsers);
+router.get('/contact-card/:shopkeeperId', userController.downloadShopkeeperContact);
 router.get('/my-profile', protect, userController.getMyProfile);
 router.get('/shopkeeper', userController.getAllShopkeepers);
 router.get('/balance-history', protect, userController.getBalanceHistory);
