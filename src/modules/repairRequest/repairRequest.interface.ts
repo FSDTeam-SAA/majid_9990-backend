@@ -37,6 +37,7 @@ export interface IRepairRequest {
       price?: number; 
       IMEINumber: string;
       description: string;
+      technician?: string;
       technicianFeedback?: string;
       status: RepairStatus;
       waitingForPartsDays?: number;

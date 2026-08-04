@@ -104,6 +104,18 @@ const getUserDescriptions = catchAsync(async (req, res) => {
       });
 });
 
+const getTechnicians = catchAsync(async (req, res) => {
+      const id = req.user.role === 'staff' && req.user.shopkeeperId ? req.user.shopkeeperId.toString() : req.user.id;
+      const result = await repairRequestService.getTechnicians(id);
+
+      sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: 'Technicians retrieved successfully',
+            data: result,
+      });
+});
+
 const getCompletedRepairRequests = catchAsync(async (req, res) => {
       const id = req.user.role === 'staff' && req.user.shopkeeperId ? req.user.shopkeeperId.toString() : req.user.id;
       const result = await repairRequestService.getCompletedRepairRequests(id, req.query);
@@ -127,6 +139,7 @@ const repairRequestController = {
       addTeachNoteByTechnician,
       generateTechnicianFeedback,
       getUserDescriptions,
+      getTechnicians,
       getCompletedRepairRequests,
 };
 

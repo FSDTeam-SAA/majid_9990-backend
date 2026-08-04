@@ -54,6 +54,7 @@ const addNewRepairRequest = async (payload: IRepairRequest, files: Express.Multe
             deviceModel: payload.deviceModel,
             IMEINumber: payload.IMEINumber,
             description: payload.description,
+            technician: payload.technician?.trim(),
             images,
             status: payload.status || 'inProgress',
       });
@@ -350,6 +351,15 @@ const getUserDescriptions = async (userId: string) => {
       return repairRequests;
 };
 
+const getTechnicians = async (userId: string) => {
+      const technicians = await RepairRequest.distinct('technician', {
+            userId,
+            technician: { $exists: true, $ne: '' },
+      });
+
+      return technicians.sort((first, second) => first.localeCompare(second));
+};
+
 // Add this method to the repairRequestService object
 const getCompletedRepairRequests = async (userId: string, query: any) => {
       const page = Number(query.page) || 1;
@@ -384,6 +394,7 @@ const repairRequestService = {
       addTeachNoteByTechnician,
       generateTechnicianFeedbackByRequest,
       getUserDescriptions,
+      getTechnicians,
       getCompletedRepairRequests,
       sendCompletionEmail,
 };
