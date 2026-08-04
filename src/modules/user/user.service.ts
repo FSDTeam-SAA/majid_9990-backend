@@ -12,6 +12,11 @@ import { getUserBalanceHistory } from '../payment/balanceTransaction.service';
 import { IUser } from './user.interface';
 import { User } from './user.model';
 
+type ShopkeeperContact = Pick<
+      IUser,
+      'firstName' | 'lastName' | 'email' | 'phone' | 'shopName' | 'shopAddress' | 'whatsappNumber'
+>;
+
 const registerUser = async (payload: IUser) => {
       if (!payload.role) {
             throw new AppError('You have to select a role ', StatusCodes.BAD_REQUEST);
@@ -240,6 +245,26 @@ const getMyProfile = async (email: string) => {
       return result;
 };
 
+const getShopkeeperContact = async (shopkeeperId: string): Promise<ShopkeeperContact> => {
+      if (!Types.ObjectId.isValid(shopkeeperId)) {
+            throw new AppError('Shopkeeper not found', StatusCodes.NOT_FOUND);
+      }
+
+      const shopkeeper = await User.findOne({
+            _id: shopkeeperId,
+            role: 'shopkeeper',
+            isVerified: true,
+      })
+            .select('firstName lastName email phone shopName shopAddress whatsappNumber')
+            .lean();
+
+      if (!shopkeeper) {
+            throw new AppError('Shopkeeper not found', StatusCodes.NOT_FOUND);
+      }
+
+      return shopkeeper;
+};
+
 const updateUserProfile = async (payload: any, email: string, file: any) => {
       const user = await User.findOne({ email }).select('image');
       if (!user) throw new AppError('No account found with the provided credentials.', StatusCodes.NOT_FOUND);
@@ -439,6 +464,7 @@ const userService = {
       resendOtpCode,
       getAllUsers,
       getMyProfile,
+      getShopkeeperContact,
       updateUserProfile,
       getAdminId,
       deleteUserFromDB,
