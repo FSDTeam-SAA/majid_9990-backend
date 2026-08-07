@@ -5,6 +5,7 @@ import { deleteFromCloudinary, uploadToCloudinary } from '../../utils/cloudinary
 import { User } from '../user/user.model';
 import { IInvoice, IInvoiceOrderDetails, IInvoicePayload, IInvoicePaymentDetails } from './invoice.interface';
 import { Invoice } from './invoice.model';
+import { Inventory } from '../inventory/inventory.model';
 
 const resolveShopkeeperId = async (shopkeeperId?: string) => {
       const trimmedShopkeeperId = String(shopkeeperId ?? '').trim();
@@ -161,6 +162,23 @@ const createInvoice = async (payload: IInvoicePayload, file?: Express.Multer.Fil
       const totalAmount = normalizeOptionalNumber(payload.totalAmount, 'totalAmount');
       const dueAmount = normalizeOptionalNumber(payload.dueAmount, 'dueAmount');
       const amountPaid = normalizeOptionalNumber(payload.amountPaid, 'amountPaid');
+      let lineItems: Array<{ itemId: string; quantity: number; variantId?: string }> = [];
+      try {
+            lineItems = typeof payload.lineItems === 'string' ? JSON.parse(payload.lineItems) : payload.lineItems || [];
+      } catch {
+            throw new AppError('lineItems must be valid JSON', StatusCodes.BAD_REQUEST);
+      }
+      for (const line of lineItems) {
+            if (!Types.ObjectId.isValid(line.itemId) || !Number.isInteger(Number(line.quantity)) || Number(line.quantity) <= 0) {
+                  throw new AppError('Invalid invoice line item', StatusCodes.BAD_REQUEST);
+            }
+            const stockFilter: any = line.variantId
+                  ? { _id: line.itemId, variants: { $elemMatch: { _id: line.variantId, quantity: { $gte: Number(line.quantity) } } } }
+                  : { _id: line.itemId, quantity: { $gte: Number(line.quantity) } };
+            if (!(await Inventory.exists(stockFilter))) {
+                  throw new AppError('One or more selected items no longer have enough stock', StatusCodes.CONFLICT);
+            }
+      }
 
       if (!type) {
             throw new AppError('type is required', StatusCodes.BAD_REQUEST);
@@ -204,7 +222,16 @@ const createInvoice = async (payload: IInvoicePayload, file?: Express.Multer.Fil
             discountName: payload.discountName?.trim(),
             discountPercentage: normalizeOptionalNumber(payload.discountPercentage, 'discountPercentage'),
             discountAmount: normalizeOptionalNumber(payload.discountAmount, 'discountAmount'),
+            lineItems,
       });
+
+      for (const line of lineItems) {
+            if (line.variantId) {
+                  await Inventory.updateOne({ _id: line.itemId }, { $inc: { 'variants.$[variant].quantity': -Number(line.quantity) } }, { arrayFilters: [{ 'variant._id': line.variantId, 'variant.quantity': { $gte: Number(line.quantity) } }] });
+            } else {
+                  await Inventory.updateOne({ _id: line.itemId, quantity: { $gte: Number(line.quantity) } }, { $inc: { quantity: -Number(line.quantity) } });
+            }
+      }
 
       return result;
 };

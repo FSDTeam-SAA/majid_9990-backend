@@ -41,6 +41,7 @@ const invoiceSchema = new Schema<IInvoice>(
                   ref: 'Inventory',
                   default: [],
             },
+            lineItems: [{ itemId: { type: Schema.Types.ObjectId, ref: 'Inventory', required: true }, quantity: { type: Number, required: true, min: 1 }, variantId: { type: Schema.Types.ObjectId } }],
             totalAmount: {
                   type: Number,
                   default: null,

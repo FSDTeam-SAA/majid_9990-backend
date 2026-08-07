@@ -4,6 +4,19 @@ export type TCondition = 'new' | 'good condition';
 export type TInventoryType = 'inventory' | 'sold';
 export type TInventoryStatus = 'inventory' | 'sold' | 'due' | 'draft';
 
+export interface IInventoryVariant {
+      _id?: Types.ObjectId;
+      purchasePrice?: number;
+      expectedPrice?: number;
+      quantity: number;
+      color?: string;
+      storage?: string;
+      imeiNumber?: string;
+      currentState?: TCondition;
+      image?: { public_id: string; url: string };
+      supplierId?: Types.ObjectId;
+}
+
 export interface IInventory {
       itemName: string;
       categoryId?: Types.ObjectId;
@@ -41,4 +54,5 @@ export interface IInventory {
       type?: TInventoryType;
       status?: TInventoryStatus;
       currentState?: TCondition;
+      variants?: IInventoryVariant[];
 }

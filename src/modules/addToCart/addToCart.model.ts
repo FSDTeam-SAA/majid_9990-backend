@@ -18,6 +18,7 @@ const addToCartSchema = new Schema<IAddToCart>(
                   required: true,
                   min: 1,
             },
+            variantId: { type: Schema.Types.ObjectId },
       },
       {
             timestamps: true,
@@ -25,6 +26,6 @@ const addToCartSchema = new Schema<IAddToCart>(
       }
 );
 
-addToCartSchema.index({ shopkeeperId: 1, itemId: 1 }, { unique: true });
+addToCartSchema.index({ shopkeeperId: 1, itemId: 1, variantId: 1 }, { unique: true });
 
 export const AddToCart = model<IAddToCart>('AddToCart', addToCartSchema);

@@ -35,6 +35,9 @@ importers:
       http-status-code:
         specifier: ^2.1.0
         version: 2.1.0
+      http-status-codes:
+        specifier: ^2.3.0
+        version: 2.3.0
       jsonwebtoken:
         specifier: ^9.0.2
         version: 9.0.3

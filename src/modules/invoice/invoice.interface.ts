@@ -30,6 +30,12 @@ export interface IInvoiceOrderDetails {
       deliveryTo?: string;
 }
 
+export interface IInvoiceLineItem {
+      itemId: string;
+      quantity: number;
+      variantId?: string;
+}
+
 export interface IInvoice {
       shopkeeperId: Types.ObjectId;
       invoice: IInvoiceFile;
@@ -52,6 +58,7 @@ export interface IInvoice {
       discountName?: string;
       discountPercentage?: number;
       discountAmount?: number;
+      lineItems?: IInvoiceLineItem[];
 }
 
 export interface IInvoicePayload {
@@ -74,4 +81,5 @@ export interface IInvoicePayload {
       discountName?: string;
       discountPercentage?: number;
       discountAmount?: number;
+      lineItems?: IInvoiceLineItem[] | string;
 }

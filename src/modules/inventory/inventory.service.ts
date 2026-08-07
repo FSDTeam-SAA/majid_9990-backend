@@ -49,6 +49,49 @@ const parseStringArray = (value: unknown) => {
       return [];
 };
 
+const normalizeVariants = async (value: unknown, files: Express.Multer.File[] = []) => {
+      let rawVariants: unknown[] = [];
+      try {
+            rawVariants = Array.isArray(value) ? value : JSON.parse(String(value || '[]'));
+      } catch {
+            throw new AppError('variants must be valid JSON', 400);
+      }
+
+      if (!Array.isArray(rawVariants)) {
+            throw new AppError('variants must be an array', 400);
+      }
+
+      return await Promise.all(
+            rawVariants.map(async (raw, index) => {
+                  const variant = (raw && typeof raw === 'object' ? raw : {}) as Record<string, unknown>;
+                  const quantity = parseOptionalNumber(variant.quantity);
+                  if (quantity === undefined || quantity < 0 || !Number.isInteger(quantity)) {
+                        throw new AppError(`Variant ${index + 1} quantity must be a non-negative whole number`, 400);
+                  }
+                  const imeiNumber = String(variant.imeiNumber || '').trim();
+                  const imageUploadIndex = parseOptionalNumber(variant.imageUploadIndex);
+                  const file = imageUploadIndex === undefined ? undefined : files[imageUploadIndex];
+                  const uploaded = file ? await uploadToCloudinary(file.path) : null;
+                  return {
+                        ...(variant._id ? { _id: variant._id } : {}),
+                        purchasePrice: parseOptionalNumber(variant.purchasePrice),
+                        expectedPrice: parseOptionalNumber(variant.expectedPrice),
+                        quantity,
+                        color: String(variant.color || '').trim() || undefined,
+                        storage: String(variant.storage || '').trim() || undefined,
+                        imeiNumber: imeiNumber || undefined,
+                        currentState: variant.currentState === 'new' ? 'new' : 'good condition',
+                        supplierId: String(variant.supplierId || '').trim() || undefined,
+                        image: uploaded
+                              ? { public_id: uploaded.public_id, url: uploaded.secure_url }
+                              : variant.image && typeof variant.image === 'object'
+                                ? variant.image
+                                : undefined,
+                  };
+            })
+      );
+};
+
 type MarketValue = {
       amount: number;
       currency: string;
@@ -692,7 +735,7 @@ const normalizeBulkCurrentState = (value: unknown): IInventory['currentState'] |
       return undefined;
 };
 
-const createInventory = async (payload: Partial<IInventory>, file?: any) => {
+const createInventory = async (payload: Partial<IInventory>, file?: any, variantFiles: Express.Multer.File[] = []) => {
       const normalizedPayload = syncInventoryState(payload);
       const inventoryImages = parseStringArray(payload.images);
       const sourceImageUrls = parseStringArray(payload.sourceImageUrls);
@@ -706,6 +749,15 @@ const createInventory = async (payload: Partial<IInventory>, file?: any) => {
                   : sourceImageUrls[0] || inventoryImages[0] || payloadImageUrl;
       const normalizedSalePrice = parseOptionalNumber(payload.salePrice);
       const normalizedExpectedPrice = parseOptionalNumber(payload.expectedPrice);
+      const variants = await normalizeVariants((payload as any).variants, variantFiles);
+
+      for (const variant of variants) {
+            if (variant.imeiNumber) {
+                  const exists = await Inventory.exists({ $or: [{ imeiNumber: variant.imeiNumber }, { 'variants.imeiNumber': variant.imeiNumber }] });
+                  if (exists) throw new AppError(`Inventory with IMEI ${variant.imeiNumber} already exists`, 409);
+            }
+      }
+      if (variants.length) normalizedPayload.variants = variants as IInventory['variants'];
 
       if (normalizedSalePrice !== undefined) {
             normalizedPayload.salePrice = normalizedSalePrice;
@@ -718,7 +770,7 @@ const createInventory = async (payload: Partial<IInventory>, file?: any) => {
       }
 
       if (payload.imeiNumber) {
-            const existingInventory = await Inventory.findOne({ imeiNumber: payload.imeiNumber });
+            const existingInventory = await Inventory.findOne({ $or: [{ imeiNumber: payload.imeiNumber }, { 'variants.imeiNumber': payload.imeiNumber }] });
 
             if (existingInventory) {
                   throw new AppError(`Inventory with IMEI ${payload.imeiNumber} already exists`, 409);
@@ -1113,7 +1165,7 @@ const getSingleInventory = async (id: string) => {
       return await Inventory.findById(id).populate('userId');
 };
 
-const updateInventory = async (id: string, payload: Partial<IInventory>, file?: any) => {
+const updateInventory = async (id: string, payload: Partial<IInventory>, file?: any, variantFiles: Express.Multer.File[] = []) => {
       assertValidObjectId(id, 'id');
 
       // Get old inventory to check category change and image fallbacks
@@ -1132,6 +1184,9 @@ const updateInventory = async (id: string, payload: Partial<IInventory>, file?: 
                   : sourceImageUrls[0] || inventoryImages[0] || payloadImageUrl || oldInventory?.sourceImageUrl || oldInventory?.image?.url || oldInventory?.images?.[0];
       const normalizedSalePrice = parseOptionalNumber(payload.salePrice);
       const normalizedExpectedPrice = parseOptionalNumber(payload.expectedPrice);
+      if ((payload as any).variants !== undefined) {
+            normalizedPayload.variants = (await normalizeVariants((payload as any).variants, variantFiles)) as IInventory['variants'];
+      }
 
       if (normalizedSalePrice !== undefined) {
             normalizedPayload.salePrice = normalizedSalePrice;

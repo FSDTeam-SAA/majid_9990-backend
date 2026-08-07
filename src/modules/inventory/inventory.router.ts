@@ -5,7 +5,7 @@ import inventoryController from './inventory.controller';
 
 const router = Router();
 
-router.post('/create', protect, upload.single('image'), inventoryController.createInventory);
+router.post('/create', protect, upload.fields([{ name: 'image', maxCount: 1 }, { name: 'variantImages', maxCount: 20 }]), inventoryController.createInventory);
 router.post('/create-from-barcode', protect, upload.single('image'), inventoryController.createInventoryFromBarcode);
 router.post('/import-csv', protect, upload.single('file'), inventoryController.importInventoriesFromCsv);
 router.get('/import-csv/template', protect, inventoryController.getInventoryCsvTemplate);
@@ -22,7 +22,7 @@ router.get('/user/:userId', protect, inventoryController.getInventoryByUserId);
 
 router.get('/:id', protect, inventoryController.getSingleInventory);
 
-router.put('/:id', protect, upload.single('image'), inventoryController.updateInventory);
+router.put('/:id', protect, upload.fields([{ name: 'image', maxCount: 1 }, { name: 'variantImages', maxCount: 20 }]), inventoryController.updateInventory);
 
 router.delete('/:id', protect, inventoryController.deleteInventory);
 

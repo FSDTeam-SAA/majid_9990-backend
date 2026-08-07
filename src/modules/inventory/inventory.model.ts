@@ -130,6 +130,19 @@ const inventorySchema = new Schema<IInventory>(
                   enum: ['new', 'good condition'],
                   default: 'new',
             },
+            variants: [
+                  {
+                        purchasePrice: { type: Number },
+                        expectedPrice: { type: Number },
+                        quantity: { type: Number, required: true, min: 0 },
+                        color: { type: String, trim: true },
+                        storage: { type: String, trim: true },
+                        imeiNumber: { type: String, trim: true },
+                        currentState: { type: String, enum: ['new', 'good condition'], default: 'new' },
+                        image: { public_id: String, url: String },
+                        supplierId: { type: Schema.Types.ObjectId, ref: 'Supplier' },
+                  },
+            ],
             customerName: {
                   type: String,
                   trim: true,

@@ -34,6 +34,7 @@ const ensureItemExists = async (itemId: string) => {
       if (!item) {
             throw new AppError('Inventory item not found', StatusCodes.NOT_FOUND);
       }
+      return item;
 };
 
 const validateQuantity = (quantity?: number) => {
@@ -52,11 +53,15 @@ const createAddToCart = async (payload: IAddToCartPayload) => {
       const shopkeeperId = validateObjectId(String(payload.shopkeeperId), 'shopkeeperId');
       const itemId = validateObjectId(String(payload.itemId), 'itemId');
       const quantity = validateQuantity(payload.quantity);
+      const variantId = payload.variantId ? validateObjectId(String(payload.variantId), 'variantId') : undefined;
 
       await ensureShopkeeperExists(shopkeeperId);
-      await ensureItemExists(itemId);
+      const item = await ensureItemExists(itemId);
 
-      const existing = await AddToCart.findOne({ shopkeeperId, itemId });
+      if (variantId && !item.variants?.some((variant: any) => String(variant._id) === variantId)) {
+            throw new AppError('Inventory variant not found', StatusCodes.NOT_FOUND);
+      }
+      const existing = await AddToCart.findOne({ shopkeeperId, itemId, variantId: variantId ?? null });
 
       if (existing) {
             existing.quantity += quantity;
@@ -73,6 +78,7 @@ const createAddToCart = async (payload: IAddToCartPayload) => {
             shopkeeperId,
             itemId,
             quantity,
+            variantId,
       });
 
       await result.populate([

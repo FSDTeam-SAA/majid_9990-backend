@@ -11,7 +11,8 @@ const createInventory = catchAsync(async (req, res) => {
             userId,
       };
 
-      const result = await inventoryService.createInventory(payload, req.file);
+      const files = req.files as Record<string, Express.Multer.File[]> | undefined;
+      const result = await inventoryService.createInventory(payload, files?.image?.[0], files?.variantImages);
 
       sendResponse(res, {
             statusCode: StatusCodes.CREATED,
@@ -118,7 +119,8 @@ const getSingleInventory = catchAsync(async (req, res) => {
 });
 
 const updateInventory = catchAsync(async (req, res) => {
-      const result = await inventoryService.updateInventory(req.params.id as string, req.body, req.file);
+      const files = req.files as Record<string, Express.Multer.File[]> | undefined;
+      const result = await inventoryService.updateInventory(req.params.id as string, req.body, files?.image?.[0], files?.variantImages);
 
       sendResponse(res, {
             statusCode: StatusCodes.OK,
