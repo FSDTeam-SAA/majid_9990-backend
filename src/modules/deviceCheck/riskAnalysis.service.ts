@@ -24,9 +24,13 @@ const analyzeRisk = async (imei: string): Promise<DeviceChecksResponse & RiskRes
 const analyzeDeviceAnalysis = async (
       imei: string,
       serviceId: number,
-      userId?: string
+      userId?: string,
+      shopId?: string
 ): Promise<DeviceAnalysisResponse | ImeiCheckFailure> => {
-      const [checkResult, risk] = await Promise.all([runImeiCheck(imei, serviceId, userId), analyzeRisk(imei)]);
+      const [checkResult, risk] = await Promise.all([
+            runImeiCheck(imei, serviceId, userId, shopId),
+            analyzeRisk(imei),
+      ]);
 
       if (!checkResult.ok) {
             return checkResult;

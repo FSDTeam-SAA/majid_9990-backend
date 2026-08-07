@@ -9,6 +9,7 @@ import { companyName } from "../../lib/globalType";
 import verificationCodeTemplate from "../../utils/verificationCodeTemplate";
 import config from '../../config/config';
 import { createToken, verifyToken } from '../../utils/tokenGenerate';
+import shopService from '../shop/shop.service';
 
 const login = async (payload: { email: string; password: string }) => {
   const { email, password } = payload;
@@ -49,6 +50,21 @@ const login = async (payload: { email: string; password: string }) => {
     config.jwtRefreshTokenExpiresIn as string,
   );
 
+  let shops: unknown[] = [];
+  let multiShopEnabled = false;
+  let defaultShopId: string | null = null;
+
+  if (user.role === 'shopkeeper' || user.role === 'staff') {
+    try {
+      const entitlement = await shopService.getEntitlement(user);
+      shops = entitlement.shops;
+      multiShopEnabled = entitlement.multiShopEnabled;
+      defaultShopId = entitlement.defaultShopId;
+    } catch {
+      // Entitlement is an enhancement to the login payload. Never block login.
+    }
+  }
+
   return {
     accessToken,
     refreshToken,
@@ -66,6 +82,9 @@ const login = async (payload: { email: string; password: string }) => {
       dateOfBirth: user.dateOfBirth,
       shopkeeperId: user.role === 'staff' ? user.shopkeeperId : undefined,
     },
+    shops,
+    multiShopEnabled,
+    defaultShopId,
   };
 };
 

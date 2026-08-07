@@ -31,6 +31,7 @@ export interface ITechNote {
 
 export interface IRepairRequest {
       userId: Types.ObjectId;
+      shopId?: Types.ObjectId | null;
       firstName: string;
       email: string;
       deviceModel: string;

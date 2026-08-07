@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises';
 import XLSX from 'xlsx';
 import AppError from '../../errors/AppError';
-import { Types } from 'mongoose';
+import { FilterQuery, Types } from 'mongoose';
 import { IBarcodeSearchResult } from '../barcode/barcode.interface';
 import barcodeService from '../barcode/barcode.service';
 import { getOpenAiInsight } from '../deviceCheck/scanInfo.transformer';
@@ -331,7 +331,8 @@ const parseInventoryCsvRows = (filePath: string) => {
 
 const buildInventoryPayloadFromCsvRow = (
       row: Record<string, unknown> & { rowNumber: number },
-      defaultUserId?: string
+      defaultUserId?: string,
+      defaultStoreId?: string
 ) => {
       const itemName = toQueryString(getCsvValue(row, ['itemName', 'name', 'productName', 'title'])).trim();
       const imeiNumber = toQueryString(getCsvValue(row, ['imeiNumber', 'imei', 'serialNumber'])).trim();
@@ -354,7 +355,9 @@ const buildInventoryPayloadFromCsvRow = (
 
       const userId = parseObjectId(userIdValue, 'userId');
       const supplierId = parseObjectId(getCsvValue(row, ['supplierId']), 'supplierId');
-      const storeId = parseObjectId(getCsvValue(row, ['storeId']), 'storeId');
+      const storeId =
+            parseObjectId(getCsvValue(row, ['storeId']), 'storeId') ||
+            parseObjectId(String(defaultStoreId ?? ''), 'storeId');
 
       return {
             itemName,
@@ -665,6 +668,7 @@ type TBarcodeBulkInputItem = {
       code?: string;
       barcode?: string;
       userId?: string;
+      storeId?: string;
       imeiNumber?: string;
       purchasePrice?: number | string;
       currentState?: IInventory['currentState'];
@@ -821,7 +825,7 @@ const createInventory = async (payload: Partial<IInventory>, file?: any, variant
       return result;
 };
 
-const importInventoriesFromCsv = async (filePath?: string, defaultUserId?: string) => {
+const importInventoriesFromCsv = async (filePath?: string, defaultUserId?: string, defaultStoreId?: string) => {
       if (!filePath) {
             throw new AppError('CSV file is required', 400);
       }
@@ -842,7 +846,7 @@ const importInventoriesFromCsv = async (filePath?: string, defaultUserId?: strin
 
             for (const row of rows) {
                   try {
-                        const payload = buildInventoryPayloadFromCsvRow(row, defaultUserId);
+                        const payload = buildInventoryPayloadFromCsvRow(row, defaultUserId, defaultStoreId);
                         const created = await createInventory(payload);
 
                         results.push({
@@ -883,6 +887,7 @@ const createInventoryFromBarcode = async (
       payload: {
             code: string;
             userId: string;
+            storeId?: string;
             imeiNumber?: string;
             purchasePrice?: number | string;
             currentState?: IInventory['currentState'];
@@ -1017,6 +1022,7 @@ const createInventoryFromBarcode = async (
                         ? parseStringArray(payload.sourceImageUrls)
                         : barcodeImages,
                   categoryId: payload.categoryId ? parseObjectId(payload.categoryId, 'categoryId') : undefined,
+                  storeId: payload.storeId ? parseObjectId(payload.storeId, 'storeId') : undefined,
                   type: normalizeInventoryType(payload.type ?? payload.status),
                   status: normalizeInventoryStatus(
                         payload.status,
@@ -1045,6 +1051,7 @@ const createInventoryFromBarcodeBulk = async (payload: unknown, defaultUserId?: 
                   ? (payload as Record<string, unknown>)
                   : {};
       const baseUserId = toQueryString(requestBody.userId ?? defaultUserId).trim();
+      const baseStoreId = toQueryString(requestBody.storeId).trim();
       const baseImeiNumber = toQueryString(requestBody.imeiNumber).trim();
       const basePurchasePrice =
             typeof requestBody.purchasePrice === 'number' || typeof requestBody.purchasePrice === 'string'
@@ -1057,6 +1064,7 @@ const createInventoryFromBarcodeBulk = async (payload: unknown, defaultUserId?: 
             rowNumber: index + 1,
             code: String(item.code ?? item.barcode ?? '').trim(),
             userId: String(item.userId ?? baseUserId ?? '').trim(),
+            storeId: String(item.storeId ?? baseStoreId ?? '').trim(),
             imeiNumber: String(item.imeiNumber ?? baseImeiNumber ?? '').trim(),
             purchasePrice: item.purchasePrice ?? basePurchasePrice,
             currentState: item.currentState ?? baseCurrentState,
@@ -1099,6 +1107,7 @@ const createInventoryFromBarcodeBulk = async (payload: unknown, defaultUserId?: 
                   const created = await createInventoryFromBarcode({
                         code,
                         userId,
+                        storeId: row.storeId,
                         imeiNumber: row.imeiNumber,
                         purchasePrice: row.purchasePrice,
                         currentState: row.currentState,
@@ -1277,10 +1286,17 @@ const deleteInventory = async (id: string) => {
 };
 
 const getMyInventory = async (userId: string, query: Record<string, unknown> = {}) => {
+      const shopId = String(query.shopId ?? '').trim();
+      const shopScope: FilterQuery<IInventory> = {};
+      if (shopId && Types.ObjectId.isValid(shopId)) {
+            shopScope.$or = [{ storeId: new Types.ObjectId(shopId) }, { storeId: null }, { storeId: { $exists: false } }];
+      }
+
       const shouldPaginate = query.page !== undefined || query.limit !== undefined;
 
       if (!shouldPaginate) {
-            return await Inventory.find({ userId }).populate('userId').sort({ createdAt: -1 });
+            const filter: FilterQuery<IInventory> = { userId, ...shopScope };
+            return await Inventory.find(filter).populate('userId').sort({ createdAt: -1 });
       }
 
       const requestedPage = Number.parseInt(String(query.page ?? ''), 10);
@@ -1291,18 +1307,29 @@ const getMyInventory = async (userId: string, query: Record<string, unknown> = {
       const categoryId = String(query.categoryId ?? '').trim();
       const filter: FilterQuery<IInventory> = { userId };
 
+      if (Object.keys(shopScope).length) {
+            filter.$and = [shopScope];
+      }
+
       if (categoryId && Types.ObjectId.isValid(categoryId)) {
             filter.categoryId = new Types.ObjectId(categoryId);
       }
 
       if (search) {
             const searchExpression = new RegExp(search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
-            filter.$or = [
-                  { itemName: searchExpression },
-                  { brand: searchExpression },
-                  { imeiNumber: searchExpression },
-                  { sku: searchExpression },
-            ];
+            const searchClause = {
+                  $or: [
+                        { itemName: searchExpression },
+                        { brand: searchExpression },
+                        { imeiNumber: searchExpression },
+                        { sku: searchExpression },
+                  ],
+            };
+            if (filter.$and) {
+                  filter.$and.push(searchClause);
+            } else {
+                  Object.assign(filter, searchClause);
+            }
       }
 
       const [data, total] = await Promise.all([

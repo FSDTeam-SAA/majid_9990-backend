@@ -2,12 +2,15 @@ import { StatusCodes } from 'http-status-codes';
 import catchAsync from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
 import customerService from './customer.service';
+import { getShopFromRequest } from '../shop/shop.utils';
 
 const createCustomer = catchAsync(async (req, res) => {
       const userId = req.user.role === 'staff' && req.user.shopkeeperId ? req.user.shopkeeperId : req.user._id;
       if (req.user.role === 'staff' && req.user.shopkeeperId) {
             req.body.shopkeeperId = req.user.shopkeeperId;
       }
+      const shopId = await getShopFromRequest(req);
+      req.body.shopId = shopId.toString();
       const result = await customerService.createCustomer(userId, req.body ?? {});
 
       sendResponse(res, {
@@ -51,7 +54,7 @@ const getByShopkeeperId = catchAsync(async (req, res) => {
       if (req.user.role === 'staff' && req.user.shopkeeperId) {
             shopkeeperId = req.user.shopkeeperId.toString();
       }
-      const result = await customerService.getByShopkeeperId(shopkeeperId);
+      const result = await customerService.getByShopkeeperId(shopkeeperId, req.query);
 
       sendResponse(res, {
             statusCode: StatusCodes.OK,

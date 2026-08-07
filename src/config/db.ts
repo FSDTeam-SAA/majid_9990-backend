@@ -20,6 +20,17 @@ const ensureUserScopedScanHistoryIndex = async () => {
                   await ScanInfo.collection.dropIndex(legacyGlobalUniqueIndex.name);
                   console.log('Replaced legacy global IMEI scan index with a user-scoped index');
             }
+
+            const legacyUserScopedIndex = indexes.find(
+                  (index) =>
+                        index.name === 'userId_1_imei_1_serviceId_1' &&
+                        !Object.prototype.hasOwnProperty.call(index.key, 'shopId')
+            );
+
+            if (legacyUserScopedIndex?.name) {
+                  await ScanInfo.collection.dropIndex(legacyUserScopedIndex.name);
+                  console.log('Replaced user-scoped IMEI scan index with a shop-scoped index');
+            }
       } catch (error) {
             // MongoDB has no collection/indexes yet on a brand-new install.
             if ((error as { code?: number }).code !== 26) {
@@ -28,8 +39,8 @@ const ensureUserScopedScanHistoryIndex = async () => {
       }
 
       await ScanInfo.collection.createIndex(
-            { userId: 1, imei: 1, serviceId: 1 },
-            { unique: true, name: 'userId_1_imei_1_serviceId_1' }
+            { userId: 1, imei: 1, serviceId: 1, shopId: 1 },
+            { unique: true, name: 'userId_1_imei_1_serviceId_1_shopId_1' }
       );
 };
 

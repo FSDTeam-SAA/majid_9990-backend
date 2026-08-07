@@ -9,6 +9,7 @@ const customerSchema = new Schema<ICustomer>(
             phone: { type: String, trim: true },
             address: { type: String, trim: true },
             shopkeeperId: { type: Schema.Types.ObjectId, ref: 'User' },
+            shopId: { type: Schema.Types.ObjectId, ref: 'Shop', default: null },
             salesMethod: { type: String, trim: true },
             actualSalePrice: { type: Number },
             paymentType: { type: String, trim: true },

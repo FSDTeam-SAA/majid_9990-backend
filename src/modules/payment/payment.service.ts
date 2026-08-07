@@ -2,6 +2,7 @@ import Stripe from 'stripe';
 import config from '../../config/config';
 import AppError from '../../errors/AppError';
 import { User } from '../user/user.model';
+import { Shop } from '../shop/shop.model';
 import { Payment } from './payment.model';
 import { creditUserBalance } from './balanceTransaction.service';
 import { TPaymentStatus } from './payment.interface';
@@ -53,65 +54,76 @@ const creditPaymentBalance = async (payment: any) => {
 
 // ✅ Create Checkout Session
 const createPaymentSession = async (user: any, payload: any) => {
-      const stripe = getStripeClient();
-      const { amount, subscriptionId } = payload;
-      const frontendUrl = (config as { frontend_url?: string }).frontend_url ?? '';
+  const stripe = getStripeClient();
+  const { amount, subscriptionId, currency = 'usd', paymentType = 'plan', shopId } = payload;
+  const frontendUrl = (config as { frontend_url?: string }).frontend_url ?? '';
 
-      const session = await stripe.checkout.sessions.create({
-            payment_method_types: ['card'],
-            mode: 'payment',
-            success_url: `${frontendUrl}/success`,
-            cancel_url: `${frontendUrl}/cancel`,
-            customer_email: user.email,
+  const session = await stripe.checkout.sessions.create({
+    payment_method_types: ['card'],
+    mode: 'payment',
+    success_url: `${frontendUrl}/success`,
+    cancel_url: `${frontendUrl}/cancel`,
+    customer_email: user.email,
 
-            line_items: [
-                  {
-                        price_data: {
-                              currency: 'usd',
-                              product_data: {
-                                    name: 'Subscription Payment',
-                              },
-                              unit_amount: amount * 100, // cents
-                        },
-                        quantity: 1,
-                  },
-            ],
+    line_items: [
+      {
+        price_data: {
+          currency,
+          product_data: {
+            name: paymentType === 'add_shop' ? 'Additional Shop' : 'Subscription Payment',
+          },
+          unit_amount: Math.round(Number(amount) * 100), // cents
+        },
+        quantity: 1,
+      },
+    ],
 
-            metadata: {
-                  userId: user._id.toString(),
-                  subscriptionId: subscriptionId || '',
-            },
-      });
+    metadata: {
+      userId: user._id.toString(),
+      subscriptionId: subscriptionId ? String(subscriptionId) : '',
+      paymentType,
+      ...(shopId ? { shopId: String(shopId) } : {}),
+    },
+  });
 
-      // save pending payment
-      await Payment.create({
-            userId: user._id,
-            subscriptionId,
-            amount,
-            currency: 'usd',
-            stripeSessionId: session.id,
-            paymentStatus: 'pending',
-      });
+  // save pending payment
+  await Payment.create({
+    userId: user._id,
+    subscriptionId,
+    amount,
+    currency,
+    stripeSessionId: session.id,
+    paymentStatus: 'pending',
+    paymentType,
+    ...(shopId ? { shopId } : {}),
+  });
 
-      return session;
+  return session;
 };
 
 const markPaymentAsPaid = async (payment: any, session: any) => {
-      const paymentIntentId = typeof session.payment_intent === 'string' ? session.payment_intent : session.payment_intent?.id;
+  const paymentIntentId = typeof session.payment_intent === 'string' ? session.payment_intent : session.payment_intent?.id;
 
-      const updatedPayment = await Payment.findOneAndUpdate(
-            { _id: payment._id, paymentStatus: { $ne: 'paid' } },
-            {
-                  paymentStatus: 'paid',
-                  stripePaymentIntentId: paymentIntentId,
-                  paymentMethod: session.payment_method_types?.[0],
-            },
-            { new: true }
+  const updatedPayment = await Payment.findOneAndUpdate(
+    { _id: payment._id, paymentStatus: { $ne: 'paid' } },
+    {
+      paymentStatus: 'paid',
+      stripePaymentIntentId: paymentIntentId,
+      paymentMethod: session.payment_method_types?.[0],
+    },
+    { new: true }
+  );
+
+  if (updatedPayment) {
+    if (updatedPayment.paymentType === 'add_shop' && updatedPayment.shopId) {
+      await Shop.updateOne(
+        { _id: updatedPayment.shopId },
+        { $set: { isActive: true, activatedAt: new Date() } }
       );
-
-      if (updatedPayment) {
-            await creditPaymentBalance(updatedPayment);
-      }
+    } else {
+      await creditPaymentBalance(updatedPayment);
+    }
+  }
 };
 
 // Handle Webhook
@@ -248,15 +260,22 @@ const updatePaymentStatus = async (paymentId: string, nextStatus: TPaymentStatus
       payment.paymentStatus = nextStatus;
 
       if (nextStatus === 'paid') {
-            await creditUserBalance({
-                  userId: payment.userId.toString(),
-                  amount: payment.amount,
-                  currency: payment.currency,
-                  source: 'payment',
-                  description: `Balance credited from admin payment update ${payment.stripeSessionId ?? payment._id.toString()}`.trim(),
-                  referenceId: payment._id.toString(),
-                  paymentId: payment._id.toString(),
-            });
+        if (payment.paymentType === 'add_shop' && payment.shopId) {
+          await Shop.updateOne(
+            { _id: payment.shopId },
+            { $set: { isActive: true, activatedAt: new Date() } }
+          );
+        } else {
+          await creditUserBalance({
+            userId: payment.userId.toString(),
+            amount: payment.amount,
+            currency: payment.currency,
+            source: 'payment',
+            description: `Balance credited from admin payment update ${payment.stripeSessionId ?? payment._id.toString()}`.trim(),
+            referenceId: payment._id.toString(),
+            paymentId: payment._id.toString(),
+          });
+        }
       }
 
       await payment.save();

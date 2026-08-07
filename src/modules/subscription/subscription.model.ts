@@ -29,7 +29,7 @@ const subscriptionSchema = new Schema<ISubscription>(
 
             type: {
                   type: String,
-                  enum: ['STARTER', 'PAY AS YOU GO', 'DIAMOND', 'ENTERPRISE'],
+                  enum: ['STARTER', 'PAY AS YOU GO', 'DIAMOND', 'ENTERPRISE', 'MULTI SHOP'],
                   required: true,
             },
 

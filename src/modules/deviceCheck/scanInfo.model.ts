@@ -6,6 +6,11 @@ const ScanInfoSchema = new Schema(
                   type: Schema.Types.ObjectId,
                   ref: 'User',
             },
+            shopId: {
+                  type: Schema.Types.ObjectId,
+                  ref: 'Shop',
+                  default: null,
+            },
             deviceName: {
                   type: String,
                   required: true,
@@ -260,7 +265,7 @@ const ScanInfoSchema = new Schema(
 // A scan belongs to the user who performed it. Keeping this uniqueness scoped
 // to the user prevents one shopkeeper's cached scan from replacing or hiding
 // another shopkeeper's history item.
-ScanInfoSchema.index({ userId: 1, imei: 1, serviceId: 1 }, { unique: true, name: 'userId_1_imei_1_serviceId_1' });
+ScanInfoSchema.index({ userId: 1, imei: 1, serviceId: 1, shopId: 1 }, { unique: true, name: 'userId_1_imei_1_serviceId_1_shopId_1' });
 ScanInfoSchema.index({ userId: 1, updatedAt: -1 });
 
 const ScanInfo = model('ScanInfo', ScanInfoSchema);

@@ -2,10 +2,13 @@ import { StatusCodes } from 'http-status-codes';
 import catchAsync from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
 import repairRequestService from './repairRequest.service';
+import { getShopFromRequest } from '../shop/shop.utils';
 
 const addNewRepairRequest = catchAsync(async (req, res) => {
       const id = req.user.role === 'staff' && req.user.shopkeeperId ? req.user.shopkeeperId.toString() : req.user.id;
       const files = req.files as Express.Multer.File[];
+      const shopId = await getShopFromRequest(req);
+      req.body.shopId = shopId.toString();
       const result = await repairRequestService.addNewRepairRequest(req.body, files, id);
 
       sendResponse(res, {

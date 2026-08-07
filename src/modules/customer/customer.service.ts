@@ -1,4 +1,5 @@
 import { StatusCodes } from 'http-status-codes';
+import { Types } from 'mongoose';
 import AppError from '../../errors/AppError';
 import { User } from '../user/user.model';
 import customerEmailTemplate from '../../utils/customerEmailTemplate';
@@ -25,6 +26,7 @@ const createCustomer = async (userId: string, payload: Partial<ICustomer> = {}) 
       const result = await Customer.create({
             ...payload,
             shopkeeperId: payload.shopkeeperId ?? userId,
+            shopId: payload.shopId ?? null,
       });
 
       return result;
@@ -55,8 +57,14 @@ const deleteCustomer = async (id: string, userId: string) => {
       return null;
 };
 
-const getByShopkeeperId = async (shopkeeperId: string) => {
-      return await Customer.find({ shopkeeperId }).sort({ createdAt: -1 });
+const getByShopkeeperId = async (shopkeeperId: string, query: Record<string, unknown> = {}) => {
+      const filter: Record<string, unknown> = { shopkeeperId };
+
+      if (query.shopId && Types.ObjectId.isValid(String(query.shopId))) {
+            filter.$or = [{ shopId: new Types.ObjectId(String(query.shopId)) }, { shopId: null }];
+      }
+
+      return await Customer.find(filter).sort({ createdAt: -1 });
 };
 
 const getAll = async () => {

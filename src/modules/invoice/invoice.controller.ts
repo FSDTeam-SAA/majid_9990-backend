@@ -2,11 +2,14 @@ import { StatusCodes } from 'http-status-codes';
 import catchAsync from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
 import invoiceService from './invoice.service';
+import { getShopFromRequest } from '../shop/shop.utils';
 
 const createInvoice = catchAsync(async (req, res) => {
       if (req.user.role === 'staff' && req.user.shopkeeperId) {
             req.body.shopkeeperId = req.user.shopkeeperId;
       }
+      const shopId = await getShopFromRequest(req);
+      req.body.shopId = shopId.toString();
       const result = await invoiceService.createInvoice(req.body, req.file);
 
       sendResponse(res, {

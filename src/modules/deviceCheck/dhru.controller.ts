@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import XLSX from 'xlsx';
+import { Types } from 'mongoose';
 import AppError from '../../errors/AppError';
 import { ImeiServiceCatalog } from './imeiService.model';
 import { curatedDhruServices, normalizeServiceName } from './dhru.services.catalog';
@@ -194,7 +195,8 @@ const processMultipleServiceCheck = async (
       serviceIds: number[],
       shouldGenerateFresh: boolean,
       shouldCharge: boolean,
-      servicePrice: number
+      servicePrice: number,
+      shopId?: string
 ): Promise<SingleImeiCheckResult> => {
       type BundledCheckResult = {
             serviceId: number;
@@ -224,7 +226,7 @@ const processMultipleServiceCheck = async (
                               };
                         }
 
-                        const result = await runImeiCheck(String(imei), svcId, userId);
+                                          const result = await runImeiCheck(String(imei), svcId, userId, shopId);
                         return {
                               serviceId: svcId,
                               ok: result.ok,
@@ -412,7 +414,8 @@ const processSingleImeiCheck = async (
       userId: string,
       imei: string,
       serviceId: number,
-      shouldGenerateFresh: boolean
+      shouldGenerateFresh: boolean,
+      shopId?: string
 ): Promise<SingleImeiCheckResult> => {
       if (!imei || !isValidImei(imei)) {
             return {
@@ -482,7 +485,8 @@ const processSingleImeiCheck = async (
                   service.serviceIds,
                   shouldGenerateFresh,
                   shouldCharge,
-                  servicePrice
+                  servicePrice,
+                  shopId
             );
       }
 
@@ -499,7 +503,7 @@ const processSingleImeiCheck = async (
             };
       }
 
-      const result = await runImeiCheck(String(imei), serviceId, userId);
+      const result = await runImeiCheck(String(imei), serviceId, userId, shopId);
       console.log('runImeiCheck', result);
 
       if (!result.ok) {
@@ -580,6 +584,7 @@ const extractImeisFromWorkbook = (filePath: string) => {
 export const checkImeiFromDhru = async (req: Request, res: Response, next: NextFunction) => {
       try {
             const userId = req.user._id;
+            const shopId = String(req.query?.shopId ?? '').trim() || undefined;
 
             // ===== IMEI NORMALIZATION =====
             const imeiInput = req.body?.imei;
@@ -612,7 +617,8 @@ export const checkImeiFromDhru = async (req: Request, res: Response, next: NextF
                               userId,
                               imei,
                               requestedServiceId,
-                              shouldGenerateFresh
+                              shouldGenerateFresh,
+                              shopId
                         );
 
                         return {
@@ -637,6 +643,7 @@ export const checkImeiFromDhru = async (req: Request, res: Response, next: NextF
 export const checkImeiFromDhruV2 = async (req: Request, res: Response, next: NextFunction) => {
       try {
             const userId = req.user?._id?.toString();
+            const shopId = String(req.query?.shopId ?? '').trim() || undefined;
 
             // ===== IMEI NORMALIZATION =====
             const imeiInput = req.body?.imei;
@@ -769,7 +776,7 @@ export const checkImeiFromDhruV2 = async (req: Request, res: Response, next: Nex
                                                 }
                                           }
 
-                                          const result = await runImeiCheck(String(imei), svcId, userId);
+                        const result = await runImeiCheck(String(imei), svcId, userId, shopId);
                                           if (!result.ok) {
                                                 return {
                                                       serviceId: svcId,
@@ -930,7 +937,7 @@ export const checkImeiFromDhruV2 = async (req: Request, res: Response, next: Nex
                         }
 
                         // No cache -> call provider
-                        const result = await runImeiCheck(String(imei), serviceId, userId);
+                        const result = await runImeiCheck(String(imei), serviceId, userId, shopId);
 
                         if (!result.ok) {
                               if (shouldCharge && userId) {
@@ -1039,6 +1046,7 @@ export const checkImeiFromDhruV2 = async (req: Request, res: Response, next: Nex
 export const checkImeisFromFile = async (req: Request, res: Response, next: NextFunction) => {
       const file = req.file;
       const userId = req.user._id;
+      const shopId = String(req.query?.shopId ?? '').trim() || undefined;
       const shouldGenerateFresh =
             String(req.body?.genarate ?? req.body?.generate ?? '')
                   .trim()
@@ -1088,7 +1096,8 @@ export const checkImeisFromFile = async (req: Request, res: Response, next: Next
                         userId,
                         imei,
                         requestedServiceId,
-                        shouldGenerateFresh
+                        shouldGenerateFresh,
+                        shopId
                   );
 
                   if (singleResult.ok) {
@@ -1172,7 +1181,12 @@ export const getRecentChecksHistory = async (req: Request, res: Response, next: 
             const limit = Number.isFinite(limitQuery) && limitQuery > 0 ? Math.min(Math.floor(limitQuery), 50) : 10;
             const skip = (page - 1) * limit;
 
-            const filter = req.user?._id ? { userId: req.user._id } : {};
+            const filter: any = req.user?._id ? { userId: req.user._id } : {};
+            const shopId = String(req.query?.shopId ?? '').trim();
+
+            if (shopId && Types.ObjectId.isValid(shopId)) {
+                  filter.shopId = new Types.ObjectId(shopId);
+            }
 
             const [history, total] = await Promise.all([
                   ScanInfo.find(filter)

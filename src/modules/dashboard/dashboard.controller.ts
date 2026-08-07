@@ -6,8 +6,9 @@ import dashboardService from './dashboard.service';
 const getDashboardStats = catchAsync(async (req, res) => {
       const shopkeeperId = req.query.shopkeeperId as string | undefined;
       const filter = (req.query.filter as 'daily' | 'monthly' | 'yearly') || 'monthly';
+      const shopId = req.query.shopId as string | undefined;
 
-      const result = await dashboardService.getDashboardStats(shopkeeperId, filter);
+      const result = await dashboardService.getDashboardStats(shopkeeperId, filter, shopId);
 
       sendResponse(res, {
             statusCode: StatusCodes.OK,

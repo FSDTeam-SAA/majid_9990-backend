@@ -757,7 +757,8 @@ export type ImeiCheckResult = ImeiCheckSuccess | ImeiCheckFailure;
 export const runImeiCheck = async (
       imei: string,
       requestedServiceId: number,
-      userId?: string
+      userId?: string,
+      shopId?: string
 ): Promise<ImeiCheckResult> => {
       const { response: placeOrderResponse, usedServiceId } = await placeImeiOrderWithFallback(
             imei,
@@ -848,10 +849,13 @@ export const runImeiCheck = async (
             providerDataRaw,
             parsedProviderData,
       };
-      const scanPayload = userId ? { ...baseScanPayload, userId } : baseScanPayload;
+      const shopIdFilter = shopId ? { shopId } : {};
+      const scanPayload = userId
+            ? { ...baseScanPayload, userId, ...shopIdFilter }
+            : baseScanPayload;
 
       const scanFilter = userId
-            ? { imei, serviceId: requestedServiceId, userId }
+            ? { imei, serviceId: requestedServiceId, userId, ...shopIdFilter }
             : { imei, serviceId: requestedServiceId, userId: { $exists: false } };
       const savedScanInfo = await ScanInfo.findOneAndUpdate(scanFilter, scanPayload, {
             upsert: true,

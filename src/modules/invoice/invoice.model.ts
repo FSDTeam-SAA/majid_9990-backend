@@ -8,6 +8,11 @@ const invoiceSchema = new Schema<IInvoice>(
                   ref: 'User',
                   required: true,
             },
+            shopId: {
+                  type: Schema.Types.ObjectId,
+                  ref: 'Shop',
+                  default: null,
+            },
             invoice: {
                   public_id: {
                         type: String,
@@ -132,3 +137,4 @@ export const Invoice = model<IInvoice>('Invoice', invoiceSchema);
 
 invoiceSchema.index({ createdAt: -1 });
 invoiceSchema.index({ shopkeeperId: 1, createdAt: -1 });
+invoiceSchema.index({ shopkeeperId: 1, shopId: 1, createdAt: -1 });

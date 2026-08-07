@@ -21,6 +21,7 @@ const findServiceByServiceId = async (serviceId: number) => {
 
 export const getRiskAnalysis = catchAsync(async (req, res) => {
       const imei = String(req.body?.imei ?? '').trim();
+      const shopId = String(req.query?.shopId ?? '').trim() || undefined;
       const shouldGenerateFresh =
             String(req.body?.genarate ?? req.body?.generate ?? '')
                   .trim()
@@ -79,7 +80,7 @@ export const getRiskAnalysis = catchAsync(async (req, res) => {
       }
 
       try {
-            const refreshResult = await runImeiCheck(imei, serviceId, req.user._id);
+            const refreshResult = await runImeiCheck(imei, serviceId, req.user._id, shopId);
 
             if (!refreshResult.ok) {
                   throw new AppError(refreshResult.message, refreshResult.statusCode);
@@ -124,6 +125,7 @@ export const getRiskAnalysis = catchAsync(async (req, res) => {
 
 export const getDeviceAnalysis = catchAsync(async (req, res) => {
       const imei = String(req.body?.imei ?? '').trim();
+      const shopId = String(req.query?.shopId ?? '').trim() || undefined;
       const shouldGenerateFresh =
             String(req.body?.genarate ?? req.body?.generate ?? '')
                   .trim()
@@ -191,7 +193,7 @@ export const getDeviceAnalysis = catchAsync(async (req, res) => {
       }
 
       try {
-            const result = await riskAnalysisService.analyzeDeviceAnalysis(imei, serviceId, req.user._id);
+            const result = await riskAnalysisService.analyzeDeviceAnalysis(imei, serviceId, req.user._id, shopId);
 
             if (!('risk' in result)) {
                   if (shouldCharge) {

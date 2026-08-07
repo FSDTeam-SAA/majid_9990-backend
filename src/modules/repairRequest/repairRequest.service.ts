@@ -47,6 +47,7 @@ const addNewRepairRequest = async (payload: IRepairRequest, files: Express.Multe
 
       const newRequest = await RepairRequest.create({
             userId: payload.userId || user._id,
+            shopId: payload.shopId ?? null,
             firstName: payload.firstName,
             email: payload.email,
             phoneNumber: payload.phoneNumber, // ✅ ADDED
@@ -69,6 +70,9 @@ const getMyRepairRequestsHistory = async (userId: string, query: any) => {
       const filter: FilterQuery<IRepairRequest> = readyForCollection
             ? { userId, status: { $in: ['completed', 'approved'] } }
             : { userId };
+      if (query.shopId && Types.ObjectId.isValid(String(query.shopId))) {
+            filter.$or = [{ shopId: new Types.ObjectId(String(query.shopId)) }, { shopId: null }];
+      }
       const data = await RepairRequest.find(filter).skip(skip).limit(limit).sort({ createdAt: -1, _id: -1 });
       const total = await RepairRequest.countDocuments(filter);
 

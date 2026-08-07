@@ -2,13 +2,16 @@ import { StatusCodes } from 'http-status-codes';
 import catchAsync from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
 import inventoryService from './inventory.service';
+import { getShopFromRequest } from '../shop/shop.utils';
 
 const createInventory = catchAsync(async (req, res) => {
       const userId = req.user.role === 'staff' && req.user.shopkeeperId ? req.user.shopkeeperId : req.user._id;
+      const storeId = await getShopFromRequest(req);
 
       const payload = {
             ...req.body,
             userId,
+            storeId: storeId.toString(),
       };
 
       const files = req.files as Record<string, Express.Multer.File[]> | undefined;
@@ -24,6 +27,7 @@ const createInventory = catchAsync(async (req, res) => {
 
 const createInventoryFromBarcode = catchAsync(async (req, res) => {
       const effectiveUserId = req.user.role === 'staff' && req.user.shopkeeperId ? req.user.shopkeeperId : undefined;
+      const storeId = await getShopFromRequest(req);
       const {
             code,
             userId = effectiveUserId,
@@ -41,6 +45,7 @@ const createInventoryFromBarcode = catchAsync(async (req, res) => {
             {
                   code,
                   userId,
+                  storeId: storeId.toString(),
                   imeiNumber,
                   purchasePrice,
                   currentState,
@@ -64,7 +69,8 @@ const createInventoryFromBarcodeBulk = catchAsync(async (req, res) => {
       const defaultUserId = req.user.role === 'staff' && req.user.shopkeeperId
             ? String(req.user.shopkeeperId)
             : String(req.body?.userId ?? req.user?._id ?? '').trim() || undefined;
-      const result = await inventoryService.createInventoryFromBarcodeBulk(req.body, defaultUserId);
+      const storeId = await getShopFromRequest(req);
+      const result = await inventoryService.createInventoryFromBarcodeBulk({ ...req.body, storeId: storeId.toString() }, defaultUserId);
 
       sendResponse(res, {
             statusCode: StatusCodes.CREATED,
@@ -78,7 +84,8 @@ const importInventoriesFromCsv = catchAsync(async (req, res) => {
       const defaultUserId = req.user.role === 'staff' && req.user.shopkeeperId
             ? String(req.user.shopkeeperId)
             : String(req.body?.userId ?? req.user?._id ?? '').trim() || undefined;
-      const result = await inventoryService.importInventoriesFromCsv(req.file?.path, defaultUserId);
+      const storeId = await getShopFromRequest(req);
+      const result = await inventoryService.importInventoriesFromCsv(req.file?.path, defaultUserId, storeId.toString());
 
       sendResponse(res, {
             statusCode: StatusCodes.CREATED,

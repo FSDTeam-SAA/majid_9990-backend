@@ -2,20 +2,25 @@ import { Types } from 'mongoose';
 
 export type TPaymentStatus = 'pending' | 'paid' | 'failed';
 
+export type TPaymentType = 'plan' | 'add_shop';
+
 export interface IPayment {
-      userId: Types.ObjectId;
-      subscriptionId?: Types.ObjectId;
+  userId: Types.ObjectId;
+  subscriptionId?: Types.ObjectId;
 
-      amount: number;
-      currency: string;
+  amount: number;
+  currency: string;
 
-      stripeSessionId?: string;
-      stripePaymentIntentId?: string;
+  stripeSessionId?: string;
+  stripePaymentIntentId?: string;
 
-      paymentStatus: TPaymentStatus;
+  paymentStatus: TPaymentStatus;
 
-      paymentMethod?: string;
+  paymentMethod?: string;
 
-      createdAt?: Date;
-      updatedAt?: Date;
+  paymentType?: TPaymentType;
+  shopId?: Types.ObjectId;
+
+  createdAt?: Date;
+  updatedAt?: Date;
 }

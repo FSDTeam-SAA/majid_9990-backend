@@ -22,6 +22,7 @@ import ocrRouter from '../modules/ocr/ocr.router';
 import categoryRouter from '../modules/inventory/category/category.route';
 import cashManagementRouter from '../modules/cashManagement/cashManagement.route';
 import supplierRouter from '../modules/supplier/supplier.router';
+import shopRouter from '../modules/shop/shop.router';
 
 const router = Router();
 
@@ -123,8 +124,12 @@ const moduleRoutes = [
             route: cashManagementRouter,
       },
       {
-            path: '/suppliers',
-            route: supplierRouter,
+        path: '/suppliers',
+        route: supplierRouter,
+      },
+      {
+        path: '/shop',
+        route: shopRouter,
       },
 ];
 moduleRoutes.forEach((route) => router.use(route.path, route.route));

@@ -28,6 +28,11 @@ const RepairRequestSchema = new Schema<IRepairRequest>(
                   ref: 'User',
                   required: true,
             },
+            shopId: {
+                  type: Schema.Types.ObjectId,
+                  ref: 'Shop',
+                  default: null,
+            },
             firstName: { type: String, required: true },
             email: { type: String, required: true },
             phoneNumber: { type: String, required: true }, // ✅ ADDED

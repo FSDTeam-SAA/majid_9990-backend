@@ -285,7 +285,8 @@ const generateAIInsights = (
 
 const getDashboardStats = async (
       shopkeeperId?: string,
-      filter: 'daily' | 'monthly' | 'yearly' = 'monthly'
+      filter: 'daily' | 'monthly' | 'yearly' = 'monthly',
+      shopId?: string
 ): Promise<IDashboardStats> => {
       const { start, end } = getDateRange(filter);
       const { start: prevStart, end: prevEnd } = getPreviousPeriodRange(filter);
@@ -307,6 +308,11 @@ const getDashboardStats = async (
             }
             matchCondition.shopkeeperId = new Types.ObjectId(shopkeeperId);
             prevMatchCondition.shopkeeperId = new Types.ObjectId(shopkeeperId);
+      }
+
+      if (shopId && Types.ObjectId.isValid(shopId)) {
+            matchCondition.shopId = new Types.ObjectId(shopId);
+            prevMatchCondition.shopId = new Types.ObjectId(shopId);
       }
 
       // Current period stats

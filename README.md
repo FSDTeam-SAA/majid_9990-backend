@@ -133,3 +133,13 @@ Otherwise follows the original single-service path
 }
 }
 }
+
+
+## Multi account 
+Here's how the multi-shop feature works from your side:
+Your shops — Every shopkeeper automatically gets one default shop. It's created from your profile details, so you don't need to do anything on day one.
+Switching shops — The little store dropdown in the top header shows all your shops. Click one to switch, and everything you see (dashboard, scan history, inventory, invoices, customers, repair requests) updates to that shop's data. Staff members are always locked to your default shop.
+Adding a new shop — Go to My Shops in the sidebar, fill in the shop name and address, and hit "Create & Pay for Shop." You'll be taken to Stripe to pay for it. As soon as the payment clears, the shop is activated and appears in your switcher.
+Unlocking the option — Adding a second shop requires the Multi Shop plan (€9.99, one-time). Until you've paid for it, the "add shop" button directs you to the pricing page. After that, you can add unlimited additional shops, each paid separately.
+Pricing/payments — The old top-up flow was fixed, so choosing a plan now correctly charges the plan price and sends you to checkout.
+Everything is backward-compatible — your existing data stays visible under your default shop.

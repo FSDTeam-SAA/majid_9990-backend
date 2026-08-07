@@ -151,6 +151,7 @@ const normalizeOrderDetails = (value: IInvoicePayload['orderDetails']): IInvoice
 
 const createInvoice = async (payload: IInvoicePayload, file?: Express.Multer.File): Promise<IInvoice> => {
       const shopkeeperId = await resolveShopkeeperId(payload.shopkeeperId);
+      const shopId = normalizeObjectId(payload.shopId);
       const type = String(payload.type ?? '').trim();
       const customerInfo = normalizeObjectId(payload.customerInfo ?? undefined);
       const itemsIds = normalizeObjectIdArray(payload.itemsIds);
@@ -214,6 +215,7 @@ const createInvoice = async (payload: IInvoicePayload, file?: Express.Multer.Fil
 
       const result = await Invoice.create({
             shopkeeperId,
+            shopId,
             invoice: invoiceFile,
             type,
             customerInfo,
@@ -269,6 +271,7 @@ const createInvoice = async (payload: IInvoicePayload, file?: Express.Multer.Fil
 type InvoicePaginationQuery = {
       page?: unknown;
       limit?: unknown;
+      shopId?: unknown;
 };
 
 const getInvoiceByShopkeeperId = async (shopkeeperId: string, query: InvoicePaginationQuery = {}) => {
@@ -281,7 +284,11 @@ const getInvoiceByShopkeeperId = async (shopkeeperId: string, query: InvoicePagi
       const shouldPaginate = query.page !== undefined || query.limit !== undefined;
 
       if (!shouldPaginate) {
-            return await Invoice.find({ shopkeeperId: trimmedShopkeeperId })
+            const listFilter: Record<string, unknown> = { shopkeeperId: trimmedShopkeeperId };
+            if (query.shopId && Types.ObjectId.isValid(String(query.shopId))) {
+                  listFilter.$or = [{ shopId: new Types.ObjectId(String(query.shopId)) }, { shopId: null }];
+            }
+            return await Invoice.find(listFilter)
                   .populate('shopkeeperId')
                   .populate('customerInfo')
                   .populate('itemsIds', 'itemName imeiNumber expectedPrice image')
@@ -292,7 +299,10 @@ const getInvoiceByShopkeeperId = async (shopkeeperId: string, query: InvoicePagi
       const requestedLimit = Number.parseInt(String(query.limit ?? ''), 10);
       const page = Number.isFinite(requestedPage) && requestedPage > 0 ? requestedPage : 1;
       const limit = Number.isFinite(requestedLimit) && requestedLimit > 0 ? Math.min(requestedLimit, 100) : 10;
-      const filter = { shopkeeperId: trimmedShopkeeperId };
+      const filter: Record<string, unknown> = { shopkeeperId: trimmedShopkeeperId };
+      if (query.shopId && Types.ObjectId.isValid(String(query.shopId))) {
+            filter.$or = [{ shopId: new Types.ObjectId(String(query.shopId)) }, { shopId: null }];
+      }
 
       const [data, total] = await Promise.all([
             Invoice.find(filter)

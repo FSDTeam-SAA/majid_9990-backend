@@ -38,6 +38,7 @@ export interface IInvoiceLineItem {
 
 export interface IInvoice {
       shopkeeperId: Types.ObjectId;
+      shopId?: Types.ObjectId | null;
       invoice: IInvoiceFile;
       type: string;
       customerInfo?: Types.ObjectId | null;
@@ -63,6 +64,7 @@ export interface IInvoice {
 
 export interface IInvoicePayload {
       shopkeeperId?: string;
+      shopId?: string;
       type?: string;
       customerInfo?: string;
       itemsIds?: string[];
