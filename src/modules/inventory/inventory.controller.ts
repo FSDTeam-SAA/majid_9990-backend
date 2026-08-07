@@ -144,13 +144,14 @@ const deleteInventory = catchAsync(async (req, res) => {
 const getMyInventory = catchAsync(async (req, res) => {
       const userId = req.user.role === 'staff' && req.user.shopkeeperId ? req.user.shopkeeperId : req.user._id;
 
-      const result = await inventoryService.getMyInventory(userId);
+      const result = await inventoryService.getMyInventory(userId, req.query as Record<string, unknown>);
 
       sendResponse(res, {
             statusCode: StatusCodes.OK,
             success: true,
             message: 'My inventory fetched successfully',
-            data: result,
+            data: Array.isArray(result) ? result : result.data,
+            meta: Array.isArray(result) ? undefined : result.meta,
       });
 });
 

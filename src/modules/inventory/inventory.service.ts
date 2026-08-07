@@ -1276,8 +1276,49 @@ const deleteInventory = async (id: string) => {
       return result;
 };
 
-const getMyInventory = async (userId: string) => {
-      return await Inventory.find({ userId }).populate('userId').sort({ createdAt: -1 });
+const getMyInventory = async (userId: string, query: Record<string, unknown> = {}) => {
+      const shouldPaginate = query.page !== undefined || query.limit !== undefined;
+
+      if (!shouldPaginate) {
+            return await Inventory.find({ userId }).populate('userId').sort({ createdAt: -1 });
+      }
+
+      const requestedPage = Number.parseInt(String(query.page ?? ''), 10);
+      const requestedLimit = Number.parseInt(String(query.limit ?? ''), 10);
+      const page = Number.isFinite(requestedPage) && requestedPage > 0 ? requestedPage : 1;
+      const limit = Number.isFinite(requestedLimit) && requestedLimit > 0 ? Math.min(requestedLimit, 100) : 12;
+      const search = String(query.search ?? '').trim();
+      const categoryId = String(query.categoryId ?? '').trim();
+      const filter: FilterQuery<IInventory> = { userId };
+
+      if (categoryId && Types.ObjectId.isValid(categoryId)) {
+            filter.categoryId = new Types.ObjectId(categoryId);
+      }
+
+      if (search) {
+            const searchExpression = new RegExp(search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+            filter.$or = [
+                  { itemName: searchExpression },
+                  { brand: searchExpression },
+                  { imeiNumber: searchExpression },
+                  { sku: searchExpression },
+            ];
+      }
+
+      const [data, total] = await Promise.all([
+            Inventory.find(filter).populate('userId').sort({ createdAt: -1, _id: -1 }).skip((page - 1) * limit).limit(limit),
+            Inventory.countDocuments(filter),
+      ]);
+
+      return {
+            data,
+            meta: {
+                  page,
+                  limit,
+                  total,
+                  totalPage: Math.max(1, Math.ceil(total / limit)),
+            },
+      };
 };
 
 const getInventoryByUserId = async (userId: string) => {

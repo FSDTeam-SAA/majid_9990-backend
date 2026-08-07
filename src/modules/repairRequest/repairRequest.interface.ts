@@ -5,6 +5,7 @@ export type RepairStatus =
       | 'approved'
       | 'rejected'
       | 'completed'
+      | 'collected'
       | 'inReview'
       | 'start-work'
       | 'quote-sent'

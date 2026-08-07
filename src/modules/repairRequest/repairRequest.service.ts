@@ -65,7 +65,10 @@ const addNewRepairRequest = async (payload: IRepairRequest, files: Express.Multe
 const getMyRepairRequestsHistory = async (userId: string, query: any) => {
       const { page, limit, skip } = getPagination(query);
 
-      const filter = { userId };
+      const readyForCollection = String(query.readyForCollection ?? '').toLowerCase() === 'true';
+      const filter: FilterQuery<IRepairRequest> = readyForCollection
+            ? { userId, status: { $in: ['completed', 'approved'] } }
+            : { userId };
       const data = await RepairRequest.find(filter).skip(skip).limit(limit).sort({ createdAt: -1, _id: -1 });
       const total = await RepairRequest.countDocuments(filter);
 

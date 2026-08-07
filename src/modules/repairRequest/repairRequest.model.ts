@@ -45,6 +45,7 @@ const RepairRequestSchema = new Schema<IRepairRequest>(
                         'approved',
                         'rejected',
                         'completed',
+                        'collected',
                         'inReview',
                         'start-work',
                         'waiting-for-parts',

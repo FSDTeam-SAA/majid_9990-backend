@@ -6,6 +6,7 @@ import { User } from '../user/user.model';
 import { IInvoice, IInvoiceOrderDetails, IInvoicePayload, IInvoicePaymentDetails } from './invoice.interface';
 import { Invoice } from './invoice.model';
 import { Inventory } from '../inventory/inventory.model';
+import RepairRequest from '../repairRequest/repairRequest.model';
 
 const resolveShopkeeperId = async (shopkeeperId?: string) => {
       const trimmedShopkeeperId = String(shopkeeperId ?? '').trim();
@@ -159,6 +160,7 @@ const createInvoice = async (payload: IInvoicePayload, file?: Express.Multer.Fil
                   .toLowerCase() || undefined;
       const paymentDetails = normalizePaymentDetails(payload.paymentDetails);
       const orderDetails = normalizeOrderDetails(payload.orderDetails);
+      const repairRequestId = normalizeObjectId(payload.repairRequestId);
       const totalAmount = normalizeOptionalNumber(payload.totalAmount, 'totalAmount');
       const dueAmount = normalizeOptionalNumber(payload.dueAmount, 'dueAmount');
       const amountPaid = normalizeOptionalNumber(payload.amountPaid, 'amountPaid');
@@ -190,6 +192,18 @@ const createInvoice = async (payload: IInvoicePayload, file?: Express.Multer.Fil
 
       if (payload.paymentStatus && !['paid', 'partial', 'due'].includes(payload.paymentStatus)) {
             throw new AppError('Invalid paymentStatus', StatusCodes.BAD_REQUEST);
+      }
+
+      if (repairRequestId) {
+            const isReadyForCollection = await RepairRequest.exists({
+                  _id: repairRequestId,
+                  userId: shopkeeperId,
+                  status: { $in: ['completed', 'approved'] },
+            });
+
+            if (!isReadyForCollection) {
+                  throw new AppError('Repair order is no longer ready for collection', StatusCodes.CONFLICT);
+            }
       }
 
       if (paymentMethod === 'card' && paymentDetails?.cardLastFour && !/^\d{4}$/.test(paymentDetails.cardLastFour)) {
@@ -224,6 +238,22 @@ const createInvoice = async (payload: IInvoicePayload, file?: Express.Multer.Fil
             discountAmount: normalizeOptionalNumber(payload.discountAmount, 'discountAmount'),
             lineItems,
       });
+
+      if (repairRequestId) {
+            const repairRequest = await RepairRequest.findOneAndUpdate(
+                  {
+                        _id: repairRequestId,
+                        userId: shopkeeperId,
+                        status: { $in: ['completed', 'approved'] },
+                  },
+                  { $set: { status: 'collected' } },
+                  { new: true },
+            );
+
+            if (!repairRequest) {
+                  throw new AppError('Repair order is no longer ready for collection', StatusCodes.CONFLICT);
+            }
+      }
 
       for (const line of lineItems) {
             if (line.variantId) {
