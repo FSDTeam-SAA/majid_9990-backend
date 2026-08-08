@@ -3,6 +3,9 @@ import { StatusCodes } from 'http-status-codes';
 import AppError from '../../errors/AppError';
 import { User } from '../user/user.model';
 import { Shop } from './shop.model';
+import { Category } from '../inventory/category/category.model';
+import { Supplier } from '../supplier/supplier.model';
+import { Inventory } from '../inventory/inventory.model';
 
 export const getShopkeeperId = (user: any): Types.ObjectId => {
   const id = user?.role === 'staff' && user?.shopkeeperId ? user.shopkeeperId : user?._id;
@@ -17,27 +20,44 @@ export const ensureDefaultShop = async (shopkeeperId: Types.ObjectId | string): 
     throw new AppError('Shopkeeper not found', StatusCodes.NOT_FOUND);
   }
 
-  const existing = await Shop.findOne({ shopkeeperId: id, isDefault: true }).lean();
-  if (existing) {
-    return existing;
+  let defaultShop = await Shop.findOne({ shopkeeperId: id, isDefault: true }).lean();
+  if (!defaultShop) {
+    const fallbackName =
+      [user.firstName, user.lastName].filter(Boolean).join(' ').trim() || 'My Shop';
+
+    const created = await Shop.create({
+      shopkeeperId: id,
+      shopName: String(user.shopName || '').trim() || fallbackName,
+      shopAddress: String(user.shopAddress || '').trim(),
+      whatsappNumber: String(user.whatsappNumber || '').trim(),
+      googleReviewPageUrl: String(user.googleReviewPageUrl || '').trim(),
+      currency: user.currency || 'USD',
+      isDefault: true,
+      isActive: true,
+      activatedAt: new Date(),
+    });
+    defaultShop = created.toObject ? created.toObject() : created;
   }
 
-  const fallbackName =
-    [user.firstName, user.lastName].filter(Boolean).join(' ').trim() || 'My Shop';
+  if (defaultShop?._id) {
+    const defaultShopId = defaultShop._id;
+    await Promise.all([
+      Category.updateMany(
+        { shopkeeperId: id, $or: [{ shopId: null }, { shopId: { $exists: false } }] },
+        { $set: { shopId: defaultShopId } }
+      ),
+      Supplier.updateMany(
+        { createdBy: id, $or: [{ shopId: null }, { shopId: { $exists: false } }] },
+        { $set: { shopId: defaultShopId } }
+      ),
+      Inventory.updateMany(
+        { userId: id, $or: [{ storeId: null }, { storeId: { $exists: false } }] },
+        { $set: { storeId: defaultShopId } }
+      ),
+    ]);
+  }
 
-  const created = await Shop.create({
-    shopkeeperId: id,
-    shopName: String(user.shopName || '').trim() || fallbackName,
-    shopAddress: String(user.shopAddress || '').trim(),
-    whatsappNumber: String(user.whatsappNumber || '').trim(),
-    googleReviewPageUrl: String(user.googleReviewPageUrl || '').trim(),
-    currency: user.currency || 'USD',
-    isDefault: true,
-    isActive: true,
-    activatedAt: new Date(),
-  });
-
-  return created;
+  return defaultShop;
 };
 
 export const isValidObjectId = (value?: string | Types.ObjectId | null): boolean =>
@@ -86,17 +106,32 @@ export const getShopFromRequest = async (req: any): Promise<Types.ObjectId> => {
 
 /**
  * Builds a backward-compatible shop-scoped filter for a user-owned collection.
- * Records without a shopId (legacy data) are always included so nothing that
- * existed before the multi-shop feature disappears.
+ * Legacy records without a shopId are assigned to default shop, so only the default shop
+ * includes null/missing shopId, while non-default shops strictly require shopId match.
  */
-export const buildShopScopeFilter = (
+export const buildShopScopeFilter = async (
   userId: Types.ObjectId | string,
-  shopId?: string | Types.ObjectId | null
-): Record<string, any> => {
-  const filter: Record<string, any> = { userId: new Types.ObjectId(String(userId)) };
+  shopId?: string | Types.ObjectId | null,
+  userField: string = 'userId',
+  shopField: string = 'shopId'
+): Promise<Record<string, any>> => {
+  const shopkeeperId = new Types.ObjectId(String(userId));
+  const filter: Record<string, any> = { [userField]: shopkeeperId };
 
   if (isValidObjectId(shopId)) {
-    filter.$or = [{ shopId: new Types.ObjectId(String(shopId)) }, { shopId: null }];
+    const targetShopId = new Types.ObjectId(String(shopId));
+    const defaultShop = await ensureDefaultShop(shopkeeperId);
+    const isDefault = defaultShop._id.toString() === targetShopId.toString();
+
+    if (isDefault) {
+      filter.$or = [
+        { [shopField]: targetShopId },
+        { [shopField]: null },
+        { [shopField]: { $exists: false } },
+      ];
+    } else {
+      filter[shopField] = targetShopId;
+    }
   }
 
   return filter;

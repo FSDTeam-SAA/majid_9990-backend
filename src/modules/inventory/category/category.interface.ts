@@ -4,6 +4,7 @@ export interface ICategory {
       _id?: Types.ObjectId;
       name: string;
       shopkeeperId: Types.ObjectId;
+      shopId?: Types.ObjectId;
       image?: {
             public_id: string;
             url: string;

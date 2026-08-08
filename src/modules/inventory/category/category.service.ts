@@ -4,6 +4,7 @@ import { ICategory } from './category.interface';
 import AppError from '../../../errors/AppError';
 import { Inventory } from '../inventory.model';
 import { uploadToCloudinary, deleteFromCloudinary } from '../../../utils/cloudinary';
+import { buildShopScopeFilter, ensureDefaultShop } from '../../shop/shop.utils';
 
 class CategoryService {
       private getOwnerId(ownerId: string | Types.ObjectId) {
@@ -12,11 +13,28 @@ class CategoryService {
             return resolvedOwnerId;
       }
 
-      private async updateTotalItems(categoryId: Types.ObjectId, shopkeeperId: Types.ObjectId): Promise<void> {
-            const itemCount = await Inventory.countDocuments({
+      private async updateTotalItems(
+            categoryId: Types.ObjectId,
+            shopkeeperId: Types.ObjectId,
+            shopId?: string | Types.ObjectId
+      ): Promise<void> {
+            const inventoryFilter: Record<string, any> = {
                   categoryId: categoryId,
                   status: 'inventory', // Only count active inventory items
-            });
+            };
+            if (shopId && Types.ObjectId.isValid(String(shopId))) {
+                  const targetShopId = new Types.ObjectId(String(shopId));
+                  const defaultShop = await ensureDefaultShop(shopkeeperId);
+                  const isDefault = defaultShop._id.toString() === targetShopId.toString();
+
+                  if (isDefault) {
+                        inventoryFilter.$or = [{ storeId: targetShopId }, { storeId: null }, { storeId: { $exists: false } }];
+                  } else {
+                        inventoryFilter.storeId = targetShopId;
+                  }
+            }
+
+            const itemCount = await Inventory.countDocuments(inventoryFilter);
 
             await Category.findOneAndUpdate({ _id: categoryId, shopkeeperId }, { totalItems: itemCount });
       }
@@ -24,19 +42,23 @@ class CategoryService {
       async createCategory(
             payload: Partial<ICategory>,
             file?: any,
-            shopkeeperId?: string | Types.ObjectId
+            shopkeeperId?: string | Types.ObjectId,
+            shopId?: string | Types.ObjectId
       ): Promise<ICategory> {
             const name = payload.name?.trim();
             const ownerId = this.getOwnerId(shopkeeperId ?? payload.shopkeeperId!);
+            const resolvedShopId = shopId || payload.shopId;
 
             if (!name) {
                   throw new AppError('Category name is required', 400);
             }
 
-            // Check for existing category (case-insensitive)
+            const shopFilter = await buildShopScopeFilter(ownerId, resolvedShopId, 'shopkeeperId', 'shopId');
+
+            // Check for existing category (case-insensitive) within this shop scope
             const existingCategory = await Category.findOne({
                   name: { $regex: new RegExp(`^${name}$`, 'i') },
-                  shopkeeperId: ownerId,
+                  ...shopFilter,
             });
 
             if (existingCategory) {
@@ -57,6 +79,7 @@ class CategoryService {
             const category = await Category.create({
                   name,
                   shopkeeperId: ownerId,
+                  shopId: resolvedShopId && Types.ObjectId.isValid(String(resolvedShopId)) ? new Types.ObjectId(String(resolvedShopId)) : undefined,
                   image: imageData,
                   totalItems: 0,
             });
@@ -64,19 +87,25 @@ class CategoryService {
             return category;
       }
 
-      async getAllCategories(shopkeeperId: string | Types.ObjectId): Promise<ICategory[]> {
+      async getAllCategories(shopkeeperId: string | Types.ObjectId, shopId?: string | Types.ObjectId): Promise<ICategory[]> {
             const ownerId = this.getOwnerId(shopkeeperId);
-            const categories = await Category.find({ shopkeeperId: ownerId }).sort({ createdAt: -1 });
+            const filter = await buildShopScopeFilter(ownerId, shopId, 'shopkeeperId', 'shopId');
+            const categories = await Category.find(filter).sort({ createdAt: -1 });
             return categories;
       }
 
-      async getCategoryById(id: string, shopkeeperId: string | Types.ObjectId): Promise<ICategory | null> {
+      async getCategoryById(
+            id: string,
+            shopkeeperId: string | Types.ObjectId,
+            shopId?: string | Types.ObjectId
+      ): Promise<ICategory | null> {
             if (!Types.ObjectId.isValid(id)) {
                   throw new AppError('Invalid category ID', 400);
             }
 
             const ownerId = this.getOwnerId(shopkeeperId);
-            const category = await Category.findOne({ _id: id, shopkeeperId: ownerId });
+            const filter = { _id: id, ...(await buildShopScopeFilter(ownerId, shopId, 'shopkeeperId', 'shopId')) };
+            const category = await Category.findOne(filter);
 
             if (!category) {
                   throw new AppError('Category not found', 404);
@@ -89,14 +118,17 @@ class CategoryService {
             id: string,
             payload: Partial<ICategory>,
             file?: any,
-            shopkeeperId?: string | Types.ObjectId
+            shopkeeperId?: string | Types.ObjectId,
+            shopId?: string | Types.ObjectId
       ): Promise<ICategory | null> {
             if (!Types.ObjectId.isValid(id)) {
                   throw new AppError('Invalid category ID', 400);
             }
 
             const ownerId = this.getOwnerId(shopkeeperId ?? payload.shopkeeperId!);
-            const category = await Category.findOne({ _id: id, shopkeeperId: ownerId });
+            const resolvedShopId = shopId || payload.shopId;
+            const filter = { _id: id, ...(await buildShopScopeFilter(ownerId, resolvedShopId, 'shopkeeperId', 'shopId')) };
+            const category = await Category.findOne(filter);
             if (!category) {
                   throw new AppError('Category not found', 404);
             }
@@ -120,10 +152,11 @@ class CategoryService {
             // Update name if provided and check for duplicates
             if (payload.name && payload.name !== category.name) {
                   const name = payload.name.trim();
+                  const shopFilter = await buildShopScopeFilter(ownerId, resolvedShopId, 'shopkeeperId', 'shopId');
                   const existingCategory = await Category.findOne({
                         name: { $regex: new RegExp(`^${name}$`, 'i') },
                         _id: { $ne: id },
-                        shopkeeperId: ownerId,
+                        ...shopFilter,
                   });
 
                   if (existingCategory) {
@@ -141,13 +174,18 @@ class CategoryService {
             return updatedCategory;
       }
 
-      async deleteCategory(id: string, shopkeeperId: string | Types.ObjectId): Promise<void> {
+      async deleteCategory(
+            id: string,
+            shopkeeperId: string | Types.ObjectId,
+            shopId?: string | Types.ObjectId
+      ): Promise<void> {
             if (!Types.ObjectId.isValid(id)) {
                   throw new AppError('Invalid category ID', 400);
             }
 
             const ownerId = this.getOwnerId(shopkeeperId);
-            const category = await Category.findOne({ _id: id, shopkeeperId: ownerId });
+            const filter = { _id: id, ...(await buildShopScopeFilter(ownerId, shopId, 'shopkeeperId', 'shopId')) };
+            const category = await Category.findOne(filter);
             if (!category) {
                   throw new AppError('Category not found', 404);
             }
@@ -169,23 +207,56 @@ class CategoryService {
             await Category.findByIdAndDelete(id);
       }
 
-      async updateInventoryCategoryCount(categoryId: Types.ObjectId, shopkeeperId: Types.ObjectId): Promise<void> {
-            await this.updateTotalItems(categoryId, shopkeeperId);
+      async updateInventoryCategoryCount(
+            categoryId: Types.ObjectId,
+            shopkeeperId: Types.ObjectId,
+            shopId?: Types.ObjectId
+      ): Promise<void> {
+            await this.updateTotalItems(categoryId, shopkeeperId, shopId);
       }
 
-      async getCategoriesWithItemCount(shopkeeperId: string | Types.ObjectId): Promise<any[]> {
+      async getCategoriesWithItemCount(shopkeeperId: string | Types.ObjectId, shopId?: string | Types.ObjectId): Promise<any[]> {
             const ownerId = this.getOwnerId(shopkeeperId);
+            const matchFilter = await buildShopScopeFilter(ownerId, shopId, 'shopkeeperId', 'shopId');
+
+            const storeMatch: Record<string, any>[] = [
+                  { $eq: ['$categoryId', '$$catId'] },
+                  { $eq: ['$status', 'inventory'] },
+            ];
+
+            if (shopId && Types.ObjectId.isValid(String(shopId))) {
+                  const storeObjId = new Types.ObjectId(String(shopId));
+                  const defaultShop = await ensureDefaultShop(ownerId);
+                  const isDefault = defaultShop._id.toString() === storeObjId.toString();
+
+                  if (isDefault) {
+                        storeMatch.push({
+                              $or: [
+                                    { $eq: ['$storeId', storeObjId] },
+                                    { $eq: ['$storeId', null] },
+                                    { $not: ['$storeId'] },
+                              ],
+                        });
+                  } else {
+                        storeMatch.push({ $eq: ['$storeId', storeObjId] });
+                  }
+            }
+
             const categories = await Category.aggregate([
                   {
-                        $match: {
-                              shopkeeperId: ownerId,
-                        },
+                        $match: matchFilter,
                   },
                   {
                         $lookup: {
                               from: 'inventories',
-                              localField: '_id',
-                              foreignField: 'categoryId',
+                              let: { catId: '$_id' },
+                              pipeline: [
+                                    {
+                                          $match: {
+                                                $and: storeMatch,
+                                          },
+                                    },
+                              ],
                               as: 'items',
                         },
                   },
@@ -207,19 +278,16 @@ class CategoryService {
             return categories;
       }
 
-      async bulkUpdateTotalItems(shopkeeperId: string | Types.ObjectId): Promise<void> {
+      async bulkUpdateTotalItems(shopkeeperId: string | Types.ObjectId, shopId?: string | Types.ObjectId): Promise<void> {
             const ownerId = this.getOwnerId(shopkeeperId);
-            const categories = await Category.find({ shopkeeperId: ownerId });
+            const filter = await buildShopScopeFilter(ownerId, shopId, 'shopkeeperId', 'shopId');
+            const categories = await Category.find(filter);
 
             for (const category of categories) {
-                  const itemCount = await Inventory.countDocuments({
-                        categoryId: category._id,
-                        status: 'inventory',
-                  });
-
-                  await Category.findOneAndUpdate(
-                        { _id: category._id, shopkeeperId: ownerId },
-                        { totalItems: itemCount }
+                  await this.updateTotalItems(
+                        category._id,
+                        ownerId,
+                        shopId ? new Types.ObjectId(String(shopId)) : undefined
                   );
             }
       }

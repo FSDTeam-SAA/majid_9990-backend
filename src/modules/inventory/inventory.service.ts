@@ -15,6 +15,7 @@ import { LowStockAlert } from '../lowStockAlert/lowStockAlert.model';
 import { User } from '../user/user.model';
 import categoryService from './category/category.service';
 import locationService from '../location/location.service';
+import { ensureDefaultShop } from '../shop/shop.utils';
 
 const parseOptionalNumber = (value: unknown) => {
       if (value === undefined || value === null || value === '') {
@@ -1289,7 +1290,15 @@ const getMyInventory = async (userId: string, query: Record<string, unknown> = {
       const shopId = String(query.shopId ?? '').trim();
       const shopScope: FilterQuery<IInventory> = {};
       if (shopId && Types.ObjectId.isValid(shopId)) {
-            shopScope.$or = [{ storeId: new Types.ObjectId(shopId) }, { storeId: null }, { storeId: { $exists: false } }];
+            const targetShopId = new Types.ObjectId(shopId);
+            const defaultShop = await ensureDefaultShop(userId);
+            const isDefault = defaultShop._id.toString() === targetShopId.toString();
+
+            if (isDefault) {
+                  shopScope.$or = [{ storeId: targetShopId }, { storeId: null }, { storeId: { $exists: false } }];
+            } else {
+                  shopScope.storeId = targetShopId;
+            }
       }
 
       const shouldPaginate = query.page !== undefined || query.limit !== undefined;

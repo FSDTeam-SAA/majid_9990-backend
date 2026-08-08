@@ -42,7 +42,8 @@ const getAllSuppliers = catchAsync(async (req, res) => {
 
 const getSupplierById = catchAsync(async (req, res) => {
   const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-  const result = await supplierService.getSupplierById(id);
+  const shopId = await getShopFromRequest(req);
+  const result = await supplierService.getSupplierById(id, shopId ? String(shopId) : undefined);
 
   sendResponse(res, {
     statusCode: StatusCodes.OK,

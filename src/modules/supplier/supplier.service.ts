@@ -1,13 +1,18 @@
 import { StatusCodes } from 'http-status-codes';
+import { Types } from 'mongoose';
 import AppError from '../../errors/AppError';
 import { Inventory } from '../inventory/inventory.model';
 import { ISupplier } from './supplier.interface';
 import { Supplier } from './supplier.model';
-import { buildShopScopeFilter } from '../shop/shop.utils';
+import { buildShopScopeFilter, ensureDefaultShop } from '../shop/shop.utils';
 
 const createSupplier = async (userId: string, payload: Partial<ISupplier>) => {
   if (payload.email) {
-    const exists = await Supplier.findOne({ email: payload.email });
+    const filter: Record<string, any> = { email: payload.email, createdBy: userId };
+    if (payload.shopId) {
+      filter.shopId = payload.shopId;
+    }
+    const exists = await Supplier.findOne(filter);
     if (exists) {
       throw new AppError('Supplier with this email already exists', StatusCodes.CONFLICT);
     }
@@ -28,7 +33,7 @@ const getAllSuppliers = async (query: {
   const { page = 1, limit = 10, search, isActive, userId, shopId } = query;
   const skip = (page - 1) * limit;
 
-  const filter: Record<string, unknown> = buildShopScopeFilter(userId, shopId);
+  const filter: Record<string, unknown> = await buildShopScopeFilter(userId, shopId, 'createdBy', 'shopId');
 
   if (isActive !== undefined) {
     filter.isActive = isActive === 'true';
@@ -54,16 +59,38 @@ const getAllSuppliers = async (query: {
   };
 };
 
-const getSupplierById = async (id: string) => {
+const getSupplierById = async (id: string, shopId?: string) => {
   const supplier = await Supplier.findById(id);
   if (!supplier) {
     throw new AppError('Supplier not found', StatusCodes.NOT_FOUND);
   }
 
+  const inventoryFilter: Record<string, any> = { supplierId: id };
+  let matchStoreQuery: Record<string, any> = {};
+
+  if (shopId && Types.ObjectId.isValid(shopId)) {
+    const targetShopId = new Types.ObjectId(shopId);
+    const defaultShop = await ensureDefaultShop(supplier.createdBy);
+    const isDefault = defaultShop._id.toString() === targetShopId.toString();
+
+    if (isDefault) {
+      inventoryFilter.$or = [{ storeId: targetShopId }, { storeId: null }, { storeId: { $exists: false } }];
+      matchStoreQuery = { $or: [{ storeId: targetShopId }, { storeId: null }, { storeId: { $exists: false } }] };
+    } else {
+      inventoryFilter.storeId = targetShopId;
+      matchStoreQuery = { storeId: targetShopId };
+    }
+  }
+
   const [deliveryHistory, inventoryStats] = await Promise.all([
-    Inventory.find({ supplierId: id }).sort({ createdAt: -1 }),
+    Inventory.find(inventoryFilter).sort({ createdAt: -1 }),
     Inventory.aggregate([
-      { $match: { supplierId: supplier._id } },
+      {
+        $match: {
+          supplierId: supplier._id,
+          ...matchStoreQuery,
+        },
+      },
       {
         $group: {
           _id: null,
