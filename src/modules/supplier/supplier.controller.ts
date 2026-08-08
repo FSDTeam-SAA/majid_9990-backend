@@ -2,10 +2,13 @@ import { StatusCodes } from 'http-status-codes';
 import catchAsync from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
 import supplierService from './supplier.service';
+import { getShopFromRequest } from '../shop/shop.utils';
 
 const createSupplier = catchAsync(async (req, res) => {
-  const userId = req.user._id;
-  const result = await supplierService.createSupplier(userId, req.body ?? {});
+  const userId = req.user.role === 'staff' && req.user.shopkeeperId ? req.user.shopkeeperId : req.user._id;
+  const storeId = await getShopFromRequest(req);
+  const payload = { ...req.body, shopId: storeId };
+  const result = await supplierService.createSupplier(userId, payload);
 
   sendResponse(res, {
     statusCode: StatusCodes.CREATED,
@@ -17,11 +20,15 @@ const createSupplier = catchAsync(async (req, res) => {
 
 const getAllSuppliers = catchAsync(async (req, res) => {
   const { page, limit, search, isActive } = req.query;
+  const userId = req.user.role === 'staff' && req.user.shopkeeperId ? req.user.shopkeeperId : req.user._id;
+  const shopId = await getShopFromRequest(req);
   const result = await supplierService.getAllSuppliers({
     page: page ? Number(page) : undefined,
     limit: limit ? Number(limit) : undefined,
     search: search as string | undefined,
     isActive: isActive as string | undefined,
+    userId: String(userId),
+    shopId: shopId ? String(shopId) : undefined,
   });
 
   sendResponse(res, {

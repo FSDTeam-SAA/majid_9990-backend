@@ -9,6 +9,7 @@ export interface ISupplier {
   notes?: string;
   isActive: boolean;
   createdBy: Types.ObjectId;
+  shopId?: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
 }

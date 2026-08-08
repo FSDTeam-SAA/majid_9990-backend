@@ -3,6 +3,7 @@ import AppError from '../../errors/AppError';
 import { Inventory } from '../inventory/inventory.model';
 import { ISupplier } from './supplier.interface';
 import { Supplier } from './supplier.model';
+import { buildShopScopeFilter } from '../shop/shop.utils';
 
 const createSupplier = async (userId: string, payload: Partial<ISupplier>) => {
   if (payload.email) {
@@ -21,11 +22,13 @@ const getAllSuppliers = async (query: {
   limit?: number;
   search?: string;
   isActive?: string;
+  userId: string;
+  shopId?: string;
 }) => {
-  const { page = 1, limit = 10, search, isActive } = query;
+  const { page = 1, limit = 10, search, isActive, userId, shopId } = query;
   const skip = (page - 1) * limit;
 
-  const filter: Record<string, unknown> = {};
+  const filter: Record<string, unknown> = buildShopScopeFilter(userId, shopId);
 
   if (isActive !== undefined) {
     filter.isActive = isActive === 'true';

@@ -10,6 +10,7 @@ const supplierSchema = new Schema<ISupplier>(
     notes: { type: String, trim: true },
     isActive: { type: Boolean, default: true },
     createdBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    shopId: { type: Schema.Types.ObjectId, ref: 'Shop' },
   },
   {
     timestamps: true,
