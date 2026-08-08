@@ -2,6 +2,7 @@ import ScanInfo from './scanInfo.model';
 import { ensureSavedScanReportPdf } from './scanReportPdf.service';
 import { buildStructuredScanInfo } from './scanInfo.transformer';
 import { dhruService } from './dhru.service';
+import { buildShopScopeFilter } from '../shop/shop.utils';
 import axios from 'axios';
 
 const DEFAULT_SERVICE_ID = Number(process.env.DHRU_SERVICE_ID ?? 6);
@@ -667,12 +668,18 @@ export const resolveServiceId = (serviceId: unknown) => Number(serviceId ?? DEFA
 
 export const validateServiceId = (serviceId: number) => Number.isFinite(serviceId) && serviceId > 0;
 
-export const getExistingScanInfoByImei = async (imei: string, serviceId: number, userId?: string) => {
+export const getExistingScanInfoByImei = async (
+      imei: string,
+      serviceId: number,
+      userId?: string,
+      shopId?: string
+) => {
       if (!userId) {
             return ScanInfo.findOne({ imei, serviceId }).sort({ updatedAt: -1 }).lean();
       }
 
-      const userScan = await ScanInfo.findOne({ imei, serviceId, userId }).sort({ updatedAt: -1 }).lean();
+      const shopFilter = shopId ? await buildShopScopeFilter(userId, shopId, 'userId', 'shopId') : { userId };
+      const userScan = await ScanInfo.findOne({ imei, serviceId, ...shopFilter }).sort({ updatedAt: -1 }).lean();
       if (userScan) {
             return userScan;
       }
@@ -688,16 +695,18 @@ export const getExistingScanInfoByImei = async (imei: string, serviceId: number,
       const {
             _id: _sourceId,
             userId: _sourceUserId,
+            shopId: _sourceShopId,
             createdAt: _createdAt,
             updatedAt: _updatedAt,
             ...scanData
       } = cachedScan;
       const copiedScan = await ScanInfo.findOneAndUpdate(
-            { imei, serviceId, userId },
+            { imei, serviceId, ...shopFilter },
             {
                   $set: {
                         ...scanData,
                         userId,
+                        ...(shopId ? { shopId } : {}),
                         reportActions: {
                               ...scanData.reportActions,
                               pdfCertificateUrl: null,

@@ -18,6 +18,7 @@ import {
 import { creditUserBalance, debitUserBalance } from '../payment/balanceTransaction.service';
 import ScanInfo from './scanInfo.model';
 import { ensureSavedScanReportPdf, getSavedScanReportPdfPath } from './scanReportPdf.service';
+import { buildShopScopeFilter } from '../shop/shop.utils';
 
 type SingleImeiCheckResult =
       | {
@@ -584,7 +585,7 @@ const extractImeisFromWorkbook = (filePath: string) => {
 export const checkImeiFromDhru = async (req: Request, res: Response, next: NextFunction) => {
       try {
             const userId = req.user._id;
-            const shopId = String(req.query?.shopId ?? '').trim() || undefined;
+            const shopId = String(req.query?.shopId ?? req.body?.shopId ?? '').trim() || undefined;
 
             // ===== IMEI NORMALIZATION =====
             const imeiInput = req.body?.imei;
@@ -643,7 +644,7 @@ export const checkImeiFromDhru = async (req: Request, res: Response, next: NextF
 export const checkImeiFromDhruV2 = async (req: Request, res: Response, next: NextFunction) => {
       try {
             const userId = req.user?._id?.toString();
-            const shopId = String(req.query?.shopId ?? '').trim() || undefined;
+            const shopId = String(req.query?.shopId ?? req.body?.shopId ?? '').trim() || undefined;
 
             // ===== IMEI NORMALIZATION =====
             const imeiInput = req.body?.imei;
@@ -674,7 +675,8 @@ export const checkImeiFromDhruV2 = async (req: Request, res: Response, next: Nex
                   userId: string | undefined,
                   imei: string,
                   serviceId: number,
-                  shouldGenerateFresh: boolean
+                  shouldGenerateFresh: boolean,
+                  shopId?: string
             ) => {
                   if (!imei || !isValidImei(imei)) {
                         return {
@@ -755,7 +757,8 @@ export const checkImeiFromDhruV2 = async (req: Request, res: Response, next: Nex
                                                 const existingScanInfo = await getExistingScanInfoByImei(
                                                       imei,
                                                       svcId,
-                                                      userId
+                                                      userId,
+                                                      shopId
                                                 );
                                                 if (existingScanInfo) {
                                                       return {
@@ -908,7 +911,7 @@ export const checkImeiFromDhruV2 = async (req: Request, res: Response, next: Nex
                         // Single serviceId: try cache first unless fresh requested
                         const existingScanInfo = shouldGenerateFresh
                               ? null
-                              : await getExistingScanInfoByImei(imei, serviceId, userId);
+                              : await getExistingScanInfoByImei(imei, serviceId, userId, shopId);
 
                         if (existingScanInfo) {
                               const parsedProviderData = extractProviderDataFromHtml(
@@ -1046,7 +1049,7 @@ export const checkImeiFromDhruV2 = async (req: Request, res: Response, next: Nex
 export const checkImeisFromFile = async (req: Request, res: Response, next: NextFunction) => {
       const file = req.file;
       const userId = req.user._id;
-      const shopId = String(req.query?.shopId ?? '').trim() || undefined;
+      const shopId = String(req.query?.shopId ?? req.body?.shopId ?? '').trim() || undefined;
       const shouldGenerateFresh =
             String(req.body?.genarate ?? req.body?.generate ?? '')
                   .trim()
@@ -1181,12 +1184,10 @@ export const getRecentChecksHistory = async (req: Request, res: Response, next: 
             const limit = Number.isFinite(limitQuery) && limitQuery > 0 ? Math.min(Math.floor(limitQuery), 50) : 10;
             const skip = (page - 1) * limit;
 
-            const filter: any = req.user?._id ? { userId: req.user._id } : {};
-            const shopId = String(req.query?.shopId ?? '').trim();
-
-            if (shopId && Types.ObjectId.isValid(shopId)) {
-                  filter.shopId = new Types.ObjectId(shopId);
-            }
+            const shopId = String(req.query?.shopId ?? req.body?.shopId ?? '').trim();
+            const filter = req.user?._id
+                  ? await buildShopScopeFilter(req.user._id, shopId, 'userId', 'shopId')
+                  : {};
 
             const [history, total] = await Promise.all([
                   ScanInfo.find(filter)

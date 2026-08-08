@@ -6,6 +6,7 @@ import { Shop } from './shop.model';
 import { Category } from '../inventory/category/category.model';
 import { Supplier } from '../supplier/supplier.model';
 import { Inventory } from '../inventory/inventory.model';
+import ScanInfo from '../deviceCheck/scanInfo.model';
 
 export const getShopkeeperId = (user: any): Types.ObjectId => {
   const id = user?.role === 'staff' && user?.shopkeeperId ? user.shopkeeperId : user?._id;
@@ -53,6 +54,10 @@ export const ensureDefaultShop = async (shopkeeperId: Types.ObjectId | string): 
       Inventory.updateMany(
         { userId: id, $or: [{ storeId: null }, { storeId: { $exists: false } }] },
         { $set: { storeId: defaultShopId } }
+      ),
+      ScanInfo.updateMany(
+        { userId: id, $or: [{ shopId: null }, { shopId: { $exists: false } }] },
+        { $set: { shopId: defaultShopId } }
       ),
     ]);
   }
