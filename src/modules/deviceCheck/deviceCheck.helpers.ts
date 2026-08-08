@@ -832,7 +832,6 @@ export const runImeiCheck = async (
             }
       }
 
-      const structuredInfo = await buildStructuredScanInfo(imei, providerPayload ?? {});
       const providerPayloadRecord = providerPayload as Record<string, any> | null;
       const providerHtml =
             typeof providerPayloadRecord?.result === 'string'
@@ -843,6 +842,8 @@ export const runImeiCheck = async (
                       ? providerPayloadRecord.data
                       : null;
       const parsedProviderData = extractProviderDataFromHtml(providerHtml);
+
+      const structuredInfo = await buildStructuredScanInfo(imei, providerPayload ?? {}, parsedProviderData);
       let providerDataRaw: string | null = null;
 
       try {

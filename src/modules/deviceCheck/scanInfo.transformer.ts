@@ -242,15 +242,28 @@ export const getOpenAiInsight = async (params: {
 
 // This function processes IMEI scan data from a provider response. It extracts device details, checks blacklist, financing, and FMI/iCloud lock status, calculates device risk and estimated market value, generates AI-based insights, and returns a structured report containing device status, risk meter, market value, verification checks, and report generation information.
 
-export const buildStructuredScanInfo = async (imei: string, providerData: ProviderPayload) => {
+export const buildStructuredScanInfo = async (
+      imei: string,
+      providerData: ProviderPayload,
+      parsedProviderData?: Record<string, unknown>
+) => {
       const sourceText = extractTextBlock(providerData);
 
-      const manufacturer = getFirstField(sourceText, ['Manufacturer', 'Brand']);
-      const marketingName = getFirstField(sourceText, ['Marketing Name', 'Model Name']);
-      const fullName = getFirstField(sourceText, ['Full Name', 'Device Name']);
-      const modelCode = getFirstField(sourceText, ['Model Code']);
-      const modelNumber = getFirstField(sourceText, ['Model Number']);
-      const model = getFirstField(sourceText, ['Model', 'Product']);
+      const getParsedField = (keys: string[]) => {
+            if (!parsedProviderData) return null;
+            for (const key of keys) {
+                  const val = parsedProviderData[key];
+                  if (typeof val === 'string' && val.trim().length > 0) return val.trim();
+            }
+            return null;
+      };
+
+      const manufacturer = getParsedField(['manufacturer', 'brand']) ?? getFirstField(sourceText, ['Manufacturer', 'Brand']);
+      const marketingName = getParsedField(['marketing_name', 'model_name']) ?? getFirstField(sourceText, ['Marketing Name', 'Model Name']);
+      const fullName = getParsedField(['full_name', 'device_name', 'device']) ?? getFirstField(sourceText, ['Full Name', 'Device Name', 'Device']);
+      const modelCode = getParsedField(['model_code']) ?? getFirstField(sourceText, ['Model Code']);
+      const modelNumber = getParsedField(['model_number']) ?? getFirstField(sourceText, ['Model Number']);
+      const model = getParsedField(['model', 'product', 'model_description', 'product_description']) ?? getFirstField(sourceText, ['Model', 'Product']);
       const blacklistStatusRaw = getField(sourceText, 'Blacklist Status') ?? 'Unknown';
       const generalListStatus = (getField(sourceText, 'General List Status') ?? '').toLowerCase();
 
