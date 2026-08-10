@@ -1,0 +1,2362 @@
+[
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c634ed"
+    },
+    "normalizedName": "applesoldbycountryinfo",
+    "category": "APPLE CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "APPLE SOLD BY & COUNTRY INFO",
+    "price": "2.38",
+    "serviceId": 105,
+    "serviceIds": [
+      105
+    ],
+    "sourceNames": [
+      "APPLE SOLD BY & COUNTRY INFO"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c634ee"
+    },
+    "normalizedName": "applegsxpremiumdetails",
+    "category": "APPLE CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "APPLE GSX PREMIUM DETAILS",
+    "price": "2.79",
+    "serviceId": 63,
+    "serviceIds": [
+      63
+    ],
+    "sourceNames": [
+      "APPLE GSX PREMIUM DETAILS"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c634ef"
+    },
+    "normalizedName": "applereplacementshistory",
+    "category": "APPLE CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "APPLE REPLACEMENTS HISTORY",
+    "price": "1.19",
+    "serviceId": 29,
+    "serviceIds": [
+      29
+    ],
+    "sourceNames": [
+      "APPLE REPLACEMENTS HISTORY"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c634f0"
+    },
+    "normalizedName": "applegsxrepaireligibility",
+    "category": "APPLE CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "APPLE GSX REPAIR ELIGIBILITY",
+    "price": "1.19",
+    "serviceId": 77,
+    "serviceIds": [
+      77
+    ],
+    "sourceNames": [
+      "APPLE GSX REPAIR ELIGIBILITY"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c634f5"
+    },
+    "normalizedName": "iphonecarrierfmi",
+    "category": "APPLE CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "IPHONE CARRIER & FMI",
+    "price": "0.08",
+    "serviceId": 78,
+    "serviceIds": [
+      78
+    ],
+    "sourceNames": [
+      "iPHONE CARRIER & FMI"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c634f4"
+    },
+    "normalizedName": "iphonecarrier",
+    "category": "APPLE CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "IPHONE CARRIER",
+    "price": "0.06",
+    "serviceId": 103,
+    "serviceIds": [
+      103
+    ],
+    "sourceNames": [
+      "iPHONE CARRIER"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c634f3"
+    },
+    "normalizedName": "applepartnumbermpn",
+    "category": "APPLE CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "APPLE PART NUMBER - MPN",
+    "price": "0.15",
+    "serviceId": 219,
+    "serviceIds": [
+      219
+    ],
+    "sourceNames": [
+      "APPLE PART NUMBER - MPN"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c634f2"
+    },
+    "normalizedName": "appleicloudidhint",
+    "category": "APPLE CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "APPLE ICLOUD ID HINT",
+    "price": "0.40",
+    "serviceId": 60,
+    "serviceIds": [
+      60
+    ],
+    "sourceNames": [
+      "APPLE iCLOUD ID HINT"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c634f1"
+    },
+    "normalizedName": "applegsxcasesrepairs",
+    "category": "APPLE CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "APPLE GSX CASES & REPAIRS",
+    "price": "1.19",
+    "serviceId": 68,
+    "serviceIds": [
+      68
+    ],
+    "sourceNames": [
+      "APPLE GSX CASES & REPAIRS"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c634f7"
+    },
+    "normalizedName": "iphonemodelcolorcapacity",
+    "category": "APPLE CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "IPHONE MODEL COLOR & CAPACITY",
+    "price": "0.022",
+    "serviceId": 92,
+    "serviceIds": [
+      92
+    ],
+    "sourceNames": [
+      "iPHONE MODEL COLOR & CAPACITY"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c634f6"
+    },
+    "normalizedName": "iphonecarrierfmiblacklist",
+    "category": "APPLE CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "IPHONE CARRIER & FMI & BLACKLIST",
+    "price": "0.10",
+    "serviceId": 61,
+    "serviceIds": [
+      61
+    ],
+    "sourceNames": [
+      "iPHONE CARRIER & FMI & BLACKLIST"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c634fb"
+    },
+    "normalizedName": "appleserialinfo",
+    "category": "APPLE CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "APPLE SERIAL INFO",
+    "price": "0.01",
+    "serviceId": 26,
+    "serviceIds": [
+      26
+    ],
+    "sourceNames": [
+      "APPLE SERIAL INFO"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c634fa"
+    },
+    "normalizedName": "applebasicinfo",
+    "category": "APPLE CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "APPLE BASIC INFO",
+    "price": "0.07",
+    "serviceId": 30,
+    "serviceIds": [
+      30
+    ],
+    "sourceNames": [
+      "APPLE BASIC INFO"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c634f8"
+    },
+    "normalizedName": "iphonesimlock",
+    "category": "APPLE CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "IPHONE SIM-LOCK",
+    "price": "0.025",
+    "serviceId": 8,
+    "serviceIds": [
+      8
+    ],
+    "sourceNames": [
+      "iPHONE SIM-LOCK"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c634f9"
+    },
+    "normalizedName": "imeisnconvert",
+    "category": "APPLE CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "IMEI SN CONVERT",
+    "price": "0.01",
+    "serviceId": null,
+    "serviceIds": [],
+    "sourceNames": [],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c634fc"
+    },
+    "normalizedName": "icloudonoff",
+    "category": "APPLE CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "ICLOUD ON/OFF",
+    "price": "0.02",
+    "serviceId": 3,
+    "serviceIds": [
+      3
+    ],
+    "sourceNames": [
+      "iCLOUD ON/OFF"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c634fd"
+    },
+    "normalizedName": "appleactivationstatus",
+    "category": "APPLE CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "APPLE ACTIVATION STATUS",
+    "price": "0.04",
+    "serviceId": 101,
+    "serviceIds": [
+      101
+    ],
+    "sourceNames": [
+      "APPLE ACTIVATION STATUS"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c634fe"
+    },
+    "normalizedName": "appleactivationstatuspro",
+    "category": "APPLE CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "APPLE ACTIVATION STATUS - PRO",
+    "price": "0.04",
+    "serviceId": 88,
+    "serviceIds": [
+      88
+    ],
+    "sourceNames": [
+      "APPLE ACTIVATION STATUS - PRO"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c634ff"
+    },
+    "normalizedName": "appledemodevicesinfo",
+    "category": "APPLE CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "APPLE DEMO DEVICES INFO",
+    "price": "0.19",
+    "serviceId": 85,
+    "serviceIds": [
+      85
+    ],
+    "sourceNames": [
+      "APPLE DEMO DEVICES INFO"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c63500"
+    },
+    "normalizedName": "applemdmstatus",
+    "category": "APPLE CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "APPLE MDM STATUS",
+    "price": "0.44",
+    "serviceId": 81,
+    "serviceIds": [
+      81
+    ],
+    "sourceNames": [
+      "APPLE MDM STATUS"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c63501"
+    },
+    "normalizedName": "applemdmicloudgsxstatus",
+    "category": "APPLE CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "APPLE MDM & ICLOUD & GSX STATUS",
+    "price": "0.49",
+    "serviceId": 72,
+    "serviceIds": [
+      72
+    ],
+    "sourceNames": [
+      "APPLE MDM & iCLOUD & GSX STATUS"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c63502"
+    },
+    "normalizedName": "macbookimacicloudonoffstatus",
+    "category": "APPLE CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "MACBOOK & IMAC ICLOUD ON/OFF STATUS",
+    "price": "0.19",
+    "serviceId": 110,
+    "serviceIds": [
+      110
+    ],
+    "sourceNames": [
+      "MACBOOK & iMAC iCLOUD ON/OFF STATUS"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c63503"
+    },
+    "normalizedName": "iphonemacicloudcleanloststatus",
+    "category": "APPLE CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "IPHONE & MAC ICLOUD CLEAN/LOST STATUS",
+    "price": "0.22",
+    "serviceId": 66,
+    "serviceIds": [
+      66
+    ],
+    "sourceNames": [
+      "iPHONE & MAC iCLOUD CLEAN/LOST STATUS"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c63504"
+    },
+    "normalizedName": "attusastatusunlock",
+    "category": "STATUS CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "AT&T USA STATUS & UNLOCK",
+    "price": "0.40",
+    "serviceId": 65,
+    "serviceIds": [
+      65
+    ],
+    "sourceNames": [
+      "AT&T USA STATUS & UNLOCK"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c63505"
+    },
+    "normalizedName": "tmobileusastatuspro",
+    "category": "STATUS CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "T-MOBILE USA STATUS - PRO",
+    "price": "0.05",
+    "serviceId": 16,
+    "serviceIds": [
+      16
+    ],
+    "sourceNames": [
+      "T-MOBILE USA STATUS - PRO"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c63506"
+    },
+    "normalizedName": "cricketusastatuspro",
+    "category": "STATUS CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "CRICKET USA STATUS - PRO",
+    "price": "0.15",
+    "serviceId": 21,
+    "serviceIds": [
+      21
+    ],
+    "sourceNames": [
+      "CRICKET USA STATUS - PRO"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c63507"
+    },
+    "normalizedName": "verizonusastatuspro",
+    "category": "STATUS CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "VERIZON USA STATUS - PRO",
+    "price": "0.05",
+    "serviceId": 232,
+    "serviceIds": [
+      232
+    ],
+    "sourceNames": [
+      "VERIZON USA STATUS - PRO"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c63508"
+    },
+    "normalizedName": "verizonusastatus",
+    "category": "STATUS CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "VERIZON USA STATUS",
+    "price": "0.05",
+    "serviceId": 9,
+    "serviceIds": [
+      9
+    ],
+    "sourceNames": [
+      "VERIZON USA STATUS"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c63509"
+    },
+    "normalizedName": "xfinityusastatuspro",
+    "category": "STATUS CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "XFINITY USA STATUS - PRO",
+    "price": "0.08",
+    "serviceId": 230,
+    "serviceIds": [
+      230
+    ],
+    "sourceNames": [
+      "XFINITY USA STATUS - PRO"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c6350a"
+    },
+    "normalizedName": "cspireusastatuspro",
+    "category": "STATUS CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "CSPIRE USA STATUS - PRO",
+    "price": "0.08",
+    "serviceId": 231,
+    "serviceIds": [
+      231
+    ],
+    "sourceNames": [
+      "CSPIRE USA STATUS - PRO"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c6350b"
+    },
+    "normalizedName": "tracfoneusastatuspro",
+    "category": "STATUS CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "TRACFONE USA STATUS - PRO",
+    "price": "0.06",
+    "serviceId": 220,
+    "serviceIds": [
+      220
+    ],
+    "sourceNames": [
+      "TRACFONE USA STATUS - PRO"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c6350c"
+    },
+    "normalizedName": "wwblackliststatus",
+    "category": "STATUS CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "WW BLACKLIST STATUS",
+    "price": "0.04",
+    "serviceId": 54,
+    "serviceIds": [
+      54
+    ],
+    "sourceNames": [
+      "WW BLACKLIST STATUS"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c6350d"
+    },
+    "normalizedName": "koreablackliststatus",
+    "category": "STATUS CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "KOREA BLACKLIST STATUS",
+    "price": "0.02",
+    "serviceId": 20,
+    "serviceIds": [
+      20
+    ],
+    "sourceNames": [
+      "KOREA BLACKLIST STATUS"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c6350e"
+    },
+    "normalizedName": "japanblackliststatus",
+    "category": "STATUS CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "JAPAN BLACKLIST STATUS",
+    "price": "0.08",
+    "serviceId": 32,
+    "serviceIds": [
+      32
+    ],
+    "sourceNames": [
+      "JAPAN BLACKLIST STATUS"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c6350f"
+    },
+    "normalizedName": "australiablackliststatus",
+    "category": "STATUS CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "AUSTRALIA BLACKLIST STATUS",
+    "price": "0.01",
+    "serviceId": 31,
+    "serviceIds": [
+      31
+    ],
+    "sourceNames": [
+      "AUSTRALIA BLACKLIST STATUS"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c63510"
+    },
+    "normalizedName": "asusinfo",
+    "category": "GENERIC CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "ASUS INFO",
+    "price": "0.06",
+    "serviceId": 34,
+    "serviceIds": [
+      34
+    ],
+    "sourceNames": [
+      "ASUS INFO"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c63511"
+    },
+    "normalizedName": "acerinfo",
+    "category": "GENERIC CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "ACER INFO",
+    "price": "0.06",
+    "serviceId": 23,
+    "serviceIds": [
+      23
+    ],
+    "sourceNames": [
+      "ACER INFO"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c63512"
+    },
+    "normalizedName": "sparxinfo",
+    "category": "GENERIC CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "SPARX INFO",
+    "price": "0.01",
+    "serviceId": 86,
+    "serviceIds": [
+      86
+    ],
+    "sourceNames": [
+      "SPARX INFO"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c63513"
+    },
+    "normalizedName": "honorinfo",
+    "category": "GENERIC CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "HONOR INFO",
+    "price": "0.08",
+    "serviceId": 73,
+    "serviceIds": [
+      73
+    ],
+    "sourceNames": [
+      "HONOR INFO"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c63514"
+    },
+    "normalizedName": "doogeeinfo",
+    "category": "GENERIC CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "DOOGEE INFO",
+    "price": "0.05",
+    "serviceId": 56,
+    "serviceIds": [
+      56
+    ],
+    "sourceNames": [
+      "DOOGEE INFO"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c63515"
+    },
+    "normalizedName": "huaweiinfo",
+    "category": "GENERIC CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "HUAWEI INFO",
+    "price": "0.10",
+    "serviceId": 15,
+    "serviceIds": [
+      15
+    ],
+    "sourceNames": [
+      "HUAWEI INFO"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c63516"
+    },
+    "normalizedName": "lenovoinfo",
+    "category": "GENERIC CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "LENOVO INFO",
+    "price": "0.06",
+    "serviceId": 22,
+    "serviceIds": [
+      22
+    ],
+    "sourceNames": [
+      "LENOVO INFO"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c63517"
+    },
+    "normalizedName": "alcatelinfo",
+    "category": "GENERIC CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "ALCATEL INFO",
+    "price": "0.10",
+    "serviceId": 17,
+    "serviceIds": [
+      17
+    ],
+    "sourceNames": [
+      "ALCATEL INFO"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c63518"
+    },
+    "normalizedName": "kyocerainfo",
+    "category": "GENERIC CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "KYOCERA INFO",
+    "price": "0.05",
+    "serviceId": 43,
+    "serviceIds": [
+      43
+    ],
+    "sourceNames": [
+      "KYOCERA INFO"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c63519"
+    },
+    "normalizedName": "samsunginfo",
+    "category": "GENERIC CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "SAMSUNG INFO",
+    "price": "0.06",
+    "serviceId": 80,
+    "serviceIds": [
+      80
+    ],
+    "sourceNames": [
+      "SAMSUNG INFO"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c6351d"
+    },
+    "normalizedName": "nothingphoneinfo",
+    "category": "GENERIC CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "NOTHING PHONE INFO",
+    "price": "0.03",
+    "serviceId": 233,
+    "serviceIds": [
+      233
+    ],
+    "sourceNames": [
+      "NOTHING PHONE INFO"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c6351b"
+    },
+    "normalizedName": "vivoiqooinfo",
+    "category": "GENERIC CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "VIVO | IQOO INFO",
+    "price": "0.02",
+    "serviceId": 75,
+    "serviceIds": [
+      75
+    ],
+    "sourceNames": [
+      "VIVO | IQOO INFO"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c6351c"
+    },
+    "normalizedName": "googlepixelinfo",
+    "category": "GENERIC CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "GOOGLE PIXEL INFO",
+    "price": "0.12",
+    "serviceId": 42,
+    "serviceIds": [
+      42
+    ],
+    "sourceNames": [
+      "GOOGLE PIXEL INFO"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c6351e"
+    },
+    "normalizedName": "unitycellecorinfo",
+    "category": "GENERIC CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "UNITY CELLECOR INFO",
+    "price": "0.01",
+    "serviceId": 87,
+    "serviceIds": [
+      87
+    ],
+    "sourceNames": [
+      "UNITY CELLECOR INFO"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c6351a"
+    },
+    "normalizedName": "motorolainfo",
+    "category": "GENERIC CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "MOTOROLA INFO",
+    "price": "0.08",
+    "serviceId": 13,
+    "serviceIds": [
+      13
+    ],
+    "sourceNames": [
+      "MOTOROLA INFO"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c63521"
+    },
+    "normalizedName": "ztenubiaredmagicinfo",
+    "category": "GENERIC CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "ZTE | NUBIA | REDMAGIC INFO",
+    "price": "0.05",
+    "serviceId": 55,
+    "serviceIds": [
+      55
+    ],
+    "sourceNames": [
+      "ZTE | NUBIA | REDMAGIC INFO"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c63522"
+    },
+    "normalizedName": "oppooneplusrealmeinfo",
+    "category": "GENERIC CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "OPPO | ONEPLUS REALME INFO",
+    "price": "0.20",
+    "serviceId": 39,
+    "serviceIds": [
+      39
+    ],
+    "sourceNames": [
+      "OPPO | ONEPLUS | REALME INFO"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c63520"
+    },
+    "normalizedName": "samsungknoxguardinfo",
+    "category": "GENERIC CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "SAMSUNG KNOX GUARD INFO",
+    "price": "0.30",
+    "serviceId": 82,
+    "serviceIds": [
+      82
+    ],
+    "sourceNames": [
+      "SAMSUNG KNOX GUARD INFO"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c6351f"
+    },
+    "normalizedName": "samsunginfopro",
+    "category": "GENERIC CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "SAMSUNG INFO - PRO",
+    "price": "0.10",
+    "serviceId": 1,
+    "serviceIds": [
+      1
+    ],
+    "sourceNames": [
+      "SAMSUNG INFO - PRO"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c63524"
+    },
+    "normalizedName": "xiaomiredmipocomilockonoffinfo",
+    "category": "GENERIC CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "XIAOMI | REDMI | POCO MI LOCK ON/OFF INFO",
+    "price": "0.10",
+    "serviceId": 206,
+    "serviceIds": [
+      206
+    ],
+    "sourceNames": [
+      "XIAOMI | REDMI | POCO MI LOCK ON/OFF INFO"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c63526"
+    },
+    "normalizedName": "brandmodelinfo",
+    "category": "GENERIC CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "BRAND & MODEL INFO",
+    "price": "0.02",
+    "serviceId": 203,
+    "serviceIds": [
+      203
+    ],
+    "sourceNames": [
+      "BRAND & MODEL INFO"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c63523"
+    },
+    "normalizedName": "itelinfinixtecnosoniminfo",
+    "category": "GENERIC CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "ITEL INFINIX | TECNO | SONIM INFO",
+    "price": "0.03",
+    "serviceId": 45,
+    "serviceIds": [
+      45
+    ],
+    "sourceNames": [
+      "ITEL | INFINIX | TECNO | SONIM INFO"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c63525"
+    },
+    "normalizedName": "xiaomiredmipocomilockcleanlostinfo",
+    "category": "GENERIC CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "XIAOMI | REDMI | POCO MI LOCK CLEAN/LOST INFO",
+    "price": "0.50",
+    "serviceId": 58,
+    "serviceIds": [
+      58
+    ],
+    "sourceNames": [
+      "XIAOMI | REDMI | POCO MI LOCK CLEAN/LOST INFO"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c63527"
+    },
+    "normalizedName": "simiccidimsiinfo",
+    "category": "GENERIC CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "SIM ICCID | IMSI INFO",
+    "price": "0.02",
+    "serviceId": 37,
+    "serviceIds": [
+      37
+    ],
+    "sourceNames": [
+      "SIM ICCID | IMSI INFO"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c63528"
+    },
+    "normalizedName": "mdmlockbypassiphoneipad",
+    "category": "PREMIUM CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "MDM LOCK BYPASS - IPHONE/IPAD",
+    "price": "39.00",
+    "serviceId": 94,
+    "serviceIds": [
+      94
+    ],
+    "sourceNames": [
+      "MDM LOCK BYPASS - iPHONE/iPAD"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c63529"
+    },
+    "normalizedName": "tmobileusaunbarringloststolen",
+    "category": "PREMIUM CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "T-MOBILE USA UNBARRING LOST/STOLEN",
+    "price": "34.50",
+    "serviceId": 145,
+    "serviceIds": [
+      145
+    ],
+    "sourceNames": [
+      "T-MOBILE USA UNBARRING LOST/STOLEN"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c6352a"
+    },
+    "normalizedName": "tmobileusaunbarringpremium",
+    "category": "PREMIUM CHECK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "T-MOBILE USA UNBARRING PREMIUM",
+    "price": "34.50",
+    "serviceId": 112,
+    "serviceIds": [
+      112
+    ],
+    "sourceNames": [
+      "T-MOBILE USA UNBARRING PREMIUM"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c6352c"
+    },
+    "normalizedName": "austriaa1mobilkompremium",
+    "category": "IPHONE UNLOCK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "AUSTRIA A1 MOBILKOM PREMIUM",
+    "price": "165.00",
+    "serviceId": 137,
+    "serviceIds": [
+      137
+    ],
+    "sourceNames": [
+      "AUSTRIA A1 MOBILKOM - PREMIUM"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c6352e"
+    },
+    "normalizedName": "canadatelusclean",
+    "category": "IPHONE UNLOCK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "CANADA TELUS - CLEAN",
+    "price": "2.00",
+    "serviceId": 95,
+    "serviceIds": [
+      95
+    ],
+    "sourceNames": [
+      "CANADA TELUS - CLEAN"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c6352b"
+    },
+    "normalizedName": "austriaa1mobilkomoutofcontract",
+    "category": "IPHONE UNLOCK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "AUSTRIA A1 MOBILKOM - OUT OF CONTRACT",
+    "price": "115.00",
+    "serviceId": 138,
+    "serviceIds": [
+      138
+    ],
+    "sourceNames": [
+      "AUSTRIA A1 MOBILKOM - OUT OF CONTRACT"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c6352d"
+    },
+    "normalizedName": "canadafidorogerspremium",
+    "category": "IPHONE UNLOCK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "CANADA FIDO/ROGERS - PREMIUM",
+    "price": "20.00",
+    "serviceId": 96,
+    "serviceIds": [
+      96
+    ],
+    "sourceNames": [
+      "CANADA FIDO/ROGERS - PREMIUM"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c63531"
+    },
+    "normalizedName": "claroallcountriespremiumuptoiphone13",
+    "category": "IPHONE UNLOCK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "CLARO ALL COUNTRIES - PREMIUM (UP TO IPHONE 13)",
+    "price": "47.00",
+    "serviceId": 135,
+    "serviceIds": [
+      135
+    ],
+    "sourceNames": [
+      "CLARO ALL COUNTRIES - PREMIUM (UP TO iPHONE 13)"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c6352f"
+    },
+    "normalizedName": "claroallcountriespremiumiphone14",
+    "category": "IPHONE UNLOCK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "CLARO ALL COUNTRIES - PREMIUM (IPHONE 14)",
+    "price": "59.00",
+    "serviceId": 132,
+    "serviceIds": [
+      132
+    ],
+    "sourceNames": [
+      "CLARO ALL COUNTRIES - PREMIUM (iPHONE 14)"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c63530"
+    },
+    "normalizedName": "claroallcountriespremiumiphone15",
+    "category": "IPHONE UNLOCK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "CLARO ALL COUNTRIES - PREMIUM (IPHONE 15)",
+    "price": "89.00",
+    "serviceId": 142,
+    "serviceIds": [
+      142
+    ],
+    "sourceNames": [
+      "CLARO ALL COUNTRIES - PREMIUM (iPHONE 15)"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c63532"
+    },
+    "normalizedName": "emeaservicepremium",
+    "category": "IPHONE UNLOCK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "EMEA SERVICE - PREMIUM",
+    "price": "1.50",
+    "serviceId": 113,
+    "serviceIds": [
+      113
+    ],
+    "sourceNames": [
+      "EMEA SERVICE - PREMIUM"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c63533"
+    },
+    "normalizedName": "hungaryvodafonepremiumiphone4sto11",
+    "category": "IPHONE UNLOCK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "HUNGARY VODAFONE - PREMIUM (IPHONE 4S TO 11)",
+    "price": "66.00",
+    "serviceId": 83,
+    "serviceIds": [
+      83
+    ],
+    "sourceNames": [
+      "HUNGARY VODAFONE - PREMIUM (iPHONE 4S TO 11)"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c63536"
+    },
+    "normalizedName": "japansoftbankclean",
+    "category": "IPHONE UNLOCK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "JAPAN SOFTBANK - CLEAN",
+    "price": "2.60",
+    "serviceId": 52,
+    "serviceIds": [
+      52
+    ],
+    "sourceNames": [
+      "JAPAN SOFTBANK - CLEAN"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c63538"
+    },
+    "normalizedName": "romaniaorangepremium",
+    "category": "IPHONE UNLOCK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "ROMANIA ORANGE - PREMIUM",
+    "price": "14.00",
+    "serviceId": 69,
+    "serviceIds": [
+      69
+    ],
+    "sourceNames": [
+      "ROMANIA ORANGE - PREMIUM"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c63537"
+    },
+    "normalizedName": "philippinesglobeclean",
+    "category": "IPHONE UNLOCK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "PHILIPPINES GLOBE - CLEAN",
+    "price": "5.50",
+    "serviceId": 50,
+    "serviceIds": [
+      50
+    ],
+    "sourceNames": [
+      "PHILIPPINES GLOBE - CLEAN"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c63534"
+    },
+    "normalizedName": "japanaukddiclean",
+    "category": "IPHONE UNLOCK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "JAPAN AU KDDI - CLEAN",
+    "price": "4.00",
+    "serviceId": 126,
+    "serviceIds": [
+      126
+    ],
+    "sourceNames": [
+      "JAPAN AU KDDI - CLEAN"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c63535"
+    },
+    "normalizedName": "japannttdocomoclean",
+    "category": "IPHONE UNLOCK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "JAPAN NTT DOCOMO - CLEAN",
+    "price": "2.60",
+    "serviceId": 116,
+    "serviceIds": [
+      116
+    ],
+    "sourceNames": [
+      "JAPAN NTT DOCOMO - CLEAN"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c6353c"
+    },
+    "normalizedName": "ukvodafoneclean",
+    "category": "GENERIC UNLOCK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "UK VODAFONE - CLEAN",
+    "price": "10.00",
+    "serviceId": 127,
+    "serviceIds": [
+      127
+    ],
+    "sourceNames": [
+      "UK VODAFONE - CLEAN"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c6353b"
+    },
+    "normalizedName": "uko2tescoclean",
+    "category": "IPHONE UNLOCK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "UK O2 TESCO - CLEAN",
+    "price": "25.00",
+    "serviceId": 98,
+    "serviceIds": [
+      98
+    ],
+    "sourceNames": [
+      "UK O2 TESCO - CLEAN"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c6353d"
+    },
+    "normalizedName": "usresellerflexclean",
+    "category": "IPHONE UNLOCK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "US RESELLER FLEX - CLEAN",
+    "price": "25.00",
+    "serviceId": 129,
+    "serviceIds": [
+      129
+    ],
+    "sourceNames": [
+      "US RESELLER FLEX - CLEAN"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c6353e"
+    },
+    "normalizedName": "usresellerflexpremium",
+    "category": "IPHONE UNLOCK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "US RESELLER FLEX - PREMIUM",
+    "price": "25.00",
+    "serviceId": 144,
+    "serviceIds": [
+      144
+    ],
+    "sourceNames": [
+      "US RESELLER FLEX - PREMIUM"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c63539"
+    },
+    "normalizedName": "romaniavodafonepremium",
+    "category": "IPHONE UNLOCK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "ROMANIA VODAFONE - PREMIUM",
+    "price": "18.00",
+    "serviceId": 71,
+    "serviceIds": [
+      71
+    ],
+    "sourceNames": [
+      "ROMANIA VODAFONE - PREMIUM"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c6353a"
+    },
+    "normalizedName": "ukeetmobileorangepremium",
+    "category": "IPHONE UNLOCK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "UK EE/T-MOBILE/ORANGE - PREMIUM",
+    "price": "25.00",
+    "serviceId": 97,
+    "serviceIds": [
+      97
+    ],
+    "sourceNames": [
+      "UK EE/T-MOBILE/ORANGE - PREMIUM"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c6353f"
+    },
+    "normalizedName": "usaattcleanactiveline",
+    "category": "IPHONE UNLOCK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "USA AT&T - CLEAN/ACTIVE LINE",
+    "price": "25.00",
+    "serviceId": 51,
+    "serviceIds": [
+      51
+    ],
+    "sourceNames": [
+      "USA AT&T - CLEAN/ACTIVE LINE"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c63540"
+    },
+    "normalizedName": "usaattsolddate60days",
+    "category": "IPHONE UNLOCK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "USA AT&T - SOLD DATE: 60 DAYS",
+    "price": "28.00",
+    "serviceId": 234,
+    "serviceIds": [
+      234
+    ],
+    "sourceNames": [
+      "USA AT&T - SOLD DATE: 60 DAYS"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c63541"
+    },
+    "normalizedName": "usacspireclean",
+    "category": "IPHONE UNLOCK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "USA C SPIRE - CLEAN",
+    "price": "6.00",
+    "serviceId": 111,
+    "serviceIds": [
+      111
+    ],
+    "sourceNames": [
+      "USA C SPIRE - CLEAN"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c63543"
+    },
+    "normalizedName": "usatmobilepremium",
+    "category": "IPHONE UNLOCK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "USA T-MOBILE - PREMIUM",
+    "price": "155.25",
+    "serviceId": 141,
+    "serviceIds": [
+      141
+    ],
+    "sourceNames": [
+      "USA T-MOBILE - PREMIUM"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c63542"
+    },
+    "normalizedName": "usacricketclean6monthsold",
+    "category": "IPHONE UNLOCK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "USA CRICKET - CLEAN & 6 MONTHS OLD",
+    "price": "6.00",
+    "serviceId": 53,
+    "serviceIds": [
+      53
+    ],
+    "sourceNames": [
+      "USA CRICKET - CLEAN & 6 MONTHS OLD"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c63544"
+    },
+    "normalizedName": "usaverizoncleanactivated",
+    "category": "IPHONE UNLOCK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "USA VERIZON - CLEAN & ACTIVATED",
+    "price": "6.00",
+    "serviceId": 47,
+    "serviceIds": [
+      47
+    ],
+    "sourceNames": [
+      "USA VERIZON - CLEAN & ACTIVATED"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c63545"
+    },
+    "normalizedName": "canadavideotron",
+    "category": "GENERIC UNLOCK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "CANADA VIDEOTRON",
+    "price": "1.00",
+    "serviceId": 104,
+    "serviceIds": [
+      104
+    ],
+    "sourceNames": [
+      "CANADA VIDEOTRON"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c63547"
+    },
+    "normalizedName": "htcinternational",
+    "category": "GENERIC UNLOCK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "HTC INTERNATIONAL",
+    "price": "2.00",
+    "serviceId": 115,
+    "serviceIds": [
+      115
+    ],
+    "sourceNames": [
+      "HTC INTERNATIONAL"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c63546"
+    },
+    "normalizedName": "francebouygues",
+    "category": "GENERIC UNLOCK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "FRANCE BOUYGUES",
+    "price": "2.00",
+    "serviceId": 107,
+    "serviceIds": [
+      107
+    ],
+    "sourceNames": [
+      "FRANCE BOUYGUES"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c63548"
+    },
+    "normalizedName": "samsungeuropelimitedcountries",
+    "category": "GENERIC UNLOCK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "SAMSUNG EUROPE - LIMITED COUNTRIES",
+    "price": "14.00",
+    "serviceId": 130,
+    "serviceIds": [
+      130
+    ],
+    "sourceNames": [
+      "SAMSUNG EUROPE - LIMITED COUNTRIES"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c63549"
+    },
+    "normalizedName": "samsungeuropepremium",
+    "category": "GENERIC UNLOCK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "SAMSUNG EUROPE - PREMIUM",
+    "price": "18.00",
+    "serviceId": 125,
+    "serviceIds": [
+      125
+    ],
+    "sourceNames": [
+      "SAMSUNG EUROPE - PREMIUM"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c6354a"
+    },
+    "normalizedName": "samsungukirelandpremium",
+    "category": "GENERIC UNLOCK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "SAMSUNG UK & IRELAND - PREMIUM",
+    "price": "18.00",
+    "serviceId": 134,
+    "serviceIds": [
+      134
+    ],
+    "sourceNames": [
+      "SAMSUNG UK & IRELAND - PREMIUM"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69f61dd74bf207e5a7c6354b"
+    },
+    "normalizedName": "uko2clean",
+    "category": "GENERIC UNLOCK SERVICES",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "UK O2 - CLEAN",
+    "price": "9.50",
+    "serviceId": 57,
+    "serviceIds": [
+      57
+    ],
+    "sourceNames": [
+      "UK O2 - CLEAN"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69ff46fbe28e47970ab87c86"
+    },
+    "normalizedName": "iphoneallinonebestbeforebuy",
+    "category": "fevourite",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "iPhone all in one /best before buy",
+    "price": "0.49",
+    "serviceId": 1000,
+    "serviceIds": [
+      78,
+      3,
+      54,
+      88,
+      92
+    ],
+    "sourceNames": [
+      "iPhone all in one /best before buy"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69ff4d0ce28e47970ab87c87"
+    },
+    "normalizedName": "macfullcheckbestbeforebuy",
+    "category": "fevourite",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "Mac full check /best before buy",
+    "price": "1.29",
+    "serviceId": 1001,
+    "serviceIds": [
+      3,
+      66,
+      54,
+      81,
+      30
+    ],
+    "sourceNames": [
+      "Mac full check /best before buy"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69ff5326e28e47970ab87c88"
+    },
+    "normalizedName": "samsungfullreportbestbeforebuy",
+    "category": "fevourite",
+    "createdAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    },
+    "currency": "USD",
+    "isFree": false,
+    "name": "Samsung full report / best before buy",
+    "price": "0.79",
+    "serviceId": 1002,
+    "serviceIds": [
+      80,
+      82,
+      54,
+      78,
+      203
+    ],
+    "sourceNames": [
+      "Samsung full report / best before buy"
+    ],
+    "updatedAt": {
+      "$date": "2026-05-02T15:52:55.352Z"
+    }
+  }
+]
