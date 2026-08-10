@@ -118,13 +118,15 @@ const registerUser = async (payload: IUser) => {
                   payload.role === 'user' ? 'customer' : payload.role === 'shopkeeper' ? 'shopkeeper' : payload.role;
 
             const admin = await User.findOne({ role: 'admin' });
-            await createNotification({
-                  to: new mongoose.Types.ObjectId(admin!._id),
-                  message: `${result.firstName} ${result.lastName} just joined your platform as a ${roleText}.`,
-                  type: 'REGISTRATION',
-                  title: 'New User Registered',
-                  id: new mongoose.Types.ObjectId(result._id),
-            });
+            if (admin) {
+                  await createNotification({
+                        to: new mongoose.Types.ObjectId(admin._id as string),
+                        message: `${result.firstName} ${result.lastName} just joined your platform as a ${roleText}.`,
+                        type: 'REGISTRATION',
+                        title: 'New User Registered',
+                        id: new mongoose.Types.ObjectId(result._id as string),
+                  });
+            }
       }
 
       // JWT payload
