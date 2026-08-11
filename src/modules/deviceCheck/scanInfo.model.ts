@@ -161,18 +161,18 @@ const ScanInfoSchema = new Schema(
             technicalBreakdown: {
                   processor: {
                         type: String,
-                        required: true,
+                        required: false,
                   },
                   batteryHealth: {
                         percentage: {
                               type: Number,
                               min: 0,
                               max: 100,
-                              required: true,
+                              required: false,
                         },
                         cycleCount: {
                               type: Number,
-                              required: true,
+                              required: false,
                         },
                         label: {
                               type: String,
@@ -181,11 +181,11 @@ const ScanInfoSchema = new Schema(
                   storage: {
                         total: {
                               type: String,
-                              required: true,
+                              required: false,
                         },
                         free: {
                               type: String,
-                              required: true,
+                              required: false,
                         },
                         label: {
                               type: String,
@@ -193,11 +193,11 @@ const ScanInfoSchema = new Schema(
                   },
                   modem: {
                         type: String,
-                        required: true,
+                        required: false,
                   },
                   display: {
                         type: String,
-                        required: true,
+                        required: false,
                   },
                   warranty: {
                         status: {
@@ -215,11 +215,11 @@ const ScanInfoSchema = new Schema(
                   origin: {
                         country: {
                               type: String,
-                              required: true,
+                              required: false,
                         },
                         modelNumber: {
                               type: String,
-                              required: true,
+                              required: false,
                         },
                         label: {
                               type: String,
@@ -265,7 +265,10 @@ const ScanInfoSchema = new Schema(
 // A scan belongs to the user who performed it. Keeping this uniqueness scoped
 // to the user prevents one shopkeeper's cached scan from replacing or hiding
 // another shopkeeper's history item.
-ScanInfoSchema.index({ userId: 1, imei: 1, serviceId: 1, shopId: 1 }, { unique: true, name: 'userId_1_imei_1_serviceId_1_shopId_1' });
+ScanInfoSchema.index(
+      { userId: 1, imei: 1, serviceId: 1, shopId: 1 },
+      { unique: true, name: 'userId_1_imei_1_serviceId_1_shopId_1' }
+);
 ScanInfoSchema.index({ userId: 1, updatedAt: -1 });
 
 const ScanInfo = model('ScanInfo', ScanInfoSchema);

@@ -1,0 +1,117 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [4 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 5 0 R >>
+endobj
+5 0 obj
+<< /Length 1940 >>
+stream
+BT
+/F1 10 Tf
+50 790 Td
+15 TL
+(IMOSCAN DEVICE REPORT) Tj
+T*
+(Report ID: "6a79d2e92796be69fd47b4f5") Tj
+T*
+(Generated: 2026-08-10T13:32:25.539Z) Tj
+T*
+(N/A) Tj
+T*
+(DEVICE SUMMARY) Tj
+T*
+(Device: iPhone 17 Pro) Tj
+T*
+(IMEI / Serial: 351297474660682) Tj
+T*
+(Status: unknown) Tj
+T*
+(Risk: Low Risk \(12/100\)) Tj
+T*
+(Market value: USD 920) Tj
+T*
+(N/A) Tj
+T*
+(AI INSIGHT) Tj
+T*
+(IMEI Risk Analysis Report: The device iPhone 17 Pro with IMEI 351297474660682 is classified as) Tj
+T*
+(Low Risk. It is currently activated and registered, with no open repairs or temporary) Tj
+T*
+(coverage. The device is under a limited warranty that expires on April 20, 2027. The estimated) Tj
+T*
+(purchase date is April 21, 2026. Market value is $920 USD.) Tj
+T*
+(N/A) Tj
+T*
+(VERIFICATION CHECKS) Tj
+T*
+(Global Blacklist: Not reported stolen \(passed\)) Tj
+T*
+(Carrier Financing: No active payment plan detected \(passed\)) Tj
+T*
+(Hardware Lock: FMI status unavailable \(warning\)) Tj
+T*
+(Part Authenticity: No direct part-level authenticity signal in provider response \(warning\)) Tj
+T*
+(N/A) Tj
+T*
+(DEVICE DETAILS) Tj
+T*
+(image:) Tj
+T*
+({"src":"https://appleid.cdn-apple.com/static/deviceImages-15.0/iPhone/iPhone18,1-3b3b3c-47ade5/online-sourcelist__3x.png","alt":null,"height":80,"width":null,"html":"<img) Tj
+T*
+(src=\\"https://appleid.cdn-apple.com/static/deviceImages-15.0/iPhone/iPhone18,1-3b3b3c-47ade5/online-sourcelist__3x.png\\") Tj
+T*
+(height=\\"80\\">"}) Tj
+T*
+(device: iPhone 17 Pro) Tj
+T*
+(imei number: 351297474660682) Tj
+T*
+(serial number: HQDQW53HTV) Tj
+T*
+(serial key: 6a79d2e427ae32223c146802) Tj
+T*
+(coverage benefits: Hardware Service, Chat & Phone Support) Tj
+T*
+(warranty type: Limited Warranty) Tj
+T*
+(warranty expires: April 20, 2027) Tj
+T*
+(estimated purchase date: April 21, 2026) Tj
+T*
+(activation status: Activated) Tj
+T*
+(registration status: Yes) Tj
+T*
+(replaced device: No) Tj
+T*
+(temp coverage: No) Tj
+T*
+(open repair: No) Tj
+ET
+endstream
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000185 00000 n 
+0000000311 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+2303
+%%EOF

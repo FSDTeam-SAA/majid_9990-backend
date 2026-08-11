@@ -1,0 +1,167 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [4 0 R 6 0 R] /Count 2 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 5 0 R >>
+endobj
+5 0 obj
+<< /Length 2113 >>
+stream
+BT
+/F1 10 Tf
+50 790 Td
+15 TL
+(IMOSCAN DEVICE REPORT) Tj
+T*
+(Report ID: "6a79dae02796be69fd47b56f") Tj
+T*
+(Generated: 2026-08-10T14:06:24.626Z) Tj
+T*
+(N/A) Tj
+T*
+(DEVICE SUMMARY) Tj
+T*
+(Device: IPHONE 17 PRO DEEP BLUE 256GB-SDH) Tj
+T*
+(IMEI / Serial: 351297474660682) Tj
+T*
+(Status: unknown) Tj
+T*
+(Risk: Low Risk \(12/100\)) Tj
+T*
+(Market value: USD 920) Tj
+T*
+(N/A) Tj
+T*
+(AI INSIGHT) Tj
+T*
+(IMEI Risk Assessment: Low Risk: The device IPHONE 17 PRO DEEP BLUE 256GB-SDH with IMEI) Tj
+T*
+(351297474660682 is classified as Low Risk. It has a market value of 920 USD. The device is) Tj
+T*
+(under a limited warranty valid until 2027-04-20, with 253 days remaining. The device was) Tj
+T*
+(purchased and registered in the United Kingdom on 2026-04-20. It is unlocked and has no) Tj
+T*
+(enrollment in DEP. The last restore date was 2026-08-02, and the device is running OS build) Tj
+T*
+(23G71.) Tj
+T*
+(N/A) Tj
+T*
+(VERIFICATION CHECKS) Tj
+T*
+(Global Blacklist: Not reported stolen \(passed\)) Tj
+T*
+(Carrier Financing: No active payment plan detected \(passed\)) Tj
+T*
+(Hardware Lock: FMI status unavailable \(warning\)) Tj
+T*
+(Part Authenticity: No direct part-level authenticity signal in provider response \(warning\)) Tj
+T*
+(N/A) Tj
+T*
+(DEVICE DETAILS) Tj
+T*
+(serial: HQDQW53HTV) Tj
+T*
+(imei: 351297474660682) Tj
+T*
+(imei2: 351297474271241) Tj
+T*
+(config code: 006FQ6) Tj
+T*
+(sold to name: AMAZON EU SARL) Tj
+T*
+(purchase country desc: United Kingdom) Tj
+T*
+(product line: 301245) Tj
+T*
+(config description: IPHONE 17 PRO,ROW,256GB,BLU) Tj
+T*
+(dep enrolled: False) Tj
+T*
+(warranty status code: LP) Tj
+T*
+(warranty status description: Limited Warranty) Tj
+T*
+(coverage end date: 2027-04-20 22:59:59) Tj
+T*
+(coverage start date: 2026-04-20 23:00:00) Tj
+T*
+(days remaining: 253) Tj
+T*
+(purchase date: 2026-04-20 23:00:00) Tj
+T*
+(purchase country code: GBR) Tj
+T*
+(registration date: 2026-04-20 23:00:00) Tj
+T*
+(wireless mac address: 948978DA5742) Tj
+T*
+(applied activation details: Unlock.) Tj
+T*
+(applied activation policy id: 10) Tj
+T*
+(carrier name: Carrier) Tj
+T*
+(csncsn2eid: 89049032020008884800234590892119) Tj
+ET
+endstream
+endobj
+6 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 7 0 R >>
+endobj
+7 0 obj
+<< /Length 503 >>
+stream
+BT
+/F1 10 Tf
+50 790 Td
+15 TL
+(first activation date: 2026-04-21 08:05:11) Tj
+T*
+(iccid: 89701012927862884035) Tj
+T*
+(initial activation policy id: 10) Tj
+T*
+(initial activation policy details: Unlock.) Tj
+T*
+(last restore date: 2026-08-02 02:18:51) Tj
+T*
+(last unbrick os build: 23G71) Tj
+T*
+(next tether policy id: 10) Tj
+T*
+(next tether policy details: Unlock.) Tj
+T*
+(product description: IPHONE 17 PRO DEEP BLUE 256GB-SDH) Tj
+T*
+(product version: 26.6) Tj
+T*
+(unlock date: 2026-04-21 08:08:21) Tj
+ET
+endstream
+endobj
+xref
+0 8
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000121 00000 n 
+0000000191 00000 n 
+0000000317 00000 n 
+0000002482 00000 n 
+0000002608 00000 n 
+trailer
+<< /Size 8 /Root 1 0 R >>
+startxref
+3162
+%%EOF

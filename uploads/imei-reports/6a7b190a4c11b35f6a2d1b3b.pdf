@@ -1,0 +1,81 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [4 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 5 0 R >>
+endobj
+5 0 obj
+<< /Length 941 >>
+stream
+BT
+/F1 10 Tf
+50 790 Td
+15 TL
+(IMOSCAN DEVICE REPORT) Tj
+T*
+(Report ID: "6a7b190a4c11b35f6a2d1b3b") Tj
+T*
+(Generated: 2026-08-11T12:43:54.631Z) Tj
+T*
+(N/A) Tj
+T*
+(DEVICE SUMMARY) Tj
+T*
+(Device: Unknown Device) Tj
+T*
+(IMEI / Serial: LTQGCD213R) Tj
+T*
+(Status: unknown) Tj
+T*
+(Risk: Low Risk \(12/100\)) Tj
+T*
+(Market value: USD 300) Tj
+T*
+(N/A) Tj
+T*
+(AI INSIGHT) Tj
+T*
+(Device Not Supported: The device with IMEI LTQGCD213R is not supported as only iPhone and iPad) Tj
+T*
+(devices are accepted on this service.) Tj
+T*
+(N/A) Tj
+T*
+(VERIFICATION CHECKS) Tj
+T*
+(Global Blacklist: Not reported stolen \(passed\)) Tj
+T*
+(Carrier Financing: No active payment plan detected \(passed\)) Tj
+T*
+(Hardware Lock: FMI status unavailable \(warning\)) Tj
+T*
+(Part Authenticity: No direct part-level authenticity signal in provider response \(warning\)) Tj
+T*
+(N/A) Tj
+T*
+(DEVICE DETAILS) Tj
+T*
+(rejected: Only iPhone & iPad supported on this service!) Tj
+ET
+endstream
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000185 00000 n 
+0000000311 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+1303
+%%EOF
