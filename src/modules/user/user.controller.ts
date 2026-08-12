@@ -170,6 +170,18 @@ const getMyShopkeeperData = catchAsync(async (req, res) => {
       });
 });
 
+const adminUpdateUser = catchAsync(async (req, res) => {
+      const { userId } = req.params;
+      const result = await userService.adminUpdateUser(userId, req.body);
+
+      sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: 'User updated successfully.',
+            data: result,
+      });
+});
+
 const userController = {
       registerUser,
       verifyEmail,
@@ -185,6 +197,7 @@ const userController = {
       createStaff,
       getAllStaffByShopkeeper,
       getMyShopkeeperData,
+      adminUpdateUser,
 };
 
 export default userController;

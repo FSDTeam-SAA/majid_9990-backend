@@ -226,7 +226,7 @@ const resendOtpCode = async (email: string) => {
 
 const getAllUsers = async () => {
       const result = await User.find().select(
-            'username firstName lastName email phone role image isVerified wageType wageAmount workingDays weekendDays idVerificationStatus idNumber createdAt updatedAt'
+            'username firstName lastName email phone role image isVerified balance wageType wageAmount workingDays weekendDays idVerificationStatus idNumber createdAt updatedAt'
       );
       return result;
 };
@@ -456,8 +456,24 @@ const getAllShopkeepers = async (query: any) => {
       };
 };
 
-const getBalanceHistory = async (userId: string, query: any) => {
+      const getBalanceHistory = async (userId: string, query: any) => {
       return await getUserBalanceHistory(userId, query);
+};
+
+const adminUpdateUser = async (userId: string, payload: any) => {
+      const user = await User.findById(userId);
+      if (!user) throw new AppError('User not found', StatusCodes.NOT_FOUND);
+
+      const updateData: any = { ...payload };
+
+      if (payload.password) {
+            updateData.password = await bcrypt.hash(payload.password, Number(config.bcryptSaltRounds));
+      }
+
+      const result = await User.findByIdAndUpdate(userId, updateData, { new: true }).select(
+            '-password -otp -otpExpires -resetPasswordOtp -resetPasswordOtpExpires'
+      );
+      return result;
 };
 
 const userService = {
@@ -475,6 +491,7 @@ const userService = {
       createStaff,
       getAllStaffByShopkeeper,
       getMyShopkeeperData,
+      adminUpdateUser,
 };
 
 export default userService;
