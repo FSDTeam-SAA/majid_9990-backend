@@ -357,16 +357,6 @@ export const analyzeParsedProviderDataWithAi = async (
       const { deviceName, deviceDescription } = extractPricingHints(parsedProviderData ?? {});
       let fallbackEstimatedPrice = estimateMarketValueFromHints(deviceName, deviceDescription);
 
-      try {
-            const existingMax = await ScanInfo.findOne({ imei }).sort({ 'marketValue.amount': -1 }).lean();
-            const existingMaxAmount = existingMax?.marketValue?.amount ?? 0;
-            if (existingMaxAmount > (fallbackEstimatedPrice ?? 0)) {
-                  fallbackEstimatedPrice = existingMaxAmount;
-            }
-      } catch (err) {
-            console.error('Failed to query existing max market value', err);
-      }
-
       const apiKey = String(process.env.OPENAI_API_KEY ?? '').trim();
       if (!apiKey) {
             return {
@@ -548,10 +538,6 @@ Return JSON only:
                   Number.isFinite(rawEstimatedDevicePrice) && rawEstimatedDevicePrice > 0
                         ? Number(rawEstimatedDevicePrice.toFixed(2))
                         : fallbackEstimatedPrice;
-
-            if ((fallbackEstimatedPrice ?? 0) > (estimatedDevicePrice ?? 0)) {
-                  estimatedDevicePrice = fallbackEstimatedPrice;
-            }
 
             return {
                   riskMeter: riskMeter,
@@ -915,23 +901,13 @@ export const runImeiCheck = async (
       const scanFilter = userId
             ? { imei, serviceId: requestedServiceId, userId, ...shopIdFilter }
             : { imei, serviceId: requestedServiceId, userId: { $exists: false } };
-      
       try {
-            const existingMax = await ScanInfo.findOne({ imei }).sort({ 'marketValue.amount': -1 }).lean();
-            const existingMaxAmount = existingMax?.marketValue?.amount ?? 0;
-            
-            if (existingMaxAmount > scanPayload.marketValue.amount) {
-                  scanPayload.marketValue.amount = existingMaxAmount;
-            }
-
-            if (scanPayload.marketValue.amount > existingMaxAmount) {
-                  await ScanInfo.updateMany(
-                        { imei },
-                        { $set: { 'marketValue.amount': scanPayload.marketValue.amount, 'marketValue.currency': scanPayload.marketValue.currency } }
-                  );
-            }
+            await ScanInfo.updateMany(
+                  { imei },
+                  { $set: { 'marketValue.amount': scanPayload.marketValue.amount, 'marketValue.currency': scanPayload.marketValue.currency } }
+            );
       } catch (err) {
-            console.error('Error synchronizing max market value', err);
+            console.error('Error synchronizing market value', err);
       }
 
       const savedScanInfo = await ScanInfo.findOneAndUpdate(scanFilter, scanPayload, {
