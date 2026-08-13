@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { extractPricingHints, estimateMarketValueFromHints } from './deviceCheck.helpers';
 
 type RiskLevel = 'low' | 'medium' | 'high';
 type DeviceStatus = 'clean' | 'blacklisted' | 'financed' | 'locked' | 'unknown';
@@ -261,13 +262,14 @@ export const buildStructuredScanInfo = async (
       const manufacturer = getParsedField(['manufacturer', 'brand']) ?? getFirstField(sourceText, ['Manufacturer', 'Brand']);
       const marketingName = getParsedField(['marketing_name', 'model_name']) ?? getFirstField(sourceText, ['Marketing Name', 'Model Name']);
       const fullName = getParsedField(['full_name', 'device_name', 'device']) ?? getFirstField(sourceText, ['Full Name', 'Device Name', 'Device']);
+      const modelDescription = getParsedField(['model_description', 'description']) ?? getFirstField(sourceText, ['Model Description', 'Description']);
       const modelCode = getParsedField(['model_code']) ?? getFirstField(sourceText, ['Model Code']);
       const modelNumber = getParsedField(['model_number']) ?? getFirstField(sourceText, ['Model Number']);
-      const model = getParsedField(['model', 'product', 'model_description', 'product_description']) ?? getFirstField(sourceText, ['Model', 'Product']);
+      const model = getParsedField(['model', 'product']) ?? getFirstField(sourceText, ['Model', 'Product']);
       const blacklistStatusRaw = getField(sourceText, 'Blacklist Status') ?? 'Unknown';
       const generalListStatus = (getField(sourceText, 'General List Status') ?? '').toLowerCase();
 
-      const candidateDeviceNames = [marketingName, fullName, model, modelCode, modelNumber, manufacturer].filter(
+      const candidateDeviceNames = [modelDescription, fullName, model, marketingName, modelCode, modelNumber, manufacturer].filter(
             (value): value is string => hasMeaningfulText(value)
       );
       const deviceName = candidateDeviceNames.length
@@ -285,7 +287,8 @@ export const buildStructuredScanInfo = async (
       const deviceStatus = getDeviceStatus(blacklistStatusRaw, paymentPlanActive);
       const risk = getRisk(deviceStatus, paymentPlanActive, fmiStatus);
 
-      const estimatedMarketValue = estimateMarketValue(deviceName);
+      const { deviceName: hintName, deviceDescription: hintDesc } = extractPricingHints(parsedProviderData ?? {});
+      const estimatedMarketValue = estimateMarketValueFromHints(hintName, hintDesc) ?? estimateMarketValue(deviceName);
       const openAiInsight = await getOpenAiInsight({
             imei,
             deviceName: deviceName || manufacturer || 'Unknown Device',

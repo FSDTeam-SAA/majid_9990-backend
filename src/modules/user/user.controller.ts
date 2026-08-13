@@ -172,7 +172,7 @@ const getMyShopkeeperData = catchAsync(async (req, res) => {
 
 const adminUpdateUser = catchAsync(async (req, res) => {
       const { userId } = req.params;
-      const result = await userService.adminUpdateUser(userId, req.body);
+      const result = await userService.adminUpdateUser(userId as string, req.body);
 
       sendResponse(res, {
             statusCode: StatusCodes.OK,

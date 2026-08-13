@@ -94,6 +94,31 @@ export const extractProviderDataFromHtml = (htmlString: string | null | undefine
       return data;
 };
 
+export const isProviderErrorResult = (parsedProviderData: Record<string, unknown>): boolean => {
+      const keys = Object.keys(parsedProviderData);
+      const values = Object.values(parsedProviderData);
+
+      if (keys.some((key) => key.startsWith('error') || (key === 'status' && String(parsedProviderData[key]).toLowerCase() === 'rejected'))) {
+            return true;
+      }
+
+      if (
+            values.some((val) => {
+                  if (typeof val !== 'string') return false;
+                  const v = val.toLowerCase();
+                  return v.includes('not found') || v === 'rejected' || v.includes('invalid imei');
+            })
+      ) {
+            return true;
+      }
+
+      if (keys.length === 0) {
+            return true;
+      }
+
+      return false;
+};
+
 const parseJsonObject = (value: string) => {
       const start = value.indexOf('{');
       const end = value.lastIndexOf('}');
@@ -238,7 +263,7 @@ const getFirstNonEmptyField = (source: Record<string, unknown>, keys: string[]):
       return null;
 };
 
-const extractPricingHints = (parsedProviderData: Record<string, unknown>) => {
+export const extractPricingHints = (parsedProviderData: Record<string, unknown>) => {
       const deviceName = getFirstNonEmptyField(parsedProviderData, [
             'device_name',
             'full_name',
@@ -269,7 +294,7 @@ const extractPricingHints = (parsedProviderData: Record<string, unknown>) => {
       };
 };
 
-const estimateMarketValueFromHints = (deviceName: string | null, deviceDescription: string | null): number | null => {
+export const estimateMarketValueFromHints = (deviceName: string | null, deviceDescription: string | null): number | null => {
       const combined = `${deviceName ?? ''} ${deviceDescription ?? ''}`.toLowerCase().trim();
       if (!combined) {
             return null;
@@ -330,7 +355,17 @@ export const analyzeParsedProviderDataWithAi = async (
       const fallbackRiskMeter = scoreProviderSignals(providerSignalText);
       const fallbackInsight = buildFallbackInsight(providerName, fallbackRiskMeter);
       const { deviceName, deviceDescription } = extractPricingHints(parsedProviderData ?? {});
-      const fallbackEstimatedPrice = estimateMarketValueFromHints(deviceName, deviceDescription);
+      let fallbackEstimatedPrice = estimateMarketValueFromHints(deviceName, deviceDescription);
+
+      try {
+            const existingMax = await ScanInfo.findOne({ imei }).sort({ 'marketValue.amount': -1 }).lean();
+            const existingMaxAmount = existingMax?.marketValue?.amount ?? 0;
+            if (existingMaxAmount > (fallbackEstimatedPrice ?? 0)) {
+                  fallbackEstimatedPrice = existingMaxAmount;
+            }
+      } catch (err) {
+            console.error('Failed to query existing max market value', err);
+      }
 
       const apiKey = String(process.env.OPENAI_API_KEY ?? '').trim();
       if (!apiKey) {
@@ -509,10 +544,14 @@ Return JSON only:
                         : fallbackInsight.message;
 
             const rawEstimatedDevicePrice = Number((parsed as Record<string, unknown>).estimatedDevicePriceUSD);
-            const estimatedDevicePrice =
+            let estimatedDevicePrice =
                   Number.isFinite(rawEstimatedDevicePrice) && rawEstimatedDevicePrice > 0
                         ? Number(rawEstimatedDevicePrice.toFixed(2))
                         : fallbackEstimatedPrice;
+
+            if ((fallbackEstimatedPrice ?? 0) > (estimatedDevicePrice ?? 0)) {
+                  estimatedDevicePrice = fallbackEstimatedPrice;
+            }
 
             return {
                   riskMeter: riskMeter,
@@ -843,6 +882,15 @@ export const runImeiCheck = async (
                       : null;
       const parsedProviderData = extractProviderDataFromHtml(providerHtml);
 
+      if (isProviderErrorResult(parsedProviderData)) {
+            return {
+                  ok: false,
+                  statusCode: 400,
+                  message: 'IMEI not found or rejected by provider',
+                  data: providerPayload,
+            };
+      }
+
       const structuredInfo = await buildStructuredScanInfo(imei, providerPayload ?? {}, parsedProviderData);
       let providerDataRaw: string | null = null;
 
@@ -867,6 +915,25 @@ export const runImeiCheck = async (
       const scanFilter = userId
             ? { imei, serviceId: requestedServiceId, userId, ...shopIdFilter }
             : { imei, serviceId: requestedServiceId, userId: { $exists: false } };
+      
+      try {
+            const existingMax = await ScanInfo.findOne({ imei }).sort({ 'marketValue.amount': -1 }).lean();
+            const existingMaxAmount = existingMax?.marketValue?.amount ?? 0;
+            
+            if (existingMaxAmount > scanPayload.marketValue.amount) {
+                  scanPayload.marketValue.amount = existingMaxAmount;
+            }
+
+            if (scanPayload.marketValue.amount > existingMaxAmount) {
+                  await ScanInfo.updateMany(
+                        { imei },
+                        { $set: { 'marketValue.amount': scanPayload.marketValue.amount, 'marketValue.currency': scanPayload.marketValue.currency } }
+                  );
+            }
+      } catch (err) {
+            console.error('Error synchronizing max market value', err);
+      }
+
       const savedScanInfo = await ScanInfo.findOneAndUpdate(scanFilter, scanPayload, {
             upsert: true,
             new: true,

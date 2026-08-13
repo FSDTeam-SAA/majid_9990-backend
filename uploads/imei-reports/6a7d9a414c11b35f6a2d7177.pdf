@@ -1,0 +1,151 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [4 0 R 6 0 R] /Count 2 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 5 0 R >>
+endobj
+5 0 obj
+<< /Length 2248 >>
+stream
+BT
+/F1 10 Tf
+50 790 Td
+15 TL
+(IMOSCAN DEVICE REPORT) Tj
+T*
+(Report ID: "6a7d9a414c11b35f6a2d7177") Tj
+T*
+(Generated: 2026-08-13T10:19:45.795Z) Tj
+T*
+(N/A) Tj
+T*
+(DEVICE SUMMARY) Tj
+T*
+(Device: No) Tj
+T*
+(IMEI / Serial: 351297474660682) Tj
+T*
+(Status: unknown) Tj
+T*
+(Risk: Low Risk \(12/100\)) Tj
+T*
+(Market value: USD 1200) Tj
+T*
+(N/A) Tj
+T*
+(AI INSIGHT) Tj
+T*
+(IMEI Risk Analysis Report: The device with IMEI 351297474660682 is identified as an IPHONE 17) Tj
+T*
+(PRO, ROW, 256GB, BLU. The risk label is Low Risk. The device status is unknown. It has a) Tj
+T*
+(market value of 1010 USD. The device is activated and registered with a valid purchase date.) Tj
+T*
+(It is not in lost mode, not a loaner device, and not replaced. AppleCare coverage is not) Tj
+T*
+(active, but the device has limited warranty and active repairs and service coverage expiring) Tj
+T*
+(on 2027-04-20. Telephone technical support has expired.) Tj
+T*
+(N/A) Tj
+T*
+(VERIFICATION CHECKS) Tj
+T*
+(Global Blacklist: Not reported stolen \(passed\)) Tj
+T*
+(Carrier Financing: No active payment plan detected \(passed\)) Tj
+T*
+(Hardware Lock: FMI status unavailable \(warning\)) Tj
+T*
+(Part Authenticity: No direct part-level authenticity signal in provider response \(warning\)) Tj
+T*
+(N/A) Tj
+T*
+(DEVICE DETAILS) Tj
+T*
+(image:) Tj
+T*
+({"src":"https://km.support.apple.com/kb/securedImage.jsp?productid=301245&size=240","alt":null,"height":null,"width":null,"html":"<img) Tj
+T*
+(src=\\"https://km.support.apple.com/kb/securedImage.jsp?productid=301245&size=240\\">"}) Tj
+T*
+(description: IPHONE 17 PRO,ROW,256GB,BLU) Tj
+T*
+(imei number: 351297474660682) Tj
+T*
+(imei2 number: 351297474271241) Tj
+T*
+(meid number: 35129747466068) Tj
+T*
+(serial number: HQDQW53HTV) Tj
+T*
+(lost mode: No) Tj
+T*
+(loaner device: No) Tj
+T*
+(replaced device: No) Tj
+T*
+(valid purchase date: Yes) Tj
+T*
+(activation status: Activated) Tj
+T*
+(registration status: Registered) Tj
+T*
+(applecare covered: No) Tj
+T*
+(applecare eligible: No) Tj
+T*
+(applecare claim eligible: No) Tj
+T*
+(applecare claim in progress: No) Tj
+T*
+(warranty status: Limited Warranty) Tj
+T*
+(telephone technical support: Expired) Tj
+T*
+(repairs and service coverage: Active) Tj
+T*
+(repairs and service expires in: 8 Months and 7 Days) Tj
+ET
+endstream
+endobj
+6 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 7 0 R >>
+endobj
+7 0 obj
+<< /Length 181 >>
+stream
+BT
+/F1 10 Tf
+50 790 Td
+15 TL
+(repairs and service expiration date: 2027-04-20) Tj
+T*
+(estimated purchase date: 2026-04-21) Tj
+T*
+(applecare purchase date: 2026-04-20 20:00:00) Tj
+ET
+endstream
+endobj
+xref
+0 8
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000121 00000 n 
+0000000191 00000 n 
+0000000317 00000 n 
+0000002617 00000 n 
+0000002743 00000 n 
+trailer
+<< /Size 8 /Root 1 0 R >>
+startxref
+2975
+%%EOF

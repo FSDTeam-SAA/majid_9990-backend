@@ -14,6 +14,7 @@ import {
       runImeiCheck,
       extractProviderDataFromHtml,
       analyzeParsedProviderDataWithAi,
+      isProviderErrorResult,
 } from './deviceCheck.helpers';
 import { creditUserBalance, debitUserBalance } from '../payment/balanceTransaction.service';
 import ScanInfo from './scanInfo.model';
@@ -760,26 +761,29 @@ export const checkImeiFromDhruV2 = async (req: Request, res: Response, next: Nex
                                                       userId,
                                                       shopId
                                                 );
+                                                
                                                 if (existingScanInfo) {
-                                                      return {
-                                                            serviceId: svcId,
-                                                            ok: true,
-                                                            cached: true,
-                                                            provider: null,
-                                                            // extract parsed key/value pairs from stored providerData
-                                                            parsedProviderData: extractProviderDataFromHtml(
-                                                                  (existingScanInfo.providerData as Record<string, any>)
-                                                                        ?.result ?? null
-                                                            ),
-                                                            // surface cached AI/risk when available so V2 responses remain rich
-                                                            aiInsight: existingScanInfo.aiInsight ?? null,
-                                                            riskMeter: existingScanInfo.riskMeter ?? null,
-                                                            reportId: existingScanInfo._id.toString(),
-                                                      };
+                                                      const parsedProviderData = extractProviderDataFromHtml(
+                                                            (existingScanInfo.providerData as Record<string, any>)
+                                                                  ?.result ?? null
+                                                      );
+
+                                                      if (!isProviderErrorResult(parsedProviderData)) {
+                                                            return {
+                                                                  serviceId: svcId,
+                                                                  ok: true,
+                                                                  cached: true,
+                                                                  provider: null,
+                                                                  parsedProviderData,
+                                                                  aiInsight: existingScanInfo.aiInsight ?? null,
+                                                                  riskMeter: existingScanInfo.riskMeter ?? null,
+                                                                  reportId: existingScanInfo._id.toString(),
+                                                            };
+                                                      }
                                                 }
                                           }
 
-                        const result = await runImeiCheck(String(imei), svcId, userId, shopId);
+                                          const result = await runImeiCheck(String(imei), svcId, userId, shopId);
                                           if (!result.ok) {
                                                 return {
                                                       serviceId: svcId,
@@ -909,14 +913,21 @@ export const checkImeiFromDhruV2 = async (req: Request, res: Response, next: Nex
                         }
 
                         // Single serviceId: try cache first unless fresh requested
-                        const existingScanInfo = shouldGenerateFresh
+                        let existingScanInfo = shouldGenerateFresh
                               ? null
                               : await getExistingScanInfoByImei(imei, serviceId, userId, shopId);
 
+                        let parsedProviderData: Record<string, unknown> | null = null;
                         if (existingScanInfo) {
-                              const parsedProviderData = extractProviderDataFromHtml(
+                              parsedProviderData = extractProviderDataFromHtml(
                                     (existingScanInfo.providerData as Record<string, any>)?.result ?? null
                               );
+                              if (isProviderErrorResult(parsedProviderData)) {
+                                    existingScanInfo = null;
+                              }
+                        }
+
+                        if (existingScanInfo && parsedProviderData) {
 
                               const aiAnalysis = await analyzeParsedProviderDataWithAi(
                                     String(imei),
