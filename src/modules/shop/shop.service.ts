@@ -9,6 +9,8 @@ import { IShop, IShopEntitlement } from './shop.interface';
 import { Shop } from './shop.model';
 import { ensureDefaultShop, getShopkeeperId, toObjectId } from './shop.utils';
 import { Invoice } from '../invoice/invoice.model';
+import { Category } from '../inventory/category/category.model';
+import { Inventory } from '../inventory/inventory.model';
 
 const MULTI_SHOP_PLAN_TYPE = 'MULTI SHOP';
 
@@ -319,6 +321,32 @@ const getShopPerformance = async (user: any, query: any) => {
   };
 };
 
+const getUploadedImages = async (user: any) => {
+  const shopkeeperId = getShopkeeperId(user);
+  await ensureDefaultShop(shopkeeperId);
+
+  // Get images from categories
+  const categories = await Category.find({ shopkeeperId, 'image.url': { $exists: true, $ne: null } })
+    .select('image')
+    .lean();
+
+  // Get images from inventories (using userId which stores shopkeeperId for inventory)
+  const inventories = await Inventory.find({ userId: shopkeeperId, 'image.url': { $exists: true, $ne: null } })
+    .select('image')
+    .lean();
+
+  const allImages = [
+    ...categories.map(c => c.image),
+    ...inventories.map(i => i.image)
+  ].filter((img): img is { public_id: string; url: string } => !!(img && img.url));
+
+  // Deduplicate by URL
+  const uniqueImages = Array.from(new Map(allImages.map(img => [img.url, img])).values());
+
+  // Return the most recent ones first (we'll just reverse since they usually come in chronological order)
+  return uniqueImages.reverse();
+};
+
 const shopService = {
   getMyShops,
   getEntitlement,
@@ -327,6 +355,7 @@ const shopService = {
   updateShop,
   deleteShop,
   getShopPerformance,
+  getUploadedImages,
 };
 
 export default shopService;

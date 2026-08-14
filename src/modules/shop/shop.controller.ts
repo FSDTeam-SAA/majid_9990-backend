@@ -83,6 +83,17 @@ const getShopPerformance = catchAsync(async (req, res) => {
   });
 });
 
+const getUploadedImages = catchAsync(async (req, res) => {
+  const images = await shopService.getUploadedImages(req.user);
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'Uploaded images fetched successfully',
+    data: images,
+  });
+});
+
 const shopController = {
   getMyShops,
   getEntitlement,
@@ -91,6 +102,7 @@ const shopController = {
   updateShop,
   deleteShop,
   getShopPerformance,
+  getUploadedImages,
 };
 
 export default shopController;
