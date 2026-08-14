@@ -1302,9 +1302,19 @@ const getMyInventory = async (userId: string, query: Record<string, unknown> = {
       }
 
       const shouldPaginate = query.page !== undefined || query.limit !== undefined;
+      const categoryId = String(query.categoryId ?? '').trim();
+
+      const filter: FilterQuery<IInventory> = { userId };
+      
+      if (Object.keys(shopScope).length) {
+            filter.$and = [shopScope];
+      }
+
+      if (categoryId && Types.ObjectId.isValid(categoryId)) {
+            filter.categoryId = new Types.ObjectId(categoryId);
+      }
 
       if (!shouldPaginate) {
-            const filter: FilterQuery<IInventory> = { userId, ...shopScope };
             return await Inventory.find(filter).populate('userId').sort({ createdAt: -1 });
       }
 
@@ -1313,16 +1323,6 @@ const getMyInventory = async (userId: string, query: Record<string, unknown> = {
       const page = Number.isFinite(requestedPage) && requestedPage > 0 ? requestedPage : 1;
       const limit = Number.isFinite(requestedLimit) && requestedLimit > 0 ? Math.min(requestedLimit, 100) : 12;
       const search = String(query.search ?? '').trim();
-      const categoryId = String(query.categoryId ?? '').trim();
-      const filter: FilterQuery<IInventory> = { userId };
-
-      if (Object.keys(shopScope).length) {
-            filter.$and = [shopScope];
-      }
-
-      if (categoryId && Types.ObjectId.isValid(categoryId)) {
-            filter.categoryId = new Types.ObjectId(categoryId);
-      }
 
       if (search) {
             const searchExpression = new RegExp(search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
