@@ -72,6 +72,17 @@ const deleteShop = catchAsync(async (req, res) => {
   });
 });
 
+const getShopPerformance = catchAsync(async (req, res) => {
+  const result = await shopService.getShopPerformance(req.user, req.query);
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'Shop performance fetched successfully',
+    data: result,
+  });
+});
+
 const shopController = {
   getMyShops,
   getEntitlement,
@@ -79,6 +90,7 @@ const shopController = {
   createShop,
   updateShop,
   deleteShop,
+  getShopPerformance,
 };
 
 export default shopController;

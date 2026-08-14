@@ -8,6 +8,7 @@ import { User } from '../user/user.model';
 import { IShop, IShopEntitlement } from './shop.interface';
 import { Shop } from './shop.model';
 import { ensureDefaultShop, getShopkeeperId, toObjectId } from './shop.utils';
+import { Invoice } from '../invoice/invoice.model';
 
 const MULTI_SHOP_PLAN_TYPE = 'MULTI SHOP';
 
@@ -230,6 +231,94 @@ const deleteShop = async (user: any, shopId: string) => {
   return { _id: shopId };
 };
 
+const getShopPerformance = async (user: any, query: any) => {
+  const shopkeeperId = getShopkeeperId(user);
+  await ensureDefaultShop(shopkeeperId);
+
+  const { dateFilter = 'today' } = query;
+
+  let dateQuery: any = {};
+  const now = new Date();
+  
+  if (dateFilter === 'today') {
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    dateQuery = { $gte: startOfToday };
+  } else if (dateFilter === 'yesterday') {
+    const startOfYesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    dateQuery = { $gte: startOfYesterday, $lt: startOfToday };
+  } else if (dateFilter === 'this-week') {
+    const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay()));
+    startOfWeek.setHours(0, 0, 0, 0);
+    dateQuery = { $gte: startOfWeek };
+  } else if (dateFilter === 'this-month') {
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    dateQuery = { $gte: startOfMonth };
+  }
+
+  const shops = await Shop.find({ shopkeeperId }).sort({ isDefault: -1, createdAt: 1 }).lean();
+  
+  const staffList = await User.find({ shopkeeperId, role: 'staff', isVerified: true })
+    .select('_id firstName lastName image')
+    .lean();
+
+  const invoiceFilter: any = { shopkeeperId };
+  if (Object.keys(dateQuery).length > 0) {
+    invoiceFilter.createdAt = dateQuery;
+  }
+
+  const salesByShop = await Invoice.aggregate([
+    { $match: invoiceFilter },
+    {
+      $group: {
+        _id: '$shopId',
+        totalSales: { $sum: '$amountPaid' },
+        cashSales: {
+          $sum: {
+            $cond: [{ $in: [{ $toLower: '$paymentMethod' }, ['cash']] }, '$amountPaid', 0],
+          },
+        },
+        cardSales: {
+          $sum: {
+            $cond: [{ $in: [{ $toLower: '$paymentMethod' }, ['card', 'credit card', 'debit card']] }, '$amountPaid', 0],
+          },
+        },
+        customersCount: { $sum: 1 },
+      },
+    },
+  ]);
+
+  const salesMap = salesByShop.reduce((acc: any, curr: any) => {
+    acc[curr._id ? curr._id.toString() : 'unassigned'] = curr;
+    return acc;
+  }, {});
+
+  const shopsWithStats = shops.map((shop) => {
+    const shopIdStr = shop._id.toString();
+    const stats = salesMap[shopIdStr] || { totalSales: 0, cashSales: 0, cardSales: 0, customersCount: 0 };
+    return {
+      ...shop,
+      stats: {
+        totalSales: stats.totalSales || 0,
+        cashSales: stats.cashSales || 0,
+        cardSales: stats.cardSales || 0,
+        customersCount: stats.customersCount || 0,
+      },
+      staff: staffList,
+    };
+  });
+
+  return {
+    shops: shopsWithStats,
+    aggregate: {
+      activeShopsCount: shops.filter(s => s.isActive).length,
+      totalSales: shopsWithStats.reduce((sum, s) => sum + s.stats.totalSales, 0),
+      totalCustomers: shopsWithStats.reduce((sum, s) => sum + s.stats.customersCount, 0),
+      totalStaff: staffList.length,
+    }
+  };
+};
+
 const shopService = {
   getMyShops,
   getEntitlement,
@@ -237,6 +326,7 @@ const shopService = {
   createShop,
   updateShop,
   deleteShop,
+  getShopPerformance,
 };
 
 export default shopService;

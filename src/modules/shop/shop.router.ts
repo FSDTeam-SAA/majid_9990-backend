@@ -5,6 +5,7 @@ import shopController from './shop.controller';
 const router = Router();
 
 router.get('/my-shops', protect, isShopkeeperOrStaff, shopController.getMyShops);
+router.get('/performance', protect, isShopkeeperOrStaff, shopController.getShopPerformance);
 router.get('/entitlement', protect, isShopkeeperOrStaff, shopController.getEntitlement);
 router.get('/:id', protect, isShopkeeperOrStaff, shopController.getShopById);
 router.post('/create', protect, isShopkeeperOrStaff, shopController.createShop);
