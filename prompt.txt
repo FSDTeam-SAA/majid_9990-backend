@@ -1,19 +1,85 @@
-1. authenticaiton system neet to update I'm telling you the flow we have 'user', 'admin', 'shopkeeper roles in the site, you need to add another role that is stuff
----> in the user model add that role also 
----> if the user is a stuff role then there will be a another field shopkeeperId (this is the one who is creating adding the stuff)
----> is the role is stuff it will be auto validated no need to send email to the user for email validation. 
----> when a stuff login they will show all the all shopkeeper datas that a shopkeeper will show 
-example: I need to showing all the datas that a shopkeeper when log in can see. 
-also if a stuff login and do some changes or create new things example a invoice, search report, add cash or add cusotmer 
-or other thigns all the changes will be visible for the shopkeeper end. 
+17 aug 
+prompt: 1:
+Add recommendations pop up and setup them against category, for example if on dashboard staff selling phone show them recommendations of screen protectors, phone cases, chargers, if selling laptops let them show laptops bags, chargers, if repaired devices, let them show screen protectors, phone cases. Auto pop up message should come on checkout page for staff to give them reminder to offer these items to customer before charging them. Please check image below for better understanding 
 
-many exixing things are made. the stuff feaute has is new need to add. so do the thing and a updated postman json colleciton so i can implement in the frontend. and tell me what done by making a mark down 
+pormpt: 2:
+/invoice/purchase-invoice in this page after fill up all the field and click create purchase receipt it will came a popup like 
+Collect Payment
+Select how the customer is paying BDT 73,633.24. The payment record will be saved with the customer invoice.
 
 
--------------------------------2 ----------------------------
-majid_9990-backend/src/modules/deviceCheck$  in here you can see a api /check-v2', optionalProtect, checkImeiFromDhruV2 
-in here there is a part the open ai genarate a price of the device. this need to updated it will only pussing the Device Name, Device Description, if those are here based on those
-the ai model will get the device price and send 
+Cash
+Cash received
+
+Card
+Debit or credit
+
+Bank
+Bank transfer
+
+Due
+Customer required
+Cash details
+
+Only transaction references and last four digits are stored.
+
+Cash Received
+49088.83
+Change
+BDT 0.00
+
+Payment Note
+Optional note
+
+Cancel
+Confirm & Print Receipt
+
+same like the checkout page modle that came. this will also came in the delivery invoice.  
+
+propmt: 3
+Analyze the entire application for incorrect currency conversion and currency display issues.
+
+The system appears to be converting values that are already stored in the selected currency as if they were USD.
+
+Issues reported:
+
+* In Transactions, an amount around $88 is being displayed/calculated as approximately £65, meaning the system may be converting USD to GBP incorrectly or twice.
+* In Inventory Setup, a selling price of $960 is showing approximately $1,200+ in Quick View.
+* Currency conversion must happen only when it is actually required.
+* A value already entered/stored in the shop's selected currency must NOT be converted again when displayed.
+* Check backend storage, API responses, frontend formatting, currency settings, exchange-rate logic, checkout, transactions, inventory, Quick View, invoices, and reports.
+* Make sure the currency code and currency symbol are handled consistently.
+* Respect the shopkeeper's configured/default currency.
+
+Important:
+
+* Do not break existing payment functionality.
+* Do not change database structures unless absolutely necessary.
+* Do not remove existing features.
+* Do not hardcode USD or GBP.
+* Fix the root cause rather than adding frontend-only patches.
+* Verify that amounts remain mathematically correct throughout the complete flow: creation → storage → API → frontend → payment → transaction → invoice.
+
+After implementation, test multiple currencies, especially USD and GBP, to ensure there is no double conversion.
 
 
--------------------3 ------------------------------
+
+prompt: 4 
+Improve the invoice/logo settings section.
+
+Currently, the shop logo does not always appear fully inside the logo area. Add a proper logo adjustment interface where shopkeepers can manually control how their logo is displayed.
+
+Requirements:
+
+* Allow shopkeepers to upload a logo.
+* Show a preview of the logo inside the actual logo container.
+* Allow manual zoom in/out.
+* Allow repositioning/panning of the logo horizontally and vertically.
+* Make it possible to fit the entire logo inside the available area.
+* Preserve the configured position and zoom level.
+* The saved configuration should be used when generating invoices/PDFs/receipts.
+* Prevent the logo from being unintentionally cropped.
+* Provide a reset/default positioning option.
+* Make the UI simple and professional.
+
+Do not change any existing invoice functionality other than adding these logo controls.

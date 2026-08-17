@@ -275,6 +275,14 @@ const updateUserProfile = async (payload: any, email: string, file: any) => {
       let updateData: any = { ...payload };
       let oldImagePublicId: string | undefined;
 
+      if (typeof updateData.logoSettings === 'string') {
+            try {
+                  updateData.logoSettings = JSON.parse(updateData.logoSettings);
+            } catch {
+                  // ignore JSON parse error
+            }
+      }
+
       if (file) {
             const uploadResult = await uploadToCloudinary(file.path);
             oldImagePublicId = user.image?.public_id;

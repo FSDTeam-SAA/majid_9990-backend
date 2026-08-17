@@ -23,6 +23,7 @@ import categoryRouter from '../modules/inventory/category/category.route';
 import cashManagementRouter from '../modules/cashManagement/cashManagement.route';
 import supplierRouter from '../modules/supplier/supplier.router';
 import shopRouter from '../modules/shop/shop.router';
+import popUpRuleRouter from '../modules/popUpRule/popUpRule.router';
 
 const router = Router();
 
@@ -130,6 +131,10 @@ const moduleRoutes = [
       {
         path: '/shop',
         route: shopRouter,
+      },
+      {
+        path: '/pop-up-rules',
+        route: popUpRuleRouter,
       },
 ];
 moduleRoutes.forEach((route) => router.use(route.path, route.route));

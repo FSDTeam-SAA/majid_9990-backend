@@ -36,6 +36,14 @@ export interface IUser {
       averageRating?: number;
       shopkeeperId?: Types.ObjectId | string;
       currency?: string;
+      logoSettings?: {
+            zoom?: number;
+            x?: number;
+            y?: number;
+            fit?: 'contain' | 'cover' | 'fill' | 'none';
+            rotation?: number;
+            backgroundColor?: string;
+      };
       createdAt?: Date;
       updatedAt?: Date;
 }

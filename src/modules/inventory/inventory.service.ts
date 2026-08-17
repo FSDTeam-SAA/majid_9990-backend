@@ -797,7 +797,7 @@ const createInventory = async (payload: Partial<IInventory>, file?: any, variant
                   if (exists) throw new AppError(`Inventory with IMEI ${variant.imeiNumber} already exists`, 409);
             }
       }
-      if (variants.length) normalizedPayload.variants = variants as IInventory['variants'];
+      normalizedPayload.variants = variants as IInventory['variants'];
 
       if (normalizedSalePrice !== undefined) {
             normalizedPayload.salePrice = normalizedSalePrice;
@@ -819,6 +819,8 @@ const createInventory = async (payload: Partial<IInventory>, file?: any, variant
 
       if (normalizedSourceImageUrl) {
             normalizedPayload.sourceImageUrl = normalizedSourceImageUrl;
+      } else {
+            delete (normalizedPayload as any).sourceImageUrl;
       }
 
       if (inventoryImages.length) {
@@ -827,6 +829,8 @@ const createInventory = async (payload: Partial<IInventory>, file?: any, variant
             normalizedPayload.images = sourceImageUrls;
       } else if (normalizedSourceImageUrl) {
             normalizedPayload.images = [normalizedSourceImageUrl];
+      } else {
+            normalizedPayload.images = [];
       }
 
       if (file) {
@@ -842,12 +846,16 @@ const createInventory = async (payload: Partial<IInventory>, file?: any, variant
                   public_id: '',
                   url: normalizedSourceImageUrl,
             };
+      } else {
+            delete (normalizedPayload as any).image;
       }
 
       if (sourceImageUrls.length) {
             normalizedPayload.sourceImageUrls = sourceImageUrls;
       } else if (normalizedSourceImageUrl) {
             normalizedPayload.sourceImageUrls = [normalizedSourceImageUrl];
+      } else {
+            normalizedPayload.sourceImageUrls = [];
       }
 
       const result = await Inventory.create(normalizedPayload);
@@ -1253,6 +1261,16 @@ const updateInventory = async (id: string, payload: Partial<IInventory>, file?: 
             normalizedPayload.images = sourceImageUrls;
       } else if (normalizedSourceImageUrl) {
             normalizedPayload.images = [normalizedSourceImageUrl];
+      } else if ((payload as any).images !== undefined) {
+            normalizedPayload.images = [];
+      }
+
+      if (sourceImageUrls.length) {
+            normalizedPayload.sourceImageUrls = sourceImageUrls;
+      } else if (normalizedSourceImageUrl) {
+            normalizedPayload.sourceImageUrls = [normalizedSourceImageUrl];
+      } else if ((payload as any).sourceImageUrls !== undefined) {
+            normalizedPayload.sourceImageUrls = [];
       }
 
       if (file) {

@@ -100,6 +100,18 @@ const userSchema = new Schema<IUser>(
                   default: 'USD',
                   uppercase: true,
             },
+            logoSettings: {
+                  zoom: { type: Number, default: 1 },
+                  x: { type: Number, default: 0 },
+                  y: { type: Number, default: 0 },
+                  fit: {
+                        type: String,
+                        enum: ['contain', 'cover', 'fill', 'none'],
+                        default: 'contain',
+                  },
+                  rotation: { type: Number, default: 0 },
+                  backgroundColor: { type: String, default: 'transparent' },
+            },
             otp: { type: String, default: null },
             otpExpires: { type: Date, default: null },
             resetPasswordOtp: { type: String, default: null },
