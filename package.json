@@ -20,6 +20,7 @@
     "cloudinary": "^2.6.1",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
+    "exceljs": "^4.4.0",
     "express": "^5.1.0",
     "http": "^0.0.1-security",
     "http-status": "^2.1.0",
@@ -38,7 +39,6 @@
     "swagger-autogen": "^2.23.7",
     "swagger-ui-express": "^5.0.1",
     "tesseract.js": "^7.0.0",
-    "xlsx": "^0.18.5",
     "zod": "^3.25.64"
   },
   "devDependencies": {

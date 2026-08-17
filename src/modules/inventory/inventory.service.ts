@@ -1,5 +1,6 @@
 import fs from 'node:fs/promises';
-import XLSX from 'xlsx';
+import path from 'path';
+import ExcelJS from 'exceljs';
 import AppError from '../../errors/AppError';
 import { FilterQuery, Types } from 'mongoose';
 import { IBarcodeSearchResult } from '../barcode/barcode.interface';
@@ -303,31 +304,65 @@ const buildInventoryCsvTemplate = () => {
       return [headerLine, ...dataLines].join('\n');
 };
 
-const parseInventoryCsvRows = (filePath: string) => {
-      const workbook = XLSX.readFile(filePath);
-      const sheetName = workbook.SheetNames[0];
+const getCellValueString = (cellValue: unknown): string => {
+      if (cellValue === null || cellValue === undefined) return '';
+      if (typeof cellValue === 'object') {
+            if ('result' in (cellValue as Record<string, unknown>) && (cellValue as Record<string, unknown>).result !== undefined) {
+                  return getCellValueString((cellValue as Record<string, unknown>).result);
+            }
+            if ('text' in (cellValue as Record<string, unknown>) && (cellValue as Record<string, unknown>).text !== undefined) {
+                  return getCellValueString((cellValue as Record<string, unknown>).text);
+            }
+            if ('richText' in (cellValue as Record<string, unknown>) && Array.isArray((cellValue as Record<string, unknown>).richText)) {
+                  return (cellValue as { richText: Array<{ text: string }> }).richText.map((rt) => rt.text).join('');
+            }
+      }
+      return String(cellValue);
+};
 
-      if (!sheetName) {
+const parseInventoryCsvRows = async (filePath: string) => {
+      const workbook = new ExcelJS.Workbook();
+      const ext = path.extname(filePath).toLowerCase();
+      if (ext === '.csv') {
+            await workbook.csv.readFile(filePath);
+      } else {
+            await workbook.xlsx.readFile(filePath);
+      }
+
+      const worksheet = workbook.worksheets[0];
+      if (!worksheet || worksheet.rowCount === 0) {
             return [] as Array<Record<string, unknown> & { rowNumber: number }>;
       }
 
-      const sheet = workbook.Sheets[sheetName];
-      const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, {
-            blankrows: false,
-            defval: '',
+      const headers: string[] = [];
+      const headerRow = worksheet.getRow(1);
+      headerRow.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+            headers[colNumber - 1] = getCellValueString(cell.value).trim();
       });
 
-      return rows.map((row, index) => {
-            const normalizedRow = Object.entries(row).reduce<Record<string, unknown>>((acc, [key, value]) => {
-                  acc[normalizeCsvHeader(key)] = value;
-                  return acc;
-            }, {});
+      const rows: Array<Record<string, unknown> & { rowNumber: number }> = [];
 
-            return {
-                  rowNumber: index + 2,
-                  ...normalizedRow,
-            };
-      });
+      for (let i = 2; i <= worksheet.rowCount; i++) {
+            const row = worksheet.getRow(i);
+            let hasValue = false;
+            const rowData: Record<string, unknown> = {};
+
+            headers.forEach((header, colIdx) => {
+                  if (!header) return;
+                  const val = getCellValueString(row.getCell(colIdx + 1).value);
+                  if (val !== '') hasValue = true;
+                  rowData[normalizeCsvHeader(header)] = val;
+            });
+
+            if (hasValue) {
+                  rows.push({
+                        rowNumber: i,
+                        ...rowData,
+                  });
+            }
+      }
+
+      return rows;
 };
 
 const buildInventoryPayloadFromCsvRow = (
@@ -832,7 +867,7 @@ const importInventoriesFromCsv = async (filePath?: string, defaultUserId?: strin
       }
 
       try {
-            const rows = parseInventoryCsvRows(filePath);
+            const rows = await parseInventoryCsvRows(filePath);
 
             if (!rows.length) {
                   throw new AppError('CSV file must contain at least one data row', 400);

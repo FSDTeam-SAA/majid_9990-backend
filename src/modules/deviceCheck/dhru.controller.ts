@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 import { Types } from 'mongoose';
 import AppError from '../../errors/AppError';
 import { ImeiServiceCatalog } from './imeiService.model';
@@ -547,26 +547,51 @@ const processSingleImeiCheck = async (
       };
 };
 
-const extractImeisFromWorkbook = (filePath: string) => {
-      const workbook = XLSX.readFile(filePath);
-      const sheetName = workbook.SheetNames[0];
+const getCellValueString = (cellValue: unknown): string => {
+      if (cellValue === null || cellValue === undefined) return '';
+      if (typeof cellValue === 'object') {
+            if ('result' in (cellValue as Record<string, unknown>) && (cellValue as Record<string, unknown>).result !== undefined) {
+                  return getCellValueString((cellValue as Record<string, unknown>).result);
+            }
+            if ('text' in (cellValue as Record<string, unknown>) && (cellValue as Record<string, unknown>).text !== undefined) {
+                  return getCellValueString((cellValue as Record<string, unknown>).text);
+            }
+            if ('richText' in (cellValue as Record<string, unknown>) && Array.isArray((cellValue as Record<string, unknown>).richText)) {
+                  return (cellValue as { richText: Array<{ text: string }> }).richText.map((rt) => rt.text).join('');
+            }
+      }
+      return String(cellValue);
+};
 
-      if (!sheetName) {
-            return [] as string[];
+const extractImeisFromWorkbook = async (filePath: string): Promise<string[]> => {
+      const workbook = new ExcelJS.Workbook();
+      const ext = path.extname(filePath).toLowerCase();
+      if (ext === '.csv') {
+            await workbook.csv.readFile(filePath);
+      } else {
+            await workbook.xlsx.readFile(filePath);
       }
 
-      const sheet = workbook.Sheets[sheetName];
-      const rows = XLSX.utils.sheet_to_json<Array<string | number | null | undefined>>(sheet, {
-            header: 1,
-            blankrows: false,
-            defval: '',
+      const worksheet = workbook.worksheets[0];
+      if (!worksheet || worksheet.rowCount === 0) {
+            return [];
+      }
+
+      const rawRows: string[][] = [];
+      worksheet.eachRow({ includeEmpty: false }, (row) => {
+            const rowValues: string[] = [];
+            const maxCol = row.cellCount;
+            for (let c = 1; c <= maxCol; c++) {
+                  rowValues.push(getCellValueString(row.getCell(c).value));
+            }
+            rawRows.push(rowValues);
       });
 
-      if (!rows.length) {
-            return [] as string[];
+      if (!rawRows.length) {
+            return [];
       }
 
-      const firstRow = rows[0].map((cell) => normalizeImei(cell).toLowerCase());
+      const firstRow = rawRows[0].map((cell) => normalizeImei(cell).toLowerCase());
       const headerLooksLikeImeiColumn = firstRow.some((cell) => cell === 'imei' || cell.includes('imei'));
       const imeiColumnIndex = headerLooksLikeImeiColumn
             ? Math.max(
@@ -574,7 +599,7 @@ const extractImeisFromWorkbook = (filePath: string) => {
                     0
               )
             : 0;
-      const dataRows = headerLooksLikeImeiColumn ? rows.slice(1) : rows;
+      const dataRows = headerLooksLikeImeiColumn ? rawRows.slice(1) : rawRows;
 
       return dataRows.map((row) => normalizeImei(row?.[imeiColumnIndex] ?? row?.[0])).filter((imei) => imei.length > 0);
 };
@@ -1084,7 +1109,8 @@ export const checkImeisFromFile = async (req: Request, res: Response, next: Next
                   });
             }
 
-            const imeis = extractImeisFromWorkbook(file.path)
+            const rawImeis = await extractImeisFromWorkbook(file.path);
+            const imeis = rawImeis
                   .map((imei) => normalizeImei(imei))
                   .filter((imei) => imei.length > 0);
 
