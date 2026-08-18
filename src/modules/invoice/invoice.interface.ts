@@ -18,6 +18,10 @@ export interface IInvoicePaymentDetails {
       transactionReference?: string;
       amountPaid?: number;
       dueAmount?: number;
+      tax?: number;
+      taxName?: string;
+      taxIncludedInPrice?: boolean;
+      totalAmount: number;
       dueDate?: Date;
       notes?: string;
 }

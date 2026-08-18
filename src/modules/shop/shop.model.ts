@@ -57,6 +57,24 @@ const shopSchema = new Schema<IShop>(
       type: Date,
       default: null,
     },
+    taxEnabled: {
+      type: Boolean,
+      default: false,
+    },
+    taxName: {
+      type: String,
+      trim: true,
+      default: 'Tax',
+    },
+    taxPercentage: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    taxIncludedInPrice: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,

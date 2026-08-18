@@ -225,6 +225,8 @@ const createInvoice = async (payload: IInvoicePayload, file?: Express.Multer.Fil
             dueAmount,
             repairRequestId: normalizeObjectId(payload.repairRequestId),
             tax: normalizeOptionalNumber(payload.tax, 'tax'),
+            taxName: payload.taxName,
+            taxIncludedInPrice: payload.taxIncludedInPrice,
             paymentMethod,
             paymentStatus: payload.paymentStatus,
             paymentDetails,

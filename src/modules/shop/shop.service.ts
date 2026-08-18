@@ -198,6 +198,22 @@ const updateShop = async (user: any, shopId: string, payload: any) => {
     updateData.currency = String(payload.currency).trim().toUpperCase() || 'USD';
   }
 
+  if (payload.taxEnabled !== undefined) {
+    updateData.taxEnabled = Boolean(payload.taxEnabled);
+  }
+
+  if (payload.taxName !== undefined) {
+    updateData.taxName = String(payload.taxName).trim() || 'Tax';
+  }
+
+  if (payload.taxPercentage !== undefined) {
+    updateData.taxPercentage = Number(payload.taxPercentage) || 0;
+  }
+
+  if (payload.taxIncludedInPrice !== undefined) {
+    updateData.taxIncludedInPrice = Boolean(payload.taxIncludedInPrice);
+  }
+
   if (Object.keys(updateData).length === 0) {
     return shop;
   }

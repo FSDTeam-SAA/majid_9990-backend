@@ -17,6 +17,10 @@ export interface IShop {
   isDefault: boolean;
   isActive: boolean;
   activatedAt?: Date | null;
+  taxEnabled?: boolean;
+  taxName?: string;
+  taxPercentage?: number;
+  taxIncludedInPrice?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
 }

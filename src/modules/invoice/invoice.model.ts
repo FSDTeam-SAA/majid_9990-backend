@@ -63,6 +63,8 @@ const invoiceSchema = new Schema<IInvoice>(
                   default: null,
             },
 
+            taxName: { type: String, default: null },
+            taxIncludedInPrice: { type: Boolean, default: null },
             tax: {
                   type: Number,
                   default: null,

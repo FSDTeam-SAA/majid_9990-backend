@@ -83,3 +83,31 @@ Requirements:
 * Make the UI simple and professional.
 
 Do not change any existing invoice functionality other than adding these logo controls.
+
+
+==============================================================================================> 18 aug 26
+p1: 
+The application currently displays a Tax section, but it is unclear how shopkeepers configure and use tax.
+
+Implement a complete tax configuration flow.
+
+Requirements:
+
+* Add a clear Tax Settings section under Settings.
+* Allow shopkeepers to enable/disable tax.
+* Allow them to define a tax name, such as VAT, GST, Sales Tax, etc.
+* Allow them to configure the tax percentage.
+* Clearly show where the tax percentage is entered.
+* Define whether tax is included in the product price or added on top of the subtotal.
+* Apply the configured tax correctly during checkout.
+* Display subtotal, discount, tax, and final total clearly.
+* Apply the same tax information consistently to invoices and receipts.
+* Make sure tax calculations are mathematically accurate.
+* Respect the shop/store-specific settings.
+* If the system supports multiple stores, each store must be able to have its own tax configuration.
+
+Do not introduce tax calculations in places where they were not intended.
+Do not change existing pricing behavior unless the tax setting is enabled.
+
+
+
