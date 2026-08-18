@@ -21,7 +21,7 @@ export interface IInvoicePaymentDetails {
       tax?: number;
       taxName?: string;
       taxIncludedInPrice?: boolean;
-      totalAmount: number;
+      totalAmount?: number;
       dueDate?: Date;
       notes?: string;
 }
@@ -53,6 +53,8 @@ export interface IInvoice {
       dueAmount?: number;
       repairRequestId?: Types.ObjectId;
       tax?: number;
+      taxName?: string;
+      taxIncludedInPrice?: boolean;
       paymentMethod?: string;
       paymentStatus?: InvoicePaymentStatus;
       paymentDetails?: IInvoicePaymentDetails;
@@ -77,6 +79,8 @@ export interface IInvoicePayload {
       dueAmount?: number;
       repairRequestId?: string;
       tax?: number;
+      taxName?: string;
+      taxIncludedInPrice?: boolean;
       paymentMethod?: string;
       paymentStatus?: InvoicePaymentStatus;
       paymentDetails?: IInvoicePaymentDetails | string;

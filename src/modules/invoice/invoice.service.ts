@@ -354,6 +354,8 @@ const updateInvoice = async (id: string, payload: IInvoicePayload, file?: Expres
                   | 'dueAmount'
                   | 'repairRequestId'
                   | 'tax'
+                  | 'taxName'
+                  | 'taxIncludedInPrice'
                   | 'paymentMethod'
                   | 'paymentStatus'
                   | 'paymentDetails'
@@ -379,6 +381,14 @@ const updateInvoice = async (id: string, payload: IInvoicePayload, file?: Expres
 
       if (payload.tax !== undefined) {
             updateData.tax = payload.tax;
+      }
+
+      if (payload.taxName !== undefined) {
+            updateData.taxName = payload.taxName?.trim() || undefined;
+      }
+
+      if (payload.taxIncludedInPrice !== undefined) {
+            updateData.taxIncludedInPrice = payload.taxIncludedInPrice;
       }
 
       if (payload.paymentMethod !== undefined) {
