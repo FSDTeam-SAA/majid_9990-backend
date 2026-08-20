@@ -93,6 +93,11 @@ const userSchema = new Schema<IUser>(
                   ref: 'User',
                   default: null,
             },
+            shopId: {
+                  type: Schema.Types.ObjectId,
+                  ref: 'Shop',
+                  default: null,
+            },
             totalReviews: { type: Number, default: 0 },
             averageRating: { type: Number, default: 0 },
             currency: {

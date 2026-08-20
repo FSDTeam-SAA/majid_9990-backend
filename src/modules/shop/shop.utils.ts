@@ -38,6 +38,9 @@ export const ensureDefaultShop = async (shopkeeperId: Types.ObjectId | string): 
       activatedAt: new Date(),
     });
     defaultShop = created.toObject ? created.toObject() : created;
+  } else if (defaultShop?._id && user?.currency && defaultShop.currency !== user.currency) {
+    await Shop.updateOne({ _id: defaultShop._id }, { $set: { currency: user.currency } });
+    defaultShop.currency = user.currency;
   }
 
   if (defaultShop?._id) {

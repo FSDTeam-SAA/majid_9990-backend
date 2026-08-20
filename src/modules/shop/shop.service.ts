@@ -277,8 +277,11 @@ const getShopPerformance = async (user: any, query: any) => {
   const shops = await Shop.find({ shopkeeperId }).sort({ isDefault: -1, createdAt: 1 }).lean();
   
   const staffList = await User.find({ shopkeeperId, role: 'staff', isVerified: true })
-    .select('_id firstName lastName image')
+    .select('_id firstName lastName phone email image workingDays weekendDays shopId')
     .lean();
+
+  const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const todayDayName = daysOfWeek[now.getDay()];
 
   const invoiceFilter: any = { shopkeeperId };
   if (Object.keys(dateQuery).length > 0) {
@@ -314,15 +317,32 @@ const getShopPerformance = async (user: any, query: any) => {
   const shopsWithStats = shops.map((shop) => {
     const shopIdStr = shop._id.toString();
     const stats = salesMap[shopIdStr] || { totalSales: 0, cashSales: 0, cardSales: 0, customersCount: 0 };
+    
+    const assignedStaff = staffList.filter((st: any) => {
+      if (st.shopId) {
+        return st.shopId.toString() === shopIdStr;
+      }
+      return shop.isDefault || shops.length === 1;
+    });
+
+    const staffWorkingToday = assignedStaff.filter((st: any) => {
+      if (Array.isArray(st.workingDays) && st.workingDays.length > 0) {
+        return st.workingDays.includes(todayDayName);
+      }
+      return true;
+    });
+
     return {
       ...shop,
+      currency: shop.currency || user.currency || 'USD',
       stats: {
         totalSales: stats.totalSales || 0,
         cashSales: stats.cashSales || 0,
         cardSales: stats.cardSales || 0,
         customersCount: stats.customersCount || 0,
       },
-      staff: staffList,
+      staff: assignedStaff,
+      staffWorkingToday: staffWorkingToday,
     };
   });
 

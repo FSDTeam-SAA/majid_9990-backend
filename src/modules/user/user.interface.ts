@@ -35,6 +35,7 @@ export interface IUser {
       totalReviews?: number;
       averageRating?: number;
       shopkeeperId?: Types.ObjectId | string;
+      shopId?: Types.ObjectId | string;
       currency?: string;
       logoSettings?: {
             zoom?: number;

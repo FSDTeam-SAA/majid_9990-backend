@@ -225,9 +225,11 @@ const resendOtpCode = async (email: string) => {
 };
 
 const getAllUsers = async () => {
-      const result = await User.find().select(
-            'username firstName lastName email phone role image isVerified balance wageType wageAmount workingDays weekendDays idVerificationStatus idNumber createdAt updatedAt'
-      );
+      const result = await User.find()
+            .populate('shopId', 'shopName shopAddress')
+            .select(
+                  'username firstName lastName email phone role image isVerified balance wageType wageAmount workingDays weekendDays idVerificationStatus idNumber shopId shopkeeperId createdAt updatedAt'
+            );
       return result;
 };
 
@@ -319,6 +321,7 @@ const createStaff = async (payload: {
       password: string;
       phone?: string;
       shopkeeperId: string;
+      shopId?: string;
       wageType?: 'per-day' | 'per-hour';
       wageAmount?: number;
       workingDays?: string[];
@@ -333,6 +336,7 @@ const createStaff = async (payload: {
             password,
             phone,
             shopkeeperId,
+            shopId,
             wageType,
             wageAmount,
             workingDays,
@@ -370,6 +374,7 @@ const createStaff = async (payload: {
             phone,
             role: 'staff',
             shopkeeperId: new Types.ObjectId(shopkeeperId),
+            shopId: shopId && Types.ObjectId.isValid(shopId) ? new Types.ObjectId(shopId) : null,
             isVerified: true,
             wageType,
             wageAmount,
@@ -387,9 +392,9 @@ const createStaff = async (payload: {
             id: new mongoose.Types.ObjectId(result._id),
       });
 
-      return await User.findById(result._id).select(
-            '-password -otp -otpExpires -resetPasswordOtp -resetPasswordOtpExpires'
-      );
+      return await User.findById(result._id)
+            .populate('shopId', 'shopName shopAddress')
+            .select('-password -otp -otpExpires -resetPasswordOtp -resetPasswordOtpExpires');
 };
 
 const getAllStaffByShopkeeper = async (shopkeeperId: string) => {
@@ -400,7 +405,9 @@ const getAllStaffByShopkeeper = async (shopkeeperId: string) => {
       const result = await User.find({
             role: 'staff',
             shopkeeperId: new Types.ObjectId(shopkeeperId),
-      }).select('-password -otp -otpExpires -resetPasswordOtp -resetPasswordOtpExpires');
+      })
+            .populate('shopId', 'shopName shopAddress')
+            .select('-password -otp -otpExpires -resetPasswordOtp -resetPasswordOtpExpires');
 
       return result;
 };
