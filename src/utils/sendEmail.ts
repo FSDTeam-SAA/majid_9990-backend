@@ -2,11 +2,13 @@
 
 import nodemailer from 'nodemailer';
 import config from '../config/config';
+import { companyName } from '../lib/globalType';
 
 interface SendEmailParams {
       to: string;
       subject: string;
       html: string;
+      fromName?: string;
 }
 
 interface SendEmailResponse {
@@ -15,7 +17,7 @@ interface SendEmailResponse {
       error?: string;
 }
 
-const sendEmail = async ({ to, subject, html }: SendEmailParams): Promise<SendEmailResponse> => {
+const sendEmail = async ({ to, subject, html, fromName }: SendEmailParams): Promise<SendEmailResponse> => {
       try {
             // Validate email configuration
             if (!config.email?.emailAddress || !config.email?.emailPass) {
@@ -38,8 +40,10 @@ const sendEmail = async ({ to, subject, html }: SendEmailParams): Promise<SendEm
             // Verify connection configuration
             await transporter.verify();
 
+            const sender = fromName || companyName || 'Imoscan';
+
             const mailOptions = {
-                  from: `"Repair Service" <${config.email.emailAddress}>`,
+                  from: `"${sender}" <${config.email.emailAddress}>`,
                   to,
                   subject,
                   html,
