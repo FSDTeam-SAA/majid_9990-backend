@@ -20,6 +20,9 @@ const paymentSchema = new Schema<IPayment>(
       type: String,
       default: 'usd',
     },
+    ryftPaymentSessionId: String,
+    ryftPaymentId: String,
+    clientSecret: String,
     stripeSessionId: String,
     stripePaymentIntentId: String,
     paymentStatus: {
@@ -27,7 +30,10 @@ const paymentSchema = new Schema<IPayment>(
       enum: ['pending', 'paid', 'failed'],
       default: 'pending',
     },
-    paymentMethod: String,
+    paymentMethod: {
+      type: String,
+      default: 'RyftPay',
+    },
     paymentType: {
       type: String,
       enum: ['plan', 'add_shop'],
@@ -46,5 +52,6 @@ const paymentSchema = new Schema<IPayment>(
 );
 
 paymentSchema.index({ userId: 1, createdAt: -1 });
+paymentSchema.index({ ryftPaymentSessionId: 1 });
 
 export const Payment = model<IPayment>('Payment', paymentSchema);

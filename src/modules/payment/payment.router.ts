@@ -13,7 +13,7 @@ router.get('/all-payments', protect, isAdmin, paymentController.getAllPayments);
 router.patch('/status/:id', protect, isAdmin, paymentController.updatePaymentStatus);
 router.delete('/:id', protect, isAdmin, paymentController.deletePayment);
 
-// webhook (NO protect + raw body)
-router.post('/webhook', require('express').raw({ type: 'application/json' }), paymentController.stripeWebhook);
+// webhook (NO protect + raw body for signature verification)
+router.post('/webhook', require('express').raw({ type: '*/*' }), paymentController.ryftWebhook);
 
 export default router;

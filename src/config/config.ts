@@ -18,9 +18,10 @@ export default {
             emailAddress: process.env.EMAIL_ADDRESS,
             emailPass: process.env.EMAIL_PASSWORD,
       },
-      stripe_secret_key: process.env.STRIPE_SECRET_KEY,
-      stripe_webhook_secret: process.env.STRIPE_WEBHOOK_SECRET,
-      stripe_public_key: process.env.STRIPE_PUBLIC_KEY,
+      ryft_secret_key: process.env.RYFT_SECRET_KEY,
+      ryft_webhook_secret: process.env.RYFT_WEBHOOK_SECRET,
+      ryft_public_key: process.env.RYFT_PUBLIC_KEY,
+      ryft_base_url: process.env.RYFT_BASE_URL || 'https://api.ryftpay.com/v1',
       frontend_url: process.env.FRONTEND_URL,
       lowStockAlert: {
             enableEmailNotification: process.env.LOW_STOCK_ENABLE_EMAIL !== 'false',

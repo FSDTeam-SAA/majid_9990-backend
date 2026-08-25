@@ -11,6 +11,11 @@ export interface IPayment {
   amount: number;
   currency: string;
 
+  ryftPaymentSessionId?: string;
+  ryftPaymentId?: string;
+  clientSecret?: string;
+
+  // Legacy compatibility
   stripeSessionId?: string;
   stripePaymentIntentId?: string;
 
