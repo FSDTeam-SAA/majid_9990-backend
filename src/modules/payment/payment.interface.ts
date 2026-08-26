@@ -23,8 +23,16 @@ export interface IPayment {
 
   paymentMethod?: string;
 
-  paymentType?: TPaymentType;
+  paymentType?: TPaymentType | string;
   shopId?: Types.ObjectId;
+
+  // Split payment & Connect fields
+  isSplitPayment?: boolean;
+  subAccountId?: string;
+  platformFee?: number;
+  platformFeePercentage?: number;
+  shopkeeperAmount?: number;
+  recipientUserId?: Types.ObjectId | string;
 
   createdAt?: Date;
   updatedAt?: Date;

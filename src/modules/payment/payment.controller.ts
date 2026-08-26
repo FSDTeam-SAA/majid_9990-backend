@@ -4,15 +4,56 @@ import sendResponse from '../../utils/sendResponse';
 import paymentService from './payment.service';
 import { StatusCodes } from 'http-status-codes';
 
-// Create session
+// Create session (standard or split payment)
 const createPayment = catchAsync(async (req, res) => {
   const session = await paymentService.createPaymentSession(req.user, req.body);
 
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
-    message: 'Ryft payment session created',
+    message: session.isSplitPayment
+      ? 'Ryft split payment session created (2% platform charge)'
+      : 'Ryft payment session created',
     data: session,
+  });
+});
+
+// Ryft Sub-Account Onboarding Link
+const createOnboardingLink = catchAsync(async (req, res) => {
+  const result = await paymentService.createRyftSubAccountOnboardingLink(
+    req.user,
+    req.body?.redirectUrl
+  );
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'Ryft sub-account onboarding link generated',
+    data: result,
+  });
+});
+
+// Ryft Sub-Account Connection Status
+const getConnectStatus = catchAsync(async (req, res) => {
+  const result = await paymentService.getRyftSubAccountStatus(req.user);
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'Ryft sub-account status fetched',
+    data: result,
+  });
+});
+
+// Save / Link Ryft Sub-Account ID
+const saveConnectAccount = catchAsync(async (req, res) => {
+  const result = await paymentService.saveRyftSubAccount(req.user, req.body);
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'Ryft sub-account saved successfully',
+    data: result,
   });
 });
 
@@ -100,6 +141,9 @@ const deletePayment = catchAsync(async (req, res) => {
 
 export default {
   createPayment,
+  createOnboardingLink,
+  getConnectStatus,
+  saveConnectAccount,
   ryftWebhook,
   stripeWebhook: ryftWebhook, // alias for safety
   getMyPayments,

@@ -121,12 +121,24 @@ const userSchema = new Schema<IUser>(
             otpExpires: { type: Date, default: null },
             resetPasswordOtp: { type: String, default: null },
             resetPasswordOtpExpires: { type: Date, default: null },
+            ryftAccountId: { type: String, default: null },
+            ryftAccountStatus: {
+                  type: String,
+                  enum: ['not_created', 'pending', 'verified', 'enabled', 'rejected'],
+                  default: 'not_created',
+            },
+            ryftPayoutsEnabled: { type: Boolean, default: false },
+            ryftDetailsSubmitted: { type: Boolean, default: false },
+            ryftOnboardingUrl: { type: String, default: null },
+            ryftAccountCurrency: { type: String, default: 'GBP' },
       },
       {
             timestamps: true,
             versionKey: false,
       }
 );
+
+userSchema.index({ ryftAccountId: 1 });
 
 userSchema.pre('save', async function (next) {
       this.password = await bcrypt.hash(this.password, Number(config.bcryptSaltRounds));

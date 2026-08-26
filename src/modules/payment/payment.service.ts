@@ -8,6 +8,8 @@ import { Payment } from './payment.model';
 import { creditUserBalance } from './balanceTransaction.service';
 import { TPaymentStatus } from './payment.interface';
 
+export const PLATFORM_FEE_PERCENTAGE = 2; // 2% platform split for connected accounts
+
 const getRyftSecretKey = (): string => {
   const secretKey = (config as { ryft_secret_key?: string }).ryft_secret_key;
   if (!secretKey) {
@@ -17,15 +19,33 @@ const getRyftSecretKey = (): string => {
 };
 
 const getRyftBaseUrl = (): string => {
-  return (config as { ryft_base_url?: string }).ryft_base_url || 'https://api.ryftpay.com/v1';
+  const secretKey = (config as { ryft_secret_key?: string }).ryft_secret_key || '';
+  const configuredUrl = (config as { ryft_base_url?: string }).ryft_base_url;
+
+  if (configuredUrl && configuredUrl !== 'https://api.ryftpay.com/v1') {
+    return configuredUrl.replace(/\/+$/, '');
+  }
+
+  // Automatic Sandbox API detection when using sandbox credentials
+  if (secretKey.startsWith('sk_sandbox_')) {
+    return 'https://sandbox-api.ryftpay.com/v1';
+  }
+
+  return (configuredUrl || 'https://api.ryftpay.com/v1').replace(/\/+$/, '');
 };
 
-const getRyftHeaders = () => {
+const getRyftHeaders = (subAccountId?: string) => {
   const secretKey = getRyftSecretKey();
-  return {
+  const headers: Record<string, string> = {
     Authorization: secretKey,
     'Content-Type': 'application/json',
   };
+
+  if (subAccountId && subAccountId.trim()) {
+    headers['Account'] = subAccountId.trim();
+  }
+
+  return headers;
 };
 
 const creditPaymentBalance = async (payment: any) => {
@@ -57,9 +77,181 @@ const creditPaymentBalance = async (payment: any) => {
   });
 };
 
-// ✅ Create Ryft Payment Session
+// ==========================================
+// 🚀 Ryft Sub-Account Onboarding & Connect
+// ==========================================
+
+const createRyftSubAccountOnboardingLink = async (user: any, redirectUrlParam?: string) => {
+  const secretKey = getRyftSecretKey();
+  const ryftBaseUrl = getRyftBaseUrl();
+  const frontendUrl = (config as { frontend_url?: string }).frontend_url || 'http://localhost:3000';
+  const targetRedirectUrl = redirectUrlParam || `${frontendUrl}/shopkeeper/settings/payment-setup?status=onboard_complete`;
+
+  const currentUser = await User.findById(user._id || user.id);
+  if (!currentUser) {
+    throw new AppError('User not found', 404);
+  }
+
+  const requestBody = {
+    email: currentUser.email,
+    redirectUrl: targetRedirectUrl,
+  };
+
+  try {
+    const response = await axios.post(`${ryftBaseUrl}/accounts/authorize`, requestBody, {
+      headers: {
+        Authorization: secretKey,
+        'Content-Type': 'application/json',
+      },
+      timeout: 30000,
+    });
+
+    const data = response.data;
+    const url = data?.url || data?.link || data?.redirectUrl;
+    const accountId = data?.accountId || data?.id || currentUser.ryftAccountId;
+
+    if (accountId) {
+      currentUser.ryftAccountId = accountId;
+      if (currentUser.ryftAccountStatus === 'not_created') {
+        currentUser.ryftAccountStatus = 'pending';
+      }
+    }
+
+    if (url) {
+      currentUser.ryftOnboardingUrl = url;
+    }
+
+    await currentUser.save();
+
+    return {
+      url,
+      accountId: currentUser.ryftAccountId || accountId || null,
+      status: currentUser.ryftAccountStatus || 'pending',
+      platformFeePercentage: PLATFORM_FEE_PERCENTAGE,
+      environment: ryftBaseUrl.includes('sandbox') ? 'sandbox' : 'production',
+    };
+  } catch (error: any) {
+    const errorMessage =
+      error?.response?.data?.message ||
+      error?.response?.data?.error ||
+      error?.message ||
+      'Failed to create Ryft sub-account onboarding link';
+    console.error('Ryft sub-account onboarding error:', error?.response?.data || error);
+    throw new AppError(`Ryft onboarding failed: ${errorMessage}`, 502);
+  }
+};
+
+const getRyftSubAccountStatus = async (user: any) => {
+  const currentUser = await User.findById(user._id || user.id);
+  if (!currentUser) {
+    throw new AppError('User not found', 404);
+  }
+
+  const ryftBaseUrl = getRyftBaseUrl();
+  const secretKey = (config as { ryft_secret_key?: string }).ryft_secret_key;
+  const isConfigured = Boolean(secretKey && secretKey !== 'sk_test_replace_me');
+  const isSandbox = ryftBaseUrl.includes('sandbox') || (secretKey ? secretKey.startsWith('sk_sandbox_') : false);
+
+  if (!currentUser.ryftAccountId) {
+    return {
+      isOnboarded: false,
+      accountId: null,
+      status: currentUser.ryftAccountStatus || 'not_created',
+      payoutsEnabled: false,
+      detailsSubmitted: false,
+      platformFeePercentage: PLATFORM_FEE_PERCENTAGE,
+      isConfigured,
+      isSandbox,
+      accountCurrency: currentUser.ryftAccountCurrency || 'GBP',
+      environment: isSandbox ? 'sandbox' : 'production',
+    };
+  }
+
+  try {
+    const response = await axios.get(`${ryftBaseUrl}/accounts/${currentUser.ryftAccountId}`, {
+      headers: getRyftHeaders(),
+      timeout: 15000,
+    });
+
+    const account = response.data;
+    const status = String(account?.status || account?.verificationStatus || 'pending').toLowerCase();
+    const payoutsEnabled = Boolean(account?.payoutsEnabled ?? (status === 'enabled' || status === 'verified'));
+    const detailsSubmitted = Boolean(account?.detailsSubmitted ?? true);
+
+    currentUser.ryftAccountStatus = status;
+    currentUser.ryftPayoutsEnabled = payoutsEnabled;
+    currentUser.ryftDetailsSubmitted = detailsSubmitted;
+    if (account?.currency) {
+      currentUser.ryftAccountCurrency = account.currency;
+    }
+    await currentUser.save();
+
+    return {
+      isOnboarded: Boolean(payoutsEnabled || status === 'enabled' || status === 'verified'),
+      accountId: currentUser.ryftAccountId,
+      status,
+      payoutsEnabled,
+      detailsSubmitted,
+      platformFeePercentage: PLATFORM_FEE_PERCENTAGE,
+      isConfigured,
+      isSandbox,
+      accountCurrency: currentUser.ryftAccountCurrency || account?.currency || 'GBP',
+      environment: isSandbox ? 'sandbox' : 'production',
+      rawAccount: account,
+    };
+  } catch (error: any) {
+    console.warn(`Could not query Ryft sub-account ${currentUser.ryftAccountId}:`, error?.response?.data || error?.message);
+    return {
+      isOnboarded: Boolean(currentUser.ryftPayoutsEnabled),
+      accountId: currentUser.ryftAccountId,
+      status: currentUser.ryftAccountStatus || 'pending',
+      payoutsEnabled: Boolean(currentUser.ryftPayoutsEnabled),
+      detailsSubmitted: Boolean(currentUser.ryftDetailsSubmitted),
+      platformFeePercentage: PLATFORM_FEE_PERCENTAGE,
+      isConfigured,
+      isSandbox,
+      accountCurrency: currentUser.ryftAccountCurrency || 'GBP',
+      environment: isSandbox ? 'sandbox' : 'production',
+    };
+  }
+};
+
+const saveRyftSubAccount = async (user: any, payload: { accountId: string; status?: string }) => {
+  const { accountId, status } = payload;
+  if (!accountId || !accountId.trim()) {
+    throw new AppError('accountId is required', 400);
+  }
+
+  const currentUser = await User.findById(user._id || user.id);
+  if (!currentUser) {
+    throw new AppError('User not found', 404);
+  }
+
+  currentUser.ryftAccountId = accountId.trim();
+  if (status) {
+    currentUser.ryftAccountStatus = status;
+  }
+
+  await currentUser.save();
+
+  return await getRyftSubAccountStatus(currentUser);
+};
+
+// ==========================================
+// 💳 Create Ryft Payment Session (Split / Platform Fee)
+// ==========================================
+
 const createPaymentSession = async (user: any, payload: any) => {
-  const { amount, subscriptionId, currency = 'GBP', paymentType = 'plan', shopId } = payload;
+  const {
+    amount,
+    subscriptionId,
+    currency = 'GBP',
+    paymentType = 'plan',
+    shopId,
+    subAccountId: explicitSubAccountId,
+    recipientUserId,
+  } = payload;
+
   const frontendUrl = (config as { frontend_url?: string }).frontend_url ?? '';
   const ryftBaseUrl = getRyftBaseUrl();
   const ryftPublicKey = (config as { ryft_public_key?: string }).ryft_public_key ?? '';
@@ -67,7 +259,44 @@ const createPaymentSession = async (user: any, payload: any) => {
   const normalizedCurrency = String(currency || 'GBP').toUpperCase();
   const unitAmount = Math.round(Number(amount) * 100);
 
-  const requestBody = {
+  // Resolve whether this payment routes to a shopkeeper's connected account
+  let targetSubAccountId: string | null = explicitSubAccountId ? String(explicitSubAccountId).trim() : null;
+  let targetRecipientId: string | null = recipientUserId ? String(recipientUserId) : null;
+
+  if (!targetSubAccountId) {
+    if (recipientUserId) {
+      const recipient = await User.findById(recipientUserId);
+      if (recipient?.ryftAccountId) {
+        targetSubAccountId = recipient.ryftAccountId;
+      }
+    } else if (shopId) {
+      const shop = await Shop.findById(shopId);
+      if (shop?.shopkeeperId) {
+        targetRecipientId = shop.shopkeeperId.toString();
+        const shopkeeper = await User.findById(shop.shopkeeperId);
+        if (shopkeeper?.ryftAccountId) {
+          targetSubAccountId = shopkeeper.ryftAccountId;
+        }
+      }
+    } else if (paymentType !== 'plan' && paymentType !== 'add_shop') {
+      // If a shopkeeper is creating a payment for their own services/invoices
+      const currentUser = await User.findById(user._id || user.id);
+      if (currentUser?.role === 'shopkeeper' && currentUser.ryftAccountId) {
+        targetSubAccountId = currentUser.ryftAccountId;
+        targetRecipientId = currentUser._id.toString();
+      }
+    }
+  }
+
+  const isSplitPayment = Boolean(targetSubAccountId);
+  let platformFeeMinor = 0;
+
+  if (isSplitPayment) {
+    // 2% Platform split
+    platformFeeMinor = Math.round(unitAmount * (PLATFORM_FEE_PERCENTAGE / 100));
+  }
+
+  const requestBody: Record<string, any> = {
     amount: unitAmount,
     currency: normalizedCurrency,
     customerEmail: user?.email,
@@ -76,15 +305,23 @@ const createPaymentSession = async (user: any, payload: any) => {
       userId: user._id.toString(),
       subscriptionId: subscriptionId ? String(subscriptionId) : '',
       paymentType,
+      isSplitPayment: isSplitPayment ? 'true' : 'false',
+      ...(targetSubAccountId ? { subAccountId: targetSubAccountId } : {}),
+      ...(platformFeeMinor > 0 ? { platformFee: String(platformFeeMinor) } : {}),
       ...(shopId ? { shopId: String(shopId) } : {}),
     },
   };
 
+  if (isSplitPayment && platformFeeMinor > 0) {
+    requestBody.platformFee = platformFeeMinor;
+  }
+
   let ryftSession: any;
 
   try {
+    const headers = getRyftHeaders(targetSubAccountId || undefined);
     const response = await axios.post(`${ryftBaseUrl}/payment-sessions`, requestBody, {
-      headers: getRyftHeaders(),
+      headers,
       timeout: 30000,
     });
     ryftSession = response.data;
@@ -98,7 +335,7 @@ const createPaymentSession = async (user: any, payload: any) => {
     throw new AppError(`Ryft payment session creation failed: ${errorMessage}`, 502);
   }
 
-  // save pending payment
+  // Save pending payment record in DB
   const payment = await Payment.create({
     userId: user._id,
     subscriptionId,
@@ -109,6 +346,12 @@ const createPaymentSession = async (user: any, payload: any) => {
     paymentStatus: 'pending',
     paymentMethod: 'RyftPay',
     paymentType,
+    isSplitPayment,
+    subAccountId: targetSubAccountId || undefined,
+    platformFee: isSplitPayment ? platformFeeMinor / 100 : 0,
+    platformFeePercentage: isSplitPayment ? PLATFORM_FEE_PERCENTAGE : 0,
+    shopkeeperAmount: isSplitPayment ? (unitAmount - platformFeeMinor) / 100 : 0,
+    recipientUserId: targetRecipientId || undefined,
     ...(shopId ? { shopId } : {}),
   });
 
@@ -120,6 +363,10 @@ const createPaymentSession = async (user: any, payload: any) => {
     currency: normalizedCurrency,
     publicKey: ryftPublicKey,
     paymentId: payment._id.toString(),
+    isSplitPayment,
+    platformFee: isSplitPayment ? platformFeeMinor / 100 : 0,
+    platformFeePercentage: isSplitPayment ? PLATFORM_FEE_PERCENTAGE : 0,
+    shopkeeperAmount: isSplitPayment ? (unitAmount - platformFeeMinor) / 100 : Number(amount),
     url: `${frontendUrl}/payment/checkout?clientSecret=${encodeURIComponent(ryftSession.clientSecret)}&sessionId=${encodeURIComponent(ryftSession.id)}`,
   };
 };
@@ -193,7 +440,28 @@ const verifyWebhookSignature = (rawBody: Buffer | string, signatureHeader?: stri
 // Handle Webhook
 const handleRyftWebhook = async (event: any) => {
   const eventType = String(event?.eventType || event?.type || '').toLowerCase();
-  const eventData = event?.data || event?.paymentSession || event;
+  const eventData = event?.data || event?.paymentSession || event?.account || event;
+
+  // Handle Account Webhook Events (Sub-account updates)
+  if (eventType.startsWith('account.') || eventType.includes('account')) {
+    const accountId = eventData?.id || eventData?.accountId;
+    if (accountId) {
+      const status = String(eventData?.status || eventData?.verificationStatus || 'pending').toLowerCase();
+      const payoutsEnabled = Boolean(eventData?.payoutsEnabled ?? (status === 'enabled' || status === 'verified'));
+      const detailsSubmitted = Boolean(eventData?.detailsSubmitted ?? true);
+
+      await User.findOneAndUpdate(
+        { ryftAccountId: accountId },
+        {
+          ryftAccountStatus: status,
+          ryftPayoutsEnabled: payoutsEnabled,
+          ryftDetailsSubmitted: detailsSubmitted,
+          ...(eventData?.currency ? { ryftAccountCurrency: eventData.currency } : {}),
+        }
+      );
+    }
+    return;
+  }
 
   const sessionId = eventData?.id || eventData?.paymentSessionId || eventData?.sessionId;
   const metadataPaymentId = eventData?.metadata?.paymentId;
@@ -262,7 +530,7 @@ const syncPendingPayments = async () => {
       const response = await axios.get(
         `${ryftBaseUrl}/payment-sessions/${payment.ryftPaymentSessionId}`,
         {
-          headers: getRyftHeaders(),
+          headers: getRyftHeaders(payment.subAccountId),
           timeout: 15000,
         }
       );
@@ -399,6 +667,9 @@ const deletePayment = async (paymentId: string) => {
 
 export default {
   createPaymentSession,
+  createRyftSubAccountOnboardingLink,
+  getRyftSubAccountStatus,
+  saveRyftSubAccount,
   verifyWebhookSignature,
   handleRyftWebhook,
   syncPendingPayments,

@@ -36,12 +36,36 @@ const paymentSchema = new Schema<IPayment>(
     },
     paymentType: {
       type: String,
-      enum: ['plan', 'add_shop'],
       default: 'plan',
     },
     shopId: {
       type: Schema.Types.ObjectId,
       ref: 'Shop',
+      default: null,
+    },
+    isSplitPayment: {
+      type: Boolean,
+      default: false,
+    },
+    subAccountId: {
+      type: String,
+      default: null,
+    },
+    platformFee: {
+      type: Number,
+      default: 0,
+    },
+    platformFeePercentage: {
+      type: Number,
+      default: 2,
+    },
+    shopkeeperAmount: {
+      type: Number,
+      default: 0,
+    },
+    recipientUserId: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
       default: null,
     },
   },
@@ -53,5 +77,7 @@ const paymentSchema = new Schema<IPayment>(
 
 paymentSchema.index({ userId: 1, createdAt: -1 });
 paymentSchema.index({ ryftPaymentSessionId: 1 });
+paymentSchema.index({ subAccountId: 1 });
+paymentSchema.index({ recipientUserId: 1 });
 
 export const Payment = model<IPayment>('Payment', paymentSchema);
