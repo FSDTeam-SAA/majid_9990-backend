@@ -108,6 +108,17 @@ ${score >= 90 ? '🏆 Excellent cash management!' : score >= 75 ? '✅ Good job!
             return insight;
       }
 
+      private isSameDay(d1?: Date | null, d2?: Date | null): boolean {
+            if (!d1 || !d2) return false;
+            const date1 = new Date(d1);
+            const date2 = new Date(d2);
+            return (
+                  date1.getFullYear() === date2.getFullYear() &&
+                  date1.getMonth() === date2.getMonth() &&
+                  date1.getDate() === date2.getDate()
+            );
+      }
+
       async createOrUpdateCashManagement(payload: ICashManagementInput): Promise<ICashManagementWithAI> {
             const { shopkeeperId, startingDayCash, banked = 0, cashInDrawer = 0 } = payload;
 
@@ -160,6 +171,7 @@ ${score >= 90 ? '🏆 Excellent cash management!' : score >= 75 ? '✅ Good job!
                         banked,
                         cashInDrawer,
                         cashManagementScore: score,
+                        date: new Date(),
                   });
             }
 
@@ -192,13 +204,48 @@ ${score >= 90 ? '🏆 Excellent cash management!' : score >= 75 ? '✅ Good job!
                   throw new AppError('Invalid shopkeeper ID', 400);
             }
 
-            const cashManagement = await CashManagement.findOne({ shopkeeperId }).populate(
+            let cashManagement = await CashManagement.findOne({ shopkeeperId }).populate(
                   'shopkeeperId',
                   'firstName lastName email phone'
             );
 
             if (!cashManagement) {
                   return null;
+            }
+
+            // Check if record is from a previous calendar day -> Auto-reset for today
+            const isToday = this.isSameDay(cashManagement.date || cashManagement.updatedAt, new Date());
+            if (!isToday) {
+                  const score = this.calculateCashManagementScore({
+                        startingDayCash: 0,
+                        banked: 0,
+                        cashInDrawer: 0,
+                  });
+                  const shopkeeperName = cashManagement.shopkeeperId
+                        ? `${(cashManagement.shopkeeperId as any).firstName || ''} ${(cashManagement.shopkeeperId as any).lastName || ''}`.trim() || 'Shopkeeper'
+                        : 'Shopkeeper';
+                  const aiInsight = await this.generateAIInsight({
+                        shopkeeperName,
+                        startingDayCash: 0,
+                        banked: 0,
+                        cashInDrawer: 0,
+                        score,
+                  });
+
+                  cashManagement = await CashManagement.findByIdAndUpdate(
+                        cashManagement._id,
+                        {
+                              startingDayCash: 0,
+                              banked: 0,
+                              cashInDrawer: 0,
+                              cashManagementScore: score,
+                              aiInsight,
+                              date: new Date(),
+                        },
+                        { new: true }
+                  ).populate('shopkeeperId', 'firstName lastName email phone');
+
+                  if (!cashManagement) return null;
             }
 
             // If no AI insight exists, generate it
