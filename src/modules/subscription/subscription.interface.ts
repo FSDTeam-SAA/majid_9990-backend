@@ -20,7 +20,7 @@
 //       isFree: boolean;
 // }
 
-export type PlanType = 'STARTER' | 'PAY AS YOU GO' | 'DIAMOND' | 'ENTERPRISE' | 'MULTI SHOP';
+export type PlanType = 'STARTER' | 'PAY AS YOU GO' | 'DIAMOND' | 'ENTERPRISE' | 'MULTI SHOP' | 'IMOSCAN EPOS';
 
 export interface IPlanFeature {
       name: string;
