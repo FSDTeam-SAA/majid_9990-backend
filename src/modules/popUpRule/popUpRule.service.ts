@@ -111,24 +111,32 @@ const getRecommendations = async (shopkeeperId: string, categoryIds: string[]) =
                   }
 
                   if (catItemIds.length > 0) {
-                        // Fetch a few items from these categories
                         const items = await Inventory.find({ 
                               categoryId: { $in: catItemIds }, 
                               userId: shopkeeperId, 
                               type: 'inventory' 
                         }).limit(15).populate('categoryId');
-                        
-                        // to avoid duplicates if an item is both matched by inventory ID and category ID
                         fetchedItems.push(...items);
                   }
             } else {
-                  // Fallback: show from the same category
+                  // Fallback: specifically recommend accessories (cases, chargers, screen protectors, cables, etc.)
+                  const accessoryRegex = /case|cover|charger|cable|protector|screen|glass|aux|earphone|headphone|audio|adapter|power\s*bank/i;
                   const items = await Inventory.find({ 
-                        categoryId: rule.categoryId, 
                         userId: shopkeeperId, 
-                        type: 'inventory' 
-                  }).limit(10).populate('categoryId');
-                  fetchedItems.push(...items);
+                        type: 'inventory',
+                        itemName: { $regex: accessoryRegex }
+                  }).limit(12).populate('categoryId');
+
+                  if (items.length > 0) {
+                        fetchedItems.push(...items);
+                  } else {
+                        // If no specific keyword match, fallback to general inventory items
+                        const fallbackItems = await Inventory.find({ 
+                              userId: shopkeeperId, 
+                              type: 'inventory' 
+                        }).limit(8).populate('categoryId');
+                        fetchedItems.push(...fallbackItems);
+                  }
             }
 
             // Remove duplicates based on ID

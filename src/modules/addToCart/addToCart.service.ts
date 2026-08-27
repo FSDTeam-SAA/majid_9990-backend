@@ -128,17 +128,21 @@ const updateAddToCart = async (id: string, payload: IAddToCartPayload) => {
             updatePayload.quantity = validateQuantity(payload.quantity);
       }
 
-      const targetShopkeeperId = updatePayload.shopkeeperId ?? String(existing.shopkeeperId);
-      const targetItemId = updatePayload.itemId ?? String(existing.itemId);
+      if (payload.shopkeeperId !== undefined || payload.itemId !== undefined) {
+            const targetShopkeeperId = updatePayload.shopkeeperId ?? String(existing.shopkeeperId);
+            const targetItemId = updatePayload.itemId ?? String(existing.itemId);
+            const targetVariantId = payload.variantId !== undefined ? payload.variantId : (existing.variantId ?? null);
 
-      const duplicate = await AddToCart.findOne({
-            _id: { $ne: validatedId },
-            shopkeeperId: targetShopkeeperId,
-            itemId: targetItemId,
-      });
+            const duplicate = await AddToCart.findOne({
+                  _id: { $ne: validatedId },
+                  shopkeeperId: targetShopkeeperId,
+                  itemId: targetItemId,
+                  variantId: targetVariantId,
+            });
 
-      if (duplicate) {
-            throw new AppError('Cart item already exists for this shopkeeper and item', StatusCodes.CONFLICT);
+            if (duplicate) {
+                  throw new AppError('Cart item already exists for this shopkeeper and item', StatusCodes.CONFLICT);
+            }
       }
 
       return await AddToCart.findByIdAndUpdate(validatedId, updatePayload, {
