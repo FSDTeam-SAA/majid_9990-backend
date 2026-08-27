@@ -1,8 +1,7 @@
 import { StatusCodes } from 'http-status-codes';
-import { Types } from 'mongoose';
+import { FilterQuery, Types } from 'mongoose';
 import AppError from '../../errors/AppError';
 import { Invoice } from '../invoice/invoice.model';
-import { Customer } from '../customer/customer.model';
 import { Inventory } from '../inventory/inventory.model';
 
 interface IDashboardStats {
@@ -35,13 +34,6 @@ interface IDashboardStats {
 
       // AI Insights
       insights: string[];
-}
-
-interface IPeriodData {
-      totalSales: number;
-      totalProfit: number;
-      totalOrders: number;
-      avgOrderValue: number;
 }
 
 const getDateRange = (filter: 'daily' | 'monthly' | 'yearly') => {
@@ -109,44 +101,195 @@ const getPreviousPeriodRange = (filter: 'daily' | 'monthly' | 'yearly') => {
       return { start, end };
 };
 
-const calculateStats = async (startDate: Date, endDate: Date): Promise<IPeriodData> => {
-      const result = await Invoice.aggregate([
-            {
-                  $match: {
-                        createdAt: { $gte: startDate, $lte: endDate },
-                        totalAmount: { $ne: null },
-                  },
-            },
-            {
-                  $group: {
-                        _id: null,
-                        totalSales: { $sum: '$totalAmount' },
-                        totalOrders: { $sum: 1 },
-                        avgOrderValue: { $avg: '$totalAmount' },
-                  },
-            },
-      ]);
+const calculateGrowth = (current: number, previous: number): number => {
+      if (previous === 0) {
+            return current > 0 ? 100 : 0;
+      }
+      return parseFloat((((current - previous) / previous) * 100).toFixed(1));
+};
 
-      if (result.length === 0) {
+interface IPeriodInvoiceResult {
+      totalSales: number;
+      totalCost: number;
+      totalProfit: number;
+      totalOrders: number;
+      avgOrderValue: number;
+      totalDue: number;
+      invoices: any[];
+}
+
+const calculatePeriodInvoicesAndProfit = async (matchCondition: any): Promise<IPeriodInvoiceResult> => {
+      const invoices = await Invoice.find(matchCondition)
+            .select('totalAmount amountPaid dueAmount paymentStatus lineItems itemsIds customerInfo')
+            .lean();
+
+      if (!invoices.length) {
             return {
                   totalSales: 0,
+                  totalCost: 0,
                   totalProfit: 0,
                   totalOrders: 0,
                   avgOrderValue: 0,
+                  totalDue: 0,
+                  invoices: [],
             };
       }
 
+      // Collect all itemIds from lineItems and itemsIds
+      const itemIdsSet = new Set<string>();
+      for (const inv of invoices) {
+            if (Array.isArray(inv.lineItems)) {
+                  for (const line of inv.lineItems) {
+                        if (line?.itemId) {
+                              itemIdsSet.add(line.itemId.toString());
+                        }
+                  }
+            }
+            if (Array.isArray(inv.itemsIds)) {
+                  for (const id of inv.itemsIds) {
+                        if (id) {
+                              itemIdsSet.add(id.toString());
+                        }
+                  }
+            }
+      }
+
+      const validObjectIds = Array.from(itemIdsSet)
+            .filter((id) => Types.ObjectId.isValid(id))
+            .map((id) => new Types.ObjectId(id));
+
+      const inventoryItems = validObjectIds.length > 0
+            ? await Inventory.find({ _id: { $in: validObjectIds } })
+                    .select('purchasePrice variants')
+                    .lean()
+            : [];
+
+      const inventoryMap = new Map<string, any>();
+      for (const item of inventoryItems) {
+            inventoryMap.set(item._id.toString(), item);
+      }
+
+      let totalSales = 0;
+      let totalCost = 0;
+      let totalDue = 0;
+
+      for (const inv of invoices) {
+            const invoiceSales = Number(inv.totalAmount) || 0;
+            totalSales += invoiceSales;
+            totalDue += Number(inv.dueAmount) || 0;
+
+            let invoiceCost = 0;
+            if (Array.isArray(inv.lineItems) && inv.lineItems.length > 0) {
+                  for (const line of inv.lineItems) {
+                        const item = inventoryMap.get(line.itemId?.toString());
+                        if (item) {
+                              let unitCost = Number(item.purchasePrice) || 0;
+                              if (line.variantId && Array.isArray(item.variants)) {
+                                    const variant = item.variants.find(
+                                          (v: any) => v._id?.toString() === line.variantId?.toString()
+                                    );
+                                    if (variant && variant.purchasePrice !== undefined && variant.purchasePrice !== null) {
+                                          unitCost = Number(variant.purchasePrice) || 0;
+                                    }
+                              }
+                              const qty = Math.max(1, Number(line.quantity) || 1);
+                              invoiceCost += unitCost * qty;
+                        }
+                  }
+            } else if (Array.isArray(inv.itemsIds) && inv.itemsIds.length > 0) {
+                  for (const id of inv.itemsIds) {
+                        const item = inventoryMap.get(id?.toString());
+                        if (item) {
+                              const unitCost = Number(item.purchasePrice) || 0;
+                              invoiceCost += unitCost;
+                        }
+                  }
+            }
+            totalCost += invoiceCost;
+      }
+
+      const totalOrders = invoices.length;
+      const avgOrderValue = totalOrders > 0 ? parseFloat((totalSales / totalOrders).toFixed(2)) : 0;
+      const totalProfit = Math.max(0, parseFloat((totalSales - totalCost).toFixed(2)));
+
       return {
-            totalSales: result[0].totalSales || 0,
-            totalProfit: 0,
-            totalOrders: result[0].totalOrders || 0,
-            avgOrderValue: result[0].avgOrderValue || 0,
+            totalSales: parseFloat(totalSales.toFixed(2)),
+            totalCost: parseFloat(totalCost.toFixed(2)),
+            totalProfit,
+            totalOrders,
+            avgOrderValue,
+            totalDue: parseFloat(totalDue.toFixed(2)),
+            invoices,
       };
 };
 
-const calculateGrowth = (current: number, previous: number): number => {
-      if (previous === 0) return 0;
-      return parseFloat((((current - previous) / previous) * 100).toFixed(1));
+const calculateStockManagement = async (shopkeeperId?: string, shopId?: string) => {
+      const inventoryFilter: FilterQuery<any> = {};
+
+      if (shopkeeperId && Types.ObjectId.isValid(shopkeeperId)) {
+            inventoryFilter.userId = new Types.ObjectId(shopkeeperId);
+      }
+
+      if (shopId && Types.ObjectId.isValid(shopId)) {
+            const targetShopId = new Types.ObjectId(shopId);
+            inventoryFilter.$or = [{ storeId: targetShopId }, { storeId: null }, { storeId: { $exists: false } }];
+      }
+
+      const inventoryList = await Inventory.find(inventoryFilter)
+            .select('quantity minStockLevel variants status type')
+            .lean();
+
+      const totalProducts = inventoryList.length;
+      if (totalProducts === 0) {
+            return {
+                  score: 100,
+                  status: 'Good',
+                  totalProducts: 0,
+                  totalStockUnits: 0,
+                  inStockCount: 0,
+                  lowStockCount: 0,
+                  outOfStockCount: 0,
+            };
+      }
+
+      let inStockCount = 0;
+      let lowStockCount = 0;
+      let outOfStockCount = 0;
+      let totalStockUnits = 0;
+
+      for (const item of inventoryList) {
+            let totalQty = 0;
+            if (Array.isArray(item.variants) && item.variants.length > 0) {
+                  totalQty = item.variants.reduce((sum: number, v: any) => sum + (Number(v.quantity) || 0), 0);
+            } else {
+                  totalQty = Number(item.quantity) || 0;
+            }
+            totalStockUnits += totalQty;
+
+            const minLevel = Number(item.minStockLevel) > 0 ? Number(item.minStockLevel) : 3;
+
+            if (totalQty <= 0) {
+                  outOfStockCount++;
+            } else if (totalQty <= minLevel) {
+                  lowStockCount++;
+            } else {
+                  inStockCount++;
+            }
+      }
+
+      // Proportional score: in-stock items give 100%, low-stock items give 50%, out-of-stock gives 0%
+      const scoreRatio = (inStockCount * 1.0 + lowStockCount * 0.5) / totalProducts;
+      const score = Math.min(Math.max(Math.round(scoreRatio * 100), 0), 100);
+
+      return {
+            score,
+            status: getStatus(score),
+            totalProducts,
+            totalStockUnits,
+            inStockCount,
+            lowStockCount,
+            outOfStockCount,
+      };
 };
 
 const calculateBusinessHealthScore = (metrics: {
@@ -315,64 +458,70 @@ const getDashboardStats = async (
             prevMatchCondition.shopId = new Types.ObjectId(shopId);
       }
 
-      // Current period stats
-      const currentStats = await Invoice.aggregate([
-            { $match: matchCondition },
-            {
-                  $group: {
-                        _id: null,
-                        totalSales: { $sum: '$totalAmount' },
-                        totalOrders: { $sum: 1 },
-                        avgOrderValue: { $avg: '$totalAmount' },
-                  },
-            },
-      ]);
+      // Current period stats (sales, orders, profit, cost, dues)
+      const current = await calculatePeriodInvoicesAndProfit(matchCondition);
 
       // Previous period stats
-      const previousStats = await Invoice.aggregate([
-            { $match: prevMatchCondition },
-            {
-                  $group: {
-                        _id: null,
-                        totalSales: { $sum: '$totalAmount' },
-                        totalOrders: { $sum: 1 },
-                        avgOrderValue: { $avg: '$totalAmount' },
-                  },
-            },
-      ]);
-
-      const current = currentStats[0] || { totalSales: 0, totalOrders: 0, avgOrderValue: 0 };
-      const previous = previousStats[0] || { totalSales: 0, totalOrders: 0, avgOrderValue: 0 };
+      const previous = await calculatePeriodInvoicesAndProfit(prevMatchCondition);
 
       // Calculate growth percentages
       const salesGrowth = calculateGrowth(current.totalSales || 0, previous.totalSales || 0);
-      const profitGrowth = 0; // Will implement when cost field is added
+      const profitGrowth = calculateGrowth(current.totalProfit || 0, previous.totalProfit || 0);
       const ordersGrowth = calculateGrowth(current.totalOrders || 0, previous.totalOrders || 0);
       const avgOrderGrowth = calculateGrowth(current.avgOrderValue || 0, previous.avgOrderValue || 0);
 
-      // Calculate individual metrics scores (0-100 scale)
-      // These would ideally come from various sources, but we'll calculate based on available data
-      const metrics = {
-            // Sales Growth: Based on growth percentage (capped at 100)
-            salesGrowth: Math.min(Math.max(salesGrowth + 50, 0), 100),
+      // Profit margin percentage
+      const profitMarginPercentage =
+            current.totalSales > 0 ? (current.totalProfit / current.totalSales) * 100 : 0;
+      const profitMarginScore = Math.min(Math.max(Math.round(profitMarginPercentage), 0), 100);
 
-            // Profit Margin: Based on sales and average order value
-            profitMargin: Math.min(
-                  Math.max(
-                        current.totalOrders > 0 ? (current.totalSales / (current.totalOrders * 100)) * 50 + 50 : 50,
-                        0
-                  ),
+      // Stock management from real inventory data
+      const stockManagementData = await calculateStockManagement(shopkeeperId, shopId);
+
+      // Outstanding Payments score from real invoice due amounts
+      let outstandingPaymentsScore = 100;
+      if (current.totalSales > 0) {
+            const paidRatio = Math.max(0, (current.totalSales - current.totalDue) / current.totalSales);
+            outstandingPaymentsScore = Math.min(Math.max(Math.round(paidRatio * 100), 0), 100);
+      }
+
+      // Customer Satisfaction score from real customer repeats and payment completion
+      let customerSatisfactionScore = 90;
+      if (current.invoices.length > 0) {
+            const customerMap = new Map<string, number>();
+            let paidOrPartialCount = 0;
+
+            for (const inv of current.invoices) {
+                  if (inv.customerInfo) {
+                        const cId = inv.customerInfo.toString();
+                        customerMap.set(cId, (customerMap.get(cId) || 0) + 1);
+                  }
+                  if (inv.paymentStatus === 'paid' || inv.paymentStatus === 'partial' || (!inv.paymentStatus && !inv.dueAmount)) {
+                        paidOrPartialCount++;
+                  }
+            }
+
+            const fulfillmentRate = paidOrPartialCount / current.invoices.length;
+            const totalUniqueCustomers = customerMap.size;
+            const repeatCustomers = Array.from(customerMap.values()).filter((cnt) => cnt > 1).length;
+            const loyaltyBonus = totalUniqueCustomers > 0 ? (repeatCustomers / totalUniqueCustomers) * 20 : 10;
+
+            customerSatisfactionScore = Math.min(
+                  Math.max(Math.round(fulfillmentRate * 80 + loyaltyBonus), 0),
                   100
-            ),
+            );
+      } else {
+            customerSatisfactionScore = 100;
+      }
 
-            // Stock Management: We'll use inventory data if available
-            stockManagement: 90, // Default, can be enhanced with actual inventory data
+      const salesGrowthScore = Math.min(Math.max(Math.round(salesGrowth + 50), 0), 100);
 
-            // Customer Satisfaction: Based on customer frequency if available
-            customerSatisfaction: 93, // Default, can be enhanced with customer data
-
-            // Outstanding Payments: Based on due amounts
-            outstandingPayments: 85, // Default, can be enhanced with payment data
+      const metrics = {
+            salesGrowth: salesGrowthScore,
+            profitMargin: profitMarginScore,
+            stockManagement: stockManagementData.score,
+            customerSatisfaction: customerSatisfactionScore,
+            outstandingPayments: outstandingPaymentsScore,
       };
 
       // Calculate business health score
@@ -388,7 +537,7 @@ const getDashboardStats = async (
       return {
             // Basic stats
             totalSales: current.totalSales || 0,
-            totalProfit: 0,
+            totalProfit: current.totalProfit || 0,
             totalOrders: current.totalOrders || 0,
             avgOrderValue: current.avgOrderValue || 0,
             salesGrowth,
@@ -403,7 +552,7 @@ const getDashboardStats = async (
             metrics: {
                   salesGrowth: { score: metrics.salesGrowth, status: getStatus(metrics.salesGrowth) },
                   profitMargin: { score: metrics.profitMargin, status: getStatus(metrics.profitMargin) },
-                  stockManagement: { score: metrics.stockManagement, status: getStatus(metrics.stockManagement) },
+                  stockManagement: { score: stockManagementData.score, status: stockManagementData.status },
                   customerSatisfaction: {
                         score: metrics.customerSatisfaction,
                         status: getStatus(metrics.customerSatisfaction),
