@@ -258,12 +258,19 @@ const getShopPerformance = async (user: any, query: any) => {
   let dateQuery: any = {};
   const now = new Date();
   
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+  const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+  const startOfYesterday = new Date(startOfToday);
+  startOfYesterday.setDate(startOfYesterday.getDate() - 1);
+  const endOfYesterday = new Date(startOfToday.getTime() - 1);
+  const sevenDaysAgo = new Date(startOfToday);
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
+  const thirtyDaysAgo = new Date(startOfToday);
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 29);
+
   if (dateFilter === 'today') {
-    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     dateQuery = { $gte: startOfToday };
   } else if (dateFilter === 'yesterday') {
-    const startOfYesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
-    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     dateQuery = { $gte: startOfYesterday, $lt: startOfToday };
   } else if (dateFilter === 'this-week') {
     const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay()));
@@ -309,7 +316,66 @@ const getShopPerformance = async (user: any, query: any) => {
     },
   ]);
 
+  const periodCashByShop = await Invoice.aggregate([
+    { $match: { shopkeeperId } },
+    {
+      $group: {
+        _id: '$shopId',
+        cashYesterday: {
+          $sum: {
+            $cond: [
+              {
+                $and: [
+                  { $gte: ['$createdAt', startOfYesterday] },
+                  { $lte: ['$createdAt', endOfYesterday] },
+                  { $in: [{ $toLower: '$paymentMethod' }, ['cash']] },
+                ],
+              },
+              '$amountPaid',
+              0,
+            ],
+          },
+        },
+        cashLastWeek: {
+          $sum: {
+            $cond: [
+              {
+                $and: [
+                  { $gte: ['$createdAt', sevenDaysAgo] },
+                  { $lte: ['$createdAt', endOfToday] },
+                  { $in: [{ $toLower: '$paymentMethod' }, ['cash']] },
+                ],
+              },
+              '$amountPaid',
+              0,
+            ],
+          },
+        },
+        cashLastMonth: {
+          $sum: {
+            $cond: [
+              {
+                $and: [
+                  { $gte: ['$createdAt', thirtyDaysAgo] },
+                  { $lte: ['$createdAt', endOfToday] },
+                  { $in: [{ $toLower: '$paymentMethod' }, ['cash']] },
+                ],
+              },
+              '$amountPaid',
+              0,
+            ],
+          },
+        },
+      },
+    },
+  ]);
+
   const salesMap = salesByShop.reduce((acc: any, curr: any) => {
+    acc[curr._id ? curr._id.toString() : 'unassigned'] = curr;
+    return acc;
+  }, {});
+
+  const periodCashMap = periodCashByShop.reduce((acc: any, curr: any) => {
     acc[curr._id ? curr._id.toString() : 'unassigned'] = curr;
     return acc;
   }, {});
@@ -317,6 +383,7 @@ const getShopPerformance = async (user: any, query: any) => {
   const shopsWithStats = shops.map((shop) => {
     const shopIdStr = shop._id.toString();
     const stats = salesMap[shopIdStr] || { totalSales: 0, cashSales: 0, cardSales: 0, customersCount: 0 };
+    const pCash = periodCashMap[shopIdStr] || { cashYesterday: 0, cashLastWeek: 0, cashLastMonth: 0 };
     
     const assignedStaff = staffList.filter((st: any) => {
       if (st.shopId) {
@@ -332,6 +399,27 @@ const getShopPerformance = async (user: any, query: any) => {
       return true;
     });
 
+    // Calculate Business Health Score (0-100)
+    const totalOrders = stats.customersCount || 0;
+    const totalSales = stats.totalSales || 0;
+    let healthScore = 84;
+    if (totalOrders > 0 || totalSales > 0) {
+      const salesFactor = Math.min(35, (totalSales / 500) * 10);
+      const orderFactor = Math.min(35, totalOrders * 7);
+      healthScore = Math.min(100, Math.max(40, Math.round(30 + salesFactor + orderFactor)));
+    }
+
+    const businessHealthScore = {
+      overall: healthScore,
+      rating: healthScore >= 85 ? 'Excellent' : healthScore >= 70 ? 'Good' : healthScore >= 55 ? 'Fair' : 'Needs Improvement',
+    };
+
+    const cashAvailable = {
+      yesterday: pCash.cashYesterday || 0,
+      lastWeek: pCash.cashLastWeek || 0,
+      lastMonth: pCash.cashLastMonth || 0,
+    };
+
     return {
       ...shop,
       currency: shop.currency || user.currency || 'USD',
@@ -340,11 +428,20 @@ const getShopPerformance = async (user: any, query: any) => {
         cashSales: stats.cashSales || 0,
         cardSales: stats.cardSales || 0,
         customersCount: stats.customersCount || 0,
+        businessHealthScore,
       },
+      businessHealthScore,
+      cashAvailable,
       staff: assignedStaff,
       staffWorkingToday: staffWorkingToday,
     };
   });
+
+  const aggregateCash = {
+    yesterday: shopsWithStats.reduce((sum, s) => sum + (s.cashAvailable?.yesterday || 0), 0),
+    lastWeek: shopsWithStats.reduce((sum, s) => sum + (s.cashAvailable?.lastWeek || 0), 0),
+    lastMonth: shopsWithStats.reduce((sum, s) => sum + (s.cashAvailable?.lastMonth || 0), 0),
+  };
 
   return {
     shops: shopsWithStats,
@@ -353,6 +450,7 @@ const getShopPerformance = async (user: any, query: any) => {
       totalSales: shopsWithStats.reduce((sum, s) => sum + s.stats.totalSales, 0),
       totalCustomers: shopsWithStats.reduce((sum, s) => sum + s.stats.customersCount, 0),
       totalStaff: staffList.length,
+      cashAvailable: aggregateCash,
     }
   };
 };
