@@ -14,6 +14,8 @@ import { enqueueLowStockEmail } from '../../workers/lowStockEmailWorker';
 import config from '../../config/config';
 import { LowStockAlert } from '../lowStockAlert/lowStockAlert.model';
 import { User } from '../user/user.model';
+import { Category } from './category/category.model';
+import { Supplier } from '../supplier/supplier.model';
 import categoryService from './category/category.service';
 import locationService from '../location/location.service';
 import { ensureDefaultShop } from '../shop/shop.utils';
@@ -249,51 +251,77 @@ const escapeCsvValue = (value: unknown) => {
 
 const inventoryCsvHeaders = [
       'itemName',
-      'sku',
       'brand',
       'color',
       'storage',
       'size',
       'imeiNumber',
+      'sku',
       'modelNumber',
       'quantity',
       'purchasePrice',
       'expectedPrice',
-      'productDetails',
-      'aiDescription',
-      'groupKey',
-      'minStockLevel',
-      'type',
-      'status',
+      'category',
+      'supplier',
       'currentState',
-      'userId',
-      'supplierId',
-      'storeId',
+      'productDetails',
+      'minStockLevel',
 ];
 
 const inventoryCsvTemplateRows = [
       [
-            'Sample iPhone 13',
-            'SKU-IPH13-256-BLK',
+            'Apple iPhone 15 Pro Max',
             'Apple',
-            'Black',
+            'Natural Titanium',
             '256GB',
-            '6.1',
+            '6.7 inch',
             '356789012345678',
-            'A2633',
-            5,
-            500,
-            750,
-            'Premium smartphone in excellent condition',
-            'Ready for sale',
-            'GROUP-001',
-            2,
-            'inventory',
-            'inventory',
+            'SKU-IPH15PM-256-NT',
+            'A2849',
+            1,
+            850,
+            1150,
+            'Smartphones',
+            'Apple Authorized Distributor',
             'new',
-            'USER_OBJECT_ID',
-            'SUPPLIER_OBJECT_ID',
-            'STORE_OBJECT_ID',
+            'Mint condition, unlocked global version',
+            2,
+      ],
+      [
+            'Samsung Galaxy S24 Ultra',
+            'Samsung',
+            'Titanium Black',
+            '512GB',
+            '6.8 inch',
+            '359876543210987',
+            'SKU-S24U-512-TB',
+            'SM-S928B',
+            1,
+            780,
+            1050,
+            'Smartphones',
+            'Global Tech Supplier',
+            'new',
+            'Brand new sealed box with S-Pen',
+            2,
+      ],
+      [
+            'Apple iPad Pro 11-inch M4',
+            'Apple',
+            'Space Black',
+            '256GB',
+            '11 inch',
+            '354567890123456',
+            'SKU-IPADM4-256-SB',
+            'A2836',
+            1,
+            700,
+            950,
+            'Tablets',
+            'Apple Authorized Distributor',
+            'new',
+            'Wi-Fi + Cellular OLED display',
+            1,
       ],
 ];
 
@@ -365,13 +393,14 @@ const parseInventoryCsvRows = async (filePath: string) => {
       return rows;
 };
 
-const buildInventoryPayloadFromCsvRow = (
+const buildInventoryPayloadFromCsvRow = async (
       row: Record<string, unknown> & { rowNumber: number },
       defaultUserId?: string,
-      defaultStoreId?: string
+      defaultStoreId?: string,
+      defaultCategoryId?: string
 ) => {
       const itemName = toQueryString(getCsvValue(row, ['itemName', 'name', 'productName', 'title'])).trim();
-      const imeiNumber = toQueryString(getCsvValue(row, ['imeiNumber', 'imei', 'serialNumber'])).trim();
+      const imeiNumber = toQueryString(getCsvValue(row, ['imeiNumber', 'imei', 'serialNumber', 'barcode', 'code'])).trim();
       const userIdValue =
             toQueryString(getCsvValue(row, ['userId', 'ownerId', 'user'])).trim() || String(defaultUserId ?? '').trim();
       const type = normalizeInventoryType(getCsvValue(row, ['type']));
@@ -390,10 +419,42 @@ const buildInventoryPayloadFromCsvRow = (
       }
 
       const userId = parseObjectId(userIdValue, 'userId');
-      const supplierId = parseObjectId(getCsvValue(row, ['supplierId']), 'supplierId');
-      const storeId =
-            parseObjectId(getCsvValue(row, ['storeId']), 'storeId') ||
-            parseObjectId(String(defaultStoreId ?? ''), 'storeId');
+
+      // Resolve Category
+      const rawCat = toQueryString(getCsvValue(row, ['category', 'categoryId', 'categoryName', 'categoryTitle'])).trim() || String(defaultCategoryId ?? '').trim();
+      let categoryId: Types.ObjectId | undefined = undefined;
+      if (rawCat) {
+            if (Types.ObjectId.isValid(rawCat)) {
+                  categoryId = new Types.ObjectId(rawCat);
+            } else {
+                  const foundCat = await Category.findOne({
+                        name: { $regex: new RegExp(`^${rawCat.trim()}$`, 'i') },
+                  }).select('_id').lean();
+                  if (foundCat?._id) {
+                        categoryId = new Types.ObjectId(String(foundCat._id));
+                  }
+            }
+      }
+
+      // Resolve Supplier
+      const rawSupplier = toQueryString(getCsvValue(row, ['supplier', 'supplierId', 'supplierName'])).trim();
+      let supplierId: Types.ObjectId | undefined = undefined;
+      if (rawSupplier) {
+            if (Types.ObjectId.isValid(rawSupplier)) {
+                  supplierId = new Types.ObjectId(rawSupplier);
+            } else {
+                  const foundSupplier = await Supplier.findOne({
+                        userId,
+                        name: { $regex: new RegExp(`^${rawSupplier.trim()}$`, 'i') },
+                  }).select('_id').lean();
+                  if (foundSupplier?._id) {
+                        supplierId = new Types.ObjectId(String(foundSupplier._id));
+                  }
+            }
+      }
+
+      const storeIdValue = toQueryString(getCsvValue(row, ['storeId'])).trim() || String(defaultStoreId ?? '').trim();
+      const storeId = storeIdValue && Types.ObjectId.isValid(storeIdValue) ? new Types.ObjectId(storeIdValue) : undefined;
 
       return {
             itemName,
@@ -408,9 +469,9 @@ const buildInventoryPayloadFromCsvRow = (
             size: toQueryString(getCsvValue(row, ['size'])).trim() || undefined,
             imeiNumber,
             modelNumber: toQueryString(getCsvValue(row, ['modelNumber', 'model'])).trim() || undefined,
-            quantity: parseOptionalNumber(getCsvValue(row, ['quantity'])),
-            purchasePrice: parseOptionalNumber(getCsvValue(row, ['purchasePrice', 'costPrice'])),
-            expectedPrice: parseOptionalNumber(getCsvValue(row, ['expectedPrice', 'salePrice'])),
+            quantity: parseOptionalNumber(getCsvValue(row, ['quantity', 'qty'])) ?? 1,
+            purchasePrice: parseOptionalNumber(getCsvValue(row, ['purchasePrice', 'costPrice', 'buyPrice'])),
+            expectedPrice: parseOptionalNumber(getCsvValue(row, ['expectedPrice', 'salePrice', 'sellPrice', 'price'])),
             productDetails: toQueryString(getCsvValue(row, ['productDetails', 'details'])).trim() || undefined,
             aiDescription: toQueryString(getCsvValue(row, ['aiDescription', 'description'])).trim() || undefined,
             groupKey: toQueryString(getCsvValue(row, ['groupKey'])).trim() || undefined,
@@ -419,6 +480,7 @@ const buildInventoryPayloadFromCsvRow = (
             status,
             currentState: normalizeBulkCurrentState(getCsvValue(row, ['currentState', 'condition', 'state'])),
             userId,
+            categoryId,
             supplierId,
             storeId,
       };
@@ -707,7 +769,16 @@ type TBarcodeBulkInputItem = {
       storeId?: string;
       imeiNumber?: string;
       purchasePrice?: number | string;
+      expectedPrice?: number | string;
+      salePrice?: number | string;
       currentState?: IInventory['currentState'];
+      categoryId?: string;
+      supplierId?: string;
+      quantity?: number | string;
+      color?: string | string[];
+      storage?: string | string[];
+      sourceImageUrl?: string;
+      sourceImageUrls?: string[] | string;
 };
 
 const parseBarcodeBulkItems = (value: unknown): TBarcodeBulkInputItem[] => {
@@ -789,6 +860,54 @@ const createInventory = async (payload: Partial<IInventory>, file?: any, variant
                   : sourceImageUrls[0] || inventoryImages[0] || payloadImageUrl;
       const normalizedSalePrice = parseOptionalNumber(payload.salePrice);
       const normalizedExpectedPrice = parseOptionalNumber(payload.expectedPrice);
+      const normalizedPurchasePrice = parseOptionalNumber(payload.purchasePrice);
+      const normalizedQuantity = parseOptionalNumber(payload.quantity);
+      const normalizedMinStockLevel = parseOptionalNumber(payload.minStockLevel);
+
+      if (normalizedPurchasePrice !== undefined) {
+            normalizedPayload.purchasePrice = normalizedPurchasePrice;
+      }
+      if (normalizedQuantity !== undefined) {
+            normalizedPayload.quantity = normalizedQuantity;
+      }
+      if (normalizedMinStockLevel !== undefined) {
+            normalizedPayload.minStockLevel = normalizedMinStockLevel;
+      }
+
+      if (normalizedExpectedPrice !== undefined) {
+            normalizedPayload.expectedPrice = normalizedExpectedPrice;
+            if (normalizedSalePrice === undefined || payload.type !== 'sold') {
+                  normalizedPayload.salePrice = normalizedExpectedPrice;
+            }
+      }
+      if (normalizedSalePrice !== undefined) {
+            normalizedPayload.salePrice = normalizedSalePrice;
+      }
+
+      if ((payload as any).categoryId !== undefined) {
+            const rawCatId = typeof (payload as any).categoryId === 'object' && (payload as any).categoryId !== null
+                  ? String((payload as any).categoryId._id || (payload as any).categoryId.id || '')
+                  : String((payload as any).categoryId ?? '').trim();
+
+            if (rawCatId && Types.ObjectId.isValid(rawCatId)) {
+                  normalizedPayload.categoryId = new Types.ObjectId(rawCatId);
+            } else if (!rawCatId) {
+                  delete (normalizedPayload as any).categoryId;
+            }
+      }
+
+      if ((payload as any).supplierId !== undefined) {
+            const rawSupplierId = typeof (payload as any).supplierId === 'object' && (payload as any).supplierId !== null
+                  ? String((payload as any).supplierId._id || (payload as any).supplierId.id || '')
+                  : String((payload as any).supplierId ?? '').trim();
+
+            if (rawSupplierId && Types.ObjectId.isValid(rawSupplierId)) {
+                  normalizedPayload.supplierId = new Types.ObjectId(rawSupplierId);
+            } else if (!rawSupplierId) {
+                  delete (normalizedPayload as any).supplierId;
+            }
+      }
+
       const variants = await normalizeVariants((payload as any).variants, variantFiles);
 
       for (const variant of variants) {
@@ -798,16 +917,6 @@ const createInventory = async (payload: Partial<IInventory>, file?: any, variant
             }
       }
       normalizedPayload.variants = variants as IInventory['variants'];
-
-      if (normalizedSalePrice !== undefined) {
-            normalizedPayload.salePrice = normalizedSalePrice;
-      } else if (normalizedExpectedPrice !== undefined) {
-            normalizedPayload.salePrice = normalizedExpectedPrice;
-      }
-
-      if (normalizedExpectedPrice !== undefined) {
-            normalizedPayload.expectedPrice = normalizedExpectedPrice;
-      }
 
       if (payload.imeiNumber) {
             const existingInventory = await Inventory.findOne({ $or: [{ imeiNumber: payload.imeiNumber }, { 'variants.imeiNumber': payload.imeiNumber }] });
@@ -869,7 +978,7 @@ const createInventory = async (payload: Partial<IInventory>, file?: any, variant
       return result;
 };
 
-const importInventoriesFromCsv = async (filePath?: string, defaultUserId?: string, defaultStoreId?: string) => {
+const importInventoriesFromCsv = async (filePath?: string, defaultUserId?: string, defaultStoreId?: string, defaultCategoryId?: string) => {
       if (!filePath) {
             throw new AppError('CSV file is required', 400);
       }
@@ -890,7 +999,7 @@ const importInventoriesFromCsv = async (filePath?: string, defaultUserId?: strin
 
             for (const row of rows) {
                   try {
-                        const payload = buildInventoryPayloadFromCsvRow(row, defaultUserId, defaultStoreId);
+                        const payload = await buildInventoryPayloadFromCsvRow(row, defaultUserId, defaultStoreId, defaultCategoryId);
                         const created = await createInventory(payload);
 
                         results.push({
@@ -934,10 +1043,16 @@ const createInventoryFromBarcode = async (
             storeId?: string;
             imeiNumber?: string;
             purchasePrice?: number | string;
+            expectedPrice?: number | string;
+            salePrice?: number | string;
             currentState?: IInventory['currentState'];
             type?: IInventory['type'];
             status?: IInventory['status'];
             categoryId?: string;
+            supplierId?: string;
+            quantity?: number | string;
+            color?: string | string[];
+            storage?: string | string[];
             images?: string[] | string;
             sourceImageUrl?: string;
             sourceImageUrls?: string[] | string;
@@ -992,12 +1107,14 @@ const createInventoryFromBarcode = async (
       });
 
       const purchasePrice = parseOptionalNumber(payload.purchasePrice);
-      const expectedPrice = marketPricing.expected.amount;
-      const salePrice = marketPricing.sale.amount;
+      const expectedPrice = parseOptionalNumber(payload.expectedPrice) ?? marketPricing.expected.amount;
+      const salePrice = parseOptionalNumber(payload.salePrice) ?? parseOptionalNumber(payload.expectedPrice) ?? marketPricing.sale.amount;
 
       const brand = barcodeResult.brand || undefined;
-      const colorVariants = extractColorsFromName(itemName);
-      const storageVariants = extractStorageFromName(itemName);
+      const explicitColors = parseStringArray(payload.color);
+      const colorVariants = explicitColors.length ? explicitColors : extractColorsFromName(itemName);
+      const explicitStorage = parseStringArray(payload.storage);
+      const storageVariants = explicitStorage.length ? explicitStorage : extractStorageFromName(itemName);
 
       const productDetails = (() => {
             const parts: string[] = [];
@@ -1050,6 +1167,8 @@ const createInventoryFromBarcode = async (
                   expectedPrice,
                   salePrice,
                   currentState: normalizeCondition(payload.currentState),
+                  quantity: parseOptionalNumber(payload.quantity) ?? 1,
+                  supplierId: payload.supplierId ? parseObjectId(payload.supplierId, 'supplierId') : undefined,
                   productDetails,
                   aiDescription,
                   images:
@@ -1097,6 +1216,7 @@ const createInventoryFromBarcodeBulk = async (payload: unknown, defaultUserId?: 
       const baseUserId = toQueryString(requestBody.userId ?? defaultUserId).trim();
       const baseStoreId = toQueryString(requestBody.storeId).trim();
       const baseImeiNumber = toQueryString(requestBody.imeiNumber).trim();
+      const baseCategoryId = toQueryString(requestBody.categoryId).trim() || undefined;
       const basePurchasePrice =
             typeof requestBody.purchasePrice === 'number' || typeof requestBody.purchasePrice === 'string'
                   ? requestBody.purchasePrice
@@ -1111,7 +1231,16 @@ const createInventoryFromBarcodeBulk = async (payload: unknown, defaultUserId?: 
             storeId: String(item.storeId ?? baseStoreId ?? '').trim(),
             imeiNumber: String(item.imeiNumber ?? baseImeiNumber ?? '').trim(),
             purchasePrice: item.purchasePrice ?? basePurchasePrice,
+            expectedPrice: item.expectedPrice,
+            salePrice: item.salePrice,
             currentState: item.currentState ?? baseCurrentState,
+            categoryId: item.categoryId ?? baseCategoryId,
+            supplierId: item.supplierId,
+            quantity: item.quantity,
+            color: item.color,
+            storage: item.storage,
+            sourceImageUrl: item.sourceImageUrl,
+            sourceImageUrls: item.sourceImageUrls,
       }));
 
       if (!rows.length) {
@@ -1154,7 +1283,16 @@ const createInventoryFromBarcodeBulk = async (payload: unknown, defaultUserId?: 
                         storeId: row.storeId,
                         imeiNumber: row.imeiNumber,
                         purchasePrice: row.purchasePrice,
+                        expectedPrice: row.expectedPrice,
+                        salePrice: row.salePrice,
                         currentState: row.currentState,
+                        categoryId: row.categoryId,
+                        supplierId: row.supplierId,
+                        quantity: row.quantity,
+                        color: row.color,
+                        storage: row.storage,
+                        sourceImageUrl: row.sourceImageUrl,
+                        sourceImageUrls: row.sourceImageUrls,
                   });
 
                   results.push({
@@ -1237,18 +1375,56 @@ const updateInventory = async (id: string, payload: Partial<IInventory>, file?: 
                   : sourceImageUrls[0] || inventoryImages[0] || payloadImageUrl || oldInventory?.sourceImageUrl || oldInventory?.image?.url || oldInventory?.images?.[0];
       const normalizedSalePrice = parseOptionalNumber(payload.salePrice);
       const normalizedExpectedPrice = parseOptionalNumber(payload.expectedPrice);
-      if ((payload as any).variants !== undefined) {
-            normalizedPayload.variants = (await normalizeVariants((payload as any).variants, variantFiles)) as IInventory['variants'];
-      }
+      const normalizedPurchasePrice = parseOptionalNumber(payload.purchasePrice);
+      const normalizedQuantity = parseOptionalNumber(payload.quantity);
+      const normalizedMinStockLevel = parseOptionalNumber(payload.minStockLevel);
 
-      if (normalizedSalePrice !== undefined) {
-            normalizedPayload.salePrice = normalizedSalePrice;
-      } else if (normalizedExpectedPrice !== undefined) {
-            normalizedPayload.salePrice = normalizedExpectedPrice;
+      if (normalizedPurchasePrice !== undefined) {
+            normalizedPayload.purchasePrice = normalizedPurchasePrice;
+      }
+      if (normalizedQuantity !== undefined) {
+            normalizedPayload.quantity = normalizedQuantity;
+      }
+      if (normalizedMinStockLevel !== undefined) {
+            normalizedPayload.minStockLevel = normalizedMinStockLevel;
       }
 
       if (normalizedExpectedPrice !== undefined) {
             normalizedPayload.expectedPrice = normalizedExpectedPrice;
+            if (normalizedSalePrice === undefined || payload.type !== 'sold') {
+                  normalizedPayload.salePrice = normalizedExpectedPrice;
+            }
+      }
+      if (normalizedSalePrice !== undefined) {
+            normalizedPayload.salePrice = normalizedSalePrice;
+      }
+
+      if ((payload as any).categoryId !== undefined) {
+            const rawCatId = typeof (payload as any).categoryId === 'object' && (payload as any).categoryId !== null
+                  ? String((payload as any).categoryId._id || (payload as any).categoryId.id || '')
+                  : String((payload as any).categoryId ?? '').trim();
+
+            if (rawCatId && Types.ObjectId.isValid(rawCatId)) {
+                  normalizedPayload.categoryId = new Types.ObjectId(rawCatId);
+            } else if (!rawCatId) {
+                  (normalizedPayload as any).categoryId = null;
+            }
+      }
+
+      if ((payload as any).supplierId !== undefined) {
+            const rawSupplierId = typeof (payload as any).supplierId === 'object' && (payload as any).supplierId !== null
+                  ? String((payload as any).supplierId._id || (payload as any).supplierId.id || '')
+                  : String((payload as any).supplierId ?? '').trim();
+
+            if (rawSupplierId && Types.ObjectId.isValid(rawSupplierId)) {
+                  normalizedPayload.supplierId = new Types.ObjectId(rawSupplierId);
+            } else if (!rawSupplierId) {
+                  (normalizedPayload as any).supplierId = null;
+            }
+      }
+
+      if ((payload as any).variants !== undefined) {
+            normalizedPayload.variants = (await normalizeVariants((payload as any).variants, variantFiles)) as IInventory['variants'];
       }
 
       if (normalizedSourceImageUrl) {

@@ -85,7 +85,8 @@ const importInventoriesFromCsv = catchAsync(async (req, res) => {
             ? String(req.user.shopkeeperId)
             : String(req.body?.userId ?? req.user?._id ?? '').trim() || undefined;
       const storeId = await getShopFromRequest(req);
-      const result = await inventoryService.importInventoriesFromCsv(req.file?.path, defaultUserId, storeId.toString());
+      const categoryId = req.body?.categoryId || req.query?.categoryId;
+      const result = await inventoryService.importInventoriesFromCsv(req.file?.path, defaultUserId, storeId.toString(), categoryId ? String(categoryId) : undefined);
 
       sendResponse(res, {
             statusCode: StatusCodes.CREATED,
