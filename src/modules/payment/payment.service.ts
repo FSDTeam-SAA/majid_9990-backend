@@ -130,7 +130,7 @@ const createRyftSubAccountOnboardingLink = async (user: any, redirectUrlParam?: 
   };
 
   // Helper to create a sub-account entity on Ryft via /accounts
-  const createNewAccount = async () => {
+  const createNewAccount = async (): Promise<string> => {
     const accountResponse = await axios.post(
       `${ryftBaseUrl}/accounts`,
       {
@@ -144,7 +144,11 @@ const createRyftSubAccountOnboardingLink = async (user: any, redirectUrlParam?: 
         timeout: 30000,
       }
     );
-    return accountResponse.data?.id;
+    const id = accountResponse.data?.id;
+    if (!id) {
+      throw new AppError('Failed to create Ryft sub-account', 500);
+    }
+    return id;
   };
 
   try {
@@ -157,17 +161,19 @@ const createRyftSubAccountOnboardingLink = async (user: any, redirectUrlParam?: 
       } catch (err: any) {
         // If the stored accountId was not found on Ryft (e.g. sandbox reset or invalid ID), create a new one
         if (err?.response?.status === 404) {
-          accountId = await createNewAccount();
-          currentUser.ryftAccountId = accountId;
-          url = await getLinkForAccountId(accountId);
+          const newAccountId = await createNewAccount();
+          currentUser.ryftAccountId = newAccountId;
+          accountId = newAccountId;
+          url = await getLinkForAccountId(newAccountId);
         } else {
           throw err;
         }
       }
     } else {
-      accountId = await createNewAccount();
-      currentUser.ryftAccountId = accountId;
-      url = await getLinkForAccountId(accountId);
+      const newAccountId = await createNewAccount();
+      currentUser.ryftAccountId = newAccountId;
+      accountId = newAccountId;
+      url = await getLinkForAccountId(newAccountId);
     }
 
     if (currentUser.ryftAccountStatus === 'not_created') {
