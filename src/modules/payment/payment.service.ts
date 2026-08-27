@@ -81,40 +81,97 @@ const creditPaymentBalance = async (payment: any) => {
 // 🚀 Ryft Sub-Account Onboarding & Connect
 // ==========================================
 
+const extractRyftErrorMessage = (error: any, defaultMessage: string): string => {
+  const errorItems = error?.response?.data?.errors;
+  if (Array.isArray(errorItems) && errorItems.length > 0) {
+    return errorItems.map((e: any) => e.message || e.code || JSON.stringify(e)).join('; ');
+  }
+  return (
+    error?.response?.data?.message ||
+    error?.response?.data?.error ||
+    error?.message ||
+    defaultMessage
+  );
+};
+
 const createRyftSubAccountOnboardingLink = async (user: any, redirectUrlParam?: string) => {
   const secretKey = getRyftSecretKey();
   const ryftBaseUrl = getRyftBaseUrl();
   const frontendUrl = (config as { frontend_url?: string }).frontend_url || 'http://localhost:3000';
-  const targetRedirectUrl = redirectUrlParam || `${frontendUrl}/shopkeeper/settings/payment-setup?status=onboard_complete`;
+  let targetRedirectUrl = redirectUrlParam || `${frontendUrl}/shopkeeper/settings/payment-setup?status=onboard_complete`;
+
+  // Ryft requires https scheme for redirect/return URLs
+  if (!targetRedirectUrl.startsWith('https://')) {
+    targetRedirectUrl = targetRedirectUrl.replace(/^http:\/\//i, 'https://');
+  }
 
   const currentUser = await User.findById(user._id || user.id);
   if (!currentUser) {
     throw new AppError('User not found', 404);
   }
 
-  const requestBody = {
-    email: currentUser.email,
-    redirectUrl: targetRedirectUrl,
+  // Helper to create hosted account onboarding link via /account-links
+  const getLinkForAccountId = async (accId: string) => {
+    const linkResponse = await axios.post(
+      `${ryftBaseUrl}/account-links`,
+      {
+        accountId: accId,
+        redirectUrl: targetRedirectUrl,
+      },
+      {
+        headers: {
+          Authorization: secretKey,
+          'Content-Type': 'application/json',
+        },
+        timeout: 30000,
+      }
+    );
+    return linkResponse.data?.url;
+  };
+
+  // Helper to create a sub-account entity on Ryft via /accounts
+  const createNewAccount = async () => {
+    const accountResponse = await axios.post(
+      `${ryftBaseUrl}/accounts`,
+      {
+        email: currentUser.email,
+      },
+      {
+        headers: {
+          Authorization: secretKey,
+          'Content-Type': 'application/json',
+        },
+        timeout: 30000,
+      }
+    );
+    return accountResponse.data?.id;
   };
 
   try {
-    const response = await axios.post(`${ryftBaseUrl}/accounts/authorize`, requestBody, {
-      headers: {
-        Authorization: secretKey,
-        'Content-Type': 'application/json',
-      },
-      timeout: 30000,
-    });
-
-    const data = response.data;
-    const url = data?.url || data?.link || data?.redirectUrl;
-    const accountId = data?.accountId || data?.id || currentUser.ryftAccountId;
+    let accountId = currentUser.ryftAccountId;
+    let url: string | undefined;
 
     if (accountId) {
-      currentUser.ryftAccountId = accountId;
-      if (currentUser.ryftAccountStatus === 'not_created') {
-        currentUser.ryftAccountStatus = 'pending';
+      try {
+        url = await getLinkForAccountId(accountId);
+      } catch (err: any) {
+        // If the stored accountId was not found on Ryft (e.g. sandbox reset or invalid ID), create a new one
+        if (err?.response?.status === 404) {
+          accountId = await createNewAccount();
+          currentUser.ryftAccountId = accountId;
+          url = await getLinkForAccountId(accountId);
+        } else {
+          throw err;
+        }
       }
+    } else {
+      accountId = await createNewAccount();
+      currentUser.ryftAccountId = accountId;
+      url = await getLinkForAccountId(accountId);
+    }
+
+    if (currentUser.ryftAccountStatus === 'not_created') {
+      currentUser.ryftAccountStatus = 'pending';
     }
 
     if (url) {
@@ -131,11 +188,7 @@ const createRyftSubAccountOnboardingLink = async (user: any, redirectUrlParam?: 
       environment: ryftBaseUrl.includes('sandbox') ? 'sandbox' : 'production',
     };
   } catch (error: any) {
-    const errorMessage =
-      error?.response?.data?.message ||
-      error?.response?.data?.error ||
-      error?.message ||
-      'Failed to create Ryft sub-account onboarding link';
+    const errorMessage = extractRyftErrorMessage(error, 'Failed to create Ryft sub-account onboarding link');
     console.error('Ryft sub-account onboarding error:', error?.response?.data || error);
     throw new AppError(`Ryft onboarding failed: ${errorMessage}`, 502);
   }
@@ -174,9 +227,9 @@ const getRyftSubAccountStatus = async (user: any) => {
     });
 
     const account = response.data;
-    const status = String(account?.status || account?.verificationStatus || 'pending').toLowerCase();
-    const payoutsEnabled = Boolean(account?.payoutsEnabled ?? (status === 'enabled' || status === 'verified'));
-    const detailsSubmitted = Boolean(account?.detailsSubmitted ?? true);
+    const status = String(account?.status || account?.verification?.status || 'pending').toLowerCase();
+    const payoutsEnabled = Boolean(account?.payoutsEnabled ?? account?.settings?.payouts?.enabled ?? (status === 'enabled' || status === 'verified'));
+    const detailsSubmitted = Boolean(account?.detailsSubmitted ?? (status !== 'unverified' && status !== 'pending'));
 
     currentUser.ryftAccountStatus = status;
     currentUser.ryftPayoutsEnabled = payoutsEnabled;
@@ -245,26 +298,41 @@ const createPaymentSession = async (user: any, payload: any) => {
   const {
     amount,
     subscriptionId,
-    currency = 'GBP',
+    currency,
     paymentType = 'plan',
     shopId,
     subAccountId: explicitSubAccountId,
     recipientUserId,
   } = payload;
 
-  const frontendUrl = (config as { frontend_url?: string }).frontend_url ?? '';
+  const frontendUrl = (config as { frontend_url?: string }).frontend_url || 'https://localhost:3000';
   const ryftBaseUrl = getRyftBaseUrl();
   const ryftPublicKey = (config as { ryft_public_key?: string }).ryft_public_key ?? '';
 
-  const normalizedCurrency = String(currency || 'GBP').toUpperCase();
+  const configuredCurrency = (process.env.RYFT_CURRENCY || 'GBP').toUpperCase();
+  let normalizedCurrency = String(currency || configuredCurrency).toUpperCase();
+  // Ryft sandbox/UK merchant accounts require GBP unless multi-currency is enabled on the merchant account
+  if (configuredCurrency === 'GBP' && normalizedCurrency !== 'GBP') {
+    normalizedCurrency = 'GBP';
+  }
   const unitAmount = Math.round(Number(amount) * 100);
+
+  // Ryft requires https scheme for returnUrl
+  let returnUrl = `${frontendUrl.replace(/\/+$/, '')}/payment/success`;
+  if (!returnUrl.startsWith('https://')) {
+    returnUrl = returnUrl.replace(/^http:\/\//i, 'https://');
+  }
 
   // Resolve whether this payment routes to a shopkeeper's connected account
   let targetSubAccountId: string | null = explicitSubAccountId ? String(explicitSubAccountId).trim() : null;
   let targetRecipientId: string | null = recipientUserId ? String(recipientUserId) : null;
 
   if (!targetSubAccountId) {
-    if (recipientUserId) {
+    if (paymentType === 'plan' || paymentType === 'add_shop') {
+      // Platform payments (subscriptions, plan upgrades, adding shop slots) go directly to platform
+      targetSubAccountId = null;
+      targetRecipientId = null;
+    } else if (recipientUserId) {
       const recipient = await User.findById(recipientUserId);
       if (recipient?.ryftAccountId) {
         targetSubAccountId = recipient.ryftAccountId;
@@ -278,7 +346,7 @@ const createPaymentSession = async (user: any, payload: any) => {
           targetSubAccountId = shopkeeper.ryftAccountId;
         }
       }
-    } else if (paymentType !== 'plan' && paymentType !== 'add_shop') {
+    } else {
       // If a shopkeeper is creating a payment for their own services/invoices
       const currentUser = await User.findById(user._id || user.id);
       if (currentUser?.role === 'shopkeeper' && currentUser.ryftAccountId) {
@@ -300,7 +368,7 @@ const createPaymentSession = async (user: any, payload: any) => {
     amount: unitAmount,
     currency: normalizedCurrency,
     customerEmail: user?.email,
-    returnUrl: `${frontendUrl}/payment/success`,
+    returnUrl,
     metadata: {
       userId: user._id.toString(),
       subscriptionId: subscriptionId ? String(subscriptionId) : '',
@@ -326,11 +394,7 @@ const createPaymentSession = async (user: any, payload: any) => {
     });
     ryftSession = response.data;
   } catch (error: any) {
-    const errorMessage =
-      error?.response?.data?.message ||
-      error?.response?.data?.error ||
-      error?.message ||
-      'Failed to create Ryft payment session';
+    const errorMessage = extractRyftErrorMessage(error, 'Failed to create Ryft payment session');
     console.error('Ryft create payment session error:', error?.response?.data || error);
     throw new AppError(`Ryft payment session creation failed: ${errorMessage}`, 502);
   }
