@@ -118,9 +118,14 @@ interface IPeriodInvoiceResult {
       invoices: any[];
 }
 
+const isPurchaseInvoiceType = (type?: string) => {
+      const normalized = String(type || '').trim().toLowerCase();
+      return normalized === 'purchase invoice' || normalized === 'purchase';
+};
+
 const calculatePeriodInvoicesAndProfit = async (matchCondition: any): Promise<IPeriodInvoiceResult> => {
       const invoices = await Invoice.find(matchCondition)
-            .select('totalAmount amountPaid dueAmount paymentStatus lineItems itemsIds customerInfo')
+            .select('totalAmount amountPaid dueAmount paymentStatus lineItems itemsIds customerInfo type')
             .lean();
 
       if (!invoices.length) {
@@ -172,10 +177,20 @@ const calculatePeriodInvoicesAndProfit = async (matchCondition: any): Promise<IP
       let totalSales = 0;
       let totalCost = 0;
       let totalDue = 0;
+      let totalSalesOrders = 0;
 
       for (const inv of invoices) {
-            const invoiceSales = Number(inv.totalAmount) || 0;
-            totalSales += invoiceSales;
+            const isPurchase = isPurchaseInvoiceType(inv.type);
+            const invoiceAmount = Number(inv.totalAmount) || 0;
+
+            if (isPurchase) {
+                  // Purchase Invoice is money spent buying stock/inventory (cost/expense), not sales revenue
+                  totalCost += invoiceAmount;
+                  continue;
+            }
+
+            totalSalesOrders++;
+            totalSales += invoiceAmount;
             totalDue += Number(inv.dueAmount) || 0;
 
             let invoiceCost = 0;
@@ -208,7 +223,7 @@ const calculatePeriodInvoicesAndProfit = async (matchCondition: any): Promise<IP
             totalCost += invoiceCost;
       }
 
-      const totalOrders = invoices.length;
+      const totalOrders = totalSalesOrders;
       const avgOrderValue = totalOrders > 0 ? parseFloat((totalSales / totalOrders).toFixed(2)) : 0;
       const totalProfit = Math.max(0, parseFloat((totalSales - totalCost).toFixed(2)));
 

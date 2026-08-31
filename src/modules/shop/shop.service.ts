@@ -290,7 +290,10 @@ const getShopPerformance = async (user: any, query: any) => {
   const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   const todayDayName = daysOfWeek[now.getDay()];
 
-  const invoiceFilter: any = { shopkeeperId };
+  const invoiceFilter: any = {
+    shopkeeperId,
+    type: { $nin: ['Purchase Invoice', 'purchase invoice', 'Purchase', 'purchase'] },
+  };
   if (Object.keys(dateQuery).length > 0) {
     invoiceFilter.createdAt = dateQuery;
   }
@@ -317,7 +320,12 @@ const getShopPerformance = async (user: any, query: any) => {
   ]);
 
   const periodCashByShop = await Invoice.aggregate([
-    { $match: { shopkeeperId } },
+    {
+      $match: {
+        shopkeeperId,
+        type: { $nin: ['Purchase Invoice', 'purchase invoice', 'Purchase', 'purchase'] },
+      },
+    },
     {
       $group: {
         _id: '$shopId',
