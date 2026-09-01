@@ -4,11 +4,19 @@ import nodemailer from 'nodemailer';
 import config from '../config/config';
 import { companyName } from '../lib/globalType';
 
+interface EmailAttachment {
+      filename: string;
+      content?: Buffer | string;
+      path?: string;
+      contentType?: string;
+}
+
 interface SendEmailParams {
       to: string;
       subject: string;
       html: string;
       fromName?: string;
+      attachments?: EmailAttachment[];
 }
 
 interface SendEmailResponse {
@@ -17,7 +25,7 @@ interface SendEmailResponse {
       error?: string;
 }
 
-const sendEmail = async ({ to, subject, html, fromName }: SendEmailParams): Promise<SendEmailResponse> => {
+const sendEmail = async ({ to, subject, html, fromName, attachments }: SendEmailParams): Promise<SendEmailResponse> => {
       try {
             // Validate email configuration
             if (!config.email?.emailAddress || !config.email?.emailPass) {
@@ -42,11 +50,12 @@ const sendEmail = async ({ to, subject, html, fromName }: SendEmailParams): Prom
 
             const sender = fromName || companyName || 'Imoscan';
 
-            const mailOptions = {
+            const mailOptions: nodemailer.SendMailOptions = {
                   from: `"${sender}" <${config.email.emailAddress}>`,
                   to,
                   subject,
                   html,
+                  ...(attachments && attachments.length > 0 ? { attachments } : {}),
             };
 
             const info = await transporter.sendMail(mailOptions);

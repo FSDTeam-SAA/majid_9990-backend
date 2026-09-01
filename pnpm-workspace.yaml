@@ -1,4 +1,0 @@
-allowBuilds:
-  '@scarf/scarf': true
-  bcrypt: true
-  tesseract.js: true

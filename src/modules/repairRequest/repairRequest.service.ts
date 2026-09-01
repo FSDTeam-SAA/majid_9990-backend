@@ -2,11 +2,14 @@ import { StatusCodes } from 'http-status-codes';
 import { FilterQuery, Types } from 'mongoose';
 import AppError from '../../errors/AppError';
 import { uploadToCloudinary } from '../../utils/cloudinary';
+import config from '../../config/config';
 import { generateTechnicianFeedback } from '../../utils/technicianFeedback';
-import { sendRepairCompletionEmail } from '../../utils/email/email.service';
+import { sendRepairCompletionEmail, sendRepairStatusEmail } from '../../utils/email/email.service';
 import { User } from '../user/user.model';
+import Shop from '../shop/shop.model';
 import { IRepairRequest, IRepairRequestStatusUpdatePayload } from './repairRequest.interface';
 import RepairRequest from './repairRequest.model';
+import { generateRepairStatusPdfBuffer } from './repairPdf.service';
 
 const assertValidRepairRequestId = (id: string) => {
       if (!Types.ObjectId.isValid(id)) {
@@ -185,14 +188,175 @@ const updateStatusByShopKeeper = async (id: string, payload: IRepairRequestStatu
             }
 
             return updatedWithFeedback;
+      } else {
+            // Send status update email with live tracking link and PDF report
+            await sendStatusUpdateEmail(result);
       }
 
       return result;
 };
 
-// ✅ New helper function to send completion email
+const resolveShopInfo = async (repairRequest: IRepairRequest) => {
+      try {
+            if (repairRequest.shopId && Types.ObjectId.isValid(String(repairRequest.shopId))) {
+                  const shop = await Shop.findById(repairRequest.shopId).select(
+                        'shopName shopAddress whatsappNumber phone email'
+                  );
+                  if (shop && shop.shopName) {
+                        return {
+                              shopName: shop.shopName,
+                              shopAddress: shop.shopAddress || '',
+                              shopPhone: shop.whatsappNumber || (shop as any).phone || '',
+                        };
+                  }
+            }
+
+            if (repairRequest.userId && Types.ObjectId.isValid(String(repairRequest.userId))) {
+                  const user = await User.findById(repairRequest.userId).select(
+                        'shopName shopAddress whatsappNumber phone'
+                  );
+                  if (user && user.shopName) {
+                        return {
+                              shopName: user.shopName,
+                              shopAddress: user.shopAddress || '',
+                              shopPhone: user.whatsappNumber || user.phone || '',
+                        };
+                  }
+            }
+      } catch (err) {
+            console.error('Error resolving shop info:', err);
+      }
+
+      return {
+            shopName: 'Imoscan Repair Service',
+            shopAddress: '',
+            shopPhone: '',
+      };
+};
+
+const getTrackingUrl = (repairId: string): string => {
+      const frontendUrl = (config as { frontend_url?: string }).frontend_url || 'https://imoscan.com';
+      return `${frontendUrl.replace(/\/$/, '')}/my-invoice/${repairId}`;
+};
+
+const getStatusDisplayLabel = (status: string): string => {
+      const map: Record<string, string> = {
+            inProgress: 'Order Booked / In Progress',
+            'order-assigned': 'Technician Assigned',
+            diagnosing: 'Diagnosing Started',
+            quote_sent: 'Quote Sent',
+            'start-work': 'Repair in Progress',
+            repairing: 'Repair in Progress',
+            'waiting-for-parts': 'Waiting for Parts',
+            completed: 'Repair Completed',
+            approved: 'Quote Approved',
+            rejected: 'Repair Rejected',
+            collected: 'Device Collected',
+            inReview: 'Under Review',
+      };
+      return map[status] || status.replace(/[-_]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+};
+
+const sendStatusUpdateEmail = async (repairRequest: IRepairRequest, customNote?: string) => {
+      try {
+            if (!repairRequest.email) return;
+
+            const shopInfo = await resolveShopInfo(repairRequest);
+            const rawId = (repairRequest as any)._id?.toString() || '';
+            const shortId = rawId ? rawId.slice(-6).toUpperCase() : '';
+            const trackingUrl = getTrackingUrl(rawId);
+            const statusLabel = getStatusDisplayLabel(repairRequest.status);
+
+            const pdfData = {
+                  requestId: shortId || rawId,
+                  customerName: repairRequest.firstName,
+                  customerEmail: repairRequest.email,
+                  customerPhone: repairRequest.phoneNumber,
+                  deviceModel: repairRequest.deviceModel,
+                  imei: repairRequest.IMEINumber,
+                  description: repairRequest.description,
+                  status: repairRequest.status,
+                  statusLabel,
+                  statusNote: customNote,
+                  price: repairRequest.price,
+                  shopName: shopInfo.shopName,
+                  shopPhone: shopInfo.shopPhone,
+                  shopAddress: shopInfo.shopAddress,
+                  technicianFeedback: repairRequest.technicianFeedback,
+                  waitingForPartsDays: repairRequest.waitingForPartsDays,
+                  waitingForPartsDescription: repairRequest.waitingForPartsDescription,
+                  technicianNotes: repairRequest.technicianNotes,
+                  trackingUrl,
+                  createdAt: repairRequest.createdAt,
+                  updatedAt: repairRequest.updatedAt,
+            };
+
+            const pdfBuffer = generateRepairStatusPdfBuffer(pdfData);
+
+            const emailData = {
+                  customerName: repairRequest.firstName,
+                  deviceModel: repairRequest.deviceModel,
+                  imei: repairRequest.IMEINumber,
+                  description: repairRequest.description,
+                  status: repairRequest.status,
+                  statusLabel,
+                  statusNote: customNote,
+                  price: repairRequest.price,
+                  shopName: shopInfo.shopName,
+                  requestId: shortId || rawId,
+                  trackingUrl,
+                  technicianFeedback: repairRequest.technicianFeedback,
+                  waitingForPartsDays: repairRequest.waitingForPartsDays,
+                  waitingForPartsDescription: repairRequest.waitingForPartsDescription,
+            };
+
+            const result = await sendRepairStatusEmail(repairRequest.email, emailData, pdfBuffer);
+
+            if (!result.success) {
+                  console.error('Failed to send repair status email:', result.error);
+            } else {
+                  console.log('Repair status email sent successfully to:', repairRequest.email);
+            }
+
+            return result;
+      } catch (error) {
+            console.error('Error in sendStatusUpdateEmail:', error);
+      }
+};
+
+// ✅ Helper function to send completion email
 const sendCompletionEmail = async (repairRequest: IRepairRequest) => {
       try {
+            if (!repairRequest.email) return;
+
+            const shopInfo = await resolveShopInfo(repairRequest);
+            const rawId = (repairRequest as any)._id?.toString() || '';
+            const shortId = rawId ? rawId.slice(-6).toUpperCase() : '';
+            const trackingUrl = getTrackingUrl(rawId);
+            const statusLabel = getStatusDisplayLabel('completed');
+
+            const pdfData = {
+                  requestId: shortId || rawId,
+                  customerName: repairRequest.firstName,
+                  customerEmail: repairRequest.email,
+                  customerPhone: repairRequest.phoneNumber,
+                  deviceModel: repairRequest.deviceModel,
+                  imei: repairRequest.IMEINumber,
+                  description: repairRequest.description,
+                  status: 'completed',
+                  statusLabel,
+                  price: repairRequest.price,
+                  shopName: shopInfo.shopName,
+                  shopPhone: shopInfo.shopPhone,
+                  shopAddress: shopInfo.shopAddress,
+                  technicianFeedback: repairRequest.technicianFeedback,
+                  trackingUrl,
+                  createdAt: repairRequest.createdAt,
+                  updatedAt: new Date(),
+            };
+
+            const pdfBuffer = generateRepairStatusPdfBuffer(pdfData);
+
             const emailData = {
                   customerName: repairRequest.firstName,
                   deviceModel: repairRequest.deviceModel,
@@ -204,14 +368,15 @@ const sendCompletionEmail = async (repairRequest: IRepairRequest) => {
                         month: 'long',
                         day: 'numeric',
                   }),
-                  requestId: (repairRequest as any)._id.toString().slice(-6).toUpperCase(),
+                  requestId: shortId || rawId,
+                  shopName: shopInfo.shopName,
+                  trackingUrl,
             };
 
-            const result = await sendRepairCompletionEmail(repairRequest.email, emailData);
+            const result = await sendRepairCompletionEmail(repairRequest.email, emailData, pdfBuffer);
 
             if (!result.success) {
                   console.error('Failed to send completion email:', result.error);
-                  // Don't throw error - email failure shouldn't stop the status update
             } else {
                   console.log('Completion email sent successfully to:', repairRequest.email);
             }
@@ -219,7 +384,6 @@ const sendCompletionEmail = async (repairRequest: IRepairRequest) => {
             return result;
       } catch (error) {
             console.error('Error in sendCompletionEmail:', error);
-            // Don't throw - just log the error
       }
 };
 
@@ -262,6 +426,9 @@ const addNoteByShopKeeper = async (id: string, payload: any, files: Express.Mult
       if (!result) {
             throw new AppError('Repair request not found', StatusCodes.NOT_FOUND);
       }
+
+      // Send status update email notifying customer of quote/note
+      await sendStatusUpdateEmail(result, message ? `New note/quote: ${message}` : undefined);
 
       return result;
 };
@@ -332,6 +499,11 @@ const addTeachNoteByTechnician = async (id: string, payload: any) => {
                   runValidators: true,
             }
       );
+
+      if (result) {
+            const partsSummary = finalNotes.map((n: any) => n.partName).filter(Boolean).join(', ');
+            await sendStatusUpdateEmail(result, partsSummary ? `Parts ordered/required: ${partsSummary}` : undefined);
+      }
 
       return result;
 };
