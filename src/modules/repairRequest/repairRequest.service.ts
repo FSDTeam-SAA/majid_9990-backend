@@ -168,6 +168,18 @@ const updateStatusByShopKeeper = async (id: string, payload: IRepairRequestStatu
             };
       }
 
+      if (payload.status === 'unable-to-repair') {
+            if (payload.unableToRepairReason) {
+                  update.$set.unableToRepairReason = payload.unableToRepairReason;
+            }
+            if (payload.unableToRepairNote) {
+                  update.$set.unableToRepairNote = payload.unableToRepairNote;
+            }
+            if (payload.unableToRepairCustomerMessage) {
+                  update.$set.unableToRepairCustomerMessage = payload.unableToRepairCustomerMessage;
+            }
+      }
+
       const result = await RepairRequest.findByIdAndUpdate(id, update, {
             new: true,
             runValidators: true,
@@ -190,7 +202,11 @@ const updateStatusByShopKeeper = async (id: string, payload: IRepairRequestStatu
             return updatedWithFeedback;
       } else {
             // Send status update email with live tracking link and PDF report
-            await sendStatusUpdateEmail(result);
+            const customMessage =
+                  result.status === 'unable-to-repair'
+                        ? result.unableToRepairCustomerMessage || result.unableToRepairReason
+                        : undefined;
+            await sendStatusUpdateEmail(result, customMessage);
       }
 
       return result;
@@ -253,6 +269,7 @@ const getStatusDisplayLabel = (status: string): string => {
             rejected: 'Repair Rejected',
             collected: 'Device Collected',
             inReview: 'Under Review',
+            'unable-to-repair': 'Unable to Repair',
       };
       return map[status] || status.replace(/[-_]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 };

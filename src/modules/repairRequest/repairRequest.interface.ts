@@ -9,7 +9,8 @@ export type RepairStatus =
       | 'inReview'
       | 'start-work'
       | 'quote-sent'
-      | 'waiting-for-parts';
+      | 'waiting-for-parts'
+      | 'unable-to-repair';
 
 export interface INote {
       message: string;
@@ -44,7 +45,10 @@ export interface IRepairRequest {
       status: RepairStatus;
       waitingForPartsDays?: number;
       waitingForPartsDescription?: string;
-      shopkeeperNotes?: INote;
+      unableToRepairReason?: string;
+      unableToRepairNote?: string;
+      unableToRepairCustomerMessage?: string;
+      shopkeeperNotes?: INote[];
       technicianNotes?: ITechNote[];
       createdAt: Date;
       updatedAt: Date;
@@ -54,4 +58,7 @@ export interface IRepairRequestStatusUpdatePayload {
       status: RepairStatus;
       waitingForPartsDays?: number | string;
       waitingForPartsDescription?: string;
+      unableToRepairReason?: string;
+      unableToRepairNote?: string;
+      unableToRepairCustomerMessage?: string;
 }
