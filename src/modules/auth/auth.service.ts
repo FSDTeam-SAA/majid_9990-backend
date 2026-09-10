@@ -89,7 +89,11 @@ const login = async (payload: { email: string; password: string }) => {
 };
 
 const refreshToken = async (token: string) => {
-  let decodedToken;
+  if (!token) {
+    throw new AppError("Refresh token is required", StatusCodes.UNAUTHORIZED);
+  }
+
+  let decodedToken: any;
 
   try {
     decodedToken = verifyToken(token, config.refreshTokenSecret as string);
@@ -105,7 +109,7 @@ const refreshToken = async (token: string) => {
   const userData = await User.findOne({ email });
 
   if (!userData) {
-    throw new Error("No account found with the provided credentials.");
+    throw new AppError("No account found with the provided credentials.", StatusCodes.UNAUTHORIZED);
   }
 
   const JwtPayload = {

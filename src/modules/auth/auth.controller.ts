@@ -14,8 +14,15 @@ const login = catchAsync(async (req, res) => {
 });
 
 const refreshToken = catchAsync(async (req, res) => {
-  const { refreshToken } = req.cookies;
-  const result = await authService.refreshToken(refreshToken);
+  const token =
+    req.body?.refreshToken ||
+    req.cookies?.refreshToken ||
+    req.headers?.["x-refresh-token"] ||
+    (typeof req.headers?.authorization === "string" && req.headers.authorization.startsWith("Bearer ")
+      ? req.headers.authorization.split(" ")[1]
+      : undefined);
+
+  const result = await authService.refreshToken(token as string);
 
   sendResponse(res, {
     statusCode: 200,
