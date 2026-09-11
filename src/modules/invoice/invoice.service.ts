@@ -489,9 +489,101 @@ const deleteInvoice = async (id: string) => {
       return null;
 };
 
+const getInvoicesByCustomerId = async (
+      customerId: string,
+      shopkeeperId: string,
+      shopId?: unknown,
+) => {
+      const trimmedCustomerId = String(customerId ?? '').trim();
+      const trimmedShopkeeperId = String(shopkeeperId ?? '').trim();
+
+      if (!Types.ObjectId.isValid(trimmedCustomerId)) {
+            throw new AppError('Invalid customerId', StatusCodes.BAD_REQUEST);
+      }
+      if (!Types.ObjectId.isValid(trimmedShopkeeperId)) {
+            throw new AppError('Invalid shopkeeperId', StatusCodes.BAD_REQUEST);
+      }
+
+      const filter: Record<string, unknown> = {
+            shopkeeperId: new Types.ObjectId(trimmedShopkeeperId),
+            customerInfo: new Types.ObjectId(trimmedCustomerId),
+      };
+
+      if (shopId && Types.ObjectId.isValid(String(shopId))) {
+            filter.$or = [{ shopId: new Types.ObjectId(String(shopId)) }, { shopId: null }];
+      }
+
+      const invoices = await Invoice.find(filter)
+            .populate('shopkeeperId')
+            .populate('customerInfo')
+            .populate('itemsIds', 'itemName imeiNumber expectedPrice image')
+            .sort({ createdAt: -1, _id: -1 })
+            .lean();
+
+      let totalInvoiced = 0;
+      let totalPaid = 0;
+      let totalDue = 0;
+
+      const formattedInvoices = invoices.map((inv) => {
+            const invoiceAmount = Number(inv.totalAmount) || 0;
+            const paidAmount = Number(
+                  inv.amountPaid ??
+                  inv.paymentDetails?.amountPaid ??
+                  (inv.paymentStatus === 'paid' ? invoiceAmount : 0)
+            ) || 0;
+
+            let due = 0;
+            if (inv.dueAmount !== null && inv.dueAmount !== undefined) {
+                  due = Number(inv.dueAmount);
+            } else {
+                  due = Math.max(0, invoiceAmount - paidAmount);
+            }
+
+            const status = due <= 0 ? 'paid' : paidAmount > 0 ? 'partial' : 'due';
+
+            totalInvoiced += invoiceAmount;
+            totalPaid += paidAmount;
+            totalDue += due;
+
+            return {
+                  ...inv,
+                  invoiceAmount,
+                  paidAmount,
+                  dueAmount: due,
+                  status,
+            };
+      });
+
+      const paymentStatus = totalDue <= 0 ? 'paid' : totalPaid > 0 ? 'partial' : 'due';
+
+      const paymentActivities = formattedInvoices
+            .filter((inv) => inv.paidAmount > 0)
+            .map((inv) => ({
+                  id: String(inv._id),
+                  date: inv.createdAt,
+                  amount: inv.paidAmount,
+                  paymentMethod: inv.paymentMethod || 'cash',
+                  invoiceNumber: inv.invoiceNumber || `INV-${String(inv._id).slice(-4).toUpperCase()}`,
+                  invoiceType: inv.type,
+            }));
+
+      return {
+            invoices: formattedInvoices,
+            summary: {
+                  totalInvoiced,
+                  totalPaid,
+                  totalDue,
+                  paymentStatus,
+                  count: formattedInvoices.length,
+            },
+            paymentActivities,
+      };
+};
+
 const invoiceService = {
       createInvoice,
       getInvoiceByShopkeeperId,
+      getInvoicesByCustomerId,
       getAllInvoices,
       updateInvoice,
       deleteInvoice,

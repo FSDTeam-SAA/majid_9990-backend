@@ -140,3 +140,5 @@ export const Invoice = model<IInvoice>('Invoice', invoiceSchema);
 invoiceSchema.index({ createdAt: -1 });
 invoiceSchema.index({ shopkeeperId: 1, createdAt: -1 });
 invoiceSchema.index({ shopkeeperId: 1, shopId: 1, createdAt: -1 });
+invoiceSchema.index({ shopkeeperId: 1, customerInfo: 1, createdAt: -1 });
+invoiceSchema.index({ shopId: 1, customerInfo: 1, createdAt: -1 });

@@ -74,9 +74,38 @@ const deleteInvoice = catchAsync(async (req, res) => {
       });
 });
 
+const getInvoicesByCustomerId = catchAsync(async (req, res) => {
+      let shopkeeperId = req.user.role === 'staff' && req.user.shopkeeperId
+            ? req.user.shopkeeperId.toString()
+            : req.user._id?.toString() || req.user.id?.toString();
+
+      if (req.query.shopkeeperId && typeof req.query.shopkeeperId === 'string') {
+            shopkeeperId = req.query.shopkeeperId;
+      }
+
+      const shopId = await getShopFromRequest(req);
+      const customerId = Array.isArray(req.params.customerId)
+            ? req.params.customerId[0]
+            : req.params.customerId;
+
+      const result = await invoiceService.getInvoicesByCustomerId(
+            customerId,
+            shopkeeperId,
+            req.query.shopId || shopId,
+      );
+
+      sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: 'Customer invoices fetched successfully',
+            data: result,
+      });
+});
+
 export default {
       createInvoice,
       getInvoiceByShopkeeperId,
+      getInvoicesByCustomerId,
       getAllInvoices,
       updateInvoice,
       deleteInvoice,

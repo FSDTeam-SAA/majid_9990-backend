@@ -8,6 +8,7 @@ const router = Router();
 router.post('/create', protect, upload.single('invoice'), invoiceController.createInvoice);
 router.get('/all', protect, invoiceController.getAllInvoices);
 router.get('/shopkeeper/:shopkeeperId', protect, invoiceController.getInvoiceByShopkeeperId);
+router.get('/customer/:customerId', protect, invoiceController.getInvoicesByCustomerId);
 router.put('/:id', protect, upload.single('invoice'), invoiceController.updateInvoice);
 router.delete('/:id', protect, invoiceController.deleteInvoice);
 
