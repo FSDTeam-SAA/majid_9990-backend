@@ -3,6 +3,7 @@ import { Types } from 'mongoose';
 import AppError from '../../errors/AppError';
 import { User } from '../user/user.model';
 import RepairRequest from '../repairRequest/repairRequest.model';
+import { Invoice } from '../invoice/invoice.model';
 import customerEmailTemplate from '../../utils/customerEmailTemplate';
 import sendEmail from '../../utils/sendEmail';
 import { ICustomer } from './customer.interface';
@@ -112,18 +113,103 @@ const getByShopkeeperId = async (shopkeeperId: string, query: Record<string, unk
                   if (item._id) emailMap.set(String(item._id).trim().toLowerCase(), item.count);
             });
 
+            // Query invoices strictly adhering to tenant isolation (shopkeeperId + shopId)
+            const invoiceFilter: Record<string, unknown> = {
+                  shopkeeperId: new Types.ObjectId(shopkeeperId),
+            };
+            if (query.shopId && Types.ObjectId.isValid(String(query.shopId))) {
+                  invoiceFilter.$or = [{ shopId: new Types.ObjectId(String(query.shopId)) }, { shopId: null }];
+            }
+
+            const allInvoices = await Invoice.find(invoiceFilter)
+                  .sort({ createdAt: -1, _id: -1 })
+                  .lean();
+
+            type InvoiceDoc = (typeof allInvoices)[0];
+            const invoicesByCustomerId = new Map<string, InvoiceDoc[]>();
+            for (const inv of allInvoices) {
+                  if (inv.customerInfo) {
+                        const cid = String(inv.customerInfo);
+                        if (!invoicesByCustomerId.has(cid)) {
+                              invoicesByCustomerId.set(cid, []);
+                        }
+                        invoicesByCustomerId.get(cid)!.push(inv);
+                  }
+            }
+
             return customers.map((c) => {
                   const p = (c.phone || '').trim();
                   const e = (c.email || '').trim().toLowerCase();
                   const repairCount = phoneMap.get(p) ?? emailMap.get(e) ?? 0;
+
+                  const customerInvs = invoicesByCustomerId.get(String(c._id)) || [];
+                  let totalInvoiced = 0;
+                  let totalPaid = 0;
+                  let dueAmount = 0;
+                  let hasOverdueOrFullDue = false;
+
+                  customerInvs.forEach((inv) => {
+                        const invoiceAmount = Number(inv.totalAmount) || 0;
+                        const paid = Number(
+                              inv.amountPaid ??
+                              inv.paymentDetails?.amountPaid ??
+                              (inv.paymentStatus === 'paid' ? invoiceAmount : 0)
+                        ) || 0;
+
+                        let due = 0;
+                        if (inv.dueAmount !== null && inv.dueAmount !== undefined) {
+                              due = Number(inv.dueAmount);
+                        } else {
+                              due = Math.max(0, invoiceAmount - paid);
+                        }
+
+                        totalInvoiced += invoiceAmount;
+                        totalPaid += paid;
+                        dueAmount += due;
+
+                        if (due > 0 && paid === 0) {
+                              hasOverdueOrFullDue = true;
+                        }
+                  });
+
+                  let paymentStatus: 'paid' | 'partial' | 'due' = 'paid';
+                  if (dueAmount <= 0) {
+                        paymentStatus = 'paid';
+                  } else if (hasOverdueOrFullDue || totalPaid === 0) {
+                        paymentStatus = 'due';
+                  } else {
+                        paymentStatus = 'partial';
+                  }
+
+                  const lastInv = customerInvs[0];
+                  const lastInvoice = lastInv ? {
+                        createdAt: lastInv.createdAt,
+                        invoiceNumber: lastInv.invoiceNumber || `INV-${String(lastInv._id).slice(-4).toUpperCase()}`,
+                        type: lastInv.type || 'Custom Invoice',
+                  } : undefined;
+
                   return {
                         ...c,
                         repairCount,
+                        invoicesCount: customerInvs.length,
+                        totalInvoiced,
+                        totalPaid,
+                        dueAmount,
+                        paymentStatus,
+                        lastInvoice,
                   };
             });
       } catch (err) {
-            console.error('Error calculating customer repair counts:', err);
-            return customers.map((c) => ({ ...c, repairCount: 0 }));
+            console.error('Error calculating customer repair counts and invoice metrics:', err);
+            return customers.map((c) => ({
+                  ...c,
+                  repairCount: 0,
+                  invoicesCount: 0,
+                  totalInvoiced: 0,
+                  totalPaid: 0,
+                  dueAmount: 0,
+                  paymentStatus: 'paid',
+            }));
       }
 };
 

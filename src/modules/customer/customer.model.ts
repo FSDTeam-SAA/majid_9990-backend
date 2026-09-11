@@ -22,4 +22,8 @@ const customerSchema = new Schema<ICustomer>(
       }
 );
 
+customerSchema.index({ shopkeeperId: 1, createdAt: -1 });
+customerSchema.index({ shopId: 1, createdAt: -1 });
+customerSchema.index({ shopkeeperId: 1, customerId: 1 });
+
 export const Customer = model<ICustomer>('Customer', customerSchema);
