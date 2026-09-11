@@ -92,4 +92,5 @@ export interface IInvoicePayload {
       discountPercentage?: number;
       discountAmount?: number;
       lineItems?: IInvoiceLineItem[] | string;
+      allocations?: Array<{ invoiceId: string; amountApplied: number }> | string;
 }

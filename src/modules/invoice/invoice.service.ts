@@ -3,10 +3,11 @@ import { Types } from 'mongoose';
 import AppError from '../../errors/AppError';
 import { deleteFromCloudinary, uploadToCloudinary } from '../../utils/cloudinary';
 import { User } from '../user/user.model';
-import { IInvoice, IInvoiceOrderDetails, IInvoicePayload, IInvoicePaymentDetails } from './invoice.interface';
+import { IInvoice, IInvoiceOrderDetails, IInvoicePayload, IInvoicePaymentDetails, InvoicePaymentStatus } from './invoice.interface';
 import { Invoice } from './invoice.model';
 import { Inventory } from '../inventory/inventory.model';
 import RepairRequest from '../repairRequest/repairRequest.model';
+import { AuditLog } from '../customer/auditLog.model';
 
 const resolveShopkeeperId = async (shopkeeperId?: string) => {
       const trimmedShopkeeperId = String(shopkeeperId ?? '').trim();
@@ -242,6 +243,78 @@ const createInvoice = async (payload: IInvoicePayload, file?: Express.Multer.Fil
             discountAmount: normalizeOptionalNumber(payload.discountAmount, 'discountAmount'),
             lineItems,
       });
+
+      // Process payment allocations to previous customer invoices (Callout 4 & 5)
+      let allocations: Array<{ invoiceId: string; amountApplied: number }> = [];
+      try {
+            allocations = typeof payload.allocations === 'string'
+                  ? JSON.parse(payload.allocations)
+                  : payload.allocations || [];
+      } catch {
+            // Ignore parse errors
+      }
+
+      if (Array.isArray(allocations) && allocations.length > 0) {
+            for (const alloc of allocations) {
+                  const allocInvoiceId = String(alloc.invoiceId || '').trim();
+                  const amountApplied = Number(alloc.amountApplied) || 0;
+
+                  if (allocInvoiceId && allocInvoiceId !== 'today' && amountApplied > 0 && Types.ObjectId.isValid(allocInvoiceId)) {
+                        const targetInv = await Invoice.findOne({
+                              _id: new Types.ObjectId(allocInvoiceId),
+                              shopkeeperId,
+                        });
+
+                        if (targetInv) {
+                              const existingTotal = Number(targetInv.totalAmount) || 0;
+                              const existingPaid = Number(
+                                    targetInv.amountPaid ??
+                                    targetInv.paymentDetails?.amountPaid ??
+                                    (targetInv.paymentStatus === 'paid' ? existingTotal : 0)
+                              ) || 0;
+                              const newPaid = existingPaid + amountApplied;
+
+                              let newDue = 0;
+                              if (targetInv.dueAmount !== null && targetInv.dueAmount !== undefined) {
+                                    newDue = Math.max(0, Number(targetInv.dueAmount) - amountApplied);
+                              } else {
+                                    newDue = Math.max(0, existingTotal - newPaid);
+                              }
+
+                              const newStatus: InvoicePaymentStatus = newDue <= 0 ? 'paid' : newPaid > 0 ? 'partial' : 'due';
+
+                              await Invoice.findByIdAndUpdate(targetInv._id, {
+                                    $set: {
+                                          amountPaid: newPaid,
+                                          dueAmount: newDue,
+                                          paymentStatus: newStatus,
+                                    },
+                              });
+
+                              try {
+                                    await AuditLog.create({
+                                          action: 'payment_adjustment',
+                                          shopkeeperId,
+                                          shopId: targetInv.shopId || shopId,
+                                          customerId: targetInv.customerInfo,
+                                          invoiceId: targetInv._id,
+                                          details: {
+                                                amountApplied,
+                                                previousDue: targetInv.dueAmount,
+                                                newDue,
+                                                newAmountPaid: newPaid,
+                                                paymentStatus: newStatus,
+                                                paymentMethod,
+                                                createdInvoiceId: result._id,
+                                          },
+                                    });
+                              } catch (auditErr) {
+                                    console.error('Audit log error:', auditErr);
+                              }
+                        }
+                  }
+            }
+      }
 
       if (repairRequestId) {
             const repairRequest = await RepairRequest.findOneAndUpdate(
