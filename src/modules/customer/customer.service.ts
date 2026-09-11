@@ -2,6 +2,7 @@ import { StatusCodes } from 'http-status-codes';
 import { Types } from 'mongoose';
 import AppError from '../../errors/AppError';
 import { User } from '../user/user.model';
+import RepairRequest from '../repairRequest/repairRequest.model';
 import customerEmailTemplate from '../../utils/customerEmailTemplate';
 import sendEmail from '../../utils/sendEmail';
 import { ICustomer } from './customer.interface';
@@ -64,7 +65,66 @@ const getByShopkeeperId = async (shopkeeperId: string, query: Record<string, unk
             filter.$or = [{ shopId: new Types.ObjectId(String(query.shopId)) }, { shopId: null }];
       }
 
-      return await Customer.find(filter).sort({ createdAt: -1 });
+      const customers = await Customer.find(filter).sort({ createdAt: -1 }).lean();
+
+      if (!customers || customers.length === 0) {
+            return [];
+      }
+
+      try {
+            const phoneRepairCounts = await RepairRequest.aggregate([
+                  {
+                        $match: {
+                              userId: new Types.ObjectId(shopkeeperId),
+                              phoneNumber: { $exists: true, $ne: '' },
+                        },
+                  },
+                  {
+                        $group: {
+                              _id: '$phoneNumber',
+                              count: { $sum: 1 },
+                        },
+                  },
+            ]);
+
+            const emailRepairCounts = await RepairRequest.aggregate([
+                  {
+                        $match: {
+                              userId: new Types.ObjectId(shopkeeperId),
+                              email: { $exists: true, $ne: '' },
+                        },
+                  },
+                  {
+                        $group: {
+                              _id: { $toLower: '$email' },
+                              count: { $sum: 1 },
+                        },
+                  },
+            ]);
+
+            const phoneMap = new Map<string, number>();
+            phoneRepairCounts.forEach((item: { _id: string; count: number }) => {
+                  if (item._id) phoneMap.set(String(item._id).trim(), item.count);
+            });
+
+            const emailMap = new Map<string, number>();
+            emailRepairCounts.forEach((item: { _id: string; count: number }) => {
+                  if (item._id) emailMap.set(String(item._id).trim().toLowerCase(), item.count);
+            });
+
+            return customers.map((c) => {
+                  const p = (c.phone || '').trim();
+                  const e = (c.email || '').trim().toLowerCase();
+                  const repairCount = phoneMap.get(p) ?? emailMap.get(e) ?? 0;
+                  return {
+                        ...c,
+                        repairCount,
+                  };
+            });
+      } catch (err) {
+            console.error('Error calculating customer repair counts:', err);
+            return customers.map((c) => ({ ...c, repairCount: 0 }));
+      }
 };
 
 const getAll = async () => {

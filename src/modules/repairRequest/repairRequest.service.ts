@@ -581,6 +581,50 @@ const getCompletedRepairRequests = async (userId: string, query: any) => {
       };
 };
 
+const getCustomerRepairHistory = async (
+      shopkeeperId: string,
+      query: { phone?: string; email?: string; customerId?: string }
+) => {
+      const { phone, email } = query;
+      const orConditions: any[] = [];
+      if (phone && phone.trim()) {
+            orConditions.push({ phoneNumber: phone.trim() });
+      }
+      if (email && email.trim()) {
+            orConditions.push({ email: { $regex: new RegExp(`^${email.trim()}$`, 'i') } });
+      }
+
+      if (orConditions.length === 0) {
+            return {
+                  repairs: [],
+                  devices: [],
+                  issues: [],
+                  totalRepairs: 0,
+                  recognizedDevicesCount: 0,
+                  mostRecentRepair: null,
+            };
+      }
+
+      const filter: FilterQuery<IRepairRequest> = {
+            userId: new Types.ObjectId(shopkeeperId),
+            $or: orConditions,
+      };
+
+      const repairs = await RepairRequest.find(filter).sort({ createdAt: -1 });
+
+      const devices = Array.from(new Set(repairs.map((r) => r.deviceModel?.trim()).filter(Boolean)));
+      const issues = Array.from(new Set(repairs.map((r) => r.description?.trim()).filter(Boolean)));
+
+      return {
+            repairs,
+            devices,
+            issues,
+            totalRepairs: repairs.length,
+            recognizedDevicesCount: devices.length,
+            mostRecentRepair: repairs[0] || null,
+      };
+};
+
 const repairRequestService = {
       addNewRepairRequest,
       getMyRepairRequestsHistory,
@@ -592,6 +636,7 @@ const repairRequestService = {
       getUserDescriptions,
       getTechnicians,
       getCompletedRepairRequests,
+      getCustomerRepairHistory,
       sendCompletionEmail,
 };
 

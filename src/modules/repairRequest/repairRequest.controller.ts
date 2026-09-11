@@ -132,6 +132,22 @@ const getCompletedRepairRequests = catchAsync(async (req, res) => {
       });
 });
 
+const getCustomerRepairHistory = catchAsync(async (req, res) => {
+      const id = req.user.role === 'staff' && req.user.shopkeeperId ? req.user.shopkeeperId.toString() : req.user.id;
+      const { phone, email, customerId } = req.query;
+      const result = await repairRequestService.getCustomerRepairHistory(id, {
+            phone: phone as string,
+            email: email as string,
+            customerId: customerId as string,
+      });
+
+      sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: 'Customer repair history retrieved successfully',
+            data: result,
+      });
+});
 
 const repairRequestController = {
       addNewRepairRequest,
@@ -144,6 +160,7 @@ const repairRequestController = {
       getUserDescriptions,
       getTechnicians,
       getCompletedRepairRequests,
+      getCustomerRepairHistory,
 };
 
 export default repairRequestController;
