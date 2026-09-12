@@ -14,7 +14,7 @@ const getSettings = catchAsync(async (req, res) => {
 });
 
 const toggleTwoFactor = catchAsync(async (req, res) => {
-      const { enabled } = req.body;
+      const { enabled } = req.body || {};
       const result = await securityService.toggleTwoFactor(req.user._id, Boolean(enabled));
 
       sendResponse(res, {
@@ -26,7 +26,7 @@ const toggleTwoFactor = catchAsync(async (req, res) => {
 });
 
 const setMethod = catchAsync(async (req, res) => {
-      const { method } = req.body;
+      const { method } = req.body || {};
       const result = await securityService.setMethod(req.user._id, method);
 
       sendResponse(res, {
@@ -49,7 +49,7 @@ const startAuthenticatorSetup = catchAsync(async (req, res) => {
 });
 
 const confirmAuthenticatorSetup = catchAsync(async (req, res) => {
-      const result = await securityService.confirmAuthenticatorSetup(req.user._id, req.body);
+      const result = await securityService.confirmAuthenticatorSetup(req.user._id, req.body || {});
 
       sendResponse(res, {
             statusCode: 200,
@@ -71,7 +71,7 @@ const removeAuthenticator = catchAsync(async (req, res) => {
 });
 
 const sendChallenge = catchAsync(async (req, res) => {
-      const { method } = req.body;
+      const { method } = req.body || {};
       const result = await securityService.sendChallenge(req.user._id, method);
 
       sendResponse(res, {
@@ -83,7 +83,7 @@ const sendChallenge = catchAsync(async (req, res) => {
 });
 
 const verifyChallenge = catchAsync(async (req, res) => {
-      const { code } = req.body;
+      const { code } = req.body || {};
       const isValid = await securityService.verifyChallenge(req.user._id, code);
 
       sendResponse(res, {
@@ -95,7 +95,7 @@ const verifyChallenge = catchAsync(async (req, res) => {
 });
 
 const confirmDestination = catchAsync(async (req, res) => {
-      const { method, code } = req.body;
+      const { method, code } = req.body || {};
       const result = await securityService.confirmDestination(req.user._id, method, code);
 
       sendResponse(res, {

@@ -95,7 +95,7 @@ const changePassword = catchAsync(async (req, res) => {
 
 const send2FaChallenge = catchAsync(async (req, res) => {
   const email = req.body?.email || req.user?.email;
-  const { method } = req.body;
+  const { method } = req.body || {};
   const result = await authService.send2FaChallenge(email, method);
 
   sendResponse(res, {
@@ -108,7 +108,7 @@ const send2FaChallenge = catchAsync(async (req, res) => {
 
 const verify2Fa = catchAsync(async (req, res) => {
   const email = req.body?.email || req.user?.email;
-  const { code } = req.body;
+  const { code } = req.body || {};
   const result = await authService.verify2Fa(email, code);
 
   sendResponse(res, {
