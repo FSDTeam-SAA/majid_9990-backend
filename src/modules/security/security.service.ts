@@ -144,10 +144,11 @@ const removeAuthenticator = async (userId: string): Promise<{ success: boolean; 
 };
 
 const sendChallenge = async (
-      userIdOrEmail: string,
+      userIdOrEmail: any,
       method?: TwoFactorMethodType
 ): Promise<{ sent: boolean; destination: string }> => {
-      const query = userIdOrEmail.includes('@') ? { email: userIdOrEmail } : { _id: userIdOrEmail };
+      const isEmail = typeof userIdOrEmail === 'string' && userIdOrEmail.includes('@');
+      const query = isEmail ? { email: userIdOrEmail } : { _id: userIdOrEmail };
       const user = await User.findOne(query);
       if (!user) {
             throw new AppError('Account not found', StatusCodes.NOT_FOUND);
@@ -211,8 +212,9 @@ const sendChallenge = async (
       };
 };
 
-const verifyChallenge = async (userIdOrEmail: string, code: string): Promise<boolean> => {
-      const query = userIdOrEmail.includes('@') ? { email: userIdOrEmail } : { _id: userIdOrEmail };
+const verifyChallenge = async (userIdOrEmail: any, code: string): Promise<boolean> => {
+      const isEmail = typeof userIdOrEmail === 'string' && userIdOrEmail.includes('@');
+      const query = isEmail ? { email: userIdOrEmail } : { _id: userIdOrEmail };
       const user = await User.findOne(query);
       if (!user) return false;
 
