@@ -10,6 +10,8 @@ import verificationCodeTemplate from "../../utils/verificationCodeTemplate";
 import config from '../../config/config';
 import { createToken, verifyToken } from '../../utils/tokenGenerate';
 import shopService from '../shop/shop.service';
+import securityService from '../security/security.service';
+import { TwoFactorMethodType } from '../security/security.interface';
 
 const login = async (payload: { email: string; password: string }) => {
   const { email, password } = payload;
@@ -65,7 +67,7 @@ const login = async (payload: { email: string; password: string }) => {
     }
   }
 
-  return {
+  const loginResult = {
     accessToken,
     refreshToken,
     user: {
@@ -81,11 +83,28 @@ const login = async (payload: { email: string; password: string }) => {
       postalCode: user.postalCode,
       dateOfBirth: user.dateOfBirth,
       shopkeeperId: user.role === 'staff' ? user.shopkeeperId : undefined,
+      twoFactorEnabled: Boolean(user.twoFactorEnabled),
+      twoFactorMethod: user.twoFactorMethod || 'email',
     },
     shops,
     multiShopEnabled,
     defaultShopId,
   };
+
+  if ((payload as any).deviceId) {
+    try {
+      await securityService.registerOrUpdateDevice(user._id.toString(), {
+        deviceId: (payload as any).deviceId,
+        name: (payload as any).deviceName,
+        platform: (payload as any).platform,
+        location: (payload as any).location,
+      });
+    } catch {
+      // Device registration enhancement should never block login
+    }
+  }
+
+  return loginResult;
 };
 
 const refreshToken = async (token: string) => {
@@ -355,6 +374,24 @@ const changePassword = async (
   return result;
 };
 
+const send2FaChallenge = async (email: string, method?: TwoFactorMethodType) => {
+  if (!email) {
+    throw new AppError("Email is required", StatusCodes.BAD_REQUEST);
+  }
+  return await securityService.sendChallenge(email, method);
+};
+
+const verify2Fa = async (email: string, code: string) => {
+  if (!email || !code) {
+    throw new AppError("Email and code are required", StatusCodes.BAD_REQUEST);
+  }
+  const isValid = await securityService.verifyChallenge(email, code);
+  if (!isValid) {
+    throw new AppError("Invalid or expired verification code", StatusCodes.BAD_REQUEST);
+  }
+  return { valid: true };
+};
+
 const authService = {
   login,
   refreshToken,
@@ -363,6 +400,8 @@ const authService = {
   verifyOtp,
   resetPassword,
   changePassword,
+  send2FaChallenge,
+  verify2Fa,
 };
 
 export default authService;

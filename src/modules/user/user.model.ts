@@ -131,6 +131,23 @@ const userSchema = new Schema<IUser>(
             ryftDetailsSubmitted: { type: Boolean, default: false },
             ryftOnboardingUrl: { type: String, default: null },
             ryftAccountCurrency: { type: String, default: 'GBP' },
+            twoFactorEnabled: { type: Boolean, default: false },
+            twoFactorMethod: {
+                  type: String,
+                  enum: ['authenticator', 'email', 'sms'],
+                  default: 'email',
+            },
+            twoFactorSecret: { type: String, default: null },
+            twoFactorEmailVerified: { type: Boolean, default: false },
+            twoFactorPhoneVerified: { type: Boolean, default: false },
+            twoFactorChallenge: {
+                  codeHash: { type: String, default: null },
+                  salt: { type: String, default: null },
+                  method: { type: String, default: null },
+                  destination: { type: String, default: null },
+                  expiresAt: { type: Date, default: null },
+                  attempts: { type: Number, default: 0 },
+            },
       },
       {
             timestamps: true,

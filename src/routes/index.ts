@@ -24,10 +24,15 @@ import cashManagementRouter from '../modules/cashManagement/cashManagement.route
 import supplierRouter from '../modules/supplier/supplier.router';
 import shopRouter from '../modules/shop/shop.router';
 import popUpRuleRouter from '../modules/popUpRule/popUpRule.router';
+import securityRouter from '../modules/security/security.router';
 
 const router = Router();
 
 const moduleRoutes = [
+      {
+            path: '/security',
+            route: securityRouter,
+      },
       {
             path: '/user',
             route: userRoutes,

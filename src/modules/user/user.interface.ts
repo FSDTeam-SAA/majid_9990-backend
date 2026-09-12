@@ -51,6 +51,19 @@ export interface IUser {
       ryftDetailsSubmitted?: boolean;
       ryftOnboardingUrl?: string;
       ryftAccountCurrency?: string;
+      twoFactorEnabled?: boolean;
+      twoFactorMethod?: 'authenticator' | 'email' | 'sms';
+      twoFactorSecret?: string | null;
+      twoFactorEmailVerified?: boolean;
+      twoFactorPhoneVerified?: boolean;
+      twoFactorChallenge?: {
+            codeHash?: string | null;
+            salt?: string | null;
+            method?: string;
+            destination?: string;
+            expiresAt?: Date | null;
+            attempts?: number;
+      };
       createdAt?: Date;
       updatedAt?: Date;
 }

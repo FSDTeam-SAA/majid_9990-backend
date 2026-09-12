@@ -93,6 +93,32 @@ const changePassword = catchAsync(async (req, res) => {
   });
 });
 
+const send2FaChallenge = catchAsync(async (req, res) => {
+  const email = req.body?.email || req.user?.email;
+  const { method } = req.body;
+  const result = await authService.send2FaChallenge(email, method);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: `Verification code sent to ${result.destination}`,
+    data: result,
+  });
+});
+
+const verify2Fa = catchAsync(async (req, res) => {
+  const email = req.body?.email || req.user?.email;
+  const { code } = req.body;
+  const result = await authService.verify2Fa(email, code);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Two-factor verification successful",
+    data: result,
+  });
+});
+
 const authController = {
   login,
   refreshToken,
@@ -101,6 +127,8 @@ const authController = {
   verifyOtp,
   resetPassword,
   changePassword,
+  send2FaChallenge,
+  verify2Fa,
 };
 
 export default authController;

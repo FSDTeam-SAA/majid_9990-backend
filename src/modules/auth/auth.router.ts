@@ -16,5 +16,8 @@ router.post('/reset-password', protect, authController.resetPassword);
 
 router.post('/change-password', protect, authController.changePassword);
 
+router.post('/2fa/send-challenge', authController.send2FaChallenge);
+router.post('/2fa/verify', authController.verify2Fa);
+
 const authRouter = router;
 export default authRouter;
