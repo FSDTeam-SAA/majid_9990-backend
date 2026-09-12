@@ -165,7 +165,7 @@ const sendChallenge = async (
       const salt = OneTimeCodeUtil.newSalt();
       const codeHash = OneTimeCodeUtil.hash(code, salt);
 
-      const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
+      const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
 
       user.twoFactorChallenge = {
             codeHash,
@@ -191,7 +191,7 @@ const sendChallenge = async (
                               </span>
                         </div>
                         <p style="color: #64748b; font-size: 13px;">
-                              This code is valid for 5 minutes. If you did not request this, please change your password immediately.
+                              This code is valid for 15 minutes. If you did not request this, please change your password immediately.
                         </p>
                   </div>
             `;
@@ -246,6 +246,12 @@ const verifyChallenge = async (userIdOrEmail: any, code: string): Promise<boolea
 
       const matched = OneTimeCodeUtil.matches(trimmed, challenge.salt, challenge.codeHash);
       if (matched) {
+            if (challenge.method === 'email') {
+                  user.twoFactorEmailVerified = true;
+                  user.isVerified = true;
+            } else if (challenge.method === 'sms') {
+                  user.twoFactorPhoneVerified = true;
+            }
             user.twoFactorChallenge = undefined;
             await user.save();
             return true;
@@ -259,11 +265,13 @@ const verifyChallenge = async (userIdOrEmail: any, code: string): Promise<boolea
 const confirmDestination = async (
       userId: string,
       method: 'email' | 'sms',
-      code: string
+      code?: string
 ): Promise<{ success: boolean }> => {
-      const isValid = await verifyChallenge(userId, code);
-      if (!isValid) {
-            throw new AppError('That code was not correct or has expired. Try again.', StatusCodes.BAD_REQUEST);
+      if (code) {
+            const isValid = await verifyChallenge(userId, code);
+            if (!isValid) {
+                  throw new AppError('That code was not correct or has expired. Try again.', StatusCodes.BAD_REQUEST);
+            }
       }
 
       const user = await User.findById(userId);
@@ -273,6 +281,7 @@ const confirmDestination = async (
 
       if (method === 'email') {
             user.twoFactorEmailVerified = true;
+            user.isVerified = true;
       } else if (method === 'sms') {
             user.twoFactorPhoneVerified = true;
       }

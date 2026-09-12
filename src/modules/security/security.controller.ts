@@ -83,8 +83,9 @@ const sendChallenge = catchAsync(async (req, res) => {
 });
 
 const verifyChallenge = catchAsync(async (req, res) => {
-      const { code } = req.body || {};
-      const isValid = await securityService.verifyChallenge(req.user._id, code);
+      const { code, email } = req.body || {};
+      const target = req.user?._id || email;
+      const isValid = await securityService.verifyChallenge(target, code);
 
       sendResponse(res, {
             statusCode: 200,
