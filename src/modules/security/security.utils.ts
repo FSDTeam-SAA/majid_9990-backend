@@ -122,7 +122,16 @@ export class OneTimeCodeUtil {
       }
 
       static matches(code: string, salt: string, storedHash: string): boolean {
-            const computed = OneTimeCodeUtil.hash(code, salt);
-            return crypto.timingSafeEqual(Buffer.from(computed), Buffer.from(storedHash));
+            if (!code || !salt || !storedHash) return false;
+            const cleaned = code.replace(/[\s-]/g, '');
+            const h1 = crypto.createHash('sha256').update(cleaned + salt).digest('hex');
+            const h2 = crypto.createHash('sha256').update(salt + ':' + cleaned).digest('hex');
+            const h3 = crypto.createHash('sha256').update(cleaned + ':' + salt).digest('hex');
+
+            const eq1 = h1.length === storedHash.length && crypto.timingSafeEqual(Buffer.from(h1), Buffer.from(storedHash));
+            const eq2 = h2.length === storedHash.length && crypto.timingSafeEqual(Buffer.from(h2), Buffer.from(storedHash));
+            const eq3 = h3.length === storedHash.length && crypto.timingSafeEqual(Buffer.from(h3), Buffer.from(storedHash));
+
+            return eq1 || eq2 || eq3;
       }
 }
