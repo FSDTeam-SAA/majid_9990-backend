@@ -3,6 +3,7 @@ import { FilterQuery, Types } from 'mongoose';
 import AppError from '../../errors/AppError';
 import { Invoice } from '../invoice/invoice.model';
 import { Inventory } from '../inventory/inventory.model';
+import { User } from '../user/user.model';
 
 interface IDashboardStats {
       // Existing stats
@@ -592,8 +593,71 @@ const getStatus = (score: number): string => {
       return 'Critical';
 };
 
+const getDashboardChart = async (filter: string = '30days') => {
+      const now = new Date();
+      const startDate = new Date();
+      let isDaily = true;
+
+      if (filter === '6months') {
+            startDate.setMonth(now.getMonth() - 5, 1);
+            startDate.setHours(0, 0, 0, 0);
+            isDaily = false;
+      } else if (filter === '12months') {
+            startDate.setMonth(now.getMonth() - 11, 1);
+            startDate.setHours(0, 0, 0, 0);
+            isDaily = false;
+      } else {
+            // 30 days
+            startDate.setDate(now.getDate() - 29);
+            startDate.setHours(0, 0, 0, 0);
+            isDaily = true;
+      }
+
+      const users = await User.find(
+            { createdAt: { $gte: startDate } },
+            { role: 1, createdAt: 1 }
+      );
+
+      const chartDataMap = new Map<string, { date: string; user: number; shopkeeper: number }>();
+
+      if (isDaily) {
+            for (let d = new Date(startDate); d <= now; d.setDate(d.getDate() + 1)) {
+                  const dateStr = d.toISOString().split('T')[0];
+                  chartDataMap.set(dateStr, { date: dateStr, user: 0, shopkeeper: 0 });
+            }
+      } else {
+            const monthsCount = filter === '12months' ? 12 : 6;
+            for (let i = monthsCount - 1; i >= 0; i--) {
+                  const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                  const monthStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+                  chartDataMap.set(monthStr, { date: monthStr, user: 0, shopkeeper: 0 });
+            }
+      }
+
+      for (const u of users) {
+            if (!u.createdAt) continue;
+            const uDate = new Date(u.createdAt);
+            const key = isDaily
+                  ? uDate.toISOString().split('T')[0]
+                  : `${uDate.getFullYear()}-${String(uDate.getMonth() + 1).padStart(2, '0')}`;
+
+            if (chartDataMap.has(key)) {
+                  const entry = chartDataMap.get(key)!;
+                  const role = u.role?.toLowerCase();
+                  if (role === 'shopkeeper') {
+                        entry.shopkeeper += 1;
+                  } else {
+                        entry.user += 1;
+                  }
+            }
+      }
+
+      return Array.from(chartDataMap.values());
+};
+
 const dashboardService = {
       getDashboardStats,
+      getDashboardChart,
 };
 
 export default dashboardService;

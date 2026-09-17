@@ -18,6 +18,19 @@ const getDashboardStats = catchAsync(async (req, res) => {
       });
 });
 
+const getDashboardChart = catchAsync(async (req, res) => {
+      const filter = (req.query.filter as string) || '30days';
+      const result = await dashboardService.getDashboardChart(filter);
+
+      sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: 'Dashboard chart data fetched successfully',
+            data: result,
+      });
+});
+
 export default {
       getDashboardStats,
+      getDashboardChart,
 };
