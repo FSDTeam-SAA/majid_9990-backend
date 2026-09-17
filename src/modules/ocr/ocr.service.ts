@@ -22,19 +22,59 @@ const getOpenAIClient = () => {
 };
 
 class OCRService {
+      private scheduler: Tesseract.Scheduler | null = null;
+      private schedulerInitPromise: Promise<Tesseract.Scheduler> | null = null;
+      private readonly poolSize = 2;
+
       /**
-       * Extract text from image using Tesseract OCR
+       * Initialize the worker pool with Tesseract scheduler
+       */
+      private async getScheduler(): Promise<Tesseract.Scheduler> {
+            if (this.scheduler) {
+                  return this.scheduler;
+            }
+
+            if (this.schedulerInitPromise) {
+                  return this.schedulerInitPromise;
+            }
+
+            this.schedulerInitPromise = (async () => {
+                  const scheduler = Tesseract.createScheduler();
+                  for (let i = 0; i < this.poolSize; i++) {
+                        const worker = await Tesseract.createWorker('eng', 1, {
+                              logger: (m) => console.log(`[OCR Worker ${i + 1}] Progress:`, m),
+                        });
+                        scheduler.addWorker(worker);
+                  }
+                  this.scheduler = scheduler;
+                  return scheduler;
+            })();
+
+            return this.schedulerInitPromise;
+      }
+
+      /**
+       * Extract text from image using Tesseract worker scheduler
        */
       async extractTextFromImage(imagePath: string): Promise<string> {
             try {
-                  const result = await Tesseract.recognize(imagePath, 'eng', {
-                        logger: (m) => console.log('OCR Progress:', m),
-                  });
-
+                  const scheduler = await this.getScheduler();
+                  const result = await scheduler.addJob('recognize', imagePath);
                   return result.data.text;
             } catch (error) {
                   console.error('OCR extraction error:', error);
                   throw new Error(`Failed to extract text from image: ${error}`);
+            }
+      }
+
+      /**
+       * Gracefully terminate the worker scheduler pool
+       */
+      async terminate(): Promise<void> {
+            if (this.scheduler) {
+                  await this.scheduler.terminate();
+                  this.scheduler = null;
+                  this.schedulerInitPromise = null;
             }
       }
 
