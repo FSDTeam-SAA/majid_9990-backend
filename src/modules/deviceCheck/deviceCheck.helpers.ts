@@ -3,7 +3,10 @@ import { ensureSavedScanReportPdf } from './scanReportPdf.service';
 import { buildStructuredScanInfo } from './scanInfo.transformer';
 import { dhruApiClient } from './dhru.api.client';
 import { buildShopScopeFilter } from '../shop/shop.utils';
+import { cacheService } from '../../config/redis';
 import axios from 'axios';
+
+const IMEI_CACHE_TTL = 86400; // 24 hours in seconds
 
 const DEFAULT_SERVICE_ID = Number(process.env.DHRU_SERVICE_ID ?? 6);
 const ENABLE_SERVICE_FALLBACK = String(process.env.IMEI_ENABLE_SERVICE_FALLBACK ?? 'false').toLowerCase() === 'true';
@@ -699,13 +702,24 @@ export const getExistingScanInfoByImei = async (
       userId?: string,
       shopId?: string
 ) => {
+      const cacheKey = `imei:scan:${imei}:${serviceId}:${userId || 'anonymous'}:${shopId || 'none'}`;
+      const cachedInMemory = await cacheService.get<any>(cacheKey);
+      if (cachedInMemory) {
+            return cachedInMemory;
+      }
+
       if (!userId) {
-            return ScanInfo.findOne({ imei, serviceId }).sort({ updatedAt: -1 }).lean();
+            const scan = await ScanInfo.findOne({ imei, serviceId }).sort({ updatedAt: -1 }).lean();
+            if (scan) {
+                  await cacheService.set(cacheKey, scan, IMEI_CACHE_TTL);
+            }
+            return scan;
       }
 
       const shopFilter = shopId ? await buildShopScopeFilter(userId, shopId, 'userId', 'shopId') : { userId };
       const userScan = await ScanInfo.findOne({ imei, serviceId, ...shopFilter }).sort({ updatedAt: -1 }).lean();
       if (userScan) {
+            await cacheService.set(cacheKey, userScan, IMEI_CACHE_TTL);
             return userScan;
       }
 
@@ -764,6 +778,7 @@ export const getExistingScanInfoByImei = async (
             } catch (error) {
                   console.error('Failed to save cached IMEI report PDF:', error);
             }
+            await cacheService.set(cacheKey, copiedScan, IMEI_CACHE_TTL);
       }
 
       return copiedScan;
@@ -937,16 +952,21 @@ export const runImeiCheck = async (
                               },
                         }
                   );
-                  reportActions = {
-                        ...structuredInfo.reportActions,
-                        pdfCertificateUrl,
-                        isPdfGenerated: true,
-                  };
-            } catch (error) {
-                  // The scan itself is still valid. A history request can retry PDF creation from the saved report.
-                  console.error('Failed to save IMEI report PDF:', error);
-            }
+            reportActions = {
+                  ...structuredInfo.reportActions,
+                  pdfCertificateUrl,
+                  isPdfGenerated: true,
+            };
+      } catch (error) {
+            // The scan itself is still valid. A history request can retry PDF creation from the saved report.
+            console.error('Failed to save IMEI report PDF:', error);
       }
+}
+
+if (savedScanInfo) {
+      const cacheKey = `imei:scan:${imei}:${requestedServiceId}:${userId || 'anonymous'}:${shopId || 'none'}`;
+      await cacheService.set(cacheKey, savedScanInfo.toObject(), IMEI_CACHE_TTL);
+}
 
       return {
             ok: true,

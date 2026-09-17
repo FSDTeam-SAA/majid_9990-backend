@@ -1,10 +1,11 @@
 import axios from 'axios';
 import type { Request } from 'express';
+import { cacheService } from '../../config/redis';
 
 const GEO_API = 'https://ipapi.co';
 const FX_API = 'https://open.er-api.com/v6/latest/USD';
-const FX_CACHE_TTL = 60 * 60 * 1000;
-let fxRatesCache: { rates: Record<string, number>; timestamp: number } | null = null;
+const FX_CACHE_TTL = 3600; // 1 hour in seconds
+const GEO_CACHE_TTL = 86400; // 24 hours in seconds
 
 const CURRENCY_SYMBOLS: Record<string, string> = {
       USD: '$',
@@ -88,13 +89,20 @@ const parseIp = (req: Pick<Request, 'headers' | 'socket' | 'ip'>) => {
 };
 
 const getGeoForIp = async (ip: string) => {
-      try {
-            const url = `${GEO_API}/${ip}/json/`;
-            const { data } = await axios.get(url, { timeout: 5000 });
-            return data;
-      } catch {
+      const cleanIp = String(ip || '').trim();
+      if (!cleanIp || cleanIp === '127.0.0.1' || cleanIp === '::1' || cleanIp === 'localhost') {
             return null;
       }
+
+      return await cacheService.wrap(`geo:ip:${cleanIp}`, GEO_CACHE_TTL, async () => {
+            try {
+                  const url = `${GEO_API}/${cleanIp}/json/`;
+                  const { data } = await axios.get(url, { timeout: 5000 });
+                  return data;
+            } catch {
+                  return null;
+            }
+      });
 };
 
 const getCurrencyCodeForIp = async (ip: string) => {
@@ -122,38 +130,26 @@ const getUsdToCurrencyRate = async (currencyCode: string) => {
             return 1;
       }
 
-      try {
-            const { data } = await axios.get(FX_API, { timeout: 5000 });
-            const rate = Number(data?.rates?.[code]);
-
-            return Number.isFinite(rate) && rate > 0 ? rate : 1;
-      } catch {
-            return 1;
-      }
+      const rates = await getExchangeRates();
+      const rate = Number(rates?.[code]);
+      return Number.isFinite(rate) && rate > 0 ? rate : 1;
 };
 
 const getExchangeRates = async () => {
-      if (fxRatesCache && Date.now() - fxRatesCache.timestamp < FX_CACHE_TTL) {
-            return fxRatesCache.rates;
-      }
+      return await cacheService.wrap<Record<string, number> | null>('fx:usd:rates', FX_CACHE_TTL, async () => {
+            try {
+                  const { data } = await axios.get(FX_API, { timeout: 5000 });
+                  const rates = data?.rates;
 
-      try {
-            const { data } = await axios.get(FX_API, { timeout: 5000 });
-            const rates = data?.rates;
+                  if (!rates || typeof rates !== 'object') {
+                        return null;
+                  }
 
-            if (!rates || typeof rates !== 'object') {
+                  return rates as Record<string, number>;
+            } catch {
                   return null;
             }
-
-            fxRatesCache = {
-                  rates: rates as Record<string, number>,
-                  timestamp: Date.now(),
-            };
-
-            return fxRatesCache.rates;
-      } catch {
-            return null;
-      }
+      });
 };
 
 const convertCurrencyAmount = (

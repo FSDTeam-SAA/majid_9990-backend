@@ -17,6 +17,9 @@ import { creditUserBalance, debitUserBalance } from '../payment/balanceTransacti
 import ScanInfo from './scanInfo.model';
 import { ensureSavedScanReportPdf, getSavedScanReportPdfPath } from './scanReportPdf.service';
 import { buildShopScopeFilter } from '../shop/shop.utils';
+import { cacheService } from '../../config/redis';
+
+const CATALOG_CACHE_TTL = 3600; // 1 hour
 
 export type SingleImeiCheckResult =
       | {
@@ -108,9 +111,11 @@ export const resolveServicePrice = (service: { price: string; isFree: boolean })
 };
 
 export const findServiceByServiceId = async (serviceId: number) => {
-      return await ImeiServiceCatalog.findOne({
-            $or: [{ serviceId }, { serviceIds: serviceId }],
-      }).lean();
+      return await cacheService.wrap(`imei:service:${serviceId}`, CATALOG_CACHE_TTL, async () => {
+            return await ImeiServiceCatalog.findOne({
+                  $or: [{ serviceId }, { serviceIds: serviceId }],
+            }).lean();
+      });
 };
 
 export const groupByCategory = <T extends { category: string }>(items: T[]) => {
@@ -164,25 +169,32 @@ export const syncCuratedServices = async (upstreamServices: UpstreamService[]) =
                         },
                   }))
             );
+            // Invalidate cached catalogs
+            await cacheService.del('imei:services:catalog');
+            await cacheService.delPattern('imei:service:*');
       }
 
-      return groupByCategory(
+      const grouped = groupByCategory(
             catalogDocuments.map((document) => ({
                   ...document,
                   priceLabel: formatPriceLabel(document.price),
             }))
       );
+      await cacheService.set('imei:services:catalog', grouped, CATALOG_CACHE_TTL);
+      return grouped;
 };
 
 export const readStoredServices = async () => {
-      const storedServices = await ImeiServiceCatalog.find().sort({ category: 1, name: 1 }).lean();
+      return await cacheService.wrap('imei:services:catalog', CATALOG_CACHE_TTL, async () => {
+            const storedServices = await ImeiServiceCatalog.find().sort({ category: 1, name: 1 }).lean();
 
-      return groupByCategory(
-            storedServices.map((document) => ({
-                  ...document,
-                  priceLabel: formatPriceLabel(document.price),
-            }))
-      );
+            return groupByCategory(
+                  storedServices.map((document) => ({
+                        ...document,
+                        priceLabel: formatPriceLabel(document.price),
+                  }))
+            );
+      });
 };
 
 export const processMultipleServiceCheck = async (
