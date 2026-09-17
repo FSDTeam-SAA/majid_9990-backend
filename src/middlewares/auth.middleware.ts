@@ -53,42 +53,45 @@ export const optionalProtect = async (req: Request, res: Response, next: NextFun
 };
 
 export const isAdmin = (req: Request, res: Response, next: NextFunction): void => {
-      if (req.user?.role !== 'admin') {
+      const role = req.user?.role?.toLowerCase();
+      if (role !== 'admin' && role !== 'super_admin') {
             throw new AppError('Access denied. You are not an admin.', StatusCodes.FORBIDDEN);
       }
       next();
 };
 
 export const isDriver = (req: Request, res: Response, next: NextFunction): void => {
-      if (req.user?.role !== 'driver') {
+      if (req.user?.role?.toLowerCase() !== 'driver') {
             throw new AppError('Access denied. You are not an driver.', StatusCodes.FORBIDDEN);
       }
       next();
 };
 
 export const isShopkeeper = (req: Request, res: Response, next: NextFunction): void => {
-      if (req.user?.role !== 'shopkeeper') {
+      if (req.user?.role?.toLowerCase() !== 'shopkeeper') {
             throw new AppError('Access denied. You are not a shopkeeper.', StatusCodes.FORBIDDEN);
       }
       next();
 };
 
 export const isStaff = (req: Request, res: Response, next: NextFunction): void => {
-      if (req.user?.role !== 'staff') {
+      if (req.user?.role?.toLowerCase() !== 'staff') {
             throw new AppError('Access denied. You are not a staff member.', StatusCodes.FORBIDDEN);
       }
       next();
 };
 
 export const isShopkeeperOrStaff = (req: Request, res: Response, next: NextFunction): void => {
-      if (req.user?.role !== 'shopkeeper' && req.user?.role !== 'staff') {
+      const role = req.user?.role?.toLowerCase();
+      if (role !== 'shopkeeper' && role !== 'staff') {
             throw new AppError('Access denied. Only shopkeepers and staff can perform this action.', StatusCodes.FORBIDDEN);
       }
       next();
 };
 
 export const isAdminOrShopkeeper = (req: Request, res: Response, next: NextFunction): void => {
-      if (req.user?.role !== 'admin' && req.user?.role !== 'shopkeeper') {
+      const role = req.user?.role?.toLowerCase();
+      if (role !== 'admin' && role !== 'super_admin' && role !== 'shopkeeper') {
             throw new AppError('Access denied. Only admins and shopkeepers can perform this action.', StatusCodes.FORBIDDEN);
       }
       next();

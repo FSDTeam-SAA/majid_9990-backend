@@ -13,7 +13,7 @@ const sendAnnouncement = async (payload: IAnnouncement) => {
       const emails = users.map((user) => user.email);
 
       // Email send
-      await Promise.all(
+      await Promise.allSettled(
             emails.map((email) =>
                   sendEmail({
                         to: email,
