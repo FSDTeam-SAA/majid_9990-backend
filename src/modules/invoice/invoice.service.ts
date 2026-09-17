@@ -214,133 +214,170 @@ const createInvoice = async (payload: IInvoicePayload, file?: Express.Multer.Fil
 
       const invoiceFile = await buildInvoiceFile(file);
 
-      const result = await Invoice.create({
-            shopkeeperId,
-            shopId,
-            invoice: invoiceFile,
-            type,
-            customerInfo,
-            itemsIds,
-
-            totalAmount,
-            dueAmount,
-            repairRequestId: normalizeObjectId(payload.repairRequestId),
-            tax: normalizeOptionalNumber(payload.tax, 'tax'),
-            taxName: payload.taxName,
-            taxIncludedInPrice: payload.taxIncludedInPrice,
-            paymentMethod,
-            paymentStatus: payload.paymentStatus,
-            paymentDetails,
-            amountPaid,
-            invoiceNumber: String(payload.invoiceNumber ?? '').trim() || undefined,
-            currency:
-                  String(payload.currency ?? '')
-                        .trim()
-                        .toUpperCase() || undefined,
-            orderDetails,
-            discountName: payload.discountName?.trim(),
-            discountPercentage: normalizeOptionalNumber(payload.discountPercentage, 'discountPercentage'),
-            discountAmount: normalizeOptionalNumber(payload.discountAmount, 'discountAmount'),
-            lineItems,
-      });
-
-      // Process payment allocations to previous customer invoices (Callout 4 & 5)
-      let allocations: Array<{ invoiceId: string; amountApplied: number }> = [];
+      const session = await Invoice.startSession();
       try {
-            allocations = typeof payload.allocations === 'string'
-                  ? JSON.parse(payload.allocations)
-                  : payload.allocations || [];
-      } catch {
-            // Ignore parse errors
-      }
+            session.startTransaction();
 
-      if (Array.isArray(allocations) && allocations.length > 0) {
-            for (const alloc of allocations) {
-                  const allocInvoiceId = String(alloc.invoiceId || '').trim();
-                  const amountApplied = Number(alloc.amountApplied) || 0;
-
-                  if (allocInvoiceId && allocInvoiceId !== 'today' && amountApplied > 0 && Types.ObjectId.isValid(allocInvoiceId)) {
-                        const targetInv = await Invoice.findOne({
-                              _id: new Types.ObjectId(allocInvoiceId),
+            const [result] = await Invoice.create(
+                  [
+                        {
                               shopkeeperId,
-                        });
+                              shopId,
+                              invoice: invoiceFile,
+                              type,
+                              customerInfo,
+                              itemsIds,
 
-                        if (targetInv) {
-                              const existingTotal = Number(targetInv.totalAmount) || 0;
-                              const existingPaid = Number(
-                                    targetInv.amountPaid ??
-                                    targetInv.paymentDetails?.amountPaid ??
-                                    (targetInv.paymentStatus === 'paid' ? existingTotal : 0)
-                              ) || 0;
-                              const newPaid = existingPaid + amountApplied;
+                              totalAmount,
+                              dueAmount,
+                              repairRequestId: normalizeObjectId(payload.repairRequestId),
+                              tax: normalizeOptionalNumber(payload.tax, 'tax'),
+                              taxName: payload.taxName,
+                              taxIncludedInPrice: payload.taxIncludedInPrice,
+                              paymentMethod,
+                              paymentStatus: payload.paymentStatus,
+                              paymentDetails,
+                              amountPaid,
+                              invoiceNumber: String(payload.invoiceNumber ?? '').trim() || undefined,
+                              currency:
+                                    String(payload.currency ?? '')
+                                          .trim()
+                                          .toUpperCase() || undefined,
+                              orderDetails,
+                              discountName: payload.discountName?.trim(),
+                              discountPercentage: normalizeOptionalNumber(payload.discountPercentage, 'discountPercentage'),
+                              discountAmount: normalizeOptionalNumber(payload.discountAmount, 'discountAmount'),
+                              lineItems,
+                        },
+                  ],
+                  { session }
+            );
 
-                              let newDue = 0;
-                              if (targetInv.dueAmount !== null && targetInv.dueAmount !== undefined) {
-                                    newDue = Math.max(0, Number(targetInv.dueAmount) - amountApplied);
-                              } else {
-                                    newDue = Math.max(0, existingTotal - newPaid);
-                              }
+            // Process payment allocations to previous customer invoices (Callout 4 & 5)
+            let allocations: Array<{ invoiceId: string; amountApplied: number }> = [];
+            try {
+                  allocations = typeof payload.allocations === 'string'
+                        ? JSON.parse(payload.allocations)
+                        : payload.allocations || [];
+            } catch {
+                  // Ignore parse errors
+            }
 
-                              const newStatus: InvoicePaymentStatus = newDue <= 0 ? 'paid' : newPaid > 0 ? 'partial' : 'due';
+            if (Array.isArray(allocations) && allocations.length > 0) {
+                  for (const alloc of allocations) {
+                        const allocInvoiceId = String(alloc.invoiceId || '').trim();
+                        const amountApplied = Number(alloc.amountApplied) || 0;
 
-                              await Invoice.findByIdAndUpdate(targetInv._id, {
-                                    $set: {
-                                          amountPaid: newPaid,
-                                          dueAmount: newDue,
-                                          paymentStatus: newStatus,
-                                    },
-                              });
+                        if (allocInvoiceId && allocInvoiceId !== 'today' && amountApplied > 0 && Types.ObjectId.isValid(allocInvoiceId)) {
+                              const targetInv = await Invoice.findOne({
+                                    _id: new Types.ObjectId(allocInvoiceId),
+                                    shopkeeperId,
+                              }).session(session);
 
-                              try {
-                                    await AuditLog.create({
-                                          action: 'payment_adjustment',
-                                          shopkeeperId,
-                                          shopId: targetInv.shopId || shopId,
-                                          customerId: targetInv.customerInfo,
-                                          invoiceId: targetInv._id,
-                                          details: {
-                                                amountApplied,
-                                                previousDue: targetInv.dueAmount,
-                                                newDue,
-                                                newAmountPaid: newPaid,
-                                                paymentStatus: newStatus,
-                                                paymentMethod,
-                                                createdInvoiceId: result._id,
+                              if (targetInv) {
+                                    const existingTotal = Number(targetInv.totalAmount) || 0;
+                                    const existingPaid = Number(
+                                          targetInv.amountPaid ??
+                                          targetInv.paymentDetails?.amountPaid ??
+                                          (targetInv.paymentStatus === 'paid' ? existingTotal : 0)
+                                    ) || 0;
+                                    const newPaid = existingPaid + amountApplied;
+
+                                    let newDue = 0;
+                                    if (targetInv.dueAmount !== null && targetInv.dueAmount !== undefined) {
+                                          newDue = Math.max(0, Number(targetInv.dueAmount) - amountApplied);
+                                    } else {
+                                          newDue = Math.max(0, existingTotal - newPaid);
+                                    }
+
+                                    const newStatus: InvoicePaymentStatus = newDue <= 0 ? 'paid' : newPaid > 0 ? 'partial' : 'due';
+
+                                    await Invoice.findByIdAndUpdate(
+                                          targetInv._id,
+                                          {
+                                                $set: {
+                                                      amountPaid: newPaid,
+                                                      dueAmount: newDue,
+                                                      paymentStatus: newStatus,
+                                                },
                                           },
-                                    });
-                              } catch (auditErr) {
-                                    console.error('Audit log error:', auditErr);
+                                          { session }
+                                    );
+
+                                    await AuditLog.create(
+                                          [
+                                                {
+                                                      action: 'payment_adjustment',
+                                                      shopkeeperId,
+                                                      shopId: targetInv.shopId || shopId,
+                                                      customerId: targetInv.customerInfo,
+                                                      invoiceId: targetInv._id,
+                                                      details: {
+                                                            amountApplied,
+                                                            previousDue: targetInv.dueAmount,
+                                                            newDue,
+                                                            newAmountPaid: newPaid,
+                                                            paymentStatus: newStatus,
+                                                            paymentMethod,
+                                                            createdInvoiceId: result._id,
+                                                      },
+                                                },
+                                          ],
+                                          { session }
+                                    );
                               }
                         }
                   }
             }
-      }
 
-      if (repairRequestId) {
-            const repairRequest = await RepairRequest.findOneAndUpdate(
-                  {
-                        _id: repairRequestId,
-                        userId: shopkeeperId,
-                        status: { $in: ['completed', 'approved'] },
-                  },
-                  { $set: { status: 'collected' } },
-                  { new: true },
-            );
+            if (repairRequestId) {
+                  const repairRequest = await RepairRequest.findOneAndUpdate(
+                        {
+                              _id: repairRequestId,
+                              userId: shopkeeperId,
+                              status: { $in: ['completed', 'approved'] },
+                        },
+                        { $set: { status: 'collected' } },
+                        { new: true, session }
+                  );
 
-            if (!repairRequest) {
-                  throw new AppError('Repair order is no longer ready for collection', StatusCodes.CONFLICT);
+                  if (!repairRequest) {
+                        throw new AppError('Repair order is no longer ready for collection', StatusCodes.CONFLICT);
+                  }
             }
-      }
 
-      for (const line of lineItems) {
-            if (line.variantId) {
-                  await Inventory.updateOne({ _id: line.itemId }, { $inc: { 'variants.$[variant].quantity': -Number(line.quantity) } }, { arrayFilters: [{ 'variant._id': line.variantId, 'variant.quantity': { $gte: Number(line.quantity) } }] });
-            } else {
-                  await Inventory.updateOne({ _id: line.itemId, quantity: { $gte: Number(line.quantity) } }, { $inc: { quantity: -Number(line.quantity) } });
+            for (const line of lineItems) {
+                  let updateRes;
+                  if (line.variantId) {
+                        updateRes = await Inventory.updateOne(
+                              { _id: line.itemId },
+                              { $inc: { 'variants.$[variant].quantity': -Number(line.quantity) } },
+                              {
+                                    arrayFilters: [{ 'variant._id': line.variantId, 'variant.quantity': { $gte: Number(line.quantity) } }],
+                                    session,
+                              }
+                        );
+                  } else {
+                        updateRes = await Inventory.updateOne(
+                              { _id: line.itemId, quantity: { $gte: Number(line.quantity) } },
+                              { $inc: { quantity: -Number(line.quantity) } },
+                              { session }
+                        );
+                  }
+
+                  if (updateRes.matchedCount === 0 || updateRes.modifiedCount === 0) {
+                        throw new AppError('One or more selected items no longer have enough stock', StatusCodes.CONFLICT);
+                  }
             }
-      }
 
-      return result;
+            await session.commitTransaction();
+            return result;
+      } catch (error) {
+            await session.abortTransaction();
+            throw error;
+      } finally {
+            await session.endSession();
+      }
 };
 
 type InvoicePaginationQuery = {

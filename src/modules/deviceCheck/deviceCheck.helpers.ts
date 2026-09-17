@@ -1,7 +1,7 @@
 import ScanInfo from './scanInfo.model';
 import { ensureSavedScanReportPdf } from './scanReportPdf.service';
 import { buildStructuredScanInfo } from './scanInfo.transformer';
-import { dhruService } from './dhru.service';
+import { dhruApiClient } from './dhru.api.client';
 import { buildShopScopeFilter } from '../shop/shop.utils';
 import axios from 'axios';
 
@@ -635,7 +635,7 @@ const getServiceIdCandidates = async (requestedServiceId: number) => {
             return [requestedServiceId];
       }
 
-      const servicesResponse = await dhruService.getImeiServices();
+      const servicesResponse = await dhruApiClient.getImeiServices();
       console.log('Dhru services response:', servicesResponse);
       const serviceIds = extractServiceIds(servicesResponse);
       return Array.from(new Set([requestedServiceId, ...serviceIds]));
@@ -648,7 +648,7 @@ const placeImeiOrderWithFallback = async (imei: string, requestedServiceId: numb
       let usedServiceId = requestedServiceId;
 
       for (const serviceId of candidateServiceIds) {
-            const response = await dhruService.placeImeiOrder(serviceId, imei);
+            const response = await dhruApiClient.placeImeiOrder(serviceId, imei);
             console.log(`Dhru place order response (serviceId=${serviceId}, imei=${imei}):`, response);
             latestResponse = response;
             usedServiceId = serviceId;
@@ -671,7 +671,7 @@ const pollImeiOrderResult = async (orderId: string | number) => {
       for (let i = 0; i < 5; i++) {
             await sleep(2000);
 
-            const result = await dhruService.getImeiOrder(orderId);
+            const result = await dhruApiClient.getImeiOrder(orderId);
             console.log(`Dhru poll result (orderId=${orderId}, attempt=${i + 1}):`, result);
 
             if (result?.ERROR) {
@@ -952,7 +952,7 @@ export const runImeiCheck = async (
             ok: true,
             imei,
             serviceId: usedServiceId,
-            provider: dhruService.getProvider(),
+            provider: dhruApiClient.getProvider(),
             reportId: savedScanInfo?._id?.toString(),
             structured: {
                   ...structuredInfo,

@@ -1,133 +1,1269 @@
-import axios, { AxiosInstance } from 'axios';
-import qs from 'qs';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import ExcelJS from 'exceljs';
+import AppError from '../../errors/AppError';
+import { ImeiServiceCatalog } from './imeiService.model';
+import { curatedDhruServices, normalizeServiceName } from './dhru.services.catalog';
+import { dhruApiClient } from './dhru.api.client';
+import {
+      getExistingScanInfoByImei,
+      isValidImei,
+      runImeiCheck,
+      extractProviderDataFromHtml,
+      analyzeParsedProviderDataWithAi,
+      isProviderErrorResult,
+} from './deviceCheck.helpers';
+import { creditUserBalance, debitUserBalance } from '../payment/balanceTransaction.service';
+import ScanInfo from './scanInfo.model';
+import { ensureSavedScanReportPdf, getSavedScanReportPdfPath } from './scanReportPdf.service';
+import { buildShopScopeFilter } from '../shop/shop.utils';
 
-type ProviderType = 'dhru' | 'sickw';
+export type SingleImeiCheckResult =
+      | {
+              ok: true;
+              message: string;
+              data: Record<string, unknown>;
+        }
+      | {
+              ok: false;
+              statusCode: number;
+              message: string;
+              data?: unknown;
+        };
 
-class DhruService {
-      private readonly client: AxiosInstance;
-      private readonly username: string;
-      private readonly apiKey: string;
-      private readonly baseUrl: string;
-      private readonly provider: ProviderType;
-      private readonly sickwFormat: string;
-      private readonly configured: boolean;
+export type BatchImeiItemResult = {
+      rowNumber: number;
+      imei: string;
+      ok: boolean;
+      message: string;
+      cached?: boolean;
+      serviceId?: number;
+      provider?: string;
+      data?: unknown;
+};
 
-      constructor() {
-            this.baseUrl = String(process.env.DHRU_BASE_URL ?? '').trim();
-            this.username = String(process.env.DHRU_USERNAME ?? '').trim();
-            this.apiKey = String(process.env.DHRU_API_KEY ?? '').trim();
-            const explicitProvider = String(process.env.IMEI_PROVIDER ?? '')
-                  .trim()
-                  .toLowerCase();
-            const resolvedProvider = this.detectProviderFromUrl();
-            this.provider =
-                  explicitProvider === 'sickw' || explicitProvider === 'dhru' ? explicitProvider : resolvedProvider;
-            this.sickwFormat = String(process.env.SICKW_RESPONSE_FORMAT ?? 'json')
-                  .trim()
-                  .toLowerCase();
-            this.configured = Boolean(this.baseUrl && this.apiKey);
+export type UpstreamService = {
+      serviceId: number;
+      name: string;
+      price?: string;
+};
 
-            const timeoutMs = Number(process.env.DHRU_TIMEOUT_MS ?? 60000);
+export const normalizeImei = (value: unknown): string => {
+      if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+            return String(value).split(/\s+/g).join('').trim();
+      }
+      return '';
+};
 
-            this.client = axios.create({
-                  baseURL: this.baseUrl || undefined,
-                  headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                  },
-                  timeout: Number.isFinite(timeoutMs) && timeoutMs > 0 ? timeoutMs : 60000,
-            });
+export const safeDeleteFile = async (filePath?: string): Promise<void> => {
+      if (!filePath) {
+            return;
+      }
+      try {
+            await fs.unlink(filePath);
+      } catch {
+            // ignore cleanup errors
+      }
+};
+
+export const extractUpstreamServices = (response: unknown): UpstreamService[] => {
+      const payload = response as Record<string, any>;
+      const candidates =
+            payload?.data?.['Service List'] ??
+            payload?.data?.services ??
+            payload?.data?.SERVICE_LIST ??
+            payload?.data?.['service list'] ??
+            payload?.services ??
+            payload?.SERVICE_LIST ??
+            payload?.['Service List'] ??
+            payload;
+
+      if (!Array.isArray(candidates)) {
+            return [];
       }
 
-      private detectProviderFromUrl(): ProviderType {
-            const normalized = this.baseUrl.toLowerCase();
-            return normalized.includes('sickw.com') ? 'sickw' : 'dhru';
+      return candidates
+            .map((item: any) => ({
+                  serviceId: Number(item?.service ?? item?.serviceId ?? item?.serviceid ?? item?.id),
+                  name: String(item?.name ?? item?.serviceName ?? item?.SERVICE_NAME ?? '').trim(),
+                  price: String(item?.price ?? item?.PRICE ?? '').trim(),
+            }))
+            .filter((item) => Number.isFinite(item.serviceId) && item.serviceId > 0 && item.name.length > 0);
+};
+
+export const formatPriceLabel = (price: string) => (price.toUpperCase() === 'FREE' ? 'FREE' : `${price}$`);
+
+export const resolveServicePrice = (service: { price: string; isFree: boolean }) => {
+      if (service.isFree || service.price.toUpperCase() === 'FREE') {
+            return 0;
       }
 
-      getProvider(): ProviderType {
-            return this.provider;
+      const parsedPrice = Number(service.price);
+
+      if (!Number.isFinite(parsedPrice) || parsedPrice < 0) {
+            throw new AppError('Invalid service price', 500);
       }
 
-      private async request(action: string, extraData: Record<string, unknown> = {}) {
-            if (!this.configured) {
-                  throw new Error('IMEI provider not configured');
-            }
+      return Number(parsedPrice.toFixed(3));
+};
 
-            if (this.provider === 'sickw') {
-                  const response = await this.client.get('/api.php', {
-                        params: {
-                              action,
-                              key: this.apiKey,
-                              ...extraData,
+export const findServiceByServiceId = async (serviceId: number) => {
+      return await ImeiServiceCatalog.findOne({
+            $or: [{ serviceId }, { serviceIds: serviceId }],
+      }).lean();
+};
+
+export const groupByCategory = <T extends { category: string }>(items: T[]) => {
+      const groups = new Map<string, T[]>();
+
+      for (const item of items) {
+            const existing = groups.get(item.category) ?? [];
+            existing.push(item);
+            groups.set(item.category, existing);
+      }
+
+      return Array.from(groups.entries()).map(([category, services]) => ({ category, services }));
+};
+
+export const syncCuratedServices = async (upstreamServices: UpstreamService[]) => {
+      const upstreamLookup = new Map<string, UpstreamService[]>();
+
+      for (const service of upstreamServices) {
+            const key = normalizeServiceName(service.name);
+            const existing = upstreamLookup.get(key) ?? [];
+            existing.push(service);
+            upstreamLookup.set(key, existing);
+      }
+
+      const catalogDocuments = curatedDhruServices.map((service) => {
+            const normalizedName = normalizeServiceName(service.name);
+            const matches = upstreamLookup.get(normalizedName) ?? [];
+            const serviceIds = Array.from(new Set(matches.map((item) => item.serviceId)));
+            const sourceNames = Array.from(new Set(matches.map((item) => item.name)));
+
+            return {
+                  category: service.category,
+                  name: service.name,
+                  normalizedName,
+                  price: service.price,
+                  currency: 'USD',
+                  isFree: service.price.toUpperCase() === 'FREE',
+                  serviceId: serviceIds[0] ?? null,
+                  serviceIds,
+                  sourceNames,
+            };
+      });
+
+      if (catalogDocuments.length) {
+            await ImeiServiceCatalog.bulkWrite(
+                  catalogDocuments.map((document) => ({
+                        updateOne: {
+                              filter: { normalizedName: document.normalizedName },
+                              update: { $set: document },
+                              upsert: true,
                         },
-                  });
-                  return response.data;
+                  }))
+            );
+      }
+
+      return groupByCategory(
+            catalogDocuments.map((document) => ({
+                  ...document,
+                  priceLabel: formatPriceLabel(document.price),
+            }))
+      );
+};
+
+export const readStoredServices = async () => {
+      const storedServices = await ImeiServiceCatalog.find().sort({ category: 1, name: 1 }).lean();
+
+      return groupByCategory(
+            storedServices.map((document) => ({
+                  ...document,
+                  priceLabel: formatPriceLabel(document.price),
+            }))
+      );
+};
+
+export const processMultipleServiceCheck = async (
+      userId: string,
+      imei: string,
+      service: any,
+      serviceIds: number[],
+      shouldGenerateFresh: boolean,
+      shouldCharge: boolean,
+      servicePrice: number,
+      shopId?: string
+): Promise<SingleImeiCheckResult> => {
+      type BundledCheckResult = {
+            serviceId: number;
+            ok: boolean;
+            cached: boolean;
+            provider?: string;
+            message?: string;
+            statusCode?: number;
+            data?: unknown;
+            providerData?: unknown;
+      };
+
+      try {
+            // Run IMEI checks against all serviceIds in parallel
+            const checkResults: BundledCheckResult[] = await Promise.all(
+                  serviceIds.map(async (svcId) => {
+                        const existingScanInfo = shouldGenerateFresh
+                              ? null
+                              : await getExistingScanInfoByImei(imei, svcId, userId);
+
+                        if (existingScanInfo) {
+                              return {
+                                    serviceId: svcId,
+                                    ok: true,
+                                    cached: true,
+                                    data: existingScanInfo,
+                              };
+                        }
+
+                        const result = await runImeiCheck(String(imei), svcId, userId, shopId);
+                        return {
+                              serviceId: svcId,
+                              ok: result.ok,
+                              cached: false,
+                              provider: result.ok ? result.provider : undefined,
+                              message: result.ok ? undefined : result.message,
+                              statusCode: result.ok ? undefined : result.statusCode,
+                              data: result.ok ? result.structured : result.data,
+                              providerData: result.ok ? result.providerData : undefined,
+                        };
+                  })
+            );
+
+            console.log('processMultipleServiceCheck results:', checkResults);
+
+            // Check if all checks failed
+            const allFailed = checkResults.every((r) => !r.ok);
+            if (allFailed) {
+                  if (shouldCharge) {
+                        await creditUserBalance({
+                              userId,
+                              amount: servicePrice,
+                              currency: service.currency ?? 'USD',
+                              source: 'refund',
+                              description: `Refund for failed bundled IMEI service ${service.name}`,
+                              serviceId: service.serviceId,
+                              serviceName: service.name,
+                              imei,
+                              metadata: {
+                                    normalizedName: service.normalizedName,
+                                    reason: 'All bundled checks failed',
+                                    bundledServiceIds: serviceIds,
+                              },
+                        }).catch(() => undefined);
+                  }
+
+                  return {
+                        ok: false,
+                        statusCode: 400,
+                        message: 'All bundled IMEI checks failed',
+                        data: {
+                              bundledServiceId: service.serviceId,
+                              serviceName: service.name,
+                              results: checkResults.map((r) => ({
+                                    serviceId: r.serviceId,
+                                    ok: r.ok,
+                                    message: r.message,
+                              })),
+                        },
+                  };
             }
 
-            const payload = {
-                  username: this.username,
-                  apiaccesskey: this.apiKey,
-                  requestformat: 'JSON',
-                  action,
-                  ...extraData,
+            const successfulResults = checkResults.filter((r) => r.ok);
+            const normalizedResults = successfulResults.map((result) => {
+                  const structuredData = (result.data && typeof result.data === 'object' ? result.data : {}) as Record<
+                        string,
+                        any
+                  >;
+                  const providerData = result.cached
+                        ? (structuredData.providerData ?? null)
+                        : (result.providerData ?? null);
+
+                  return {
+                        serviceId: result.serviceId,
+                        cached: result.cached,
+                        provider: result.provider ?? null,
+                        providerData,
+                        aiInsight: structuredData.aiInsight ?? null,
+                        riskAnalysis: structuredData.riskMeter ?? null,
+                        data: structuredData,
+                  };
+            });
+
+            const primaryResult = normalizedResults[0] ?? null;
+            const mergedProviderData = (() => {
+                  const keyValues = new Map<string, Set<any>>();
+
+                  for (const item of normalizedResults) {
+                        const pd = item.providerData as Record<string, any> | null;
+                        if (!pd || typeof pd !== 'object') continue;
+
+                        for (const [k, v] of Object.entries(pd)) {
+                              if (!keyValues.has(k)) keyValues.set(k, new Set());
+                              try {
+                                    keyValues.get(k)!.add(v);
+                              } catch {
+                                    keyValues.get(k)!.add(String(v));
+                              }
+                        }
+                  }
+
+                  const merged: Record<string, any> = {};
+
+                  for (const [k, values] of keyValues.entries()) {
+                        const list = Array.from(values).filter((x) => x !== undefined && x !== null);
+                        if (!list.length) continue;
+
+                        if (k === 'result') {
+                              // concatenate unique result strings
+                              const uniq = Array.from(new Set(list.map(String)));
+                              merged.result = uniq.join('\n\n');
+                              continue;
+                        }
+
+                        if (list.length === 1) {
+                              merged[k] = list[0];
+                        } else {
+                              merged[k] = Array.from(
+                                    new Set(list.map((v) => (typeof v === 'object' ? JSON.stringify(v) : v)))
+                              ).map((v) => {
+                                    try {
+                                          return JSON.parse(String(v));
+                                    } catch {
+                                          return v;
+                                    }
+                              });
+                        }
+                  }
+
+                  return merged;
+            })();
+
+            const mergedAiInsights = normalizedResults
+                  .map((item) => item.aiInsight)
+                  .filter((item): item is Record<string, unknown> => Boolean(item));
+
+            const mergedRiskAnalyses = normalizedResults
+                  .map((item) => item.riskAnalysis)
+                  .filter((item): item is Record<string, unknown> => Boolean(item));
+
+            const mergedData: Record<string, any> = {
+                  bundledServiceId: service.serviceId,
+                  bundledServiceName: service.name,
+                  bundledServiceCategory: service.category,
+                  totalChecks: checkResults.length,
+                  successfulChecks: successfulResults.length,
+                  failedChecks: checkResults.length - successfulResults.length,
+                  oldGenerated: successfulResults.every((r) => r.cached),
+                  providerData: mergedProviderData,
+                  providerServices: normalizedResults.map((item) => ({
+                        serviceId: item.serviceId,
+                        cached: item.cached,
+                        provider: item.provider,
+                        data: item.providerData,
+                  })),
+                  aiInsight: {
+                        ...(primaryResult?.aiInsight ?? {}),
+                        services: mergedAiInsights,
+                  },
+                  riskAnalysis: {
+                        ...(primaryResult?.riskAnalysis ?? {}),
+                        services: mergedRiskAnalyses,
+                  },
             };
 
-            const response = await this.client.post('/api/index.php', qs.stringify(payload));
-            return response.data;
-      }
-
-      async placeImeiOrder(serviceId: string | number, imei: string) {
-            const isSerial = /^[A-Za-z0-9]{4,}$/.test(imei) && !/^\d{15}$/.test(imei);
-
-            if (this.provider === 'sickw') {
-                  const response = await this.client.get('/api.php', {
-                        params: {
-                              format: this.sickwFormat,
-                              key: this.apiKey,
-                              imei,
-                              ...(isSerial ? { sn: imei, serial: imei } : {}),
-                              service: serviceId,
+            return {
+                  ok: true,
+                  message: `Bundled IMEI check completed (${successfulResults.length}/${checkResults.length} services)`,
+                  data: mergedData,
+            };
+      } catch (error) {
+            if (shouldCharge) {
+                  await creditUserBalance({
+                        userId,
+                        amount: servicePrice,
+                        currency: service.currency ?? 'USD',
+                        source: 'refund',
+                        description: `Refund for failed bundled IMEI service ${service.name}`,
+                        serviceId: service.serviceId,
+                        serviceName: service.name,
+                        imei,
+                        metadata: {
+                              normalizedName: service.normalizedName,
+                              reason: error instanceof Error ? error.message : 'Unknown error',
+                              bundledServiceIds: serviceIds,
                         },
-                  });
-
-                  console.log('dhru service ts, placeImeiOrder___', response);
-
-                  return response.data;
+                  }).catch(() => undefined);
             }
 
-            return this.request('placeimeiorder', {
-                  serviceid: serviceId,
+            throw error;
+      }
+};
+
+export const processSingleImeiCheck = async (
+      userId: string,
+      imei: string,
+      serviceId: number,
+      shouldGenerateFresh: boolean,
+      shopId?: string
+): Promise<SingleImeiCheckResult> => {
+      if (!imei || !isValidImei(imei)) {
+            return {
+                  ok: false,
+                  statusCode: 400,
+                  message: 'Valid 15-digit IMEI or Serial Number is required',
+            };
+      }
+
+      if (!Number.isFinite(serviceId) || serviceId <= 0) {
+            return {
+                  ok: false,
+                  statusCode: 400,
+                  message: 'Valid serviceId is required',
+            };
+      }
+
+      const service = await findServiceByServiceId(serviceId);
+
+      if (!service) {
+            return {
+                  ok: false,
+                  statusCode: 404,
+                  message: 'Service not found in the catalog',
+            };
+      }
+
+      const servicePrice = resolveServicePrice(service);
+      const shouldCharge = servicePrice > 0;
+
+      if (shouldCharge) {
+            try {
+                  await debitUserBalance({
+                        userId,
+                        amount: servicePrice,
+                        currency: service.currency ?? 'USD',
+                        source: 'imei_service',
+                        description: `IMEI service charge for ${service.name}`,
+                        serviceId,
+                        serviceName: service.name,
+                        imei,
+                        metadata: {
+                              normalizedName: service.normalizedName,
+                        },
+                  });
+            } catch (error) {
+                  if (error instanceof AppError) {
+                        return {
+                              ok: false,
+                              statusCode: error.statusCode || 400,
+                              message: error.message,
+                        };
+                  }
+
+                  throw error;
+            }
+      }
+
+      // Check if this is a custom bundled service with multiple serviceIds
+      const hasMultipleServices = Array.isArray(service.serviceIds) && service.serviceIds.length > 1;
+
+      if (hasMultipleServices) {
+            return await processMultipleServiceCheck(
+                  userId,
                   imei,
-                  ...(isSerial ? { sn: imei, serial: imei } : {}),
-            });
+                  service,
+                  service.serviceIds,
+                  shouldGenerateFresh,
+                  shouldCharge,
+                  servicePrice,
+                  shopId
+            );
       }
 
-      // this is the part you asked for
-      async getImeiServices() {
-            if (this.provider === 'sickw') {
-                  return this.request('services');
+      const existingScanInfo = shouldGenerateFresh ? null : await getExistingScanInfoByImei(imei, serviceId, userId);
+
+      if (existingScanInfo) {
+            return {
+                  ok: true,
+                  message: 'IMEI data fetched from database',
+                  data: {
+                        ...existingScanInfo,
+                        oldGenerated: true,
+                  },
+            };
+      }
+
+      const result = await runImeiCheck(String(imei), serviceId, userId, shopId);
+      console.log('runImeiCheck', result);
+
+      if (!result.ok) {
+            if (shouldCharge) {
+                  await creditUserBalance({
+                        userId,
+                        amount: servicePrice,
+                        currency: service.currency ?? 'USD',
+                        source: 'refund',
+                        description: `Refund for failed IMEI service ${service.name}`,
+                        serviceId,
+                        serviceName: service.name,
+                        imei,
+                        metadata: {
+                              normalizedName: service.normalizedName,
+                              reason: result.message,
+                        },
+                  }).catch(() => undefined);
             }
 
-            return this.request('imeiservicelist');
+            return {
+                  ok: false,
+                  statusCode: result.statusCode,
+                  message: result.message,
+                  data: result.data,
+            };
       }
 
-      async getImeiOrder(orderId: string | number) {
-            if (this.provider === 'sickw') {
-                  const response = await this.client.get('/api.php', {
-                        params: {
-                              format: this.sickwFormat,
-                              key: this.apiKey,
-                              imei: orderId,
-                              action: 'history',
+      return {
+            ok: true,
+            message: shouldGenerateFresh
+                  ? `IMEI check regenerated (${result.provider})`
+                  : `IMEI check completed (${result.provider})`,
+            data: {
+                  ...result.structured,
+                  providerData: result.providerData,
+                  oldGenerated: false,
+            },
+      };
+};
+
+export const processSingleImeiCheckV2 = async (
+      userId: string | undefined,
+      imei: string,
+      serviceId: number,
+      shouldGenerateFresh: boolean,
+      shopId?: string
+): Promise<SingleImeiCheckResult> => {
+      if (!imei || !isValidImei(imei)) {
+            return {
+                  ok: false,
+                  statusCode: 400,
+                  message: 'Valid 15-digit IMEI or Serial Number is required',
+            } as SingleImeiCheckResult;
+      }
+
+      if (!Number.isFinite(serviceId) || serviceId <= 0) {
+            return {
+                  ok: false,
+                  statusCode: 400,
+                  message: 'Valid serviceId is required',
+            } as SingleImeiCheckResult;
+      }
+
+      const service = await findServiceByServiceId(serviceId);
+
+      if (!service) {
+            return {
+                  ok: false,
+                  statusCode: 404,
+                  message: 'Service not found in the catalog',
+            } as SingleImeiCheckResult;
+      }
+
+      const servicePrice = resolveServicePrice(service);
+      const shouldCharge = servicePrice > 0;
+
+      if (shouldCharge && !userId) {
+            return {
+                  ok: false,
+                  statusCode: 401,
+                  message: 'Authentication required for paid services',
+            } as SingleImeiCheckResult;
+      }
+
+      if (shouldCharge && userId) {
+            try {
+                  await debitUserBalance({
+                        userId,
+                        amount: servicePrice,
+                        currency: service.currency ?? 'USD',
+                        source: 'imei_service',
+                        description: `IMEI service charge for ${service.name}`,
+                        serviceId,
+                        serviceName: service.name,
+                        imei,
+                        metadata: {
+                              normalizedName: service.normalizedName,
                         },
                   });
+            } catch (error) {
+                  if (error instanceof AppError) {
+                        return {
+                              ok: false,
+                              statusCode: error.statusCode || 400,
+                              message: error.message,
+                        } as SingleImeiCheckResult;
+                  }
 
-                  return response.data;
+                  throw error;
+            }
+      }
+
+      // If bundled (multiple serviceIds), run each provider separately and return raw rows
+      const hasMultipleServices = Array.isArray(service.serviceIds) && service.serviceIds.length > 1;
+
+      try {
+            if (hasMultipleServices) {
+                  const svcIds: number[] = service.serviceIds;
+
+                  const checkResults = await Promise.all(
+                        svcIds.map(async (svcId) => {
+                              // Try DB cache first unless fresh generation requested
+                              if (!shouldGenerateFresh) {
+                                    const existingScanInfo = await getExistingScanInfoByImei(
+                                          imei,
+                                          svcId,
+                                          userId,
+                                          shopId
+                                    );
+
+                                    if (existingScanInfo) {
+                                          const parsedProviderData = extractProviderDataFromHtml(
+                                                (existingScanInfo.providerData as Record<string, any>)
+                                                      ?.result ?? null
+                                          );
+
+                                          if (!isProviderErrorResult(parsedProviderData)) {
+                                                return {
+                                                      serviceId: svcId,
+                                                      ok: true,
+                                                      cached: true,
+                                                      provider: null,
+                                                      parsedProviderData,
+                                                      aiInsight: existingScanInfo.aiInsight ?? null,
+                                                      riskMeter: existingScanInfo.riskMeter ?? null,
+                                                      reportId: existingScanInfo._id.toString(),
+                                                };
+                                          }
+                                    }
+                              }
+
+                              const result = await runImeiCheck(String(imei), svcId, userId, shopId);
+                              if (!result.ok) {
+                                    return {
+                                          serviceId: svcId,
+                                          ok: false,
+                                          cached: false,
+                                          provider: null,
+                                          message: result.message,
+                                          statusCode: result.statusCode,
+                                          parsedProviderData: null,
+                                          aiInsight: null,
+                                          riskMeter: null,
+                                    };
+                              }
+
+                              const parsed = extractProviderDataFromHtml(
+                                    (result.providerData as Record<string, any>)?.result ?? null
+                              );
+
+                              const aiAnalysis = await analyzeParsedProviderDataWithAi(
+                                    String(imei),
+                                    parsed,
+                                    String(result.provider)
+                              );
+
+                              return {
+                                    serviceId: svcId,
+                                    ok: true,
+                                    cached: false,
+                                    provider: result.provider,
+                                    message: undefined,
+                                    statusCode: undefined,
+                                    parsedProviderData: parsed,
+                                    aiInsight: aiAnalysis.aiInsight,
+                                    riskMeter: aiAnalysis.riskMeter,
+                                    marketValue: aiAnalysis.marketValue,
+                                    reportId: result.reportId,
+                              };
+                        })
+                  );
+
+                  const allFailed = checkResults.every((r) => !r.ok);
+                  if (allFailed) {
+                        if (shouldCharge && userId) {
+                              const refundServiceId = Number(service.serviceId ?? serviceId);
+
+                              await creditUserBalance({
+                                    userId,
+                                    amount: servicePrice,
+                                    currency: service.currency ?? 'USD',
+                                    source: 'refund',
+                                    description: `Refund for failed bundled IMEI service ${service.name}`,
+                                    serviceId: Number.isFinite(refundServiceId)
+                                          ? refundServiceId
+                                          : serviceId,
+                                    serviceName: service.name,
+                                    imei,
+                                    metadata: {
+                                          normalizedName: service.normalizedName,
+                                          reason: 'All bundled checks failed (v2)',
+                                          bundledServiceIds: svcIds,
+                                    },
+                              }).catch(() => undefined);
+                        }
+
+                        return {
+                              ok: false,
+                              statusCode: 400,
+                              message: 'All bundled IMEI checks failed',
+                              data: {
+                                    bundledServiceId: service.serviceId,
+                                    serviceName: service.name,
+                                    results: checkResults.map((r) => ({
+                                          serviceId: r.serviceId,
+                                          ok: r.ok,
+                                          message: r.message,
+                                    })),
+                                    oldGenerated: false,
+                              },
+                        } as SingleImeiCheckResult;
+                  }
+
+                  // Merge parsedProviderData across providerResults, de-duplicating identical values
+                  const mergedParsed: Record<string, any> = {};
+                  const seenValues = new Set<string>();
+
+                  for (const pr of checkResults) {
+                        const pd = pr.parsedProviderData as Record<string, any> | null;
+                        if (!pd || typeof pd !== 'object') continue;
+
+                        for (const [k, v] of Object.entries(pd)) {
+                              const valueStr = typeof v === 'object' ? JSON.stringify(v) : String(v);
+                              if (seenValues.has(valueStr)) continue;
+                              mergedParsed[k] = v;
+                              seenValues.add(valueStr);
+                        }
+                  }
+
+                  // Run AI analysis over the merged parsed output (keeps V2 behavior)
+                  const aiAnalysis = await analyzeParsedProviderDataWithAi(
+                        String(imei),
+                        mergedParsed,
+                        String(service.name ?? 'unknown')
+                  );
+
+                  const successfulResults = checkResults.filter((r) => r.ok);
+                  const oldGenerated =
+                        successfulResults.length > 0
+                              ? successfulResults.every((r) => Boolean(r.cached))
+                              : false;
+
+                  return {
+                        ok: true,
+                        message: `Bundled IMEI check completed (${successfulResults.length}/${checkResults.length} services)`,
+                        data: {
+                              bundledServiceId: service.serviceId,
+                              bundledServiceName: service.name,
+                              bundledServiceCategory: service.category,
+                              providerResults: mergedParsed,
+                              riskMeter: aiAnalysis.riskMeter,
+                              aiInsight: aiAnalysis.aiInsight,
+                              marketValue: aiAnalysis.marketValue,
+                              oldGenerated,
+                              reportId: successfulResults[0]?.reportId,
+                        },
+                  } as SingleImeiCheckResult;
             }
 
-            return this.request('getimeiorder', {
-                  id: orderId,
+            // Single serviceId: try cache first unless fresh requested
+            let existingScanInfo = shouldGenerateFresh
+                  ? null
+                  : await getExistingScanInfoByImei(imei, serviceId, userId, shopId);
+
+            let parsedProviderData: Record<string, unknown> | null = null;
+            if (existingScanInfo) {
+                  parsedProviderData = extractProviderDataFromHtml(
+                        (existingScanInfo.providerData as Record<string, any>)?.result ?? null
+                  );
+                  if (isProviderErrorResult(parsedProviderData)) {
+                        existingScanInfo = null;
+                  }
+            }
+
+            if (existingScanInfo && parsedProviderData) {
+                  const aiAnalysis = await analyzeParsedProviderDataWithAi(
+                        String(imei),
+                        parsedProviderData,
+                        String(service.name ?? 'unknown')
+                  );
+
+                  return {
+                        ok: true,
+                        message: 'IMEI data fetched from database',
+                        data: {
+                              provider: null,
+                              parsedProviderData,
+                              riskMeter: existingScanInfo.riskMeter ?? aiAnalysis.riskMeter,
+                              aiInsight: aiAnalysis.aiInsight ?? existingScanInfo.aiInsight ?? null,
+                              marketValue: aiAnalysis.marketValue ?? existingScanInfo.marketValue ?? null,
+                              oldGenerated: true,
+                              _id: existingScanInfo._id.toString(),
+                        },
+                  } as SingleImeiCheckResult;
+            }
+
+            // No cache -> call provider
+            const result = await runImeiCheck(String(imei), serviceId, userId, shopId);
+
+            if (!result.ok) {
+                  if (shouldCharge && userId) {
+                        await creditUserBalance({
+                              userId,
+                              amount: servicePrice,
+                              currency: service.currency ?? 'USD',
+                              source: 'refund',
+                              description: `Refund for failed IMEI service ${service.name}`,
+                              serviceId,
+                              serviceName: service.name,
+                              imei,
+                              metadata: {
+                                    normalizedName: service.normalizedName,
+                                    reason: result.message,
+                              },
+                        }).catch(() => undefined);
+                  }
+
+                  return {
+                        ok: false,
+                        statusCode: result.statusCode,
+                        message: result.message,
+                        data: {
+                              ...(result.data as Record<string, unknown>),
+                              oldGenerated: false,
+                        },
+                  } as SingleImeiCheckResult;
+            }
+
+            return {
+                  ok: true,
+                  message: shouldGenerateFresh
+                        ? `IMEI check regenerated (${result.provider})`
+                        : `IMEI check completed (${result.provider})`,
+                  data: {
+                        provider: result.provider,
+                        parsedProviderData: extractProviderDataFromHtml(
+                              (result.providerData as Record<string, any>)?.result ?? null
+                        ),
+                        ...(await analyzeParsedProviderDataWithAi(
+                              String(imei),
+                              extractProviderDataFromHtml(
+                                    (result.providerData as Record<string, any>)?.result ?? null
+                              ),
+                              String(result.provider)
+                        )),
+                        _id: result.reportId,
+                        oldGenerated: false,
+                  },
+            } as SingleImeiCheckResult;
+      } catch (error) {
+            if (shouldCharge && userId) {
+                  const refundServiceId = Number(service.serviceId ?? serviceId);
+
+                  await creditUserBalance({
+                        userId,
+                        amount: servicePrice,
+                        currency: service.currency ?? 'USD',
+                        source: 'refund',
+                        description: `Refund for failed bundled IMEI service ${service.name}`,
+                        serviceId: Number.isFinite(refundServiceId) ? refundServiceId : serviceId,
+                        serviceName: service.name,
+                        imei,
+                        metadata: {
+                              normalizedName: service.normalizedName,
+                              reason: error instanceof Error ? error.message : 'Unknown error',
+                              bundledServiceIds: service.serviceIds ?? [],
+                        },
+                  }).catch(() => undefined);
+            }
+
+            throw error;
+      }
+};
+
+const getCellValueString = (cellValue: unknown): string => {
+      if (cellValue === null || cellValue === undefined) return '';
+      if (typeof cellValue === 'object') {
+            if ('result' in (cellValue as Record<string, unknown>) && (cellValue as Record<string, unknown>).result !== undefined) {
+                  return getCellValueString((cellValue as Record<string, unknown>).result);
+            }
+            if ('text' in (cellValue as Record<string, unknown>) && (cellValue as Record<string, unknown>).text !== undefined) {
+                  return getCellValueString((cellValue as Record<string, unknown>).text);
+            }
+            if ('richText' in (cellValue as Record<string, unknown>) && Array.isArray((cellValue as Record<string, unknown>).richText)) {
+                  return (cellValue as { richText: Array<{ text: string }> }).richText.map((rt) => rt.text).join('');
+            }
+      }
+      return String(cellValue);
+};
+
+export const extractImeisFromWorkbook = async (filePath: string): Promise<string[]> => {
+      const workbook = new ExcelJS.Workbook();
+      const ext = path.extname(filePath).toLowerCase();
+      if (ext === '.csv') {
+            await workbook.csv.readFile(filePath);
+      } else {
+            await workbook.xlsx.readFile(filePath);
+      }
+
+      const worksheet = workbook.worksheets[0];
+      if (!worksheet || worksheet.rowCount === 0) {
+            return [];
+      }
+
+      const rawRows: string[][] = [];
+      worksheet.eachRow({ includeEmpty: false }, (row) => {
+            const rowValues: string[] = [];
+            const maxCol = row.cellCount;
+            for (let c = 1; c <= maxCol; c++) {
+                  rowValues.push(getCellValueString(row.getCell(c).value));
+            }
+            rawRows.push(rowValues);
+      });
+
+      if (!rawRows.length) {
+            return [];
+      }
+
+      const firstRow = rawRows[0].map((cell) => normalizeImei(cell).toLowerCase());
+      const headerLooksLikeImeiColumn = firstRow.some((cell) => cell === 'imei' || cell.includes('imei'));
+      const imeiColumnIndex = headerLooksLikeImeiColumn
+            ? Math.max(
+                    firstRow.findIndex((cell) => cell === 'imei' || cell.includes('imei')),
+                    0
+              )
+            : 0;
+      const dataRows = headerLooksLikeImeiColumn ? rawRows.slice(1) : rawRows;
+
+      return dataRows.map((row) => normalizeImei(row?.[imeiColumnIndex] ?? row?.[0])).filter((imei) => imei.length > 0);
+};
+
+export const executeBatchImeiChecks = async (
+      filePath: string,
+      userId: string,
+      requestedServiceId: number,
+      shouldGenerateFresh: boolean,
+      shopId?: string
+): Promise<{
+      results: BatchImeiItemResult[];
+      summary: {
+            total: number;
+            successCount: number;
+            failedCount: number;
+      };
+}> => {
+      const rawImeis = await extractImeisFromWorkbook(filePath);
+      const imeis = rawImeis
+            .map((imei) => normalizeImei(imei))
+            .filter((imei) => imei.length > 0);
+
+      if (!imeis.length) {
+            throw new AppError('No IMEI values were found in the file', 400);
+      }
+
+      if (imeis.length > 20) {
+            throw new AppError('The file can contain at most 20 IMEI values', 400);
+      }
+
+      const results: BatchImeiItemResult[] = [];
+
+      for (let index = 0; index < imeis.length; index += 1) {
+            const imei = imeis[index];
+            const singleResult = await processSingleImeiCheck(
+                  userId,
+                  imei,
+                  requestedServiceId,
+                  shouldGenerateFresh,
+                  shopId
+            );
+
+            if (singleResult.ok) {
+                  results.push({
+                        rowNumber: index + 1,
+                        imei,
+                        ok: true,
+                        message: singleResult.message,
+                        cached: String(singleResult.message).toLowerCase().includes('database'),
+                        serviceId: requestedServiceId,
+                        data: singleResult.data,
+                  });
+                  continue;
+            }
+
+            results.push({
+                  rowNumber: index + 1,
+                  imei,
+                  ok: false,
+                  message: singleResult.message,
+                  serviceId: requestedServiceId,
+                  data: singleResult.data,
             });
       }
-}
 
-export const dhruService = new DhruService();
+      const successCount = results.filter((item) => item.ok).length;
+      const failedCount = results.length - successCount;
+
+      return {
+            results,
+            summary: {
+                  total: results.length,
+                  successCount,
+                  failedCount,
+            },
+      };
+};
+
+export const processImeiCheckV1Service = async (
+      userId: string,
+      imeiList: string[],
+      requestedServiceId: number,
+      shouldGenerateFresh: boolean,
+      shopId?: string
+) => {
+      return await Promise.all(
+            imeiList.map(async (imei) => {
+                  const result = await processSingleImeiCheck(
+                        userId,
+                        imei,
+                        requestedServiceId,
+                        shouldGenerateFresh,
+                        shopId
+                  );
+                  return {
+                        imei,
+                        ...result,
+                  };
+            })
+      );
+};
+
+export const processImeiCheckV2Service = async (
+      userId: string | undefined,
+      imeiList: string[],
+      requestedServiceId: number,
+      shouldGenerateFresh: boolean,
+      shopId?: string
+) => {
+      return await Promise.all(
+            imeiList.map(async (imei) => {
+                  const result = await processSingleImeiCheckV2(
+                        userId,
+                        imei,
+                        requestedServiceId,
+                        shouldGenerateFresh,
+                        shopId
+                  );
+                  return {
+                        imei,
+                        ...result,
+                  };
+            })
+      );
+};
+
+export const checkImeisBatchService = async (
+      file: Express.Multer.File,
+      userId: string,
+      requestedServiceId: number,
+      shouldGenerateFresh: boolean,
+      shopId?: string
+) => {
+      const extension = path.extname(file.originalname).toLowerCase();
+      if (!['.csv', '.xls', '.xlsx'].includes(extension)) {
+            throw new AppError('Only csv, xls, or xlsx files are supported', 400);
+      }
+
+      try {
+            const { results, summary } = await executeBatchImeiChecks(
+                  file.path,
+                  userId,
+                  requestedServiceId,
+                  shouldGenerateFresh,
+                  shopId
+            );
+
+            return {
+                  results,
+                  summary: {
+                        ...summary,
+                        sourceFile: file.originalname,
+                  },
+            };
+      } finally {
+            await safeDeleteFile(file.path);
+      }
+};
+
+export const syncServicesService = async () => {
+      const result = await dhruApiClient.getImeiServices();
+      const upstreamServices = extractUpstreamServices(result);
+      const services = await syncCuratedServices(upstreamServices);
+
+      return {
+            services,
+            totalServices: services.reduce((count, group) => count + group.services.length, 0),
+            totalCategories: services.length,
+      };
+};
+
+export const getServicesService = async () => {
+      const services = await readStoredServices();
+
+      return {
+            services,
+            totalServices: services.reduce((count, group) => count + group.services.length, 0),
+            totalCategories: services.length,
+      };
+};
+
+export const getScanHistoryList = async (
+      userId: string | undefined,
+      shopId: string | undefined,
+      pageQuery: number,
+      limitQuery: number
+) => {
+      const page = Number.isFinite(pageQuery) && pageQuery > 0 ? Math.floor(pageQuery) : 1;
+      const limit = Number.isFinite(limitQuery) && limitQuery > 0 ? Math.min(Math.floor(limitQuery), 50) : 10;
+      const skip = (page - 1) * limit;
+
+      const filter = userId
+            ? await buildShopScopeFilter(userId, shopId, 'userId', 'shopId')
+            : {};
+
+      const [history, total] = await Promise.all([
+            ScanInfo.find(filter)
+                  .select(
+                        'userId deviceName imei deviceStatus riskMeter marketValue createdAt updatedAt serviceId'
+                  )
+                  .sort({ updatedAt: -1 })
+                  .skip(skip)
+                  .limit(limit)
+                  .lean(),
+            ScanInfo.countDocuments(filter),
+      ]);
+
+      return {
+            history,
+            meta: {
+                  page,
+                  limit,
+                  total,
+                  totalPage: Math.ceil(total / limit) || 1,
+            },
+      };
+};
+
+export const getScanHistoryReportById = async (reportId: string, userId: string) => {
+      return await ScanInfo.findOne({
+            _id: reportId,
+            userId,
+      }).lean();
+};
+
+export const saveScanReportPdfFile = async (reportId: string, userId: string, filePath: string) => {
+      const report = await ScanInfo.findOne({
+            _id: reportId,
+            userId,
+      }).lean();
+
+      if (!report) {
+            throw new AppError('Saved IMEI report not found', 404);
+      }
+
+      const pdfPath = getSavedScanReportPdfPath(report._id.toString());
+      await fs.mkdir(path.dirname(pdfPath), { recursive: true });
+      await fs.rename(filePath, pdfPath);
+
+      const pdfCertificateUrl = `/imei/history/${report._id}/pdf`;
+      await ScanInfo.updateOne(
+            { _id: report._id },
+            {
+                  $set: {
+                        'reportActions.pdfCertificateUrl': pdfCertificateUrl,
+                        'reportActions.isPdfGenerated': true,
+                  },
+            }
+      );
+
+      return { pdfCertificateUrl };
+};
+
+export const getScanReportPdfPathAndFilename = async (reportId: string, userId: string) => {
+      const report = await ScanInfo.findOne({
+            _id: reportId,
+            userId,
+      }).lean();
+
+      if (!report) {
+            throw new AppError('Saved IMEI report not found', 404);
+      }
+
+      const pdfPath = await ensureSavedScanReportPdf(report);
+      const pdfCertificateUrl = `/imei/history/${report._id}/pdf`;
+
+      if (!report.reportActions?.isPdfGenerated || report.reportActions.pdfCertificateUrl !== pdfCertificateUrl) {
+            await ScanInfo.updateOne(
+                  { _id: report._id },
+                  {
+                        $set: {
+                              'reportActions.pdfCertificateUrl': pdfCertificateUrl,
+                              'reportActions.isPdfGenerated': true,
+                        },
+                  }
+            );
+      }
+
+      return {
+            pdfPath,
+            filename: `IMEI-Report-${report.imei}.pdf`,
+      };
+};
+
+export const getRecentChecksHistoryService = async (
+      userId: string | undefined,
+      shopId: string | undefined,
+      pageQuery: number,
+      limitQuery: number
+) => {
+      return await getScanHistoryList(userId, shopId, pageQuery, limitQuery);
+};
+
+export const getCheckHistoryReportService = async (reportId: string, userId: string) => {
+      return await getScanHistoryReportById(reportId, userId);
+};
+
+export const saveCheckHistoryReportPdfService = async (
+      reportId: string,
+      userId: string,
+      file: Express.Multer.File
+) => {
+      let fileMoved = false;
+      try {
+            const result = await saveScanReportPdfFile(reportId, userId, file.path);
+            fileMoved = true;
+            return result;
+      } finally {
+            if (!fileMoved) {
+                  await safeDeleteFile(file.path);
+            }
+      }
+};
+
+export const getCheckHistoryReportPdfService = async (reportId: string, userId: string) => {
+      return await getScanReportPdfPathAndFilename(reportId, userId);
+};

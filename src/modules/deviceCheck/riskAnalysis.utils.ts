@@ -1,4 +1,4 @@
-import { dhruService } from './dhru.service';
+import { dhruApiClient } from './dhru.api.client';
 import {
       DeviceChecksResponse,
       RiskResult,
@@ -49,7 +49,7 @@ const pollOrderResult = async (orderId: string | number): Promise<unknown> => {
 
       for (let i = 0; i < 5; i++) {
             await sleep(1500);
-            const result = await dhruService.getImeiOrder(orderId);
+            const result = await dhruApiClient.getImeiOrder(orderId);
 
             if ((result as Record<string, unknown>)?.ERROR) {
                   return result;
@@ -67,7 +67,7 @@ const pollOrderResult = async (orderId: string | number): Promise<unknown> => {
 };
 
 const callService = async (imei: string, serviceId: string): Promise<ServiceCallResult> => {
-      const placeOrderResponse = await dhruService.placeImeiOrder(serviceId, imei);
+      const placeOrderResponse = await dhruApiClient.placeImeiOrder(serviceId, imei);
 
       if ((placeOrderResponse as Record<string, unknown>)?.ERROR) {
             return {
