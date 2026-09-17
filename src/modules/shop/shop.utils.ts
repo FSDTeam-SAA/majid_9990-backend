@@ -7,6 +7,14 @@ import { Category } from '../inventory/category/category.model';
 import { Supplier } from '../supplier/supplier.model';
 import { Inventory } from '../inventory/inventory.model';
 import ScanInfo from '../deviceCheck/scanInfo.model';
+import { cacheService } from '../../config/redis';
+
+const DEFAULT_SHOP_CACHE_TTL = 3600; // 1 hour
+
+export const invalidateDefaultShopCache = async (shopkeeperId: Types.ObjectId | string): Promise<void> => {
+  const idStr = String(shopkeeperId);
+  await cacheService.del(`shop:default:${idStr}`);
+};
 
 export const getShopkeeperId = (user: any): Types.ObjectId => {
   const id = user?.role === 'staff' && user?.shopkeeperId ? user.shopkeeperId : user?._id;
@@ -14,7 +22,13 @@ export const getShopkeeperId = (user: any): Types.ObjectId => {
 };
 
 export const ensureDefaultShop = async (shopkeeperId: Types.ObjectId | string): Promise<any> => {
-  const id = new Types.ObjectId(String(shopkeeperId));
+  const idStr = String(shopkeeperId);
+  const id = new Types.ObjectId(idStr);
+
+  const cached = await cacheService.get<any>(`shop:default:${idStr}`);
+  if (cached) {
+    return cached;
+  }
 
   const user = await User.findById(id).lean();
   if (!user) {
@@ -22,6 +36,8 @@ export const ensureDefaultShop = async (shopkeeperId: Types.ObjectId | string): 
   }
 
   let defaultShop = await Shop.findOne({ shopkeeperId: id, isDefault: true }).lean();
+  let isNewlyCreated = false;
+
   if (!defaultShop) {
     const fallbackName =
       [user.firstName, user.lastName].filter(Boolean).join(' ').trim() || 'My Shop';
@@ -38,12 +54,14 @@ export const ensureDefaultShop = async (shopkeeperId: Types.ObjectId | string): 
       activatedAt: new Date(),
     });
     defaultShop = created.toObject ? created.toObject() : created;
+    isNewlyCreated = true;
   } else if (defaultShop?._id && user?.currency && defaultShop.currency !== user.currency) {
     await Shop.updateOne({ _id: defaultShop._id }, { $set: { currency: user.currency } });
     defaultShop.currency = user.currency;
   }
 
-  if (defaultShop?._id) {
+  // Only run multi-table backfill migration when a brand new default shop was created
+  if (isNewlyCreated && defaultShop?._id) {
     const defaultShopId = defaultShop._id;
     await Promise.all([
       Category.updateMany(
@@ -63,6 +81,10 @@ export const ensureDefaultShop = async (shopkeeperId: Types.ObjectId | string): 
         { $set: { shopId: defaultShopId } }
       ),
     ]);
+  }
+
+  if (defaultShop) {
+    await cacheService.set(`shop:default:${idStr}`, defaultShop, DEFAULT_SHOP_CACHE_TTL);
   }
 
   return defaultShop;

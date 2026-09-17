@@ -7,7 +7,7 @@ import { Payment } from '../payment/payment.model';
 import { User } from '../user/user.model';
 import { IShop, IShopEntitlement } from './shop.interface';
 import { Shop } from './shop.model';
-import { ensureDefaultShop, getShopkeeperId, toObjectId } from './shop.utils';
+import { ensureDefaultShop, getShopkeeperId, invalidateDefaultShopCache, toObjectId } from './shop.utils';
 import { Invoice } from '../invoice/invoice.model';
 import { Category } from '../inventory/category/category.model';
 import { Inventory } from '../inventory/inventory.model';
@@ -224,6 +224,8 @@ const updateShop = async (user: any, shopId: string, payload: any) => {
     { new: true, runValidators: true }
   ).lean();
 
+  await invalidateDefaultShopCache(shopkeeperId);
+
   return updated;
 };
 
@@ -245,6 +247,7 @@ const deleteShop = async (user: any, shopId: string) => {
   }
 
   await Shop.deleteOne({ _id: shopId });
+  await invalidateDefaultShopCache(shopkeeperId);
 
   return { _id: shopId };
 };
