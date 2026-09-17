@@ -1,8 +1,7 @@
-import { Worker } from 'worker_threads';
-import path from 'path';
-import { Types } from 'mongoose';
+import sendEmail from '../utils/sendEmail';
+import { lowStockEmailTemplate } from '../utils/lowStockEmailTemplate';
 
-interface LowStockEmailJob {
+export interface LowStockEmailJob {
       userId: string;
       email: string;
       shopkeeperName: string;
@@ -14,90 +13,99 @@ interface LowStockEmailJob {
       }>;
 }
 
-class LowStockEmailWorkerPool {
-      private workerScript: string;
-      private maxWorkers: number;
-      private activeWorkers: Set<Worker> = new Set();
+interface QueuedTask {
+      job: LowStockEmailJob;
+      resolve: () => void;
+      reject: (error: Error) => void;
+}
 
-      constructor(maxWorkers: number = 4) {
-            this.maxWorkers = maxWorkers;
-            this.workerScript = path.join(__dirname, '../workers/lowStockEmailWorkerThread.js');
+class LowStockEmailQueue {
+      private concurrency: number;
+      private activeCount = 0;
+      private queue: QueuedTask[] = [];
+
+      constructor(concurrency = 4) {
+            this.concurrency = concurrency;
       }
 
       async sendEmail(job: LowStockEmailJob): Promise<void> {
-            return new Promise((resolve, reject) => {
-                  // Wait for an available worker slot
-                  const checkWorkerSlot = () => {
-                        if (this.activeWorkers.size < this.maxWorkers) {
-                              this.createWorker(job, resolve, reject);
-                        } else {
-                              // Wait and retry
-                              setTimeout(checkWorkerSlot, 100);
-                        }
-                  };
-
-                  checkWorkerSlot();
+            return new Promise<void>((resolve, reject) => {
+                  this.queue.push({ job, resolve, reject });
+                  this.processNext();
             });
       }
 
-      private createWorker(job: LowStockEmailJob, resolve: () => void, reject: (error: Error) => void): void {
-            const worker = new Worker(this.workerScript);
-            this.activeWorkers.add(worker);
+      private async processNext(): Promise<void> {
+            if (this.activeCount >= this.concurrency || this.queue.length === 0) {
+                  return;
+            }
 
-            worker.on('message', (message) => {
-                  if (message.type === 'success') {
-                        console.log(`[LowStockEmailWorker] Email sent to ${job.email}`);
-                        resolve();
-                  } else if (message.type === 'error') {
-                        console.error(`[LowStockEmailWorker] Failed to send email to ${job.email}:`, message.error);
-                        reject(new Error(message.error));
+            const task = this.queue.shift();
+            if (!task) {
+                  return;
+            }
+
+            this.activeCount++;
+
+            try {
+                  const { email, shopkeeperName, lowStockItems } = task.job;
+
+                  if (!email || !lowStockItems || lowStockItems.length === 0) {
+                        throw new Error('Invalid job parameters: missing email or low stock items');
                   }
-            });
 
-            worker.on('error', (error) => {
-                  console.error('[LowStockEmailWorker] Worker error:', error);
-                  reject(error);
-            });
+                  const htmlContent = lowStockEmailTemplate(shopkeeperName, lowStockItems);
 
-            worker.on('exit', (code) => {
-                  this.activeWorkers.delete(worker);
-                  if (code !== 0) {
-                        console.error(`[LowStockEmailWorker] Worker exited with code ${code}`);
+                  const result = await sendEmail({
+                        to: email,
+                        subject: `🚨 Low Stock Alert - ${lowStockItems.length} Item(s) Below Minimum Level`,
+                        html: htmlContent,
+                  });
+
+                  if (!result.success) {
+                        throw new Error(result.error || 'Failed to send email');
                   }
-            });
 
-            worker.postMessage({ job });
+                  console.log(`[LowStockEmailQueue] Email sent successfully to ${email}`);
+                  task.resolve();
+            } catch (error: any) {
+                  console.error(`[LowStockEmailQueue] Failed to send email to ${task.job.email}:`, error);
+                  task.reject(error instanceof Error ? error : new Error(String(error)));
+            } finally {
+                  this.activeCount--;
+                  this.processNext();
+            }
       }
 
-      async shutdown(): Promise<void> {
-            const promises = Array.from(this.activeWorkers).map(
-                  (worker) =>
-                        new Promise<void>((resolve) => {
-                              worker.terminate().then(() => resolve());
-                        })
-            );
-            await Promise.all(promises);
-            this.activeWorkers.clear();
+      getQueueLength(): number {
+            return this.queue.length;
+      }
+
+      getActiveCount(): number {
+            return this.activeCount;
       }
 }
 
 // Singleton instance
-let workerPool: LowStockEmailWorkerPool | null = null;
+let emailQueue: LowStockEmailQueue | null = null;
 
-export const getWorkerPool = (): LowStockEmailWorkerPool => {
-      if (!workerPool) {
-            workerPool = new LowStockEmailWorkerPool(parseInt(process.env.LOW_STOCK_EMAIL_WORKERS || '4', 10));
+export const getWorkerPool = (): LowStockEmailQueue => {
+      if (!emailQueue) {
+            const concurrency = parseInt(process.env.LOW_STOCK_EMAIL_WORKERS || '4', 10);
+            emailQueue = new LowStockEmailQueue(Number.isFinite(concurrency) && concurrency > 0 ? concurrency : 4);
       }
-      return workerPool;
+      return emailQueue;
 };
 
 export const enqueueLowStockEmail = async (job: LowStockEmailJob): Promise<void> => {
       try {
-            const pool = getWorkerPool();
-            await pool.sendEmail(job);
+            const queue = getWorkerPool();
+            // Background enqueue - async operation dispatched to bounded concurrency queue without blocking caller
+            queue.sendEmail(job).catch((error) => {
+                  console.error('[LowStockEmailQueue] Background delivery failed:', error);
+            });
       } catch (error) {
-            console.error('[LowStockEmailWorker] Failed to enqueue email:', error);
-            // Don't throw - let the system continue even if email fails
+            console.error('[LowStockEmailQueue] Failed to enqueue email:', error);
       }
 };
 
