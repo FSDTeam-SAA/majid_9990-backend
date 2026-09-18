@@ -25,6 +25,7 @@ import supplierRouter from '../modules/supplier/supplier.router';
 import shopRouter from '../modules/shop/shop.router';
 import popUpRuleRouter from '../modules/popUpRule/popUpRule.router';
 import securityRouter from '../modules/security/security.router';
+import consentRouter from '../modules/consent/consent.router';
 
 const router = Router();
 
@@ -140,6 +141,10 @@ const moduleRoutes = [
       {
         path: '/pop-up-rules',
         route: popUpRuleRouter,
+      },
+      {
+        path: '/consent',
+        route: consentRouter,
       },
 ];
 moduleRoutes.forEach((route) => router.use(route.path, route.route));
