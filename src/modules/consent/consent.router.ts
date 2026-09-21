@@ -4,11 +4,11 @@ import { consentController } from './consent.controller';
 
 const router = Router();
 
-// 1. Shopkeeper creates/dispatches consent request (email link + code, or copy message)
-router.post('/request', protect, isShopkeeperOrStaff, consentController.requestConsent);
+// 1. Shopkeeper/User creates/dispatches consent request (email link + code, or copy message)
+router.post('/request', protect, consentController.requestConsent);
 
-// 2. Shopkeeper lists their consent requests
-router.get('/my-requests', protect, isShopkeeperOrStaff, consentController.listMyConsents);
+// 2. Shopkeeper/User lists their consent requests
+router.get('/my-requests', protect, consentController.listMyConsents);
 
 // 3. Shopkeeper or app polls/checks status of consent by ID or reference
 router.get('/status/:id', protect, consentController.getConsentById);
@@ -26,7 +26,7 @@ router.post('/approve/:identifier', optionalProtect, consentController.approveCo
 router.post('/decline/:identifier', optionalProtect, consentController.declineConsent);
 
 // 8. Resend new code
-router.post('/resend/:identifier', protect, isShopkeeperOrStaff, consentController.resendCode);
+router.post('/resend/:identifier', protect, consentController.resendCode);
 
 const consentRouter = router;
 export default consentRouter;
