@@ -102,6 +102,21 @@ const getInvoicesByCustomerId = catchAsync(async (req, res) => {
       });
 });
 
+const sendInvoiceEmail = catchAsync(async (req, res) => {
+      const userId = req.user.role === 'staff' && req.user.shopkeeperId
+            ? req.user.shopkeeperId.toString()
+            : req.user._id?.toString() || req.user.id?.toString();
+
+      const result = await invoiceService.sendInvoiceEmail(userId, req.body);
+
+      sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: 'Invoice email sent successfully',
+            data: result,
+      });
+});
+
 export default {
       createInvoice,
       getInvoiceByShopkeeperId,
@@ -109,4 +124,6 @@ export default {
       getAllInvoices,
       updateInvoice,
       deleteInvoice,
+      sendInvoiceEmail,
 };
+

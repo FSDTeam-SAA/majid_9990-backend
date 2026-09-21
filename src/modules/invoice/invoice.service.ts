@@ -1,9 +1,19 @@
 import { StatusCodes } from 'http-status-codes';
 import { Types } from 'mongoose';
 import AppError from '../../errors/AppError';
+import { companyName } from '../../lib/globalType';
+import sendEmail from '../../utils/sendEmail';
 import { deleteFromCloudinary, uploadToCloudinary } from '../../utils/cloudinary';
 import { User } from '../user/user.model';
-import { IInvoice, IInvoiceOrderDetails, IInvoicePayload, IInvoicePaymentDetails, InvoicePaymentStatus } from './invoice.interface';
+import { Customer } from '../customer/customer.model';
+import {
+      IInvoice,
+      IInvoiceOrderDetails,
+      IInvoicePayload,
+      IInvoicePaymentDetails,
+      InvoicePaymentStatus,
+      ISendInvoiceEmailPayload,
+} from './invoice.interface';
 import { Invoice } from './invoice.model';
 import { Inventory } from '../inventory/inventory.model';
 import RepairRequest from '../repairRequest/repairRequest.model';
@@ -690,6 +700,142 @@ const getInvoicesByCustomerId = async (
       };
 };
 
+const sendInvoiceEmail = async (userId: string, payload: ISendInvoiceEmailPayload) => {
+      const email = payload.email?.trim().toLowerCase();
+      if (!email || !email.includes('@')) {
+            throw new AppError('Valid recipient email is required', StatusCodes.BAD_REQUEST);
+      }
+
+      const sender = await User.findById(userId).select('firstName lastName shopName email');
+      const senderName = sender
+            ? [sender.firstName, sender.lastName].filter(Boolean).join(' ') || (sender as any).shopName
+            : 'Shopkeeper';
+
+      const invoiceRef = payload.invoiceRef || 'Invoice';
+      const amountLabel = payload.amountLabel || '';
+      const customerName = payload.customerName || 'Valued Customer';
+      const pdfUrl = payload.pdfUrl || '';
+
+      const html = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Invoice ${invoiceRef}</title>
+</head>
+<body style="margin:0; padding:0; background-color:#f4f6f8; font-family:Arial, Helvetica, sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="padding:40px 0;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0"
+          style="background:#ffffff; border-radius:12px; overflow:hidden;
+          box-shadow:0 8px 24px rgba(0,0,0,0.08);">
+          <tr>
+            <td style="background:#111827; padding:24px 30px;">
+              <h2 style="margin:0; color:#ffffff; font-size:18px; letter-spacing:0.5px;">
+                ${companyName} · Invoice Copy
+              </h2>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:30px;">
+              <p style="margin:0 0 12px 0; font-size:15px; color:#4b5563;">
+                Hello ${customerName},
+              </p>
+              <p style="font-size:15px; line-height:1.6; color:#4b5563; margin:0 0 20px 0;">
+                Please find your invoice copy for reference <strong>${invoiceRef}</strong> below.
+              </p>
+              
+              <div style="background:#f9fafb; border:1px solid #e5e7eb; border-radius:8px; padding:18px 24px; margin-bottom:24px;">
+                <table width="100%" cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td style="font-size:13px; color:#6b7280; padding-bottom:6px;">Invoice Reference:</td>
+                    <td align="right" style="font-size:14px; font-weight:700; color:#111827; padding-bottom:6px;">${invoiceRef}</td>
+                  </tr>
+                  ${amountLabel ? `
+                  <tr>
+                    <td style="font-size:13px; color:#6b7280;">Total Amount:</td>
+                    <td align="right" style="font-size:16px; font-weight:700; color:#0A9F55;">${amountLabel}</td>
+                  </tr>` : ''}
+                </table>
+              </div>
+
+              ${pdfUrl ? `
+              <div style="text-align:center; margin:28px 0;">
+                <a href="${pdfUrl}" target="_blank"
+                  style="display:inline-block; background:#0A9F55; color:#ffffff; text-decoration:none;
+                  padding:13px 28px; border-radius:8px; font-size:15px; font-weight:600; letter-spacing:0.3px;">
+                  View & Download Invoice (PDF)
+                </a>
+              </div>
+              ` : ''}
+
+              <p style="margin:24px 0 0 0; font-size:14px; color:#374151;">
+                Best regards,<br />
+                <strong>${senderName}</strong>
+              </p>
+
+              <div style="margin:30px 0; border-top:1px solid #e5e7eb;"></div>
+              <p style="font-size:12px; color:#9ca3af; margin:0;">
+                This is an automated invoice email sent via ${companyName}.
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="background:#f9fafb; padding:16px 30px; text-align:center;">
+              <p style="margin:0; font-size:12px; color:#6b7280;">
+                © ${new Date().getFullYear()} ${companyName}. All rights reserved.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+      `;
+
+      let attachments: any[] | undefined = undefined;
+      if (pdfUrl && (pdfUrl.startsWith('http://') || pdfUrl.startsWith('https://'))) {
+            const cleanRef = invoiceRef.replace(/[^a-zA-Z0-9_-]/g, '_');
+            attachments = [
+                  {
+                        filename: `${cleanRef || 'Invoice'}.pdf`,
+                        path: pdfUrl,
+                        contentType: 'application/pdf',
+                  },
+            ];
+      }
+
+      const result = await sendEmail({
+            to: email,
+            subject: `Invoice ${invoiceRef}`,
+            html,
+            fromName: senderName,
+            attachments,
+      });
+
+      if (!result.success) {
+            throw new AppError(result.error || 'Failed to send invoice email', StatusCodes.INTERNAL_SERVER_ERROR);
+      }
+
+      // If customerId is provided and customer has no email, optionally save
+      if (payload.customerId && Types.ObjectId.isValid(payload.customerId)) {
+            const cust = await Customer.findById(payload.customerId);
+            if (cust && !cust.email) {
+                  await Customer.findByIdAndUpdate(payload.customerId, { email });
+            }
+      }
+
+      return {
+            sent: true,
+            recipient: email,
+            invoiceRef,
+      };
+};
+
 const invoiceService = {
       createInvoice,
       getInvoiceByShopkeeperId,
@@ -697,6 +843,8 @@ const invoiceService = {
       getAllInvoices,
       updateInvoice,
       deleteInvoice,
+      sendInvoiceEmail,
 };
 
 export default invoiceService;
+

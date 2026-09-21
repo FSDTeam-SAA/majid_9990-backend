@@ -6,6 +6,7 @@ import invoiceController from './invoice.controller';
 const router = Router();
 
 router.post('/create', protect, upload.single('invoice'), invoiceController.createInvoice);
+router.post('/send-email', protect, invoiceController.sendInvoiceEmail);
 router.get('/all', protect, invoiceController.getAllInvoices);
 router.get('/shopkeeper/:shopkeeperId', protect, invoiceController.getInvoiceByShopkeeperId);
 router.get('/customer/:customerId', protect, invoiceController.getInvoicesByCustomerId);

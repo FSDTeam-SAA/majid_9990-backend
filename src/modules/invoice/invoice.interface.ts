@@ -94,3 +94,13 @@ export interface IInvoicePayload {
       lineItems?: IInvoiceLineItem[] | string;
       allocations?: Array<{ invoiceId: string; amountApplied: number }> | string;
 }
+
+export interface ISendInvoiceEmailPayload {
+      email: string;
+      invoiceRef?: string;
+      pdfUrl?: string;
+      amountLabel?: string;
+      customerName?: string;
+      customerId?: string;
+      invoiceId?: string;
+}
