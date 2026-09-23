@@ -1,3 +1,4 @@
+import * as fs from 'fs';
 import { StatusCodes } from 'http-status-codes';
 import { Types } from 'mongoose';
 import AppError from '../../errors/AppError';
@@ -8,6 +9,7 @@ import { User } from '../user/user.model';
 import { Customer } from '../customer/customer.model';
 import {
       IInvoice,
+      IInvoiceIdImages,
       IInvoiceOrderDetails,
       IInvoicePayload,
       IInvoicePaymentDetails,
@@ -18,6 +20,26 @@ import { Invoice } from './invoice.model';
 import { Inventory } from '../inventory/inventory.model';
 import RepairRequest from '../repairRequest/repairRequest.model';
 import { AuditLog } from '../customer/auditLog.model';
+
+export const sanitizeInvoiceIdImages = <T>(invoice: T): T => {
+      if (!invoice) return invoice;
+      const invObj: any = typeof (invoice as any).toObject === 'function' ? (invoice as any).toObject() : { ...(invoice as any) };
+      const now = Date.now();
+      const deleteAfter = invObj.idImageDeleteAfter || invObj.idImages?.deleteAfter;
+      if (deleteAfter && new Date(deleteAfter).getTime() <= now) {
+            if (invObj.idImages) {
+                  invObj.idImages = {
+                        isDeleted: true,
+                        front: null,
+                        back: null,
+                        deleteAfter,
+                        deletedAt: invObj.idImages.deletedAt || new Date(deleteAfter),
+                        message: 'ID image deleted automatically after 28 days per retention policy.',
+                  };
+            }
+      }
+      return invObj as T;
+};
 
 const resolveShopkeeperId = async (shopkeeperId?: string) => {
       const trimmedShopkeeperId = String(shopkeeperId ?? '').trim();
@@ -160,7 +182,11 @@ const normalizeOrderDetails = (value: IInvoicePayload['orderDetails']): IInvoice
       };
 };
 
-const createInvoice = async (payload: IInvoicePayload, file?: Express.Multer.File): Promise<IInvoice> => {
+const createInvoice = async (
+      payload: IInvoicePayload,
+      file?: Express.Multer.File,
+      nidFiles?: { front?: Express.Multer.File; back?: Express.Multer.File }
+): Promise<IInvoice> => {
       const shopkeeperId = await resolveShopkeeperId(payload.shopkeeperId);
       const shopId = normalizeObjectId(payload.shopId);
       const type = String(payload.type ?? '').trim();
@@ -224,6 +250,50 @@ const createInvoice = async (payload: IInvoicePayload, file?: Express.Multer.Fil
 
       const invoiceFile = await buildInvoiceFile(file);
 
+      // Handle ID image uploads (e.g. from Purchase Invoice trade-in)
+      let idImagesData: IInvoiceIdImages | undefined = undefined;
+      let frontUpload = null;
+      let backUpload = null;
+
+      if (nidFiles?.front) {
+            frontUpload = await uploadToCloudinary(nidFiles.front.path);
+            try {
+                  if (fs.existsSync(nidFiles.front.path)) fs.unlinkSync(nidFiles.front.path);
+            } catch (_) {}
+      }
+      if (nidFiles?.back) {
+            backUpload = await uploadToCloudinary(nidFiles.back.path);
+            try {
+                  if (fs.existsSync(nidFiles.back.path)) fs.unlinkSync(nidFiles.back.path);
+            } catch (_) {}
+      }
+
+      if (frontUpload?.secure_url || backUpload?.secure_url) {
+            const deleteAfter = new Date(Date.now() + 28 * 24 * 60 * 60 * 1000); // 28 days
+            idImagesData = {
+                  front: frontUpload?.secure_url
+                        ? { url: frontUpload.secure_url, public_id: frontUpload.public_id }
+                        : undefined,
+                  back: backUpload?.secure_url
+                        ? { url: backUpload.secure_url, public_id: backUpload.public_id }
+                        : undefined,
+                  deleteAfter,
+                  isDeleted: false,
+            };
+      } else if (payload.idImages) {
+            const parsed = parseJsonObject<IInvoiceIdImages>(payload.idImages, 'idImages');
+            if (parsed && (parsed.front?.url || parsed.back?.url)) {
+                  const deleteAfter = parsed.deleteAfter
+                        ? new Date(parsed.deleteAfter)
+                        : new Date(Date.now() + 28 * 24 * 60 * 60 * 1000);
+                  idImagesData = {
+                        ...parsed,
+                        deleteAfter,
+                        isDeleted: false,
+                  };
+            }
+      }
+
       const session = await Invoice.startSession();
       try {
             session.startTransaction();
@@ -258,6 +328,8 @@ const createInvoice = async (payload: IInvoicePayload, file?: Express.Multer.Fil
                               discountPercentage: normalizeOptionalNumber(payload.discountPercentage, 'discountPercentage'),
                               discountAmount: normalizeOptionalNumber(payload.discountAmount, 'discountAmount'),
                               lineItems,
+                              idImages: idImagesData,
+                              idImageDeleteAfter: idImagesData?.deleteAfter,
                         },
                   ],
                   { session }
@@ -381,7 +453,7 @@ const createInvoice = async (payload: IInvoicePayload, file?: Express.Multer.Fil
             }
 
             await session.commitTransaction();
-            return result;
+            return sanitizeInvoiceIdImages(result);
       } catch (error) {
             await session.abortTransaction();
             throw error;
@@ -410,11 +482,12 @@ const getInvoiceByShopkeeperId = async (shopkeeperId: string, query: InvoicePagi
             if (query.shopId && Types.ObjectId.isValid(String(query.shopId))) {
                   listFilter.$or = [{ shopId: new Types.ObjectId(String(query.shopId)) }, { shopId: null }];
             }
-            return await Invoice.find(listFilter)
+            const invoices = await Invoice.find(listFilter)
                   .populate('shopkeeperId')
                   .populate('customerInfo')
                   .populate('itemsIds', 'itemName imeiNumber expectedPrice image')
                   .sort({ createdAt: -1, _id: -1 });
+            return invoices.map(sanitizeInvoiceIdImages);
       }
 
       const requestedPage = Number.parseInt(String(query.page ?? ''), 10);
@@ -438,7 +511,7 @@ const getInvoiceByShopkeeperId = async (shopkeeperId: string, query: InvoicePagi
       ]);
 
       return {
-            data,
+            data: data.map(sanitizeInvoiceIdImages),
             meta: {
                   page,
                   limit,
@@ -449,11 +522,30 @@ const getInvoiceByShopkeeperId = async (shopkeeperId: string, query: InvoicePagi
 };
 
 const getAllInvoices = async () => {
-      return await Invoice.find()
+      const invoices = await Invoice.find()
             .populate('shopkeeperId')
             .populate('customerInfo')
             .populate('itemsIds', 'itemName imeiNumber expectedPrice image')
             .sort({ createdAt: -1 });
+      return invoices.map(sanitizeInvoiceIdImages);
+};
+
+const getInvoiceById = async (id: string) => {
+      const trimmedId = String(id ?? '').trim();
+      if (!Types.ObjectId.isValid(trimmedId)) {
+            throw new AppError('Invalid invoice ID', StatusCodes.BAD_REQUEST);
+      }
+
+      const invoice = await Invoice.findById(trimmedId)
+            .populate('shopkeeperId')
+            .populate('customerInfo')
+            .populate('itemsIds', 'itemName imeiNumber expectedPrice image');
+
+      if (!invoice) {
+            throw new AppError('Invoice not found', StatusCodes.NOT_FOUND);
+      }
+
+      return sanitizeInvoiceIdImages(invoice);
 };
 
 const updateInvoice = async (id: string, payload: IInvoicePayload, file?: Express.Multer.File) => {
@@ -604,6 +696,15 @@ const deleteInvoice = async (id: string) => {
       }
 
       await deleteFromCloudinary(invoice.invoice.public_id, invoice.invoice.resource_type || 'raw');
+
+      // Also clean up any linked ID images from Cloudinary
+      if (invoice.idImages?.front?.public_id) {
+            await deleteFromCloudinary(invoice.idImages.front.public_id, 'image');
+      }
+      if (invoice.idImages?.back?.public_id) {
+            await deleteFromCloudinary(invoice.idImages.back.public_id, 'image');
+      }
+
       await Invoice.findByIdAndDelete(id);
 
       return null;
@@ -644,7 +745,8 @@ const getInvoicesByCustomerId = async (
       let totalPaid = 0;
       let totalDue = 0;
 
-      const formattedInvoices = invoices.map((inv) => {
+      const formattedInvoices = invoices.map((rawInv) => {
+            const inv = sanitizeInvoiceIdImages(rawInv);
             const invoiceAmount = Number(inv.totalAmount) || 0;
             const paidAmount = Number(
                   inv.amountPaid ??
@@ -838,6 +940,7 @@ const sendInvoiceEmail = async (userId: string, payload: ISendInvoiceEmailPayloa
 
 const invoiceService = {
       createInvoice,
+      getInvoiceById,
       getInvoiceByShopkeeperId,
       getInvoicesByCustomerId,
       getAllInvoices,

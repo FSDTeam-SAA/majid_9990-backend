@@ -156,22 +156,80 @@ class OCRService {
       }
 
       /**
-       * Extract NID number candidates from text
+       * Extract NID / ID number candidates from text using various patterns
        */
       extractNIDFromText(text: string): string | null {
+            if (!text || !text.trim()) return null;
+
+            // 1. Check for labeled ID numbers (e.g., "NID: 1234567890", "ID NO: 123456", "Licence: ABCD123456", "Passport: 123456789")
+            const labeledPattern = /(?:NID|National\s*ID|ID\s*No\.?|ID\s*Number|Licence\s*No\.?|License\s*No\.?|Driver\s*No\.?|Passport\s*No\.?|Doc\s*No\.?)\s*[:#.-]?\s*([A-Z0-9-]{6,20})/i;
+            const labeledMatch = text.match(labeledPattern);
+            if (labeledMatch && labeledMatch[1]) {
+                  const cleaned = labeledMatch[1].replace(/-/g, '').trim();
+                  if (cleaned.length >= 6) return cleaned;
+            }
+
+            // 2. UK Driving Licence format (16-18 chars: 5 letters + 6 numbers + 2 letters/numbers + 3 numbers)
+            const ukDrivingLicence = text.match(/\b([A-Z]{5}\d{6}[A-Z0-9]{2}\d{3})\b/i);
+            if (ukDrivingLicence && ukDrivingLicence[1]) {
+                  return ukDrivingLicence[1].toUpperCase();
+            }
+
+            // 3. Bangladesh / National ID (10, 13, 17 digits)
             const digitsOnly = text.replace(/\D/g, ' ');
             const candidates = digitsOnly
                   .split(/\s+/)
                   .filter(Boolean)
                   .filter((value) => value.length === 10 || value.length === 13 || value.length === 17);
 
-            if (candidates.length === 0) {
-                  return null;
+            if (candidates.length > 0) {
+                  const sorted = candidates.sort((a, b) => b.length - a.length);
+                  return sorted[0];
             }
 
-            // Prefer longer NID numbers when multiple candidates exist
-            const sorted = candidates.sort((a, b) => b.length - a.length);
-            return sorted[0];
+            // 4. Passports or general 8-18 char alphanumeric identifiers
+            const generalCandidates = text
+                  .split(/[\s,;:\n]+/)
+                  .map((token) => token.replace(/[^A-Za-z0-9]/g, ''))
+                  .filter((token) => token.length >= 8 && token.length <= 18 && /\d/.test(token) && /[A-Za-z]/.test(token));
+
+            if (generalCandidates.length > 0) {
+                  return generalCandidates[0];
+            }
+
+            return null;
+      }
+
+      /**
+       * Extract NID / ID number using OpenAI fallback
+       */
+      async extractNIDWithAI(text: string): Promise<string | null> {
+            try {
+                  const client = getOpenAIClient();
+                  const message = await client.chat.completions.create({
+                        model: 'gpt-3.5-turbo',
+                        messages: [
+                              {
+                                    role: 'system',
+                                    content: 'You are an expert at identifying government ID / National ID / Driving Licence / Passport numbers from OCR text. Extract the single primary ID or document number. Return only the ID number as a plain string, or null if no valid ID number exists. Do not explain.',
+                              },
+                              {
+                                    role: 'user',
+                                    content: `Extract the ID number from this OCR text:\n\n${text}`,
+                              },
+                        ],
+                        temperature: 0.2,
+                  });
+
+                  const resText = message.choices[0]?.message?.content?.trim() || '';
+                  if (!resText || resText.toLowerCase() === 'null' || resText.toLowerCase().includes('no valid')) {
+                        return null;
+                  }
+                  return resText.replace(/[^A-Za-z0-9-]/g, '').trim();
+            } catch (err) {
+                  console.warn('OpenAI ID extraction error:', err);
+                  return null;
+            }
       }
 
       /**
@@ -191,12 +249,16 @@ class OCRService {
                   }
 
                   const combinedText = texts.join('\n');
-                  const nidNumber = this.extractNIDFromText(combinedText);
+                  let nidNumber = this.extractNIDFromText(combinedText);
+
+                  if (!nidNumber && combinedText.trim().length > 0) {
+                        nidNumber = await this.extractNIDWithAI(combinedText);
+                  }
 
                   return {
                         nidNumber,
                         isValid: Boolean(nidNumber),
-                        message: nidNumber ? 'NID number extracted successfully' : 'No valid NID number found',
+                        message: nidNumber ? 'NID number extracted successfully' : 'No ID number detected in image. Please enter it manually.',
                         processingTime: Date.now() - startTime,
                   };
             } catch (error) {

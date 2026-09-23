@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import { connectDB } from './config/db';
 import { ensureSwaggerSpec } from './config/swagger';
 import { initNotificationSocket } from './modules/socket/notification.service';
+import { idRetentionService } from './modules/invoice/idRetention.service';
 import 'dotenv/config';
 
 dotenv.config();
@@ -21,6 +22,9 @@ const bootstrap = async () => {
       if (dbResult.status === 'rejected') {
             throw dbResult.reason;
       }
+
+      // Initialize 28-day ID image retention service (GDPR / Privacy compliance)
+      idRetentionService.startRetentionJob();
 
       const server = http.createServer(app);
 

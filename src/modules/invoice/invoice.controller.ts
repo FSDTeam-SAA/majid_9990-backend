@@ -10,12 +10,33 @@ const createInvoice = catchAsync(async (req, res) => {
       }
       const shopId = await getShopFromRequest(req);
       req.body.shopId = shopId.toString();
-      const result = await invoiceService.createInvoice(req.body, req.file);
+
+      const files = req.files as { [fieldname: string]: Express.Multer.File[] } | undefined;
+      const invoiceFile = files?.invoice?.[0] || (req.file as Express.Multer.File | undefined);
+      const nidFrontFile = files?.nid_front?.[0] || files?.nidFrontImage?.[0] || files?.idImage?.[0];
+      const nidBackFile = files?.nid_back?.[0] || files?.nidBackImage?.[0];
+
+      const result = await invoiceService.createInvoice(req.body, invoiceFile, {
+            front: nidFrontFile,
+            back: nidBackFile,
+      });
 
       sendResponse(res, {
             statusCode: StatusCodes.CREATED,
             success: true,
             message: 'Invoice created successfully',
+            data: result,
+      });
+});
+
+const getInvoiceById = catchAsync(async (req, res) => {
+      const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+      const result = await invoiceService.getInvoiceById(id);
+
+      sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: 'Invoice fetched successfully',
             data: result,
       });
 });
@@ -119,6 +140,7 @@ const sendInvoiceEmail = catchAsync(async (req, res) => {
 
 export default {
       createInvoice,
+      getInvoiceById,
       getInvoiceByShopkeeperId,
       getInvoicesByCustomerId,
       getAllInvoices,

@@ -128,6 +128,23 @@ const invoiceSchema = new Schema<IInvoice>(
                   type: Number,
                   default: null,
             },
+            idImages: {
+                  front: {
+                        url: { type: String, trim: true, default: null },
+                        public_id: { type: String, trim: true, default: null },
+                  },
+                  back: {
+                        url: { type: String, trim: true, default: null },
+                        public_id: { type: String, trim: true, default: null },
+                  },
+                  deleteAfter: { type: Date, default: null },
+                  isDeleted: { type: Boolean, default: false },
+                  deletedAt: { type: Date, default: null },
+            },
+            idImageDeleteAfter: {
+                  type: Date,
+                  default: null,
+            },
       },
       {
             timestamps: true,
@@ -142,3 +159,5 @@ invoiceSchema.index({ shopkeeperId: 1, createdAt: -1 });
 invoiceSchema.index({ shopkeeperId: 1, shopId: 1, createdAt: -1 });
 invoiceSchema.index({ shopkeeperId: 1, customerInfo: 1, createdAt: -1 });
 invoiceSchema.index({ shopId: 1, customerInfo: 1, createdAt: -1 });
+invoiceSchema.index({ idImageDeleteAfter: 1 });
+invoiceSchema.index({ 'idImages.deleteAfter': 1, 'idImages.isDeleted': 1 });

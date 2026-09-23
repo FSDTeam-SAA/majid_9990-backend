@@ -66,6 +66,21 @@ export interface IInvoice {
       discountPercentage?: number;
       discountAmount?: number;
       lineItems?: IInvoiceLineItem[];
+      idImages?: IInvoiceIdImages;
+      idImageDeleteAfter?: Date;
+}
+
+export interface IInvoiceIdImage {
+      url: string;
+      public_id?: string;
+}
+
+export interface IInvoiceIdImages {
+      front?: IInvoiceIdImage;
+      back?: IInvoiceIdImage;
+      deleteAfter?: Date;
+      isDeleted?: boolean;
+      deletedAt?: Date;
 }
 
 export interface IInvoicePayload {
@@ -93,6 +108,9 @@ export interface IInvoicePayload {
       discountAmount?: number;
       lineItems?: IInvoiceLineItem[] | string;
       allocations?: Array<{ invoiceId: string; amountApplied: number }> | string;
+      idImages?: IInvoiceIdImages | string;
+      idImageDeleteAfter?: Date | string;
+      tradeInConsentId?: string;
 }
 
 export interface ISendInvoiceEmailPayload {

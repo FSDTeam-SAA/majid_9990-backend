@@ -70,7 +70,7 @@ const extractNID = catchAsync(async (req: Request, res: Response) => {
             sendResponse(res, {
                   statusCode: StatusCodes.OK,
                   success: true,
-                  message: result.isValid ? 'NID extracted successfully' : 'No valid NID found',
+                  message: result.message || (result.isValid ? 'NID extracted successfully' : 'ID processed. Enter number manually if unread.'),
                   data: result,
             });
       } catch (error) {
