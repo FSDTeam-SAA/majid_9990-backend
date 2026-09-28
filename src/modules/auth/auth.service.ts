@@ -14,7 +14,8 @@ import securityService from '../security/security.service';
 import { TwoFactorMethodType } from '../security/security.interface';
 
 const login = async (payload: { email: string; password: string }) => {
-  const { email, password } = payload;
+  const email = (payload.email || '').trim().toLowerCase();
+  const { password } = payload;
 
   const user = await User.isUserExistByEmail(email);
   if (!user)
@@ -309,7 +310,7 @@ const resetPassword = async (
   );
 
   const result = await User.findOneAndUpdate(
-    { email },
+    { _id: isExistingUser._id },
     {
       password: hashedPassword,
       otp: undefined,
@@ -362,7 +363,7 @@ const changePassword = async (
   );
 
   const result = await User.findOneAndUpdate(
-    { email },
+    { _id: isExistingUser._id },
     {
       password: hashedPassword,
     },

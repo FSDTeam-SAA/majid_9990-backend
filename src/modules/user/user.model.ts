@@ -17,6 +17,8 @@ const userSchema = new Schema<IUser>(
                   type: String,
                   required: true,
                   unique: true,
+                  trim: true,
+                  lowercase: true,
             },
             phone: {
                   type: String,
@@ -158,13 +160,20 @@ const userSchema = new Schema<IUser>(
 userSchema.index({ ryftAccountId: 1 });
 
 userSchema.pre('save', async function (next) {
-      this.password = await bcrypt.hash(this.password, Number(config.bcryptSaltRounds));
+      if (!this.isModified('password')) {
+            return next();
+      }
 
+      // Prevent re-hashing if password is already a valid bcrypt hash
+      if (typeof this.password === 'string' && /^\$2[aby]\$\d{2}\$[./A-Za-z0-9]{53}$/.test(this.password)) {
+            return next();
+      }
+
+      this.password = await bcrypt.hash(this.password, Number(config.bcryptSaltRounds));
       next();
 });
 
 userSchema.post('save', function (doc, next) {
-      doc.password = '';
       next();
 });
 
@@ -173,7 +182,13 @@ userSchema.statics.isPasswordMatch = async function (password: string, hashedPas
 };
 
 userSchema.statics.isUserExistByEmail = async function (email: string): Promise<IUser | null> {
-      return await User.findOne({ email });
+      const normalizedEmail = (email || '').trim().toLowerCase();
+      return await User.findOne({
+            $or: [
+                  { email: normalizedEmail },
+                  { email: { $regex: new RegExp(`^${normalizedEmail}$`, 'i') } }
+            ]
+      });
 };
 
 userSchema.statics.isUserExistById = async function (_id: string): Promise<IUser | null> {

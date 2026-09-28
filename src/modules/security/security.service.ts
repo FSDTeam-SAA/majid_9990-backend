@@ -148,7 +148,14 @@ const sendChallenge = async (
       method?: TwoFactorMethodType
 ): Promise<{ sent: boolean; destination: string }> => {
       const isEmail = typeof userIdOrEmail === 'string' && userIdOrEmail.includes('@');
-      const query = isEmail ? { email: userIdOrEmail } : { _id: userIdOrEmail };
+      const query = isEmail
+            ? {
+                    $or: [
+                          { email: userIdOrEmail.trim().toLowerCase() },
+                          { email: { $regex: new RegExp(`^${userIdOrEmail.trim()}$`, 'i') } },
+                    ],
+              }
+            : { _id: userIdOrEmail };
       const user = await User.findOne(query);
       if (!user) {
             throw new AppError('Account not found', StatusCodes.NOT_FOUND);
@@ -214,7 +221,14 @@ const sendChallenge = async (
 
 const verifyChallenge = async (userIdOrEmail: any, code: string): Promise<boolean> => {
       const isEmail = typeof userIdOrEmail === 'string' && userIdOrEmail.includes('@');
-      const query = isEmail ? { email: userIdOrEmail } : { _id: userIdOrEmail };
+      const query = isEmail
+            ? {
+                    $or: [
+                          { email: userIdOrEmail.trim().toLowerCase() },
+                          { email: { $regex: new RegExp(`^${userIdOrEmail.trim()}$`, 'i') } },
+                    ],
+              }
+            : { _id: userIdOrEmail };
       const user = await User.findOne(query);
       if (!user) return false;
 
