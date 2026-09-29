@@ -138,6 +138,17 @@ const sendInvoiceEmail = catchAsync(async (req, res) => {
       });
 });
 
+const getInvoiceTemplates = catchAsync(async (_req, res) => {
+      const result = invoiceService.getInvoiceTemplates();
+
+      sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: 'Invoice templates retrieved successfully',
+            data: result,
+      });
+});
+
 export default {
       createInvoice,
       getInvoiceById,
@@ -147,5 +158,6 @@ export default {
       updateInvoice,
       deleteInvoice,
       sendInvoiceEmail,
+      getInvoiceTemplates,
 };
 

@@ -145,6 +145,11 @@ const invoiceSchema = new Schema<IInvoice>(
                   type: Date,
                   default: null,
             },
+            invoiceTemplate: {
+                  type: String,
+                  default: 'default',
+                  trim: true,
+            },
       },
       {
             timestamps: true,

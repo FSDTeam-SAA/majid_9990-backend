@@ -119,6 +119,11 @@ const userSchema = new Schema<IUser>(
                   rotation: { type: Number, default: 0 },
                   backgroundColor: { type: String, default: 'transparent' },
             },
+            invoiceTemplate: {
+                  type: String,
+                  default: 'default',
+                  trim: true,
+            },
             otp: { type: String, default: null },
             otpExpires: { type: Date, default: null },
             resetPasswordOtp: { type: String, default: null },

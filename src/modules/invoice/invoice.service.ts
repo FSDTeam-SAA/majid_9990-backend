@@ -294,6 +294,12 @@ const createInvoice = async (
             }
       }
 
+      let invoiceTemplate = String(payload.invoiceTemplate ?? '').trim();
+      if (!invoiceTemplate) {
+            const user = await User.findById(shopkeeperId).select('invoiceTemplate');
+            invoiceTemplate = user?.invoiceTemplate || 'default';
+      }
+
       const session = await Invoice.startSession();
       try {
             session.startTransaction();
@@ -330,6 +336,7 @@ const createInvoice = async (
                               lineItems,
                               idImages: idImagesData,
                               idImageDeleteAfter: idImagesData?.deleteAfter,
+                              invoiceTemplate,
                         },
                   ],
                   { session }
@@ -578,6 +585,7 @@ const updateInvoice = async (id: string, payload: IInvoicePayload, file?: Expres
                   | 'discountName'
                   | 'discountPercentage'
                   | 'discountAmount'
+                  | 'invoiceTemplate'
             >
       > & {
             invoice?: IInvoice['invoice'];
@@ -670,6 +678,10 @@ const updateInvoice = async (id: string, payload: IInvoicePayload, file?: Expres
 
       if (payload.itemsIds && Array.isArray(payload.itemsIds)) {
             updateData.itemsIds = normalizeObjectIdArray(payload.itemsIds);
+      }
+
+      if (payload.invoiceTemplate !== undefined) {
+            updateData.invoiceTemplate = String(payload.invoiceTemplate ?? '').trim() || 'default';
       }
 
       if (file) {
@@ -938,6 +950,70 @@ const sendInvoiceEmail = async (userId: string, payload: ISendInvoiceEmailPayloa
       };
 };
 
+export const PREDEFINED_INVOICE_TEMPLATES = [
+      {
+            id: 'default',
+            name: 'Default (Classic Teal)',
+            category: 'Modern',
+            description: 'Clean default layout with emerald/teal header, complete item grid, and total summary bar.',
+            isDefault: true,
+            primaryColor: '#155E63',
+            accentColor: '#84CC16',
+      },
+      {
+            id: 'classic-editorial',
+            name: 'Classic Editorial',
+            category: 'Traditional',
+            description: 'Refined serif typography with rich burgundy accents, structured borders, and classic editorial billing format.',
+            isDefault: false,
+            primaryColor: '#800020',
+            accentColor: '#A11D33',
+      },
+      {
+            id: 'warm-minimal',
+            name: 'Warm Minimalist',
+            category: 'Traditional',
+            description: 'Warm parchment backdrop, thin framing border, centered traditional letterhead, and elegant underlined items.',
+            isDefault: false,
+            primaryColor: '#1C1917',
+            accentColor: '#84CC16',
+            backgroundColor: '#FFFDEB',
+      },
+      {
+            id: 'neo-bold',
+            name: 'Neo Bold',
+            category: 'Modern',
+            description: 'High-contrast neo-brutalist styling with vibrant electric lime banners, rounded cards, and bold grotesque type.',
+            isDefault: false,
+            primaryColor: '#0F172A',
+            accentColor: '#CCFF00',
+            backgroundColor: '#FDF2F8',
+      },
+      {
+            id: 'modern-retail',
+            name: 'Modern Retail',
+            category: 'Modern',
+            description: 'Contemporary retail invoice with calming sage green table header, checkmark paid badge, and customer promo banner.',
+            isDefault: false,
+            primaryColor: '#2D3748',
+            accentColor: '#8EA085',
+      },
+      {
+            id: 'nordic-modern',
+            name: 'Nordic Slate',
+            category: 'Modern',
+            description: 'Spacious Scandinavian design with extra-large typography, prominent total highlight box, and cool slate tones.',
+            isDefault: false,
+            primaryColor: '#0F172A',
+            accentColor: '#84CC16',
+            headerColor: '#F1F5F9',
+      },
+];
+
+const getInvoiceTemplates = () => {
+      return PREDEFINED_INVOICE_TEMPLATES;
+};
+
 const invoiceService = {
       createInvoice,
       getInvoiceById,
@@ -947,6 +1023,7 @@ const invoiceService = {
       updateInvoice,
       deleteInvoice,
       sendInvoiceEmail,
+      getInvoiceTemplates,
 };
 
 export default invoiceService;

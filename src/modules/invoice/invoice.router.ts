@@ -22,6 +22,7 @@ router.post('/send-email', protect, invoiceController.sendInvoiceEmail);
 router.get('/all', protect, invoiceController.getAllInvoices);
 router.get('/shopkeeper/:shopkeeperId', protect, invoiceController.getInvoiceByShopkeeperId);
 router.get('/customer/:customerId', protect, invoiceController.getInvoicesByCustomerId);
+router.get('/templates', invoiceController.getInvoiceTemplates);
 router.get('/:id', protect, invoiceController.getInvoiceById);
 router.put('/:id', protect, upload.single('invoice'), invoiceController.updateInvoice);
 router.delete('/:id', protect, invoiceController.deleteInvoice);

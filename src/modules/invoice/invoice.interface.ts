@@ -68,6 +68,7 @@ export interface IInvoice {
       lineItems?: IInvoiceLineItem[];
       idImages?: IInvoiceIdImages;
       idImageDeleteAfter?: Date;
+      invoiceTemplate?: string;
 }
 
 export interface IInvoiceIdImage {
@@ -111,6 +112,7 @@ export interface IInvoicePayload {
       idImages?: IInvoiceIdImages | string;
       idImageDeleteAfter?: Date | string;
       tradeInConsentId?: string;
+      invoiceTemplate?: string;
 }
 
 export interface ISendInvoiceEmailPayload {

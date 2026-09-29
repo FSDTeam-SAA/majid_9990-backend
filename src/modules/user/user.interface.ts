@@ -45,6 +45,7 @@ export interface IUser {
             rotation?: number;
             backgroundColor?: string;
       };
+      invoiceTemplate?: string;
       ryftAccountId?: string;
       ryftAccountStatus?: 'not_created' | 'pending' | 'verified' | 'enabled' | string;
       ryftPayoutsEnabled?: boolean;
