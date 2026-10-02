@@ -68,6 +68,7 @@ export interface IInvoice {
       lineItems?: IInvoiceLineItem[];
       idImages?: IInvoiceIdImages;
       idImageDeleteAfter?: Date;
+      tradeInConsentId?: Types.ObjectId | null;
       invoiceTemplate?: string;
 }
 

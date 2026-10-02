@@ -145,6 +145,11 @@ const invoiceSchema = new Schema<IInvoice>(
                   type: Date,
                   default: null,
             },
+            tradeInConsentId: {
+                  type: Schema.Types.ObjectId,
+                  ref: 'Consent',
+                  default: null,
+            },
             invoiceTemplate: {
                   type: String,
                   default: 'default',

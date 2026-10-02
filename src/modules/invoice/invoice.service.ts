@@ -336,6 +336,10 @@ const createInvoice = async (
                               lineItems,
                               idImages: idImagesData,
                               idImageDeleteAfter: idImagesData?.deleteAfter,
+                              tradeInConsentId:
+                                    payload.tradeInConsentId && Types.ObjectId.isValid(payload.tradeInConsentId)
+                                          ? new Types.ObjectId(payload.tradeInConsentId)
+                                          : null,
                               invoiceTemplate,
                         },
                   ],
