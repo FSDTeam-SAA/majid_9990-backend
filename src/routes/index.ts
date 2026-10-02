@@ -47,6 +47,14 @@ const moduleRoutes = [
             route: deviceCheckRoutes,
       },
       {
+            path: '/report',
+            route: deviceCheckRoutes,
+      },
+      {
+            path: '/verify',
+            route: deviceCheckRoutes,
+      },
+      {
             path: '/auth',
             route: authRouter,
       },

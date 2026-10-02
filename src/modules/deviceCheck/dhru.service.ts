@@ -1,5 +1,6 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import mongoose from 'mongoose';
 import ExcelJS from 'exceljs';
 import AppError from '../../errors/AppError';
 import { ImeiServiceCatalog } from './imeiService.model';
@@ -1279,3 +1280,66 @@ export const saveCheckHistoryReportPdfService = async (
 export const getCheckHistoryReportPdfService = async (reportId: string, userId: string) => {
       return await getScanReportPdfPathAndFilename(reportId, userId);
 };
+
+export const getPublicDeviceReportService = async (identifier: string) => {
+      const cleanId = String(identifier ?? '').trim();
+      if (!cleanId) {
+            throw new AppError('Identifier (IMEI or Certificate ID) is required', 400);
+      }
+
+      let report = null;
+
+      // 1. Try finding by MongoDB ObjectId
+      if (mongoose.Types.ObjectId.isValid(cleanId)) {
+            report = await ScanInfo.findById(cleanId)
+                  .populate('shopId')
+                  .populate('userId', 'name email phone avatar')
+                  .lean();
+      }
+
+      // 2. Try finding by exact IMEI (get latest)
+      if (!report) {
+            report = await ScanInfo.findOne({ imei: cleanId })
+                  .sort({ updatedAt: -1 })
+                  .populate('shopId')
+                  .populate('userId', 'name email phone avatar')
+                  .lean();
+      }
+
+      // 3. Try finding by stripped digits IMEI (e.g. if formatted with spaces or hyphens)
+      if (!report) {
+            const numericOnly = cleanId.replace(/\D/g, '');
+            if (numericOnly.length >= 8) {
+                  report = await ScanInfo.findOne({ imei: numericOnly })
+                        .sort({ updatedAt: -1 })
+                        .populate('shopId')
+                        .populate('userId', 'name email phone avatar')
+                        .lean();
+            }
+      }
+
+      // 4. Try finding in parsedProviderData fields (e.g. imei, serial_number, imei2)
+      if (!report) {
+            report = await ScanInfo.findOne({
+                  $or: [
+                        { 'parsedProviderData.imei': cleanId },
+                        { 'parsedProviderData.imei2': cleanId },
+                        { 'parsedProviderData.serial_number': cleanId },
+                        { 'parsedProviderData.serial': cleanId },
+                        { 'parsedProviderData.Serial': cleanId },
+                        { 'parsedProviderData.SerialNumber': cleanId },
+                  ],
+            })
+                  .sort({ updatedAt: -1 })
+                  .populate('shopId')
+                  .populate('userId', 'name email phone avatar')
+                  .lean();
+      }
+
+      if (!report) {
+            throw new AppError('No verification certificate found for this IMEI or Certificate ID', 404);
+      }
+
+      return report;
+};
+

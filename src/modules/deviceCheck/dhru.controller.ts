@@ -4,6 +4,7 @@ import {
       checkImeisBatchService,
       getCheckHistoryReportPdfService,
       getCheckHistoryReportService,
+      getPublicDeviceReportService,
       getRecentChecksHistoryService,
       getServicesService,
       processImeiCheckV1Service,
@@ -267,3 +268,29 @@ export const getCheckHistoryReportPdf = async (req: Request, res: Response, next
             next(error);
       }
 };
+
+export const getPublicDeviceReport = async (req: Request, res: Response, next: NextFunction) => {
+      try {
+            const identifier = String(
+                  req.params.identifier ?? req.params.reportId ?? req.params.imei ?? req.query.imei ?? req.query.id ?? ''
+            ).trim();
+
+            if (!identifier) {
+                  return res.status(400).json({
+                        success: false,
+                        message: 'Device IMEI or Certificate ID is required',
+                  });
+            }
+
+            const report = await getPublicDeviceReportService(identifier);
+
+            return res.status(200).json({
+                  success: true,
+                  message: 'Device verification certificate fetched successfully',
+                  data: report,
+            });
+      } catch (error) {
+            next(error);
+      }
+};
+

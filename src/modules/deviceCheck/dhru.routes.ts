@@ -5,6 +5,7 @@ import {
       checkImeisFromFile,
       getCheckHistoryReport,
       getCheckHistoryReportPdf,
+      getPublicDeviceReport,
       getRecentChecksHistory,
       getServices,
       saveCheckHistoryReportPdf,
@@ -15,6 +16,11 @@ import { getDeviceAnalysis, getRiskAnalysis } from './riskAnalysis.controller';
 import { optionalProtect, protect } from '../../middlewares/auth.middleware';
 
 const router = Router();
+
+// Public Report & Verification routes
+router.get('/report/:identifier', getPublicDeviceReport);
+router.get('/public-report/:identifier', getPublicDeviceReport);
+router.get('/verify/:identifier', getPublicDeviceReport);
 
 router.post('/check', protect, checkImeiFromDhru);
 router.post('/check-v2', optionalProtect, checkImeiFromDhruV2);
