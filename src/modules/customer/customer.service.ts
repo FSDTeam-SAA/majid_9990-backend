@@ -17,16 +17,29 @@ type SendCustomerEmailPayload = {
 };
 
 const createCustomer = async (userId: string, payload: Partial<ICustomer> = {}) => {
-      // Optional: prevent duplicate by phone or email
+      // If customer exists with same email, return existing customer (updating any new info)
       if (payload.email) {
-            const exists = await Customer.findOne({ email: payload.email });
+            const normalizedEmail = payload.email.toLowerCase().trim();
+            const exists = await Customer.findOne({ email: normalizedEmail });
             if (exists) {
-                  throw new AppError('Customer with this email already exists', StatusCodes.CONFLICT);
+                  const updateFields: Partial<ICustomer> = {};
+                  if (payload.firstName && payload.firstName !== exists.firstName) updateFields.firstName = payload.firstName;
+                  if (payload.lastName && payload.lastName !== exists.lastName) updateFields.lastName = payload.lastName;
+                  if (payload.phone && payload.phone !== exists.phone) updateFields.phone = payload.phone;
+                  if (payload.address && payload.address !== exists.address) updateFields.address = payload.address;
+                  if (payload.customerId && payload.customerId !== exists.customerId) updateFields.customerId = payload.customerId;
+                  if (payload.shopId && !exists.shopId) updateFields.shopId = payload.shopId;
+                  if (Object.keys(updateFields).length > 0) {
+                        const updated = await Customer.findByIdAndUpdate(exists._id, updateFields, { new: true });
+                        return updated || exists;
+                  }
+                  return exists;
             }
       }
 
       const result = await Customer.create({
             ...payload,
+            email: payload.email ? payload.email.toLowerCase().trim() : undefined,
             shopkeeperId: payload.shopkeeperId ?? userId,
             shopId: payload.shopId ?? null,
       });
