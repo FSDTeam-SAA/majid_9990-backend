@@ -53,52 +53,64 @@ export const creditUserBalance = async (input: BalanceActionInput) => {
             };
       }
 
-      const session = await User.startSession();
-      try {
-            session.startTransaction();
+      const maxRetries = 3;
+      for (let attempt = 1; attempt <= maxRetries; attempt++) {
+            const session = await User.startSession();
+            try {
+                  session.startTransaction();
 
-            const updatedUser = await User.findByIdAndUpdate(
-                  userId,
-                  { $inc: { balance: amount } },
-                  { new: true, session }
-            );
+                  const updatedUser = await User.findByIdAndUpdate(
+                        userId,
+                        { $inc: { balance: amount } },
+                        { new: true, session }
+                  );
 
-            if (!updatedUser) {
-                  throw new AppError('User not found', 404);
+                  if (!updatedUser) {
+                        throw new AppError('User not found', 404);
+                  }
+
+                  const balanceAfter = toMoney(Number(updatedUser.balance ?? 0));
+                  const balanceBefore = toMoney(balanceAfter - amount);
+
+                  const [transaction] = await BalanceTransaction.create(
+                        [
+                              {
+                                    userId,
+                                    transactionType: 'credit',
+                                    amount,
+                                    currency,
+                                    balanceBefore,
+                                    balanceAfter,
+                                    source: input.source,
+                                    description: input.description,
+                                    referenceId: input.referenceId,
+                                    paymentId: input.paymentId,
+                                    serviceId: input.serviceId,
+                                    serviceName: input.serviceName,
+                                    imei: input.imei,
+                                    metadata: input.metadata,
+                              },
+                        ],
+                        { session }
+                  );
+
+                  await session.commitTransaction();
+                  return { user: updatedUser, transaction };
+            } catch (error: any) {
+                  await session.abortTransaction();
+                  const isWriteConflict =
+                        error?.code === 112 ||
+                        error?.errorLabels?.includes('TransientTransactionError') ||
+                        String(error?.message || '').includes('Write conflict');
+
+                  if (isWriteConflict && attempt < maxRetries) {
+                        await new Promise((resolve) => setTimeout(resolve, attempt * 100));
+                        continue;
+                  }
+                  throw error;
+            } finally {
+                  await session.endSession();
             }
-
-            const balanceAfter = toMoney(Number(updatedUser.balance ?? 0));
-            const balanceBefore = toMoney(balanceAfter - amount);
-
-            const [transaction] = await BalanceTransaction.create(
-                  [
-                        {
-                              userId,
-                              transactionType: 'credit',
-                              amount,
-                              currency,
-                              balanceBefore,
-                              balanceAfter,
-                              source: input.source,
-                              description: input.description,
-                              referenceId: input.referenceId,
-                              paymentId: input.paymentId,
-                              serviceId: input.serviceId,
-                              serviceName: input.serviceName,
-                              imei: input.imei,
-                              metadata: input.metadata,
-                        },
-                  ],
-                  { session }
-            );
-
-            await session.commitTransaction();
-            return { user: updatedUser, transaction };
-      } catch (error) {
-            await session.abortTransaction();
-            throw error;
-      } finally {
-            await session.endSession();
       }
 };
 
@@ -124,57 +136,69 @@ export const debitUserBalance = async (input: BalanceActionInput) => {
             };
       }
 
-      const session = await User.startSession();
-      try {
-            session.startTransaction();
+      const maxRetries = 3;
+      for (let attempt = 1; attempt <= maxRetries; attempt++) {
+            const session = await User.startSession();
+            try {
+                  session.startTransaction();
 
-            const updatedUser = await User.findOneAndUpdate(
-                  {
-                        _id: userId,
-                        $expr: {
-                              $gte: [{ $ifNull: ['$balance', 0] }, amount],
-                        },
-                  },
-                  { $inc: { balance: -amount } },
-                  { new: true, session }
-            );
-
-            if (!updatedUser) {
-                  throw new AppError('Insufficient balance', 402);
-            }
-
-            const balanceAfter = toMoney(Number(updatedUser.balance ?? 0));
-            const balanceBefore = toMoney(balanceAfter + amount);
-
-            const [transaction] = await BalanceTransaction.create(
-                  [
+                  const updatedUser = await User.findOneAndUpdate(
                         {
-                              userId,
-                              transactionType: 'debit',
-                              amount,
-                              currency,
-                              balanceBefore,
-                              balanceAfter,
-                              source: input.source,
-                              description: input.description,
-                              referenceId: input.referenceId,
-                              paymentId: input.paymentId,
-                              serviceId: input.serviceId,
-                              serviceName: input.serviceName,
-                              imei: input.imei,
-                              metadata: input.metadata,
+                              _id: userId,
+                              $expr: {
+                                    $gte: [{ $ifNull: ['$balance', 0] }, amount],
+                              },
                         },
-                  ],
-                  { session }
-            );
+                        { $inc: { balance: -amount } },
+                        { new: true, session }
+                  );
 
-            await session.commitTransaction();
-            return { user: updatedUser, transaction };
-      } catch (error) {
-            await session.abortTransaction();
-            throw error;
-      } finally {
-            await session.endSession();
+                  if (!updatedUser) {
+                        throw new AppError('Insufficient balance', 402);
+                  }
+
+                  const balanceAfter = toMoney(Number(updatedUser.balance ?? 0));
+                  const balanceBefore = toMoney(balanceAfter + amount);
+
+                  const [transaction] = await BalanceTransaction.create(
+                        [
+                              {
+                                    userId,
+                                    transactionType: 'debit',
+                                    amount,
+                                    currency,
+                                    balanceBefore,
+                                    balanceAfter,
+                                    source: input.source,
+                                    description: input.description,
+                                    referenceId: input.referenceId,
+                                    paymentId: input.paymentId,
+                                    serviceId: input.serviceId,
+                                    serviceName: input.serviceName,
+                                    imei: input.imei,
+                                    metadata: input.metadata,
+                              },
+                        ],
+                        { session }
+                  );
+
+                  await session.commitTransaction();
+                  return { user: updatedUser, transaction };
+            } catch (error: any) {
+                  await session.abortTransaction();
+                  const isWriteConflict =
+                        error?.code === 112 ||
+                        error?.errorLabels?.includes('TransientTransactionError') ||
+                        String(error?.message || '').includes('Write conflict');
+
+                  if (isWriteConflict && attempt < maxRetries) {
+                        await new Promise((resolve) => setTimeout(resolve, attempt * 100));
+                        continue;
+                  }
+                  throw error;
+            } finally {
+                  await session.endSession();
+            }
       }
 };
 

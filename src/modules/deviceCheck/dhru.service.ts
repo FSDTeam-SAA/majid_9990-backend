@@ -1048,21 +1048,21 @@ export const processImeiCheckV1Service = async (
       shouldGenerateFresh: boolean,
       shopId?: string
 ) => {
-      return await Promise.all(
-            imeiList.map(async (imei) => {
-                  const result = await processSingleImeiCheck(
-                        userId,
-                        imei,
-                        requestedServiceId,
-                        shouldGenerateFresh,
-                        shopId
-                  );
-                  return {
-                        imei,
-                        ...result,
-                  };
-            })
-      );
+      const results = [];
+      for (const imei of imeiList) {
+            const result = await processSingleImeiCheck(
+                  userId,
+                  imei,
+                  requestedServiceId,
+                  shouldGenerateFresh,
+                  shopId
+            );
+            results.push({
+                  imei,
+                  ...result,
+            });
+      }
+      return results;
 };
 
 export const processImeiCheckV2Service = async (
@@ -1072,21 +1072,21 @@ export const processImeiCheckV2Service = async (
       shouldGenerateFresh: boolean,
       shopId?: string
 ) => {
-      return await Promise.all(
-            imeiList.map(async (imei) => {
-                  const result = await processSingleImeiCheckV2(
-                        userId,
-                        imei,
-                        requestedServiceId,
-                        shouldGenerateFresh,
-                        shopId
-                  );
-                  return {
-                        imei,
-                        ...result,
-                  };
-            })
-      );
+      const results = [];
+      for (const imei of imeiList) {
+            const result = await processSingleImeiCheckV2(
+                  userId,
+                  imei,
+                  requestedServiceId,
+                  shouldGenerateFresh,
+                  shopId
+            );
+            results.push({
+                  imei,
+                  ...result,
+            });
+      }
+      return results;
 };
 
 export const checkImeisBatchService = async (
