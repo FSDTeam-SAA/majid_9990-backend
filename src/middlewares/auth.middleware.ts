@@ -83,7 +83,7 @@ export const isStaff = (req: Request, res: Response, next: NextFunction): void =
 
 export const isShopkeeperOrStaff = (req: Request, res: Response, next: NextFunction): void => {
       const role = req.user?.role?.toLowerCase();
-      if (role !== 'shopkeeper' && role !== 'staff') {
+      if (role !== 'shopkeeper' && role !== 'staff' && role !== 'admin' && role !== 'super_admin') {
             throw new AppError('Access denied. Only shopkeepers and staff can perform this action.', StatusCodes.FORBIDDEN);
       }
       next();
