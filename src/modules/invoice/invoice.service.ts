@@ -504,7 +504,7 @@ const getInvoiceByShopkeeperId = async (shopkeeperId: string, query: InvoicePagi
       const requestedPage = Number.parseInt(String(query.page ?? ''), 10);
       const requestedLimit = Number.parseInt(String(query.limit ?? ''), 10);
       const page = Number.isFinite(requestedPage) && requestedPage > 0 ? requestedPage : 1;
-      const limit = Number.isFinite(requestedLimit) && requestedLimit > 0 ? Math.min(requestedLimit, 100) : 10;
+      const limit = Number.isFinite(requestedLimit) && requestedLimit > 0 ? Math.min(requestedLimit, 1000) : 10;
       const filter: Record<string, unknown> = { shopkeeperId: trimmedShopkeeperId };
       if (query.shopId && Types.ObjectId.isValid(String(query.shopId))) {
             filter.$or = [{ shopId: new Types.ObjectId(String(query.shopId)) }, { shopId: null }];

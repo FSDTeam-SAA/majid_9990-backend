@@ -90,10 +90,28 @@ const getCashManagementStats = catchAsync(async (req, res) => {
       });
 });
 
+const getCashDrawerMetrics = catchAsync(async (req, res) => {
+      const { shopkeeperId } = req.params;
+      const { shopId } = req.query;
+
+      const result = await cashManagementService.getCashDrawerMetrics(
+            shopkeeperId as string,
+            shopId as string | undefined
+      );
+
+      sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: 'Cash drawer metrics fetched successfully',
+            data: result,
+      });
+});
+
 export default {
       createOrUpdateCashManagement,
       getCashManagementByShopkeeper,
       getAllCashManagementRecords,
       deleteCashManagement,
       getCashManagementStats,
+      getCashDrawerMetrics,
 };

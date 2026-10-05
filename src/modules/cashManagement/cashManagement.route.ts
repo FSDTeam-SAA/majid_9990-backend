@@ -16,6 +16,9 @@ router.get('/shopkeeper/:shopkeeperId', cashManagementController.getCashManageme
 // Get cash management stats by shopkeeper
 router.get('/shopkeeper/:shopkeeperId/stats', cashManagementController.getCashManagementStats);
 
+// Get aggregated cash drawer metrics for dashboard overview
+router.get('/shopkeeper/:shopkeeperId/drawer-metrics', cashManagementController.getCashDrawerMetrics);
+
 // Admin only routes
 router.get('/', cashManagementController.getAllCashManagementRecords);
 

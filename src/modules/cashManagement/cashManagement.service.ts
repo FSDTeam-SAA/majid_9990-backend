@@ -3,6 +3,7 @@ import AppError from '../../errors/AppError';
 import { CashManagement } from './cashManagement.model';
 import { ICashManagement, ICashManagementInput, ICashManagementWithAI } from './cashManagement.interface';
 import { getOpenAiInsight } from '../deviceCheck/scanInfo.transformer';
+import { Invoice } from '../invoice/invoice.model';
 
 class CashManagementService {
       private calculateCashManagementScore(data: {
@@ -380,6 +381,168 @@ ${score >= 90 ? '🏆 Excellent cash management!' : score >= 75 ? '✅ Good job!
                   recentTrend: trend > 5 ? 'Improving' : trend < -5 ? 'Declining' : 'Stable',
                   bestDay: sortedByScore[0],
                   worstDay: sortedByScore[sortedByScore.length - 1],
+            };
+      }
+
+      async getCashDrawerMetrics(shopkeeperId: string, shopId?: string): Promise<any> {
+            if (!Types.ObjectId.isValid(shopkeeperId)) {
+                  throw new AppError('Invalid shopkeeper ID', 400);
+            }
+
+            const now = new Date();
+            const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+            const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+
+            const startOfYesterday = new Date(startOfToday);
+            startOfYesterday.setDate(startOfYesterday.getDate() - 1);
+            const endOfYesterday = new Date(startOfToday.getTime() - 1);
+
+            const sevenDaysAgo = new Date(startOfToday);
+            sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
+
+            const thirtyDaysAgo = new Date(startOfToday);
+            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 29);
+
+            const matchFilter: Record<string, unknown> = {
+                  shopkeeperId: new Types.ObjectId(shopkeeperId),
+                  $or: [
+                        { paymentMethod: { $regex: /^(cash|cash on delivery|cod|bank|bank transfer)$/i } },
+                        { paymentType: { $regex: /^(cash|cash on delivery|cod|bank|bank transfer)$/i } },
+                  ],
+            };
+
+            if (shopId && Types.ObjectId.isValid(String(shopId))) {
+                  matchFilter.$and = [
+                        {
+                              $or: [
+                                    { shopId: new Types.ObjectId(String(shopId)) },
+                                    { shopId: null },
+                              ],
+                        },
+                  ];
+            }
+
+            const groupStage = {
+                  $group: {
+                        _id: null,
+                        cashSales: {
+                              $sum: { $cond: [{ $not: '$isPurchase' }, '$amount', 0] },
+                        },
+                        cashExpenses: {
+                              $sum: { $cond: ['$isPurchase', '$amount', 0] },
+                        },
+                        invoiceCount: {
+                              $sum: { $cond: [{ $not: '$isPurchase' }, 1, 0] },
+                        },
+                        expenseCount: {
+                              $sum: { $cond: ['$isPurchase', 1, 0] },
+                        },
+                  },
+            };
+
+            const [aggResult, cashDoc, recentExpensesInvoices] = await Promise.all([
+                  Invoice.aggregate([
+                        { $match: matchFilter },
+                        {
+                              $project: {
+                                    isPurchase: {
+                                          $in: [
+                                                { $toLower: { $trim: { input: { $ifNull: ['$type', ''] } } } },
+                                                ['purchase invoice', 'purchase'],
+                                          ],
+                                    },
+                                    amount: {
+                                          $cond: [
+                                                { $gt: [{ $ifNull: ['$amountPaid', 0] }, 0] },
+                                                '$amountPaid',
+                                                { $ifNull: ['$totalAmount', 0] },
+                                          ],
+                                    },
+                                    createdAt: { $ifNull: ['$createdAt', new Date(0)] },
+                              },
+                        },
+                        {
+                              $facet: {
+                                    allTime: [groupStage],
+                                    today: [{ $match: { createdAt: { $gte: startOfToday, $lte: endOfToday } } }, groupStage],
+                                    yesterday: [{ $match: { createdAt: { $gte: startOfYesterday, $lte: endOfYesterday } } }, groupStage],
+                                    lastWeek: [{ $match: { createdAt: { $gte: sevenDaysAgo } } }, groupStage],
+                                    lastMonth: [{ $match: { createdAt: { $gte: thirtyDaysAgo } } }, groupStage],
+                              },
+                        },
+                  ]),
+                  CashManagement.findOne({ shopkeeperId: new Types.ObjectId(shopkeeperId) }),
+                  Invoice.find({
+                        shopkeeperId: new Types.ObjectId(shopkeeperId),
+                        $or: [
+                              { paymentMethod: { $regex: /^(cash|cash on delivery|cod|bank|bank transfer)$/i } },
+                              { paymentType: { $regex: /^(cash|cash on delivery|cod|bank|bank transfer)$/i } },
+                        ],
+                        type: { $regex: /^(purchase|purchase invoice)$/i },
+                  })
+                        .sort({ createdAt: -1 })
+                        .limit(20)
+                        .populate('itemsIds', 'itemName')
+                        .populate('customerInfo', 'firstName lastName')
+                        .lean(),
+            ]);
+
+            const raw = aggResult[0] || {};
+            const formatPeriod = (arr: any[]) => {
+                  const item = arr && arr[0] ? arr[0] : {};
+                  const cashSales = Number(item.cashSales || 0);
+                  const cashExpenses = Number(item.cashExpenses || 0);
+                  return {
+                        cashSales,
+                        cashExpenses,
+                        netCash: cashSales - cashExpenses,
+                        invoiceCount: Number(item.invoiceCount || 0),
+                        expenseCount: Number(item.expenseCount || 0),
+                  };
+            };
+
+            const allTimeMetrics = formatPeriod(raw.allTime);
+            const todayMetrics = formatPeriod(raw.today);
+            const yesterdayMetrics = formatPeriod(raw.yesterday);
+            const lastWeekMetrics = formatPeriod(raw.lastWeek);
+            const lastMonthMetrics = formatPeriod(raw.lastMonth);
+
+            const startingDayCash = Number(cashDoc ? cashDoc.startingDayCash || 0 : 0);
+            const banked = Number(cashDoc ? cashDoc.banked || 0 : 0);
+            const cashScore = Number(cashDoc ? cashDoc.cashManagementScore ?? 100 : 100);
+            const aiInsight = cashDoc ? cashDoc.aiInsight || '' : '';
+
+            const previousSalesTotal = Math.max(0, allTimeMetrics.cashSales + startingDayCash - banked);
+            const availableCashToday = previousSalesTotal;
+
+            const cashExpensesList = (recentExpensesInvoices || []).map((inv: any) => ({
+                  id: String(inv._id),
+                  invoiceNumber: inv.invoiceNumber,
+                  date: inv.createdAt,
+                  amount: Number(inv.amountPaid || inv.totalAmount || 0),
+                  description: Array.isArray(inv.itemsIds)
+                        ? inv.itemsIds.map((i: any) => i?.itemName).filter(Boolean).join(', ') || 'Stock Purchase'
+                        : 'Stock Purchase',
+                  sellerName: inv.customerInfo
+                        ? `${inv.customerInfo.firstName || ''} ${inv.customerInfo.lastName || ''}`.trim() || 'Walk-in Seller'
+                        : 'Walk-in Seller',
+                  pdfUrl: inv.invoice?.url,
+                  paymentMethod: inv.paymentMethod || 'cash',
+            }));
+
+            return {
+                  startingDayCash,
+                  banked,
+                  cashScore,
+                  aiInsight,
+                  availableCashToday,
+                  previousSalesTotal,
+                  todayMetrics,
+                  yesterdayMetrics,
+                  lastWeekMetrics,
+                  lastMonthMetrics,
+                  allTimeMetrics,
+                  cashExpensesList,
             };
       }
 }
