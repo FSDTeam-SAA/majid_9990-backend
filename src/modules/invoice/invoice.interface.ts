@@ -70,6 +70,31 @@ export interface IInvoice {
       idImageDeleteAfter?: Date;
       tradeInConsentId?: Types.ObjectId | null;
       invoiceTemplate?: string;
+      scoreReview?: IScoreReview;
+}
+
+export interface IScoreReview {
+      status: 'none' | 'recorded';
+      source?: string;
+      linkedBy?: string;
+      reviewUrl?: string;
+      recordedAt?: Date | null;
+      requestSentAt?: Date | null;
+      requestCount?: number;
+      lastRecipientEmail?: string;
+}
+
+export interface ISendReviewRequestPayload {
+      email?: string;
+      customerName?: string;
+      googleReviewUrl?: string;
+}
+
+export interface IUpdateReviewStatusPayload {
+      status: 'none' | 'recorded';
+      reviewUrl?: string;
+      source?: string;
+      linkedBy?: string;
 }
 
 export interface IInvoiceIdImage {
@@ -114,6 +139,7 @@ export interface IInvoicePayload {
       idImageDeleteAfter?: Date | string;
       tradeInConsentId?: string;
       invoiceTemplate?: string;
+      scoreReview?: IScoreReview | string;
 }
 
 export interface ISendInvoiceEmailPayload {

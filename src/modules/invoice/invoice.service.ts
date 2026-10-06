@@ -15,11 +15,14 @@ import {
       IInvoicePaymentDetails,
       InvoicePaymentStatus,
       ISendInvoiceEmailPayload,
+      ISendReviewRequestPayload,
+      IUpdateReviewStatusPayload,
 } from './invoice.interface';
 import { Invoice } from './invoice.model';
 import { Inventory } from '../inventory/inventory.model';
 import RepairRequest from '../repairRequest/repairRequest.model';
 import { AuditLog } from '../customer/auditLog.model';
+import { Shop } from '../shop/shop.model';
 
 export const sanitizeInvoiceIdImages = <T>(invoice: T): T => {
       if (!invoice) return invoice;
@@ -1018,6 +1021,309 @@ const getInvoiceTemplates = () => {
       return PREDEFINED_INVOICE_TEMPLATES;
 };
 
+export const generateScoreReviewEmailHtml = ({
+      shopName,
+      customerName,
+      googleReviewUrl,
+}: {
+      shopName: string;
+      customerName: string;
+      googleReviewUrl: string;
+}): string => {
+      const escape = (str?: string) =>
+            (str || '')
+                  .replace(/&/g, '&amp;')
+                  .replace(/</g, '&lt;')
+                  .replace(/>/g, '&gt;')
+                  .replace(/"/g, '&quot;')
+                  .replace(/'/g, '&#039;');
+
+      const safeShopName = escape(shopName || 'Mobile Kit Distribution');
+      const safeCustomerName = escape(customerName || 'Valued Customer');
+      const safeReviewUrl = googleReviewUrl || '#';
+
+      return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your experience matters</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #F8FAFC; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="padding: 32px 16px; background-color: #F8FAFC;">
+    <tr>
+      <td align="center">
+        <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 500px; background-color: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
+          <!-- Header -->
+          <tr>
+            <td align="center" style="padding: 36px 32px 24px 32px; border-bottom: 1px solid #F1F5F9;">
+              <table cellpadding="0" cellspacing="0">
+                <tr>
+                  <td align="center">
+                    <div style="font-size: 34px; font-weight: 900; letter-spacing: -0.5px; color: #000000; line-height: 1;">
+                      <span>sc</span><span style="display:inline-block; width: 26px; height: 26px; line-height: 26px; text-align: center; border-radius: 50%; background: #000; color: #fff; font-size: 14px; margin: 0 2px; vertical-align: middle;">★</span><span>re</span><span style="color: #84CC16; font-size: 38px; font-weight: 900; margin-left: 2px; vertical-align: middle; line-height: 1;">+</span>
+                    </div>
+                    <div style="font-size: 11px; color: #4B5563; margin-top: 6px; font-weight: 500; letter-spacing: 0.3px;">
+                      powered by imoscan
+                    </div>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Body -->
+          <tr>
+            <td style="padding: 32px 32px 36px 32px;">
+              <div style="font-size: 11px; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 14px;">
+                ${safeShopName}
+              </div>
+
+              <h1 style="font-size: 28px; font-weight: 800; color: #0F172A; margin: 0 0 24px 0; line-height: 1.25; letter-spacing: -0.5px;">
+                Your experience matters.
+              </h1>
+
+              <p style="font-size: 15px; color: #334155; margin: 0 0 16px 0; line-height: 1.6;">
+                Hi ${safeCustomerName},
+              </p>
+
+              <p style="font-size: 15px; color: #334155; margin: 0 0 16px 0; line-height: 1.6;">
+                Thank you for choosing ${safeShopName}. We hope you're happy with your visit.
+              </p>
+
+              <p style="font-size: 15px; color: #334155; margin: 0 0 28px 0; line-height: 1.6;">
+                How did we do? We'd appreciate an honest review on Google. Your feedback helps us improve and helps other customers decide where to shop.
+              </p>
+
+              <!-- CTA Button -->
+              <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 28px;">
+                <tr>
+                  <td align="center">
+                    <a href="${safeReviewUrl}" target="_blank" style="display: block; width: 100%; box-sizing: border-box; background-color: #84CC16; color: #000000; text-align: center; font-weight: 700; font-size: 15px; padding: 15px 20px; border-radius: 12px; text-decoration: none; box-shadow: 0 2px 8px rgba(132, 204, 22, 0.25);">
+                      Share your experience on Google
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+              <p style="font-size: 15px; color: #334155; margin: 0; line-height: 1.6;">
+                Thank you for your time,<br />
+                <strong>The ${safeShopName} team</strong>
+              </p>
+
+              <div style="margin: 32px 0 20px 0; border-top: 1px solid #F1F5F9;"></div>
+
+              <p style="font-size: 11px; color: #94A3B8; text-align: center; margin: 0 0 6px 0; line-height: 1.5;">
+                Sent through score+ by imoscan on behalf of ${safeShopName}.
+              </p>
+              <p style="font-size: 11px; color: #94A3B8; text-align: center; margin: 0; line-height: 1.5;">
+                <a href="#" style="color: #64748B; text-decoration: underline;">Unsubscribe from review requests.</a>
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+};
+
+const sendReviewRequest = async (
+      invoiceId: string,
+      shopkeeperId: string,
+      payload: ISendReviewRequestPayload
+) => {
+      const trimmedInvoiceId = String(invoiceId ?? '').trim();
+      if (!Types.ObjectId.isValid(trimmedInvoiceId)) {
+            throw new AppError('Invalid invoice ID', StatusCodes.BAD_REQUEST);
+      }
+
+      const invoice = await Invoice.findById(trimmedInvoiceId).populate('customerInfo');
+      if (!invoice) {
+            throw new AppError('Invoice not found', StatusCodes.NOT_FOUND);
+      }
+
+      if (invoice.shopkeeperId.toString() !== shopkeeperId.toString()) {
+            throw new AppError('You are not authorized to send review requests for this invoice', StatusCodes.FORBIDDEN);
+      }
+
+      const customer: any = invoice.customerInfo;
+      const recipientEmail = String(payload.email || customer?.email || '').trim();
+      if (!recipientEmail) {
+            throw new AppError('Recipient email is required to send a review request', StatusCodes.BAD_REQUEST);
+      }
+
+      // Resolve shopkeeper & shop details
+      const shopkeeper = await User.findById(shopkeeperId);
+      let shopName = 'Our Store';
+      let googleReviewUrl = payload.googleReviewUrl?.trim() || '';
+
+      const shopkeeperName = shopkeeper
+            ? `${shopkeeper.firstName || ''} ${shopkeeper.lastName || ''}`.trim()
+            : '';
+
+      if (invoice.shopId) {
+            const shop = await Shop.findById(invoice.shopId);
+            if (shop) {
+                  shopName = shop.shopName || shopkeeper?.shopName || shopkeeperName || 'Our Store';
+                  if (!googleReviewUrl && shop.googleReviewPageUrl) {
+                        googleReviewUrl = shop.googleReviewPageUrl.trim();
+                  }
+            }
+      }
+
+      if (!shopName || shopName === 'Our Store') {
+            shopName = shopkeeper?.shopName || shopkeeperName || 'Our Store';
+      }
+
+      if (!googleReviewUrl && (shopkeeper as any)?.googleReviewPageUrl) {
+            googleReviewUrl = (shopkeeper as any).googleReviewPageUrl.trim();
+      }
+
+      if (!googleReviewUrl) {
+            googleReviewUrl = 'https://google.com';
+      }
+
+      const customerName =
+            payload.customerName ||
+            (customer ? `${customer.firstName || ''} ${customer.lastName || ''}`.trim() : '') ||
+            'Valued Customer';
+
+      const html = generateScoreReviewEmailHtml({
+            shopName,
+            customerName,
+            googleReviewUrl,
+      });
+
+      const emailResult = await sendEmail({
+            to: recipientEmail,
+            subject: `Your experience matters - ${shopName}`,
+            html,
+            fromName: `${shopName} via Score+`,
+      });
+
+      if (!emailResult.success) {
+            throw new AppError(emailResult.error || 'Failed to send review request email', StatusCodes.INTERNAL_SERVER_ERROR);
+      }
+
+      // Update invoice scoreReview tracking. Sending request must not mark review as recorded!
+      const existingScoreReview = invoice.scoreReview || { status: 'none', requestCount: 0 };
+      invoice.scoreReview = {
+            status: existingScoreReview.status || 'none',
+            source: existingScoreReview.source || 'Linked Google review',
+            linkedBy: existingScoreReview.linkedBy || 'Shopkeeper',
+            reviewUrl: existingScoreReview.reviewUrl,
+            recordedAt: existingScoreReview.recordedAt,
+            requestSentAt: new Date(),
+            requestCount: (existingScoreReview.requestCount || 0) + 1,
+            lastRecipientEmail: recipientEmail,
+      };
+
+      await invoice.save();
+
+      // If customer had no email saved, update it
+      if (customer && !customer.email && customer._id) {
+            await Customer.findByIdAndUpdate(customer._id, { email: recipientEmail });
+      }
+
+      return {
+            success: true,
+            message: 'Review request sent successfully',
+            scoreReview: invoice.scoreReview,
+      };
+};
+
+const updateReviewStatus = async (
+      invoiceId: string,
+      shopkeeperId: string,
+      payload: IUpdateReviewStatusPayload
+) => {
+      const trimmedInvoiceId = String(invoiceId ?? '').trim();
+      if (!Types.ObjectId.isValid(trimmedInvoiceId)) {
+            throw new AppError('Invalid invoice ID', StatusCodes.BAD_REQUEST);
+      }
+
+      const invoice = await Invoice.findById(trimmedInvoiceId);
+      if (!invoice) {
+            throw new AppError('Invoice not found', StatusCodes.NOT_FOUND);
+      }
+
+      if (invoice.shopkeeperId.toString() !== shopkeeperId.toString()) {
+            throw new AppError('You are not authorized to update review status for this invoice', StatusCodes.FORBIDDEN);
+      }
+
+      const existingScoreReview = invoice.scoreReview || { status: 'none', requestCount: 0 };
+      const isRecorded = payload.status === 'recorded';
+
+      invoice.scoreReview = {
+            status: isRecorded ? 'recorded' : 'none',
+            source: payload.source?.trim() || existingScoreReview.source || 'Linked Google review',
+            linkedBy: payload.linkedBy?.trim() || existingScoreReview.linkedBy || 'Shopkeeper',
+            reviewUrl: isRecorded ? (payload.reviewUrl?.trim() || existingScoreReview.reviewUrl || '') : undefined,
+            recordedAt: isRecorded ? (existingScoreReview.recordedAt || new Date()) : null,
+            requestSentAt: existingScoreReview.requestSentAt || null,
+            requestCount: existingScoreReview.requestCount || 0,
+            lastRecipientEmail: existingScoreReview.lastRecipientEmail,
+      };
+
+      await invoice.save();
+
+      return {
+            success: true,
+            message: `Review status updated to ${invoice.scoreReview.status}`,
+            scoreReview: invoice.scoreReview,
+      };
+};
+
+const attachCustomerToInvoice = async (
+      invoiceId: string,
+      shopkeeperId: string,
+      payload: { customerId?: string; firstName?: string; lastName?: string; email?: string; phone?: string }
+) => {
+      const trimmedInvoiceId = String(invoiceId ?? '').trim();
+      if (!Types.ObjectId.isValid(trimmedInvoiceId)) {
+            throw new AppError('Invalid invoice ID', StatusCodes.BAD_REQUEST);
+      }
+
+      const invoice = await Invoice.findById(trimmedInvoiceId);
+      if (!invoice) {
+            throw new AppError('Invoice not found', StatusCodes.NOT_FOUND);
+      }
+
+      if (invoice.shopkeeperId.toString() !== shopkeeperId.toString()) {
+            throw new AppError('You are not authorized to modify this invoice', StatusCodes.FORBIDDEN);
+      }
+
+      let customerIdToLink = payload.customerId;
+
+      if (!customerIdToLink && payload.firstName?.trim()) {
+            const newCustomer = await Customer.create({
+                  firstName: payload.firstName.trim(),
+                  lastName: payload.lastName?.trim() || '',
+                  email: payload.email?.trim() || '',
+                  phone: payload.phone?.trim() || '',
+                  shopkeeperId: new Types.ObjectId(shopkeeperId),
+                  shopId: invoice.shopId || null,
+            });
+            customerIdToLink = newCustomer._id.toString();
+      }
+
+      if (!customerIdToLink) {
+            throw new AppError('Either customerId or customer details must be provided', StatusCodes.BAD_REQUEST);
+      }
+
+      invoice.customerInfo = new Types.ObjectId(customerIdToLink);
+      await invoice.save();
+
+      const populatedInvoice = await Invoice.findById(trimmedInvoiceId)
+            .populate('shopkeeperId')
+            .populate('customerInfo')
+            .populate('itemsIds', 'itemName imeiNumber expectedPrice image');
+
+      return sanitizeInvoiceIdImages(populatedInvoice);
+};
+
 const invoiceService = {
       createInvoice,
       getInvoiceById,
@@ -1028,6 +1334,9 @@ const invoiceService = {
       deleteInvoice,
       sendInvoiceEmail,
       getInvoiceTemplates,
+      sendReviewRequest,
+      updateReviewStatus,
+      attachCustomerToInvoice,
 };
 
 export default invoiceService;

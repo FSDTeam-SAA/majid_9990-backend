@@ -149,6 +149,57 @@ const getInvoiceTemplates = catchAsync(async (_req, res) => {
       });
 });
 
+const sendReviewRequest = catchAsync(async (req, res) => {
+      const id = String(req.params.id);
+      const shopkeeperId =
+            req.user.role === 'staff' && req.user.shopkeeperId
+                  ? req.user.shopkeeperId.toString()
+                  : req.user._id?.toString() || req.user.id?.toString();
+
+      const result = await invoiceService.sendReviewRequest(id, shopkeeperId, req.body);
+
+      sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: 'Review request sent successfully',
+            data: result,
+      });
+});
+
+const updateReviewStatus = catchAsync(async (req, res) => {
+      const id = String(req.params.id);
+      const shopkeeperId =
+            req.user.role === 'staff' && req.user.shopkeeperId
+                  ? req.user.shopkeeperId.toString()
+                  : req.user._id?.toString() || req.user.id?.toString();
+
+      const result = await invoiceService.updateReviewStatus(id, shopkeeperId, req.body);
+
+      sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: 'Review status updated successfully',
+            data: result,
+      });
+});
+
+const attachCustomerToInvoice = catchAsync(async (req, res) => {
+      const id = String(req.params.id);
+      const shopkeeperId =
+            req.user.role === 'staff' && req.user.shopkeeperId
+                  ? req.user.shopkeeperId.toString()
+                  : req.user._id?.toString() || req.user.id?.toString();
+
+      const result = await invoiceService.attachCustomerToInvoice(id, shopkeeperId, req.body);
+
+      sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: 'Customer attached to invoice successfully',
+            data: result,
+      });
+});
+
 export default {
       createInvoice,
       getInvoiceById,
@@ -159,5 +210,8 @@ export default {
       deleteInvoice,
       sendInvoiceEmail,
       getInvoiceTemplates,
+      sendReviewRequest,
+      updateReviewStatus,
+      attachCustomerToInvoice,
 };
 

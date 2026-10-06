@@ -155,6 +155,45 @@ const invoiceSchema = new Schema<IInvoice>(
                   default: 'default',
                   trim: true,
             },
+            scoreReview: {
+                  status: {
+                        type: String,
+                        enum: ['none', 'recorded'],
+                        default: 'none',
+                  },
+                  source: {
+                        type: String,
+                        trim: true,
+                        default: 'Linked Google review',
+                  },
+                  linkedBy: {
+                        type: String,
+                        trim: true,
+                        default: 'Shopkeeper',
+                  },
+                  reviewUrl: {
+                        type: String,
+                        trim: true,
+                        default: null,
+                  },
+                  recordedAt: {
+                        type: Date,
+                        default: null,
+                  },
+                  requestSentAt: {
+                        type: Date,
+                        default: null,
+                  },
+                  requestCount: {
+                        type: Number,
+                        default: 0,
+                  },
+                  lastRecipientEmail: {
+                        type: String,
+                        trim: true,
+                        default: null,
+                  },
+            },
       },
       {
             timestamps: true,
