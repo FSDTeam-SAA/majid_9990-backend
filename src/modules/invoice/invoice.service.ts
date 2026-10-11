@@ -1,4 +1,6 @@
 import * as fs from 'fs';
+import * as path from 'path';
+import config from '../../config/config';
 import { StatusCodes } from 'http-status-codes';
 import { Types } from 'mongoose';
 import AppError from '../../errors/AppError';
@@ -1025,10 +1027,12 @@ export const generateScoreReviewEmailHtml = ({
       shopName,
       customerName,
       googleReviewUrl,
+      logoUrl = 'cid:scorepluslogo',
 }: {
       shopName: string;
       customerName: string;
       googleReviewUrl: string;
+      logoUrl?: string;
 }): string => {
       const escape = (str?: string) =>
             (str || '')
@@ -1041,6 +1045,7 @@ export const generateScoreReviewEmailHtml = ({
       const safeShopName = escape(shopName || 'Mobile Kit Distribution');
       const safeCustomerName = escape(customerName || 'Valued Customer');
       const safeReviewUrl = googleReviewUrl || '#';
+      const safeLogoUrl = logoUrl || 'cid:scorepluslogo';
 
       return `<!DOCTYPE html>
 <html lang="en">
@@ -1056,14 +1061,17 @@ export const generateScoreReviewEmailHtml = ({
         <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 500px; background-color: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
           <!-- Header -->
           <tr>
-            <td align="center" style="padding: 36px 32px 24px 32px; border-bottom: 1px solid #F1F5F9;">
-              <table cellpadding="0" cellspacing="0">
+            <td align="center" style="padding: 32px 32px 24px 32px; border-bottom: 1px solid #F1F5F9;">
+              <table cellpadding="0" cellspacing="0" style="margin: 0 auto;">
                 <tr>
                   <td align="center">
-                    <div style="font-size: 34px; font-weight: 900; letter-spacing: -0.5px; color: #000000; line-height: 1;">
-                      <span>sc</span><span style="display:inline-block; width: 26px; height: 26px; line-height: 26px; text-align: center; border-radius: 50%; background: #000; color: #fff; font-size: 14px; margin: 0 2px; vertical-align: middle;">★</span><span>re</span><span style="color: #84CC16; font-size: 38px; font-weight: 900; margin-left: 2px; vertical-align: middle; line-height: 1;">+</span>
-                    </div>
-                    <div style="font-size: 11px; color: #4B5563; margin-top: 6px; font-weight: 500; letter-spacing: 0.3px;">
+                    <img
+                      src="${safeLogoUrl}"
+                      alt="Score+"
+                      width="150"
+                      style="display: block; width: 150px; max-width: 150px; height: auto; margin: 0 auto; border: 0; outline: none; text-decoration: none;"
+                    />
+                    <div style="font-size: 11px; color: #64748B; margin-top: 8px; font-weight: 500; letter-spacing: 0.3px;">
                       powered by imoscan
                     </div>
                   </td>
@@ -1190,10 +1198,36 @@ const sendReviewRequest = async (
             (customer ? `${customer.firstName || ''} ${customer.lastName || ''}`.trim() : '') ||
             'Valued Customer';
 
+      // Resolve score-plus logo for email template
+      const frontendUrl = (config.frontend_url || 'http://localhost:3000').replace(/\/+$/, '');
+      const remoteLogoUrl = `${frontendUrl}/images/score-plus.png`;
+      let logoAttachment: { filename: string; path: string; cid: string } | undefined = undefined;
+      let logoUrl = remoteLogoUrl;
+
+      const candidatePaths = [
+            path.resolve(__dirname, '../../../assets/score-plus.png'),
+            path.resolve(process.cwd(), 'assets/score-plus.png'),
+            path.resolve(process.cwd(), 'src/assets/score-plus.png'),
+            path.resolve(process.cwd(), '../majid-website/public/images/score-plus.png'),
+            path.resolve(process.cwd(), '../majid-website/public/score-plus.png'),
+      ];
+
+      const resolvedLogoPath = candidatePaths.find((p) => fs.existsSync(p));
+
+      if (resolvedLogoPath) {
+            logoAttachment = {
+                  filename: 'score-plus.png',
+                  path: resolvedLogoPath,
+                  cid: 'scorepluslogo',
+            };
+            logoUrl = 'cid:scorepluslogo';
+      }
+
       const html = generateScoreReviewEmailHtml({
             shopName,
             customerName,
             googleReviewUrl,
+            logoUrl,
       });
 
       const emailResult = await sendEmail({
@@ -1201,6 +1235,7 @@ const sendReviewRequest = async (
             subject: `Your experience matters - ${shopName}`,
             html,
             fromName: `${shopName} via Score+`,
+            attachments: logoAttachment ? [logoAttachment] : undefined,
       });
 
       if (!emailResult.success) {

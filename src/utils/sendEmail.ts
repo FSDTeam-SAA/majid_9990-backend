@@ -9,6 +9,7 @@ interface EmailAttachment {
       content?: Buffer | string;
       path?: string;
       contentType?: string;
+      cid?: string;
 }
 
 interface SendEmailParams {
