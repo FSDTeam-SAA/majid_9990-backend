@@ -162,15 +162,21 @@ const getByShopkeeperId = async (shopkeeperId: string, query: Record<string, unk
                   let hasOverdueOrFullDue = false;
 
                   customerInvs.forEach((inv) => {
+                        const invType = String(inv.type || '').trim().toLowerCase();
+                        const isPurchase = invType === 'purchase invoice' || invType === 'purchase';
+
                         const invoiceAmount = Number(inv.totalAmount) || 0;
                         const paid = Number(
                               inv.amountPaid ??
                               inv.paymentDetails?.amountPaid ??
-                              (inv.paymentStatus === 'paid' ? invoiceAmount : 0)
+                              (inv.paymentStatus === 'paid' || isPurchase ? invoiceAmount : 0)
                         ) || 0;
 
                         let due = 0;
-                        if (inv.dueAmount !== null && inv.dueAmount !== undefined) {
+                        if (isPurchase) {
+                              // Stock purchased from customer/supplier paid by shopkeeper: not customer receivables
+                              due = 0;
+                        } else if (inv.dueAmount !== null && inv.dueAmount !== undefined) {
                               due = Number(inv.dueAmount);
                         } else {
                               due = Math.max(0, invoiceAmount - paid);
