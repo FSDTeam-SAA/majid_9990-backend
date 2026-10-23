@@ -532,11 +532,16 @@ const setStaffPin = async (
             throw new AppError('Invalid owner password.', StatusCodes.UNAUTHORIZED);
       }
 
-      const staff = await User.findOne({
+      const isCallerAdmin = owner.role === 'admin' || owner.role === 'super_admin';
+      const staffQuery: Record<string, unknown> = {
             _id: new Types.ObjectId(staffId),
             role: 'staff',
-            shopkeeperId: new Types.ObjectId(shopkeeperId),
-      });
+      };
+      if (!isCallerAdmin) {
+            staffQuery.shopkeeperId = new Types.ObjectId(shopkeeperId);
+      }
+
+      const staff = await User.findOne(staffQuery);
 
       if (!staff) {
             throw new AppError('Staff member not found for this shop', StatusCodes.NOT_FOUND);

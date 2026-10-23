@@ -31,7 +31,7 @@ router.get('/my-shopkeeper-data', protect, userController.getMyShopkeeperData);
 
 // Staff session routes
 router.get('/staff-session/members', protect, isShopkeeperOrStaff, userController.getStaffSessionMembers);
-router.put('/staff-session/pin/:staffId', protect, isShopkeeper, userController.setStaffPin);
+router.put('/staff-session/pin/:staffId', protect, isAdminOrShopkeeper, userController.setStaffPin);
 router.post('/staff-session/switch', protect, isShopkeeperOrStaff, userController.switchStaffSession);
 router.post('/staff-session/owner', protect, userController.returnToOwnerSession);
 
