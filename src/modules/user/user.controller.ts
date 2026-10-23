@@ -182,6 +182,71 @@ const adminUpdateUser = catchAsync(async (req, res) => {
       });
 });
 
+const getStaffSessionMembers = catchAsync(async (req, res) => {
+      const shopkeeperId =
+            req.user.role === 'staff' && req.user.shopkeeperId
+                  ? req.user.shopkeeperId.toString()
+                  : req.user._id.toString();
+
+      const result = await userService.getStaffSessionMembers(shopkeeperId);
+
+      sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: 'Staff session members retrieved successfully.',
+            data: result,
+      });
+});
+
+const setStaffPin = catchAsync(async (req, res) => {
+      const shopkeeperId = req.user._id.toString();
+      const staffId = Array.isArray(req.params.staffId) ? req.params.staffId[0] : req.params.staffId;
+      const { pin, password } = req.body;
+
+      const result = await userService.setStaffPin(shopkeeperId, staffId, pin, password);
+
+      sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: 'Staff PIN updated successfully.',
+            data: result,
+      });
+});
+
+const switchStaffSession = catchAsync(async (req, res) => {
+      const shopkeeperId =
+            req.user.role === 'staff' && req.user.shopkeeperId
+                  ? req.user.shopkeeperId.toString()
+                  : req.user._id.toString();
+
+      const { staffId, pin } = req.body;
+      const result = await userService.switchStaffSession(shopkeeperId, staffId, pin);
+
+      sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: 'Switched to staff session successfully.',
+            data: result,
+      });
+});
+
+const returnToOwnerSession = catchAsync(async (req, res) => {
+      const shopkeeperId =
+            req.user.role === 'staff' && req.user.shopkeeperId
+                  ? req.user.shopkeeperId.toString()
+                  : req.user._id.toString();
+
+      const { password } = req.body;
+      const result = await userService.returnToOwnerSession(shopkeeperId, password);
+
+      sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: 'Returned to owner session successfully.',
+            data: result,
+      });
+});
+
 const userController = {
       registerUser,
       verifyEmail,
@@ -198,6 +263,10 @@ const userController = {
       getAllStaffByShopkeeper,
       getMyShopkeeperData,
       adminUpdateUser,
+      getStaffSessionMembers,
+      setStaffPin,
+      switchStaffSession,
+      returnToOwnerSession,
 };
 
 export default userController;

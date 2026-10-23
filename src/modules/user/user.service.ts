@@ -491,6 +491,135 @@ const adminUpdateUser = async (userId: string, payload: any) => {
       return result;
 };
 
+const getStaffSessionMembers = async (shopkeeperId: string) => {
+      if (!Types.ObjectId.isValid(shopkeeperId)) {
+            throw new AppError('Invalid shopkeeper ID', StatusCodes.BAD_REQUEST);
+      }
+
+      const staffList = await User.find({
+            role: 'staff',
+            shopkeeperId: new Types.ObjectId(shopkeeperId),
+      }).select('+staffPin firstName lastName email');
+
+      return staffList.map((member) => ({
+            id: member._id.toString(),
+            name: `${member.firstName || ''} ${member.lastName || ''}`.trim() || member.email,
+            hasPin: Boolean(member.staffPin),
+      }));
+};
+
+const setStaffPin = async (
+      shopkeeperId: string,
+      staffId: string,
+      pin: string,
+      ownerPassword: string
+) => {
+      if (!pin || !/^\d{4}$/.test(pin)) {
+            throw new AppError('Enter exactly four PIN digits.', StatusCodes.BAD_REQUEST);
+      }
+
+      if (!Types.ObjectId.isValid(staffId)) {
+            throw new AppError('Invalid staff ID', StatusCodes.BAD_REQUEST);
+      }
+
+      const owner = await User.findById(shopkeeperId);
+      if (!owner) {
+            throw new AppError('Owner not found', StatusCodes.NOT_FOUND);
+      }
+
+      const isPasswordMatch = await bcrypt.compare(ownerPassword, owner.password);
+      if (!isPasswordMatch) {
+            throw new AppError('Invalid owner password.', StatusCodes.UNAUTHORIZED);
+      }
+
+      const staff = await User.findOne({
+            _id: new Types.ObjectId(staffId),
+            role: 'staff',
+            shopkeeperId: new Types.ObjectId(shopkeeperId),
+      });
+
+      if (!staff) {
+            throw new AppError('Staff member not found for this shop', StatusCodes.NOT_FOUND);
+      }
+
+      const hashedPin = await bcrypt.hash(pin, 10);
+      staff.staffPin = hashedPin;
+      await staff.save();
+
+      return { success: true };
+};
+
+const switchStaffSession = async (
+      shopkeeperId: string,
+      staffId: string,
+      pin: string
+) => {
+      if (!pin || !/^\d{4}$/.test(pin)) {
+            throw new AppError('Enter exactly four PIN digits.', StatusCodes.BAD_REQUEST);
+      }
+
+      if (!Types.ObjectId.isValid(staffId)) {
+            throw new AppError('Invalid staff ID', StatusCodes.BAD_REQUEST);
+      }
+
+      const staff = await User.findOne({
+            _id: new Types.ObjectId(staffId),
+            role: 'staff',
+            shopkeeperId: new Types.ObjectId(shopkeeperId),
+      }).select('+staffPin firstName lastName email role shopkeeperId');
+
+      if (!staff) {
+            throw new AppError('Staff member not found for this shop', StatusCodes.NOT_FOUND);
+      }
+
+      if (!staff.staffPin) {
+            throw new AppError('PIN is not set for this staff member. Please set PIN first.', StatusCodes.BAD_REQUEST);
+      }
+
+      const isPinValid = await bcrypt.compare(pin, staff.staffPin);
+      if (!isPinValid) {
+            throw new AppError('Wrong PIN entered. Please try again.', StatusCodes.UNAUTHORIZED);
+      }
+
+      const tokenPayload = {
+            _id: staff._id,
+            email: staff.email,
+            role: staff.role,
+            shopkeeperId: staff.shopkeeperId,
+      };
+
+      const token = createToken(
+            tokenPayload,
+            config.JWT_SECRET as string,
+            config.JWT_EXPIRES_IN as string
+      );
+
+      const staffName = `${staff.firstName || ''} ${staff.lastName || ''}`.trim() || staff.email;
+
+      return {
+            token,
+            id: staff._id.toString(),
+            name: staffName,
+      };
+};
+
+const returnToOwnerSession = async (
+      shopkeeperId: string,
+      password: string
+) => {
+      const owner = await User.findById(shopkeeperId);
+      if (!owner) {
+            throw new AppError('Owner not found', StatusCodes.NOT_FOUND);
+      }
+
+      const isPasswordMatch = await bcrypt.compare(password, owner.password);
+      if (!isPasswordMatch) {
+            throw new AppError('Invalid owner password.', StatusCodes.UNAUTHORIZED);
+      }
+
+      return { success: true };
+};
+
 const userService = {
       registerUser,
       verifyEmail,
@@ -507,6 +636,10 @@ const userService = {
       getAllStaffByShopkeeper,
       getMyShopkeeperData,
       adminUpdateUser,
+      getStaffSessionMembers,
+      setStaffPin,
+      switchStaffSession,
+      returnToOwnerSession,
 };
 
 export default userService;

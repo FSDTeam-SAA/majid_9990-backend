@@ -1,6 +1,6 @@
 import { Router } from 'express';
 
-import { protect, isAdminOrShopkeeper, isAdmin } from '../../middlewares/auth.middleware';
+import { protect, isAdminOrShopkeeper, isAdmin, isShopkeeperOrStaff, isShopkeeper } from '../../middlewares/auth.middleware';
 import { upload } from '../../middlewares/multer.middleware';
 import userController from './user.controller';
 
@@ -29,5 +29,12 @@ router.post('/create-staff', protect, isAdminOrShopkeeper, userController.create
 router.get('/staff/:shopkeeperId', protect, userController.getAllStaffByShopkeeper);
 router.get('/my-shopkeeper-data', protect, userController.getMyShopkeeperData);
 
+// Staff session routes
+router.get('/staff-session/members', protect, isShopkeeperOrStaff, userController.getStaffSessionMembers);
+router.put('/staff-session/pin/:staffId', protect, isShopkeeper, userController.setStaffPin);
+router.post('/staff-session/switch', protect, isShopkeeperOrStaff, userController.switchStaffSession);
+router.post('/staff-session/owner', protect, userController.returnToOwnerSession);
+
 const userRouter = router;
 export default userRouter;
+

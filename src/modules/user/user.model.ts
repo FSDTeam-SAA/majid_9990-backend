@@ -155,6 +155,11 @@ const userSchema = new Schema<IUser>(
                   expiresAt: { type: Date, default: null },
                   attempts: { type: Number, default: 0 },
             },
+            staffPin: {
+                  type: String,
+                  select: false,
+                  default: null,
+            },
       },
       {
             timestamps: true,

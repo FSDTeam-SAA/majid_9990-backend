@@ -65,6 +65,7 @@ export interface IUser {
             expiresAt?: Date | null;
             attempts?: number;
       };
+      staffPin?: string;
       createdAt?: Date;
       updatedAt?: Date;
 }
