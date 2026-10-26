@@ -66,6 +66,20 @@ export interface IUser {
             attempts?: number;
       };
       staffPin?: string;
+      staffId?: string;
+      assignedShopId?: Types.ObjectId | string;
+      areaManagerId?: Types.ObjectId | string;
+      hourlyWage?: number;
+      leaveAllowanceHours?: number;
+      usedLeaveHours?: number;
+      bookedLeaveHours?: number;
+      webAuthnCredentials?: {
+            credentialId: string;
+            publicKey: string;
+            counter: number;
+            transports?: string[];
+            createdAt?: Date;
+      }[];
       createdAt?: Date;
       updatedAt?: Date;
 }

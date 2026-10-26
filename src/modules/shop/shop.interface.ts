@@ -21,6 +21,20 @@ export interface IShop {
   taxName?: string;
   taxPercentage?: number;
   taxIncludedInPrice?: boolean;
+  storeCode?: string;
+  nfcToken?: string;
+  nfcTokenRotatedAt?: Date | null;
+  areaManager?: {
+    name: string;
+    email: string;
+    phone: string;
+    title?: string;
+  };
+  storeSupport?: {
+    phone: string;
+    email: string;
+    address: string;
+  };
   createdAt?: Date;
   updatedAt?: Date;
 }

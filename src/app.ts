@@ -19,6 +19,8 @@ const allowedOrigins = [
       'https://majid-dashboard.vercel.app',
       'https://majiddashboard.vercel.app',
       'http://localhost:3000',
+      'http://localhost:3001',
+      'https://attendance.imoscan.co.uk',
 ];
 
 const corsOptions = {

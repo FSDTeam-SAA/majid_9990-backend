@@ -26,6 +26,10 @@ import shopRouter from '../modules/shop/shop.router';
 import popUpRuleRouter from '../modules/popUpRule/popUpRule.router';
 import securityRouter from '../modules/security/security.router';
 import consentRouter from '../modules/consent/consent.router';
+import attendanceRouter from '../modules/attendance/attendance.router';
+import rotaRouter from '../modules/rota/rota.router';
+import leaveRouter from '../modules/leave/leave.router';
+import wagesRouter from '../modules/wages/wages.router';
 
 const router = Router();
 
@@ -153,6 +157,22 @@ const moduleRoutes = [
       {
         path: '/consent',
         route: consentRouter,
+      },
+      {
+        path: '/attendance',
+        route: attendanceRouter,
+      },
+      {
+        path: '/rota',
+        route: rotaRouter,
+      },
+      {
+        path: '/leave',
+        route: leaveRouter,
+      },
+      {
+        path: '/wages',
+        route: wagesRouter,
       },
 ];
 moduleRoutes.forEach((route) => router.use(route.path, route.route));

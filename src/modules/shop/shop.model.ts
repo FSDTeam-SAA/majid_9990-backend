@@ -9,6 +9,25 @@ const shopImageSchema = new Schema(
   { _id: false }
 );
 
+const areaManagerSchema = new Schema(
+  {
+    name: { type: String, trim: true, default: '' },
+    email: { type: String, trim: true, default: '' },
+    phone: { type: String, trim: true, default: '' },
+    title: { type: String, trim: true, default: 'Area Manager' },
+  },
+  { _id: false }
+);
+
+const storeSupportSchema = new Schema(
+  {
+    phone: { type: String, trim: true, default: '' },
+    email: { type: String, trim: true, default: '' },
+    address: { type: String, trim: true, default: '' },
+  },
+  { _id: false }
+);
+
 const shopSchema = new Schema<IShop>(
   {
     shopkeeperId: {
@@ -74,6 +93,29 @@ const shopSchema = new Schema<IShop>(
     taxIncludedInPrice: {
       type: Boolean,
       default: false,
+    },
+    storeCode: {
+      type: String,
+      trim: true,
+      default: 'MKD-001',
+    },
+    nfcToken: {
+      type: String,
+      sparse: true,
+      unique: true,
+      trim: true,
+    },
+    nfcTokenRotatedAt: {
+      type: Date,
+      default: null,
+    },
+    areaManager: {
+      type: areaManagerSchema,
+      default: () => ({}),
+    },
+    storeSupport: {
+      type: storeSupportSchema,
+      default: () => ({}),
     },
   },
   {

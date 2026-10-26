@@ -160,6 +160,51 @@ const userSchema = new Schema<IUser>(
                   select: false,
                   default: null,
             },
+            staffId: {
+                  type: String,
+                  sparse: true,
+                  unique: true,
+                  trim: true,
+            },
+            assignedShopId: {
+                  type: Schema.Types.ObjectId,
+                  ref: 'Shop',
+                  default: null,
+            },
+            areaManagerId: {
+                  type: Schema.Types.ObjectId,
+                  ref: 'User',
+                  default: null,
+            },
+            hourlyWage: {
+                  type: Number,
+                  default: 12,
+                  min: 0,
+            },
+            leaveAllowanceHours: {
+                  type: Number,
+                  default: 160,
+                  min: 0,
+            },
+            usedLeaveHours: {
+                  type: Number,
+                  default: 0,
+                  min: 0,
+            },
+            bookedLeaveHours: {
+                  type: Number,
+                  default: 0,
+                  min: 0,
+            },
+            webAuthnCredentials: [
+                  {
+                        credentialId: { type: String, required: true },
+                        publicKey: { type: String, required: true },
+                        counter: { type: Number, default: 0 },
+                        transports: { type: [String], default: [] },
+                        createdAt: { type: Date, default: Date.now },
+                  },
+            ],
       },
       {
             timestamps: true,
