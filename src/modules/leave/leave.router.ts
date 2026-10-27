@@ -13,7 +13,7 @@ const router = Router();
 router.get('/balance/:staffId', optionalProtect, leaveController.getLeaveBalance);
 
 // Leave requests list and submission
-router.get('/', protect, isShopkeeperOrStaff, leaveController.getLeaveRequests);
+router.get('/', optionalProtect, leaveController.getLeaveRequests);
 router.post('/request', optionalProtect, leaveController.createLeaveRequest);
 
 // Manager decision on leave request
