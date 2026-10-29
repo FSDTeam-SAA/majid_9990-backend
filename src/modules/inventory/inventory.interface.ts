@@ -25,8 +25,24 @@ export interface IInventory {
       color?: string[];
       storage?: string[];
       size?: string;
-      imeiNumber: string;
+      imeiNumber?: string;
+      serialNumber?: string;
       modelNumber?: string;
+      stockUnit?: 'single' | 'pack';
+      itemsPerPack?: number;
+      batchNumber?: string;
+      expiryDate?: Date | string;
+      periodAfterOpening?: string;
+      packagingCondition?: 'sealed' | 'open' | 'damaged';
+      categoryAttributes?: Record<string, any>;
+      units?: Array<{
+            serialNumber?: string;
+            imeiNumber?: string;
+            condition?: string;
+            batteryHealth?: number | string;
+            costPrice?: number;
+            status?: string;
+      }>;
       quantity?: number;
       purchasePrice?: number;
       expectedPrice?: number;

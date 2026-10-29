@@ -908,6 +908,21 @@ const createInventory = async (payload: Partial<IInventory>, file?: any, variant
             }
       }
 
+      if (typeof (normalizedPayload as any).categoryAttributes === 'string') {
+            try {
+                  (normalizedPayload as any).categoryAttributes = JSON.parse((normalizedPayload as any).categoryAttributes);
+            } catch {
+                  // keep as is
+            }
+      }
+      if (typeof (normalizedPayload as any).units === 'string') {
+            try {
+                  (normalizedPayload as any).units = JSON.parse((normalizedPayload as any).units);
+            } catch {
+                  // keep as is
+            }
+      }
+
       const variants = await normalizeVariants((payload as any).variants, variantFiles);
 
       for (const variant of variants) {
@@ -1420,6 +1435,21 @@ const updateInventory = async (id: string, payload: Partial<IInventory>, file?: 
                   normalizedPayload.supplierId = new Types.ObjectId(rawSupplierId);
             } else if (!rawSupplierId) {
                   (normalizedPayload as any).supplierId = null;
+            }
+      }
+
+      if (typeof (normalizedPayload as any).categoryAttributes === 'string') {
+            try {
+                  (normalizedPayload as any).categoryAttributes = JSON.parse((normalizedPayload as any).categoryAttributes);
+            } catch {
+                  // keep as is
+            }
+      }
+      if (typeof (normalizedPayload as any).units === 'string') {
+            try {
+                  (normalizedPayload as any).units = JSON.parse((normalizedPayload as any).units);
+            } catch {
+                  // keep as is
             }
       }
 

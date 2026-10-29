@@ -72,12 +72,53 @@ const deleteCategory = catchAsync(async (req, res) => {
 const getCategoriesWithItemCount = catchAsync(async (req, res) => {
       const shopkeeperId = req.user.role === 'staff' && req.user.shopkeeperId ? req.user.shopkeeperId : req.user._id;
       const storeId = await getShopFromRequest(req);
-      const result = await categoryService.getCategoriesWithItemCount(shopkeeperId, storeId);
+      const includeHidden = req.query.includeHidden === 'true';
+      const result = await categoryService.getCategoriesWithItemCount(shopkeeperId, storeId, includeHidden);
 
       sendResponse(res, {
             statusCode: StatusCodes.OK,
             success: true,
             message: 'Categories with item count fetched successfully',
+            data: result,
+      });
+});
+
+const getAllCategoriesIncludingHidden = catchAsync(async (req, res) => {
+      const shopkeeperId = req.user.role === 'staff' && req.user.shopkeeperId ? req.user.shopkeeperId : req.user._id;
+      const storeId = await getShopFromRequest(req);
+      const result = await categoryService.getCategoriesWithItemCount(shopkeeperId, storeId, true);
+
+      sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: 'All categories including hidden fetched successfully',
+            data: result,
+      });
+});
+
+const toggleCategoryVisibility = catchAsync(async (req, res) => {
+      const shopkeeperId = req.user.role === 'staff' && req.user.shopkeeperId ? req.user.shopkeeperId : req.user._id;
+      const storeId = await getShopFromRequest(req);
+      const isHidden = Boolean(req.body.isHidden);
+      const result = await categoryService.toggleCategoryVisibility(req.params.id as string, shopkeeperId, isHidden, storeId);
+
+      sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: isHidden ? 'Category hidden successfully' : 'Category restored successfully',
+            data: result,
+      });
+});
+
+const resetCategoryImage = catchAsync(async (req, res) => {
+      const shopkeeperId = req.user.role === 'staff' && req.user.shopkeeperId ? req.user.shopkeeperId : req.user._id;
+      const storeId = await getShopFromRequest(req);
+      const result = await categoryService.resetCategoryImage(req.params.id as string, shopkeeperId, storeId);
+
+      sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: 'Category image reset to default successfully',
             data: result,
       });
 });
@@ -102,5 +143,8 @@ export default {
       updateCategory,
       deleteCategory,
       getCategoriesWithItemCount,
+      getAllCategoriesIncludingHidden,
+      toggleCategoryVisibility,
+      resetCategoryImage,
       bulkUpdateTotalItems,
 };

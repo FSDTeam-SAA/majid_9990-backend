@@ -8,6 +8,7 @@ const router = Router();
 // Protected routes (require authentication)
 router.get('/', protect, categoryController.getAllCategories);
 router.get('/with-count', protect, categoryController.getCategoriesWithItemCount);
+router.get('/manage', protect, categoryController.getAllCategoriesIncludingHidden);
 router.get('/:id', protect, categoryController.getCategoryById);
 
 // Admin only routes
@@ -17,6 +18,9 @@ router.post(
       upload.single('image'),
       categoryController.createCategory
 );
+
+router.patch('/:id/visibility', protect, categoryController.toggleCategoryVisibility);
+router.post('/:id/reset-image', protect, categoryController.resetCategoryImage);
 
 router.put(
       '/:id',

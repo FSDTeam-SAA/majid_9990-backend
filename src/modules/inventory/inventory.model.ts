@@ -39,9 +39,54 @@ const inventorySchema = new Schema<IInventory>(
             },
             imeiNumber: {
                   type: String,
-                  required: true,
-                  unique: true,
+                  trim: true,
+                  sparse: true,
+                  index: true,
             },
+            serialNumber: {
+                  type: String,
+                  trim: true,
+                  sparse: true,
+                  index: true,
+            },
+            stockUnit: {
+                  type: String,
+                  enum: ['single', 'pack'],
+                  default: 'single',
+            },
+            itemsPerPack: {
+                  type: Number,
+                  default: 1,
+            },
+            batchNumber: {
+                  type: String,
+                  trim: true,
+            },
+            expiryDate: {
+                  type: Date,
+            },
+            periodAfterOpening: {
+                  type: String,
+                  trim: true,
+            },
+            packagingCondition: {
+                  type: String,
+                  enum: ['sealed', 'open', 'damaged'],
+            },
+            categoryAttributes: {
+                  type: Schema.Types.Mixed,
+                  default: {},
+            },
+            units: [
+                  {
+                        serialNumber: { type: String, trim: true },
+                        imeiNumber: { type: String, trim: true },
+                        condition: { type: String, trim: true },
+                        batteryHealth: { type: Schema.Types.Mixed },
+                        costPrice: { type: Number },
+                        status: { type: String, default: 'available' },
+                  },
+            ],
             modelNumber: {
                   type: String,
             },

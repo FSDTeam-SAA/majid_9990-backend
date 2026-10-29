@@ -8,6 +8,10 @@ const categorySchema = new Schema<ICategory>(
                   required: true,
                   trim: true,
             },
+            key: {
+                  type: String,
+                  trim: true,
+            },
             shopkeeperId: {
                   type: Schema.Types.ObjectId,
                   ref: 'User',
@@ -23,10 +27,30 @@ const categorySchema = new Schema<ICategory>(
                   public_id: String,
                   url: String,
             },
+            defaultImage: {
+                  public_id: String,
+                  url: String,
+            },
             totalItems: {
                   type: Number,
                   default: 0,
                   min: 0,
+            },
+            isActive: {
+                  type: Boolean,
+                  default: true,
+            },
+            isDefault: {
+                  type: Boolean,
+                  default: false,
+            },
+            isHidden: {
+                  type: Boolean,
+                  default: false,
+            },
+            order: {
+                  type: Number,
+                  default: 0,
             },
       },
       {
