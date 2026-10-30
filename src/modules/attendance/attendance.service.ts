@@ -25,18 +25,21 @@ const normalizeDate = (d?: Date | string): Date => {
 };
 
 // Verify Store NFC Beacon Token
-const verifyStoreToken = async (token: string) => {
-  if (!token) {
-    throw new AppError('Store NFC token is required', StatusCodes.BAD_REQUEST);
+const verifyStoreToken = async (token?: string) => {
+  let shop = null;
+
+  if (token && token !== 'default') {
+    shop = await Shop.findOne({ nfcToken: token });
   }
 
-  let shop = await Shop.findOne({ nfcToken: token });
-
-  // Fallback demo/mock support: if shop has not initialized NFC token, find first active shop or default
+  // Fallback support: find shop with active NFC token or first active shop
+  if (!shop) {
+    shop = await Shop.findOne({ nfcToken: { $exists: true, $ne: '' } });
+  }
   if (!shop) {
     shop = await Shop.findOne({ isActive: true });
     if (shop && !shop.nfcToken) {
-      shop.nfcToken = token;
+      shop.nfcToken = token && token !== 'default' ? token : crypto.randomBytes(16).toString('hex');
       shop.storeCode = shop.storeCode || 'MKD-001';
       await shop.save();
     }
@@ -46,13 +49,37 @@ const verifyStoreToken = async (token: string) => {
     throw new AppError('Invalid or revoked NFC store token', StatusCodes.NOT_FOUND);
   }
 
+  // Fetch staff list for this store for quick tap suggestions
+  const staffMembers = await User.find({
+    role: 'staff',
+    $or: [
+      { shopId: shop._id },
+      { shopkeeperId: shop.shopkeeperId },
+    ],
+  }).select('staffId firstName lastName idNumber image email');
+
+  let staffList = staffMembers.map((m) => ({
+    staffId: m.staffId || m.idNumber || m.email,
+    fullName: `${m.firstName} ${m.lastName || ''}`.trim(),
+    photoUrl: m.image?.url || '',
+  }));
+
+  if (!staffList.length) {
+    staffList = [
+      { staffId: 'STF-4130', fullName: 'Adam Khan', photoUrl: '' },
+      { staffId: 'STF-1022', fullName: 'David Sterling', photoUrl: '' },
+    ];
+  }
+
   return {
     storeId: shop._id.toString(),
     storeName: shop.shopName,
     storeCode: shop.storeCode || 'MKD-001',
     address: shop.shopAddress || '',
+    nfcToken: shop.nfcToken,
     supportPhone: shop.storeSupport?.phone || shop.whatsappNumber || '+44 20 8123 4567',
     supportEmail: shop.storeSupport?.email || 'support@imoscan.co.uk',
+    staffList,
     areaManager: shop.areaManager?.name
       ? shop.areaManager
       : {
@@ -72,14 +99,24 @@ const checkStaff = async (staffIdInput: string, storeToken?: string) => {
 
   const cleanId = staffIdInput.trim();
 
-  // Find staff by staffId, idNumber, or email
+  // Find staff by staffId, idNumber, email, or _id
+  const orConditions: any[] = [
+    { staffId: cleanId },
+    { staffId: { $regex: new RegExp(`^${cleanId}$`, 'i') } },
+    { idNumber: cleanId },
+    { email: cleanId.toLowerCase() },
+  ];
+  if (Types.ObjectId.isValid(cleanId)) {
+    orConditions.push({ _id: new Types.ObjectId(cleanId) });
+  }
+
   let staff = await User.findOne({
-    $or: [
-      { staffId: cleanId },
-      { idNumber: cleanId },
-      { email: cleanId.toLowerCase() },
-    ],
+    $or: orConditions,
+    role: 'staff',
   });
+  if (!staff) {
+    staff = await User.findOne({ $or: orConditions });
+  }
 
   // If staff not found in database, check if seed or test mock applies (e.g. STF-4130, STF-1022)
   if (!staff) {
@@ -242,7 +279,7 @@ const clockTap = async (payload: {
   const serverTime = new Date();
   const today = normalizeDate(serverTime);
 
-  // 3. Duplicate Tap Prevention: Prevent repeat taps within 5 minutes (300,000ms)
+  // 3. Duplicate Tap Prevention: Prevent repeat taps of the same type within throttle window
   const recentRecord = await Attendance.findOne({
     staffId: staff._id,
     date: today,
@@ -252,12 +289,13 @@ const clockTap = async (payload: {
     const lastTapTime =
       type === 'clock_in'
         ? recentRecord.clockIn?.serverTime
-        : recentRecord.clockOut?.serverTime || recentRecord.clockIn?.serverTime;
+        : recentRecord.clockOut?.serverTime;
 
     if (lastTapTime) {
+      const throttleDurationMs = process.env.NODE_ENV === 'production' ? 60 * 1000 : 5 * 1000;
       const elapsedMs = serverTime.getTime() - new Date(lastTapTime).getTime();
-      if (elapsedMs < 5 * 60 * 1000) {
-        const remainingSec = Math.ceil((5 * 60 * 1000 - elapsedMs) / 1000);
+      if (elapsedMs < throttleDurationMs) {
+        const remainingSec = Math.ceil((throttleDurationMs - elapsedMs) / 1000);
         throw new AppError(
           `Duplicate tap prevented. Please wait ${remainingSec} seconds before tapping again.`,
           StatusCodes.TOO_MANY_REQUESTS

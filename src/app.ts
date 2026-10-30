@@ -20,6 +20,7 @@ const allowedOrigins = [
       'https://majiddashboard.vercel.app',
       'http://localhost:3000',
       'http://localhost:3001',
+      'http://localhost:3002',
       'https://attendance.imoscan.co.uk',
 ];
 

@@ -366,6 +366,9 @@ const createStaff = async (payload: {
             throw new AppError('Password must be at least 6 characters long', StatusCodes.BAD_REQUEST);
       }
 
+      const generatedStaffId =
+            (payload as any).staffId || `STF-${Math.floor(1000 + Math.random() * 9000)}`;
+
       const result = await User.create({
             firstName,
             lastName,
@@ -373,11 +376,16 @@ const createStaff = async (payload: {
             password,
             phone,
             role: 'staff',
+            staffId: generatedStaffId,
             shopkeeperId: new Types.ObjectId(shopkeeperId),
             shopId: shopId && Types.ObjectId.isValid(shopId) ? new Types.ObjectId(shopId) : null,
             isVerified: true,
             wageType,
             wageAmount,
+            hourlyWage: wageAmount ? Number(wageAmount) : 12,
+            leaveAllowanceHours: 160,
+            usedLeaveHours: 0,
+            bookedLeaveHours: 0,
             workingDays,
             weekendDays,
             idVerificationStatus,

@@ -6,13 +6,15 @@ import rotaService from './rota.service';
 const getRota = catchAsync(async (req, res) => {
   const shopId = (req.query.shopId as string) || (req.user?.shopId?.toString() as string);
   const weekStartDate = req.query.weekStartDate as string;
+  const month = req.query.month as string;
+  const year = req.query.year as string;
 
-  const result = await rotaService.getRota(shopId, weekStartDate);
+  const result = await rotaService.getRota(shopId, weekStartDate, month, year);
 
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
-    message: 'Weekly rota fetched successfully',
+    message: 'Rota fetched successfully',
     data: result,
   });
 });
