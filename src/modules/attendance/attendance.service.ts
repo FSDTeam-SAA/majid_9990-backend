@@ -610,7 +610,7 @@ const getOrGenerateNfcToken = async (shopId: string, rotate = false) => {
     storeCode: shop.storeCode || 'MKD-001',
     nfcToken: shop.nfcToken,
     nfcTokenRotatedAt: shop.nfcTokenRotatedAt,
-    attendanceUrl: `https://attendance.imoscan.co.uk/tap?token=${shop.nfcToken}`,
+    attendanceUrl: `https://attendance.imoscan.com/tap?token=${shop.nfcToken}`,
     areaManager: shop.areaManager,
     storeSupport: shop.storeSupport,
   };
