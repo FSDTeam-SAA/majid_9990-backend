@@ -13,7 +13,7 @@ const attendanceClockSchema = new Schema(
     },
     verifiedBy: {
       type: String,
-      enum: ['passkey', 'selfie'],
+      enum: ['passkey', 'selfie', 'face_id'],
       required: true,
     },
     selfieUrl: {
@@ -24,6 +24,14 @@ const attendanceClockSchema = new Schema(
     selfieExpiresAt: {
       type: Date,
       default: null,
+    },
+    faceMatchScore: {
+      type: Number,
+      default: null,
+    },
+    livenessVerified: {
+      type: Boolean,
+      default: false,
     },
   },
   { _id: false }

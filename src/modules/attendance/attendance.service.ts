@@ -220,8 +220,8 @@ const checkStaff = async (staffIdInput: string, storeToken?: string) => {
     id: staff._id.toString(),
     staffId: staff.staffId || cleanId,
     fullName: `${staff.firstName} ${staff.lastName || ''}`.trim(),
-    role: staff.role === 'staff' ? 'Technician & Sales' : staff.role,
-    photoUrl: staff.image?.url || '',
+    photoUrl: (staff as any).referenceFaceUrl || staff.image?.url || '',
+    hasReferenceFace: Boolean((staff as any).referenceFaceUrl || staff.image?.url),
     storeId: shop?._id.toString() || '',
     storeName: shop?.shopName || 'Romford Store',
     areaManager: shop?.areaManager?.name
@@ -247,9 +247,20 @@ const clockTap = async (payload: {
   verificationMethod: TVerificationMethod;
   selfieImage?: string;
   selfieUrl?: string;
+  faceMatchScore?: number;
+  livenessVerified?: boolean;
   clientTimestamp?: string;
 }) => {
-  const { staffId, storeToken, type, verificationMethod, selfieImage, selfieUrl } = payload;
+  const {
+    staffId,
+    storeToken,
+    type,
+    verificationMethod,
+    selfieImage,
+    selfieUrl,
+    faceMatchScore,
+    livenessVerified,
+  } = payload;
 
   if (!staffId || !storeToken || !type || !verificationMethod) {
     throw new AppError('Missing required clock-in parameters', StatusCodes.BAD_REQUEST);
@@ -305,12 +316,21 @@ const clockTap = async (payload: {
   }
 
   // 4. Handle 24-hour TTL Selfie Expiration
-  const selfieExpiresAt =
-    verificationMethod === 'selfie'
-      ? new Date(serverTime.getTime() + 24 * 60 * 60 * 1000)
-      : undefined;
+  const isVisualCapture =
+    verificationMethod === 'selfie' ||
+    verificationMethod === 'face_id' ||
+    Boolean(selfieImage || selfieUrl);
+  const selfieExpiresAt = isVisualCapture
+    ? new Date(serverTime.getTime() + 24 * 60 * 60 * 1000)
+    : undefined;
 
-  const resolvedSelfieUrl = selfieUrl || (selfieImage ? 'data:image/jpeg;base64,...' : '');
+  const resolvedSelfieUrl =
+    selfieUrl ||
+    (selfieImage
+      ? selfieImage.startsWith('data:')
+        ? selfieImage
+        : `data:image/jpeg;base64,${selfieImage}`
+      : '');
 
   // 5. Look up Rota Shift Schedule
   let scheduledStart = '09:00';
@@ -372,6 +392,8 @@ const clockTap = async (payload: {
           verifiedBy: verificationMethod,
           selfieUrl: resolvedSelfieUrl,
           selfieExpiresAt,
+          faceMatchScore: faceMatchScore ?? undefined,
+          livenessVerified: verificationMethod === 'face_id' ? true : Boolean(livenessVerified),
         },
         scheduledStart,
         scheduledEnd,
@@ -384,6 +406,8 @@ const clockTap = async (payload: {
         verifiedBy: verificationMethod,
         selfieUrl: resolvedSelfieUrl,
         selfieExpiresAt,
+        faceMatchScore: faceMatchScore ?? undefined,
+        livenessVerified: verificationMethod === 'face_id' ? true : Boolean(livenessVerified),
       };
       attendance.status = status;
       await attendance.save();
@@ -405,7 +429,7 @@ const clockTap = async (payload: {
     }
 
     // Save selfie with 24-hour TTL index
-    if (verificationMethod === 'selfie' && resolvedSelfieUrl) {
+    if (isVisualCapture && resolvedSelfieUrl) {
       await AttendanceSelfie.create({
         attendanceId: attendance._id,
         staffId: staff._id,
@@ -458,6 +482,8 @@ const clockTap = async (payload: {
       verifiedBy: verificationMethod,
       selfieUrl: resolvedSelfieUrl,
       selfieExpiresAt,
+      faceMatchScore: faceMatchScore ?? undefined,
+      livenessVerified: verificationMethod === 'face_id' ? true : Boolean(livenessVerified),
     };
     attendance.actualHours = actualHours;
     attendance.status = status;
@@ -479,7 +505,7 @@ const clockTap = async (payload: {
     }
 
     // Save selfie with 24-hour TTL index
-    if (verificationMethod === 'selfie' && resolvedSelfieUrl) {
+    if (isVisualCapture && resolvedSelfieUrl) {
       await AttendanceSelfie.create({
         attendanceId: attendance._id,
         staffId: staff._id,

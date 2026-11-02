@@ -1,6 +1,6 @@
 import { Types } from 'mongoose';
 
-export type TVerificationMethod = 'passkey' | 'selfie';
+export type TVerificationMethod = 'passkey' | 'selfie' | 'face_id';
 export type TAttendanceStatus =
   | 'present'
   | 'late'
@@ -26,6 +26,8 @@ export interface IAttendanceClock {
   verifiedBy: TVerificationMethod;
   selfieUrl?: string;
   selfieExpiresAt?: Date; // 24-hour TTL deletion
+  faceMatchScore?: number;
+  livenessVerified?: boolean;
 }
 
 export interface IAttendance {

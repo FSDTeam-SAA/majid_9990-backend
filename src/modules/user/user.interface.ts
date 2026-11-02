@@ -73,6 +73,8 @@ export interface IUser {
       leaveAllowanceHours?: number;
       usedLeaveHours?: number;
       bookedLeaveHours?: number;
+      referenceFaceUrl?: string;
+      referenceFaceEnrolledAt?: Date;
       webAuthnCredentials?: {
             credentialId: string;
             publicKey: string;

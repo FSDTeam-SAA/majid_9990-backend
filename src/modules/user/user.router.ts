@@ -27,6 +27,7 @@ router.put('/admin/update-user/:userId', protect, isAdmin, userController.adminU
 // Staff routes
 router.post('/create-staff', protect, isAdminOrShopkeeper, userController.createStaff);
 router.get('/staff/:shopkeeperId', protect, userController.getAllStaffByShopkeeper);
+router.put('/staff/:staffId/reference-face', protect, isAdminOrShopkeeper, upload.single('image'), userController.updateStaffReferenceFace);
 router.get('/my-shopkeeper-data', protect, userController.getMyShopkeeperData);
 
 // Staff session routes

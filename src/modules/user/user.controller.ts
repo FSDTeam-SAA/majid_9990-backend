@@ -247,6 +247,23 @@ const returnToOwnerSession = catchAsync(async (req, res) => {
       });
 });
 
+const updateStaffReferenceFace = catchAsync(async (req, res) => {
+      const { staffId } = req.params;
+      const { photoUrl } = req.body;
+      const result = await userService.updateStaffReferenceFace(
+            staffId as string,
+            req.file,
+            photoUrl
+      );
+
+      sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: 'Staff reference face registered successfully.',
+            data: result,
+      });
+});
+
 const userController = {
       registerUser,
       verifyEmail,
@@ -267,6 +284,7 @@ const userController = {
       setStaffPin,
       switchStaffSession,
       returnToOwnerSession,
+      updateStaffReferenceFace,
 };
 
 export default userController;

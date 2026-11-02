@@ -196,6 +196,14 @@ const userSchema = new Schema<IUser>(
                   default: 0,
                   min: 0,
             },
+            referenceFaceUrl: {
+                  type: String,
+                  default: null,
+            },
+            referenceFaceEnrolledAt: {
+                  type: Date,
+                  default: null,
+            },
             webAuthnCredentials: [
                   {
                         credentialId: { type: String, required: true },

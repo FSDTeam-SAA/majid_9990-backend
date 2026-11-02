@@ -633,6 +633,65 @@ const returnToOwnerSession = async (
       return { success: true };
 };
 
+const updateStaffReferenceFace = async (staffId: string, file?: any, photoUrl?: string) => {
+      if (!Types.ObjectId.isValid(staffId)) {
+            throw new AppError('Invalid staff ID', StatusCodes.BAD_REQUEST);
+      }
+
+      const staff = await User.findById(staffId);
+      if (!staff) {
+            throw new AppError('Staff member not found', StatusCodes.NOT_FOUND);
+      }
+
+      let finalUrl = '';
+      let publicId = '';
+
+      if (file) {
+            const uploadResult = await uploadToCloudinary(file.path);
+            if (uploadResult) {
+                  finalUrl = uploadResult.secure_url;
+                  publicId = uploadResult.public_id;
+            }
+      } else if (photoUrl) {
+            if (photoUrl.startsWith('data:image')) {
+                  try {
+                        const { v2: cloudinary } = await import('cloudinary');
+                        const uploadResult = await cloudinary.uploader.upload(photoUrl, {
+                              folder: 'staff_reference_faces',
+                              resource_type: 'image',
+                        });
+                        finalUrl = uploadResult.secure_url;
+                        publicId = uploadResult.public_id;
+                  } catch {
+                        // In case cloudinary upload fails in local environment, fall back to data URI
+                        finalUrl = photoUrl;
+                  }
+            } else {
+                  finalUrl = photoUrl;
+            }
+      }
+
+      if (!finalUrl) {
+            throw new AppError('No photo or image file provided', StatusCodes.BAD_REQUEST);
+      }
+
+      staff.referenceFaceUrl = finalUrl;
+      staff.referenceFaceEnrolledAt = new Date();
+      if (publicId) {
+            staff.image = { public_id: publicId, url: finalUrl };
+      } else if (!staff.image?.url) {
+            staff.image = { public_id: '', url: finalUrl };
+      }
+      await staff.save();
+
+      return {
+            staffId: staff._id,
+            fullName: `${staff.firstName} ${staff.lastName || ''}`.trim(),
+            referenceFaceUrl: staff.referenceFaceUrl,
+            referenceFaceEnrolledAt: staff.referenceFaceEnrolledAt,
+      };
+};
+
 const userService = {
       registerUser,
       verifyEmail,
@@ -653,6 +712,7 @@ const userService = {
       setStaffPin,
       switchStaffSession,
       returnToOwnerSession,
+      updateStaffReferenceFace,
 };
 
 export default userService;
