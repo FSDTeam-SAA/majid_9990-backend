@@ -543,10 +543,12 @@ const extractColorsFromName = (name: string): string[] => {
 };
 
 const extractStorageFromName = (name: string): string[] => {
+      // Exclude RAM / Memory from being mistakenly identified as storage
+      const sanitized = name.replace(/\b\d+\s*(?:GB|MB|TB)\s+(?:RAM|Memory|Unified\s+Memory)\b/gi, '');
       const storagePattern = /\b(\d+\s*(?:GB|TB|MB))\b/gi;
       const matches: string[] = [];
       let match;
-      while ((match = storagePattern.exec(name)) !== null) {
+      while ((match = storagePattern.exec(sanitized)) !== null) {
             const value = match[1].replace(/\s+/g, '').toUpperCase();
             if (!matches.includes(value)) {
                   matches.push(value);
@@ -1109,10 +1111,12 @@ const createInventoryFromBarcode = async (
                         : '';
       const fallbackName = resolvedTitle || (barcodeResult.brand ? `${barcodeResult.brand} ${barcodeResult.name}` : barcodeResult.name);
       const itemName = fallbackName?.trim() || 'Unknown Product';
-      const imeiNumber = String(payload.imeiNumber ?? '').trim() || barcodeResult.barcode || cleanCode;
+      const isStandardImei = (val?: string) => Boolean(val && /^\d{15,16}$/.test(val.trim()));
+      const explicitImei = String(payload.imeiNumber ?? '').trim();
+      const imeiNumber = explicitImei || (isStandardImei(cleanCode) ? cleanCode : undefined);
       const marketPricing = await extractMarketPricing(barcodeResult, inventoryCurrency);
       const aiInsight = await getOpenAiInsight({
-            imei: imeiNumber,
+            imei: imeiNumber || cleanCode,
             deviceName: itemName,
             deviceStatus: 'clean',
             riskLabel: 'Low Risk',
@@ -1125,7 +1129,23 @@ const createInventoryFromBarcode = async (
       const expectedPrice = parseOptionalNumber(payload.expectedPrice) ?? marketPricing.expected.amount;
       const salePrice = parseOptionalNumber(payload.salePrice) ?? parseOptionalNumber(payload.expectedPrice) ?? marketPricing.sale.amount;
 
-      const brand = barcodeResult.brand || undefined;
+      const rawBrand =
+            barcodeResult.brand ||
+            (rawData && typeof (rawData as any).manufacturer === 'string' ? (rawData as any).manufacturer : undefined) ||
+            (rawData && typeof (rawData as any).brand === 'string' ? (rawData as any).brand : undefined);
+      const brandFallback =
+            itemName.match(/\b(Apple|Samsung|Google|Lenovo|Dell|HP|Asus|Acer|Microsoft|MSI|Razer|Sony|LG|Huawei|Xiaomi|Oppo|Vivo|OnePlus|Nokia|Motorola|Toshiba)\b/i)?.[1];
+      const brand = rawBrand || brandFallback || undefined;
+
+      const rawModel =
+            (rawData && typeof (rawData as any).model === 'string' ? (rawData as any).model : undefined) ||
+            (rawData && typeof (rawData as any).mpn === 'string' ? (rawData as any).mpn : undefined) ||
+            (typeof (barcodeResult as any).description === 'string'
+                  ? (barcodeResult as any).description.match(/(?:Model|MPN)\s*[:=-]\s*([A-Za-z0-9\-_/]+)/i)?.[1]
+                  : undefined);
+      const modelFallback = itemName.match(/\b(20[A-Z0-9]{8}|A\d{4}|SM-[A-Z]\d{3,4}[A-Z0-9]?)\b/i)?.[1];
+      const modelNumber = rawModel || modelFallback || undefined;
+
       const explicitColors = parseStringArray(payload.color);
       const colorVariants = explicitColors.length ? explicitColors : extractColorsFromName(itemName);
       const explicitStorage = parseStringArray(payload.storage);
@@ -1158,6 +1178,27 @@ const createInventoryFromBarcode = async (
 
       const aiDescription = generateAiDescription();
 
+      // Check if an existing inventory item already matches this IMEI or barcode in this store
+      const existingInventory = await Inventory.findOne({
+            $or: [
+                  ...(imeiNumber ? [{ imeiNumber }, { 'variants.imeiNumber': imeiNumber }] : []),
+                  ...(cleanCode ? [{ sku: cleanCode }, { imeiNumber: cleanCode }] : []),
+            ],
+            ...(payload.storeId ? { storeId: payload.storeId } : {}),
+      });
+
+      if (existingInventory) {
+            return {
+                  result: existingInventory,
+                  productDetails: existingInventory.productDetails || productDetails,
+                  aiDescription: existingInventory.aiDescription || aiDescription,
+                  barcodeResult,
+                  aiInsight,
+                  marketValue: marketPricing,
+                  isExisting: true,
+            };
+      }
+
       const barcodeImages =
             Array.isArray(barcodeResult.images) && barcodeResult.images.length
                   ? barcodeResult.images
@@ -1174,6 +1215,8 @@ const createInventoryFromBarcode = async (
             {
                   itemName,
                   brand,
+                  modelNumber,
+                  sku: cleanCode,
                   color: colorVariants.length ? colorVariants : undefined,
                   storage: storageVariants.length ? storageVariants : undefined,
                   imeiNumber,
