@@ -35,6 +35,12 @@ export interface IShop {
     email: string;
     address: string;
   };
+  geofence?: {
+    latitude: number;
+    longitude: number;
+    radiusMeters: number;
+    enforceGeofence: boolean;
+  };
   createdAt?: Date;
   updatedAt?: Date;
 }

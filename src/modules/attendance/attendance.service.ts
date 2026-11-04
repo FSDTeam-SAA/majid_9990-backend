@@ -88,6 +88,19 @@ const verifyStoreToken = async (token?: string) => {
           email: 'sarah.ahmed@imoscan.co.uk',
           title: 'Senior Area Manager (London East)',
         },
+    geofence: shop.geofence?.latitude
+      ? {
+          latitude: shop.geofence.latitude,
+          longitude: shop.geofence.longitude,
+          radiusMeters: shop.geofence.radiusMeters || 150,
+          enforceGeofence: shop.geofence.enforceGeofence ?? true,
+        }
+      : {
+          latitude: 51.5794,
+          longitude: 0.1837,
+          radiusMeters: 150,
+          enforceGeofence: true,
+        },
   };
 };
 
@@ -239,6 +252,27 @@ const checkStaff = async (staffIdInput: string, storeToken?: string) => {
   };
 };
 
+// Helper: Calculate distance in meters between two GPS coordinates using Haversine formula
+const calculateDistanceMeters = (
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number
+): number => {
+  const R = 6371e3; // Earth's mean radius in meters
+  const phi1 = (lat1 * Math.PI) / 180;
+  const phi2 = (lat2 * Math.PI) / 180;
+  const deltaPhi = ((lat2 - lat1) * Math.PI) / 180;
+  const deltaLambda = ((lon2 - lon1) * Math.PI) / 180;
+
+  const a =
+    Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
+    Math.cos(phi1) * Math.cos(phi2) * Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  return Math.round(R * c);
+};
+
 // Process Clock In / Clock Out Tap
 const clockTap = async (payload: {
   staffId: string;
@@ -250,6 +284,11 @@ const clockTap = async (payload: {
   faceMatchScore?: number;
   livenessVerified?: boolean;
   clientTimestamp?: string;
+  location?: {
+    latitude: number;
+    longitude: number;
+    accuracy?: number;
+  };
 }) => {
   const {
     staffId,
@@ -270,6 +309,84 @@ const clockTap = async (payload: {
   const shop = await Shop.findOne({ nfcToken: storeToken });
   if (!shop) {
     throw new AppError('Invalid or expired NFC store beacon token', StatusCodes.UNAUTHORIZED);
+  }
+
+  // 1b. Geofence Distance Validation
+  let locationData:
+    | {
+        latitude: number;
+        longitude: number;
+        accuracy: number;
+        distanceFromStoreMeters: number;
+        isWithinGeofence: boolean;
+      }
+    | undefined = undefined;
+
+  const storeGeofence = shop.geofence;
+  const isGeofenceConfigured =
+    storeGeofence &&
+    typeof storeGeofence.latitude === 'number' &&
+    typeof storeGeofence.longitude === 'number';
+
+  if (isGeofenceConfigured && storeGeofence.enforceGeofence) {
+    if (
+      !payload.location ||
+      typeof payload.location.latitude !== 'number' ||
+      typeof payload.location.longitude !== 'number'
+    ) {
+      throw new AppError(
+        'Device GPS location is required to verify physical presence at this store. Please allow location access in your browser.',
+        StatusCodes.BAD_REQUEST
+      );
+    }
+
+    const distance = calculateDistanceMeters(
+      payload.location.latitude,
+      payload.location.longitude,
+      storeGeofence.latitude,
+      storeGeofence.longitude
+    );
+
+    const allowedRadius = storeGeofence.radiusMeters || 150;
+    const isWithin = distance <= allowedRadius;
+
+    locationData = {
+      latitude: payload.location.latitude,
+      longitude: payload.location.longitude,
+      accuracy: payload.location.accuracy || 0,
+      distanceFromStoreMeters: distance,
+      isWithinGeofence: isWithin,
+    };
+
+    if (!isWithin) {
+      throw new AppError(
+        `Check-in denied: You are ${distance}m away from ${shop.shopName}. Check-in is only permitted within ${allowedRadius}m of the store.`,
+        StatusCodes.FORBIDDEN
+      );
+    }
+  } else if (
+    payload.location &&
+    typeof payload.location.latitude === 'number' &&
+    typeof payload.location.longitude === 'number'
+  ) {
+    const distance = isGeofenceConfigured
+      ? calculateDistanceMeters(
+          payload.location.latitude,
+          payload.location.longitude,
+          storeGeofence.latitude,
+          storeGeofence.longitude
+        )
+      : 0;
+
+    locationData = {
+      latitude: payload.location.latitude,
+      longitude: payload.location.longitude,
+      accuracy: payload.location.accuracy || 0,
+      distanceFromStoreMeters: distance,
+      isWithinGeofence: isGeofenceConfigured
+        ? distance <= (storeGeofence.radiusMeters || 150)
+        : true,
+    };
   }
 
   // 2. Lookup Staff
@@ -394,6 +511,7 @@ const clockTap = async (payload: {
           selfieExpiresAt,
           faceMatchScore: faceMatchScore ?? undefined,
           livenessVerified: verificationMethod === 'face_id' ? true : Boolean(livenessVerified),
+          location: locationData,
         },
         scheduledStart,
         scheduledEnd,
@@ -408,6 +526,7 @@ const clockTap = async (payload: {
         selfieExpiresAt,
         faceMatchScore: faceMatchScore ?? undefined,
         livenessVerified: verificationMethod === 'face_id' ? true : Boolean(livenessVerified),
+        location: locationData,
       };
       attendance.status = status;
       await attendance.save();
@@ -456,6 +575,7 @@ const clockTap = async (payload: {
         clockIn: {
           serverTime,
           verifiedBy: verificationMethod,
+          location: locationData,
         },
         scheduledStart,
         scheduledEnd,
@@ -484,6 +604,7 @@ const clockTap = async (payload: {
       selfieExpiresAt,
       faceMatchScore: faceMatchScore ?? undefined,
       livenessVerified: verificationMethod === 'face_id' ? true : Boolean(livenessVerified),
+      location: locationData,
     };
     attendance.actualHours = actualHours;
     attendance.status = status;
@@ -639,16 +760,23 @@ const getOrGenerateNfcToken = async (shopId: string, rotate = false) => {
     attendanceUrl: `https://attendance.imoscan.com/tap?token=${shop.nfcToken}`,
     areaManager: shop.areaManager,
     storeSupport: shop.storeSupport,
+    geofence: shop.geofence,
   };
 };
 
-// Update NFC Store Settings (Area Manager, Store Support)
+// Update NFC Store Settings (Area Manager, Store Support, Geofence)
 const updateNfcSettings = async (
   shopId: string,
   payload: {
     storeCode?: string;
     areaManager?: { name: string; email: string; phone: string; title?: string };
     storeSupport?: { phone: string; email: string; address: string };
+    geofence?: {
+      latitude: number;
+      longitude: number;
+      radiusMeters?: number;
+      enforceGeofence?: boolean;
+    };
   }
 ) => {
   if (!Types.ObjectId.isValid(shopId)) {
@@ -661,6 +789,7 @@ const updateNfcSettings = async (
       ...(payload.storeCode && { storeCode: payload.storeCode }),
       ...(payload.areaManager && { areaManager: payload.areaManager }),
       ...(payload.storeSupport && { storeSupport: payload.storeSupport }),
+      ...(payload.geofence && { geofence: payload.geofence }),
     },
     { new: true }
   );

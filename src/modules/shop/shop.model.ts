@@ -28,6 +28,16 @@ const storeSupportSchema = new Schema(
   { _id: false }
 );
 
+const geofenceSchema = new Schema(
+  {
+    latitude: { type: Number, default: 51.5794 },
+    longitude: { type: Number, default: 0.1837 },
+    radiusMeters: { type: Number, default: 150 },
+    enforceGeofence: { type: Boolean, default: true },
+  },
+  { _id: false }
+);
+
 const shopSchema = new Schema<IShop>(
   {
     shopkeeperId: {
@@ -116,6 +126,15 @@ const shopSchema = new Schema<IShop>(
     storeSupport: {
       type: storeSupportSchema,
       default: () => ({}),
+    },
+    geofence: {
+      type: geofenceSchema,
+      default: () => ({
+        latitude: 51.5794,
+        longitude: 0.1837,
+        radiusMeters: 150,
+        enforceGeofence: true,
+      }),
     },
   },
   {

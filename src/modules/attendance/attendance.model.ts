@@ -33,6 +33,19 @@ const attendanceClockSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    location: {
+      type: new Schema(
+        {
+          latitude: { type: Number, default: null },
+          longitude: { type: Number, default: null },
+          accuracy: { type: Number, default: 0 },
+          distanceFromStoreMeters: { type: Number, default: 0 },
+          isWithinGeofence: { type: Boolean, default: true },
+        },
+        { _id: false }
+      ),
+      default: null,
+    },
   },
   { _id: false }
 );

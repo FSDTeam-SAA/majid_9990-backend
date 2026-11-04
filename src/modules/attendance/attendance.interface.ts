@@ -21,6 +21,14 @@ export type TExceptionDecision =
   | 'use_leave'
   | 'unpaid_leave';
 
+export interface IAttendanceLocation {
+  latitude: number;
+  longitude: number;
+  accuracy?: number;
+  distanceFromStoreMeters?: number;
+  isWithinGeofence?: boolean;
+}
+
 export interface IAttendanceClock {
   serverTime: Date;
   verifiedBy: TVerificationMethod;
@@ -28,6 +36,7 @@ export interface IAttendanceClock {
   selfieExpiresAt?: Date; // 24-hour TTL deletion
   faceMatchScore?: number;
   livenessVerified?: boolean;
+  location?: IAttendanceLocation;
 }
 
 export interface IAttendance {
