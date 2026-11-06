@@ -6,6 +6,7 @@ import { connectDB } from './config/db';
 import { ensureSwaggerSpec } from './config/swagger';
 import { initNotificationSocket } from './modules/socket/notification.service';
 import { idRetentionService } from './modules/invoice/idRetention.service';
+import { repairPhotoRetentionService } from './modules/repairRequest/repairPhotoRetention.service';
 import 'dotenv/config';
 
 dotenv.config();
@@ -25,6 +26,9 @@ const bootstrap = async () => {
 
       // Initialize 28-day ID image retention service (GDPR / Privacy compliance)
       idRetentionService.startRetentionJob();
+
+      // Initialize 30-day evidence photos auto-delete retention service (Developer Notes compliance)
+      repairPhotoRetentionService.startRetentionJob();
 
       const server = http.createServer(app);
 

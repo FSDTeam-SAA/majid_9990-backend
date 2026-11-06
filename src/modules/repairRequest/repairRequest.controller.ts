@@ -9,6 +9,18 @@ const addNewRepairRequest = catchAsync(async (req, res) => {
       const files = req.files as Express.Multer.File[];
       const shopId = await getShopFromRequest(req);
       req.body.shopId = shopId.toString();
+
+      if (typeof req.body.issues === 'string') {
+            try {
+                  req.body.issues = JSON.parse(req.body.issues);
+            } catch (_) {}
+      }
+      if (typeof req.body.evidencePhotos === 'string') {
+            try {
+                  req.body.evidencePhotos = JSON.parse(req.body.evidencePhotos);
+            } catch (_) {}
+      }
+
       const result = await repairRequestService.addNewRepairRequest(req.body, files, id);
 
       sendResponse(res, {

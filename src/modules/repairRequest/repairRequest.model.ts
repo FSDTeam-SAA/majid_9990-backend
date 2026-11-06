@@ -21,8 +21,55 @@ const TechNoteSchema = new Schema({
       time: { type: Number, required: true },
 });
 
+const RepairIssueSchema = new Schema(
+      {
+            id: { type: String },
+            category: { type: String, required: true },
+            problems: [{ type: String }],
+            additionalInfo: { type: String, default: '' },
+            estimatedTime: { type: String, default: '1-2 Hours' },
+            estimatedPrice: { type: Number, default: 0 },
+            selectedPart: {
+                  variantId: { type: Schema.Types.Mixed },
+                  partName: { type: String },
+                  quality: { type: String },
+                  price: { type: Number, default: 0 },
+                  sku: { type: String },
+                  quantity: { type: Number, default: 1 },
+            },
+      },
+      { _id: false }
+);
+
+const EvidencePhotoSchema = new Schema(
+      {
+            url: { type: String, required: true },
+            public_id: { type: String },
+            uploadedAt: { type: Date, default: Date.now },
+            autoDeleteAt: {
+                  type: Date,
+                  default: () => new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
+                  index: true,
+            },
+            usedFor: { type: String, default: 'Repair diagnosis only' },
+      },
+      { _id: false }
+);
+
+const RepairHistorySchema = new Schema(
+      {
+            title: { type: String, required: true },
+            description: { type: String, default: '' },
+            actor: { type: String, default: 'Shopkeeper' },
+            createdAt: { type: Date, default: Date.now },
+            icon: { type: String },
+      },
+      { _id: false }
+);
+
 const RepairRequestSchema = new Schema<IRepairRequest>(
       {
+            orderNumber: { type: String, index: true },
             userId: {
                   type: Schema.Types.ObjectId,
                   ref: 'User',
@@ -35,11 +82,32 @@ const RepairRequestSchema = new Schema<IRepairRequest>(
             },
             firstName: { type: String, required: true },
             email: { type: String, required: true },
-            phoneNumber: { type: String, required: true }, // ✅ ADDED
-            price: { type: Number, default: 0 }, // ✅ ADDED
+            phoneNumber: { type: String, required: true },
+            price: { type: Number, default: 0 },
             deviceModel: { type: String, required: true },
+            category: { type: String, default: 'Mobile Phone' },
+            brand: { type: String, default: '' },
+            modelName: { type: String, default: '' },
+            modelCode: { type: String, default: '' },
+            releaseYear: { type: String, default: '' },
+            colour: { type: String, default: '' },
+            condition: {
+                  type: String,
+                  enum: ['New', 'Like New', 'Good', 'Fair', 'Poor'],
+                  default: 'Good',
+            },
+            serialType: {
+                  type: String,
+                  enum: ['imei', 'serial', 'both', 'IMEI', 'Serial', 'Both'],
+                  default: 'imei',
+                  set: (val: string) => (val ? val.toLowerCase() : 'imei'),
+            },
+            serialNumber: { type: String, default: '' },
             IMEINumber: { type: String },
             description: { type: String, required: true },
+            issues: [RepairIssueSchema],
+            evidencePhotos: [EvidencePhotoSchema],
+            history: [RepairHistorySchema],
             technician: { type: String, trim: true, default: '' },
             technicianFeedback: { type: String, default: '' },
             status: {
@@ -74,6 +142,31 @@ const RepairRequestSchema = new Schema<IRepairRequest>(
             versionKey: false,
       }
 );
+
+// Auto-generate orderNumber before saving if not present
+RepairRequestSchema.pre('save', function (next) {
+      if (!this.orderNumber) {
+            const randomSuffix = Math.floor(10000 + Math.random() * 90000);
+            this.orderNumber = `R-${randomSuffix}`;
+      }
+      if (!this.history || this.history.length === 0) {
+            this.history = [
+                  {
+                        title: 'Request Booked',
+                        description: `Booked by ${this.firstName || 'Customer'}`,
+                        actor: 'Shopkeeper',
+                        createdAt: new Date(),
+                  },
+                  {
+                        title: 'In Progress',
+                        description: `Assigned to: ${this.technician || 'Unassigned'} - Ready to start`,
+                        actor: 'Shopkeeper',
+                        createdAt: new Date(),
+                  },
+            ];
+      }
+      next();
+});
 
 const RepairRequest = model<IRepairRequest>('RepairRequest', RepairRequestSchema);
 export default RepairRequest;
