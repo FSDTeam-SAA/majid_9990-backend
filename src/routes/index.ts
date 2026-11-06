@@ -8,6 +8,7 @@ import paymentRouter from '../modules/payment/payment.router';
 import notificationRouter from '../modules/notification/notification.router';
 import dashboardRouter from '../modules/dashboard/dashboard.router';
 import repairRequestRouter from '../modules/repairRequest/repairRequest.router';
+import repairPartRouter from '../modules/repairPart/repairPart.router';
 import announcementRouter from '../modules/announcement/announcement.router';
 import reviewRoutes from '../modules/review/review.router';
 import barcodeRouter from '../modules/barcode/barcode.router';
@@ -85,6 +86,10 @@ const moduleRoutes = [
       {
             path: '/repair-requests',
             route: repairRequestRouter,
+      },
+      {
+            path: '/repair-parts',
+            route: repairPartRouter,
       },
       {
             path: '/announcements',

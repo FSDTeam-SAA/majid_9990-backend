@@ -36,30 +36,116 @@ const addNewRepairRequest = async (payload: IRepairRequest, files: Express.Multe
 
       if (!payload.firstName) throw new AppError('First name is required', StatusCodes.BAD_REQUEST);
       if (!payload.email) throw new AppError('Email is required', StatusCodes.BAD_REQUEST);
-      if (!payload.phoneNumber) throw new AppError('Phone number is required', StatusCodes.BAD_REQUEST); // ✅ ADDED
+      if (!payload.phoneNumber) throw new AppError('Phone number is required', StatusCodes.BAD_REQUEST);
       if (!payload.deviceModel) throw new AppError('Device model is required', StatusCodes.BAD_REQUEST);
-      if (!payload.description) throw new AppError('Description is required', StatusCodes.BAD_REQUEST);
+      if (!payload.description && (!payload.issues || payload.issues.length === 0)) {
+            throw new AppError('Description or repair issues are required', StatusCodes.BAD_REQUEST);
+      }
+
+      // Normalize problems and category across both payload naming conventions
+      const normalizedIssues = (payload.issues || []).map((iss: any) => {
+            const category = iss.category || iss.issueCategory || 'General Issue';
+            const rawProblems = iss.problems || iss.commonProblems || [];
+            const problems = Array.isArray(rawProblems)
+                  ? rawProblems
+                  : typeof rawProblems === 'string' && rawProblems.trim().length > 0
+                        ? [rawProblems.trim()]
+                        : ['Repair inspection'];
+            return {
+                  ...iss,
+                  category,
+                  problems,
+                  additionalInfo: iss.additionalInfo || iss.additionalDetails || '',
+            };
+      });
+
+      const desc =
+            payload.description ||
+            (normalizedIssues.length > 0
+                  ? normalizedIssues.map((i: any) => `${i.category}: ${(i.problems || []).join(', ')}`).join('; ')
+                  : 'Repair Request');
 
       const images: { public_id: string; url: string }[] = [];
+      const evidencePhotos: any[] = payload.evidencePhotos ? [...payload.evidencePhotos] : [];
       for (const file of files) {
             const uploaded = await uploadToCloudinary(file.path);
             if (uploaded && uploaded.public_id && uploaded.secure_url) {
                   images.push({ public_id: uploaded.public_id, url: uploaded.secure_url });
+                  evidencePhotos.push({
+                        url: uploaded.secure_url,
+                        public_id: uploaded.public_id,
+                        uploadedAt: new Date(),
+                        autoDeleteAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+                        usedFor: 'Repair diagnosis only',
+                  });
             }
       }
 
+      const randomSuffix = Math.floor(10000 + Math.random() * 90000);
+      const orderNumber = payload.orderNumber || `R-${randomSuffix}`;
+
+      const historyEvents = payload.history && payload.history.length > 0 ? payload.history : [
+            {
+                  title: 'Request Booked',
+                  description: `Booked by ${payload.firstName || 'Customer'}`,
+                  actor: 'Shopkeeper',
+                  createdAt: new Date(),
+            },
+            {
+                  title: 'In Progress',
+                  description: `Assigned to: ${payload.technician?.trim() || 'Unassigned'} - Ready to start`,
+                  actor: 'Shopkeeper',
+                  createdAt: new Date(),
+            },
+      ];
+
+      if (normalizedIssues.length > 0) {
+            for (const iss of normalizedIssues) {
+                  const probList = Array.isArray(iss.problems) ? iss.problems : [];
+                  historyEvents.push({
+                        title: 'Issue Added',
+                        description: `${iss.category}${probList.length > 0 ? ` - ${probList.join(', ')}` : ''}`,
+                        actor: 'Shopkeeper',
+                        createdAt: new Date(),
+                  });
+            }
+      }
+
+      if (evidencePhotos.length > 0) {
+            historyEvents.push({
+                  title: `Photo Uploaded (${evidencePhotos.length})`,
+                  description: 'Evidence photos added',
+                  actor: 'Shopkeeper',
+                  createdAt: new Date(),
+            });
+      }
+
       const newRequest = await RepairRequest.create({
+            orderNumber,
             userId: payload.userId || user._id,
             shopId: payload.shopId ?? null,
             firstName: payload.firstName,
             email: payload.email,
-            phoneNumber: payload.phoneNumber, // ✅ ADDED
-            price: payload.price || 0, // ✅ ADDED
+            phoneNumber: payload.phoneNumber,
+            price: payload.price || 0,
             deviceModel: payload.deviceModel,
-            IMEINumber: payload.IMEINumber,
-            description: payload.description,
+            category: payload.category || 'Mobile Phone',
+            brand: payload.brand || '',
+            modelName: payload.modelName || payload.deviceModel,
+            modelCode: payload.modelCode || '',
+            releaseYear: payload.releaseYear || '',
+            colour: payload.colour || '',
+            condition: payload.condition || 'Good',
+            serialType: payload.serialType
+                  ? (payload.serialType.toLowerCase() as 'imei' | 'serial' | 'both')
+                  : 'imei',
+            serialNumber: payload.serialNumber || payload.IMEINumber || '',
+            IMEINumber: payload.IMEINumber || payload.serialNumber || '',
+            description: desc,
+            issues: normalizedIssues,
+            evidencePhotos,
+            history: historyEvents,
             technician: payload.technician?.trim(),
-            images,
             status: payload.status || 'inProgress',
       });
 
