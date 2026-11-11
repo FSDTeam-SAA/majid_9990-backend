@@ -324,62 +324,92 @@ const createInvoice = async (
             invoiceTemplate = user?.invoiceTemplate || 'default';
       }
 
+      // Process payment allocations to previous customer invoices (Callout 4 & 5)
+      let allocations: Array<{ invoiceId: string; amountApplied: number }> = [];
+      try {
+            allocations = typeof payload.allocations === 'string'
+                  ? JSON.parse(payload.allocations)
+                  : payload.allocations || [];
+      } catch {
+            // Ignore parse errors
+      }
+
+      let customCreatedAt: Date | undefined = undefined;
+      if (payload.createdAt) {
+            const parsed = new Date(payload.createdAt);
+            if (!isNaN(parsed.getTime())) {
+                  customCreatedAt = parsed;
+            }
+      }
+
       const session = await Invoice.startSession();
       try {
             session.startTransaction();
 
-            const [result] = await Invoice.create(
-                  [
-                        {
+            let resolvedCustomerInfo = customerInfo;
+            let resolvedCurrency =
+                  String(payload.currency ?? '')
+                        .trim()
+                        .toUpperCase() || undefined;
+
+            if ((!resolvedCustomerInfo || !resolvedCurrency) && Array.isArray(allocations) && allocations.length > 0) {
+                  const firstAllocId = String(allocations[0]?.invoiceId || '').trim();
+                  if (firstAllocId && firstAllocId !== 'today' && Types.ObjectId.isValid(firstAllocId)) {
+                        const targetInvForCustomer = await Invoice.findOne({
+                              _id: new Types.ObjectId(firstAllocId),
                               shopkeeperId,
-                              shopId,
-                              invoice: invoiceFile,
-                              type,
-                              customerInfo,
-                              itemsIds,
-
-                              totalAmount,
-                              dueAmount,
-                              repairRequestId: normalizeObjectId(payload.repairRequestId),
-                              tax: normalizeOptionalNumber(payload.tax, 'tax'),
-                              taxName: payload.taxName,
-                              taxIncludedInPrice: payload.taxIncludedInPrice,
-                              paymentMethod,
-                              paymentStatus: payload.paymentStatus,
-                              paymentDetails,
-                              bankDetails,
-                              amountPaid,
-                              invoiceNumber: String(payload.invoiceNumber ?? '').trim() || undefined,
-                              currency:
-                                    String(payload.currency ?? '')
-                                          .trim()
-                                          .toUpperCase() || undefined,
-                              orderDetails,
-                              discountName: payload.discountName?.trim(),
-                              discountPercentage: normalizeOptionalNumber(payload.discountPercentage, 'discountPercentage'),
-                              discountAmount: normalizeOptionalNumber(payload.discountAmount, 'discountAmount'),
-                              lineItems,
-                              idImages: idImagesData,
-                              idImageDeleteAfter: idImagesData?.deleteAfter,
-                              tradeInConsentId:
-                                    payload.tradeInConsentId && Types.ObjectId.isValid(payload.tradeInConsentId)
-                                          ? new Types.ObjectId(payload.tradeInConsentId)
-                                          : null,
-                              invoiceTemplate,
-                        },
-                  ],
-                  { session }
-            );
-
-            // Process payment allocations to previous customer invoices (Callout 4 & 5)
-            let allocations: Array<{ invoiceId: string; amountApplied: number }> = [];
-            try {
-                  allocations = typeof payload.allocations === 'string'
-                        ? JSON.parse(payload.allocations)
-                        : payload.allocations || [];
-            } catch {
-                  // Ignore parse errors
+                        }).session(session);
+                        if (targetInvForCustomer) {
+                              if (!resolvedCustomerInfo && targetInvForCustomer.customerInfo) {
+                                    resolvedCustomerInfo = targetInvForCustomer.customerInfo;
+                              }
+                              if (!resolvedCurrency && targetInvForCustomer.currency) {
+                                    resolvedCurrency = targetInvForCustomer.currency;
+                              }
+                        }
+                  }
             }
+
+            const invoiceCreateDoc: any = {
+                  shopkeeperId,
+                  shopId,
+                  invoice: invoiceFile,
+                  type,
+                  customerInfo: resolvedCustomerInfo,
+                  itemsIds,
+
+                  totalAmount,
+                  dueAmount,
+                  repairRequestId: normalizeObjectId(payload.repairRequestId),
+                  tax: normalizeOptionalNumber(payload.tax, 'tax'),
+                  taxName: payload.taxName,
+                  taxIncludedInPrice: payload.taxIncludedInPrice,
+                  paymentMethod,
+                  paymentStatus: payload.paymentStatus,
+                  paymentDetails,
+                  bankDetails,
+                  amountPaid,
+                  invoiceNumber: String(payload.invoiceNumber ?? '').trim() || undefined,
+                  currency: resolvedCurrency,
+                  orderDetails,
+                  discountName: payload.discountName?.trim(),
+                  discountPercentage: normalizeOptionalNumber(payload.discountPercentage, 'discountPercentage'),
+                  discountAmount: normalizeOptionalNumber(payload.discountAmount, 'discountAmount'),
+                  lineItems,
+                  idImages: idImagesData,
+                  idImageDeleteAfter: idImagesData?.deleteAfter,
+                  tradeInConsentId:
+                        payload.tradeInConsentId && Types.ObjectId.isValid(payload.tradeInConsentId)
+                              ? new Types.ObjectId(payload.tradeInConsentId)
+                              : null,
+                  invoiceTemplate,
+            };
+
+            if (customCreatedAt) {
+                  invoiceCreateDoc.createdAt = customCreatedAt;
+            }
+
+            const [result] = await Invoice.create([invoiceCreateDoc], { session });
 
             if (Array.isArray(allocations) && allocations.length > 0) {
                   for (const alloc of allocations) {
@@ -417,6 +447,8 @@ const createInvoice = async (
                                                       amountPaid: newPaid,
                                                       dueAmount: newDue,
                                                       paymentStatus: newStatus,
+                                                      'paymentDetails.amountPaid': newPaid,
+                                                      'paymentDetails.dueAmount': newDue,
                                                 },
                                           },
                                           { session }
@@ -439,6 +471,7 @@ const createInvoice = async (
                                                             paymentMethod,
                                                             createdInvoiceId: result._id,
                                                       },
+                                                      ...(customCreatedAt ? { createdAt: customCreatedAt } : {}),
                                                 },
                                           ],
                                           { session }

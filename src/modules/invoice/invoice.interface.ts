@@ -155,6 +155,7 @@ export interface IInvoicePayload {
       tradeInConsentId?: string;
       invoiceTemplate?: string;
       scoreReview?: IScoreReview | string;
+      createdAt?: Date | string;
 }
 
 export interface ISendInvoiceEmailPayload {
