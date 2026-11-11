@@ -13,6 +13,10 @@ export interface ICustomer {
       paymentType?: string;
       alreadyPaid?: number;
       customerId?: string;
+      bankName?: string;
+      accountHolderName?: string;
+      accountNumber?: string;
+      sortCode?: string;
       createdAt?: Date;
       updatedAt?: Date;
 }

@@ -143,31 +143,42 @@ const normalizeOptionalNumber = (value: unknown, fieldName: string) => {
       return parsed;
 };
 
-const normalizePaymentDetails = (value: IInvoicePayload['paymentDetails']): IInvoicePaymentDetails | undefined => {
+const normalizePaymentDetails = (
+      value: IInvoicePayload['paymentDetails'],
+      payload?: IInvoicePayload
+): IInvoicePaymentDetails | undefined => {
       const details = parseJsonObject<IInvoicePaymentDetails>(value, 'paymentDetails');
 
-      if (!details) {
+      const accountHolderName = String(details?.accountHolderName ?? payload?.accountHolderName ?? '').trim() || undefined;
+      const bankName = String(details?.bankName ?? payload?.bankName ?? '').trim() || undefined;
+      const accountNumber = String(details?.accountNumber ?? details?.bankAccountNumber ?? payload?.accountNumber ?? payload?.bankAccountNumber ?? '').trim() || undefined;
+      const sortCode = String(details?.sortCode ?? payload?.sortCode ?? '').trim() || undefined;
+
+      if (!details && !accountHolderName && !bankName && !accountNumber && !sortCode) {
             return undefined;
       }
 
-      const dueDate = details.dueDate ? new Date(details.dueDate) : undefined;
+      const dueDate = details?.dueDate ? new Date(details.dueDate) : undefined;
 
       if (dueDate && Number.isNaN(dueDate.getTime())) {
             throw new AppError('paymentDetails.dueDate must be a valid date', StatusCodes.BAD_REQUEST);
       }
 
       return {
-            amountReceived: normalizeOptionalNumber(details.amountReceived, 'paymentDetails.amountReceived'),
-            changeGiven: normalizeOptionalNumber(details.changeGiven, 'paymentDetails.changeGiven'),
-            cardholderName: String(details.cardholderName ?? '').trim() || undefined,
-            cardLastFour: String(details.cardLastFour ?? '').trim() || undefined,
-            bankName: String(details.bankName ?? '').trim() || undefined,
-            accountLastFour: String(details.accountLastFour ?? '').trim() || undefined,
-            transactionReference: String(details.transactionReference ?? '').trim() || undefined,
-            amountPaid: normalizeOptionalNumber(details.amountPaid, 'paymentDetails.amountPaid'),
-            dueAmount: normalizeOptionalNumber(details.dueAmount, 'paymentDetails.dueAmount'),
+            amountReceived: normalizeOptionalNumber(details?.amountReceived, 'paymentDetails.amountReceived'),
+            changeGiven: normalizeOptionalNumber(details?.changeGiven, 'paymentDetails.changeGiven'),
+            cardholderName: String(details?.cardholderName ?? '').trim() || undefined,
+            cardLastFour: String(details?.cardLastFour ?? '').trim() || undefined,
+            accountHolderName,
+            bankName,
+            accountNumber,
+            sortCode,
+            accountLastFour: String(details?.accountLastFour ?? '').trim() || (accountNumber && accountNumber.length >= 4 ? accountNumber.slice(-4) : undefined),
+            transactionReference: String(details?.transactionReference ?? '').trim() || undefined,
+            amountPaid: normalizeOptionalNumber(details?.amountPaid, 'paymentDetails.amountPaid'),
+            dueAmount: normalizeOptionalNumber(details?.dueAmount, 'paymentDetails.dueAmount'),
             dueDate,
-            notes: String(details.notes ?? '').trim() || undefined,
+            notes: String(details?.notes ?? '').trim() || undefined,
       };
 };
 
@@ -201,7 +212,15 @@ const createInvoice = async (
             String(payload.paymentMethod ?? '')
                   .trim()
                   .toLowerCase() || undefined;
-      const paymentDetails = normalizePaymentDetails(payload.paymentDetails);
+      const paymentDetails = normalizePaymentDetails(payload.paymentDetails, payload);
+      const bankDetails = (paymentDetails?.accountHolderName || paymentDetails?.bankName || paymentDetails?.accountNumber || paymentDetails?.sortCode)
+            ? {
+                  accountHolderName: paymentDetails.accountHolderName,
+                  bankName: paymentDetails.bankName,
+                  accountNumber: paymentDetails.accountNumber,
+                  sortCode: paymentDetails.sortCode,
+            }
+            : undefined;
       const orderDetails = normalizeOrderDetails(payload.orderDetails);
       const repairRequestId = normalizeObjectId(payload.repairRequestId);
       const totalAmount = normalizeOptionalNumber(payload.totalAmount, 'totalAmount');
@@ -328,6 +347,7 @@ const createInvoice = async (
                               paymentMethod,
                               paymentStatus: payload.paymentStatus,
                               paymentDetails,
+                              bankDetails,
                               amountPaid,
                               invoiceNumber: String(payload.invoiceNumber ?? '').trim() || undefined,
                               currency:
@@ -587,6 +607,7 @@ const updateInvoice = async (id: string, payload: IInvoicePayload, file?: Expres
                   | 'paymentMethod'
                   | 'paymentStatus'
                   | 'paymentDetails'
+                  | 'bankDetails'
                   | 'amountPaid'
                   | 'invoiceNumber'
                   | 'currency'
@@ -628,8 +649,23 @@ const updateInvoice = async (id: string, payload: IInvoicePayload, file?: Expres
             updateData.paymentStatus = payload.paymentStatus;
       }
 
-      if (payload.paymentDetails !== undefined) {
-            updateData.paymentDetails = normalizePaymentDetails(payload.paymentDetails);
+      if (
+            payload.paymentDetails !== undefined ||
+            payload.sortCode !== undefined ||
+            payload.accountNumber !== undefined ||
+            payload.bankAccountNumber !== undefined ||
+            payload.accountHolderName !== undefined ||
+            payload.bankName !== undefined
+      ) {
+            updateData.paymentDetails = normalizePaymentDetails(payload.paymentDetails, payload);
+            if (updateData.paymentDetails) {
+                  updateData.bankDetails = {
+                        accountHolderName: updateData.paymentDetails.accountHolderName,
+                        bankName: updateData.paymentDetails.bankName,
+                        accountNumber: updateData.paymentDetails.accountNumber,
+                        sortCode: updateData.paymentDetails.sortCode,
+                  };
+            }
       }
 
       if (payload.amountPaid !== undefined) {

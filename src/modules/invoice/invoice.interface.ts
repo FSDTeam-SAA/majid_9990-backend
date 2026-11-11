@@ -13,7 +13,11 @@ export interface IInvoicePaymentDetails {
       changeGiven?: number;
       cardholderName?: string;
       cardLastFour?: string;
+      accountHolderName?: string;
       bankName?: string;
+      accountNumber?: string;
+      bankAccountNumber?: string;
+      sortCode?: string;
       accountLastFour?: string;
       transactionReference?: string;
       amountPaid?: number;
@@ -58,6 +62,12 @@ export interface IInvoice {
       paymentMethod?: string;
       paymentStatus?: InvoicePaymentStatus;
       paymentDetails?: IInvoicePaymentDetails;
+      bankDetails?: {
+            accountHolderName?: string;
+            bankName?: string;
+            accountNumber?: string;
+            sortCode?: string;
+      };
       amountPaid?: number;
       invoiceNumber?: string;
       currency?: string;
@@ -126,6 +136,11 @@ export interface IInvoicePayload {
       paymentMethod?: string;
       paymentStatus?: InvoicePaymentStatus;
       paymentDetails?: IInvoicePaymentDetails | string;
+      sortCode?: string;
+      accountNumber?: string;
+      bankAccountNumber?: string;
+      accountHolderName?: string;
+      bankName?: string;
       amountPaid?: number;
       invoiceNumber?: string;
       currency?: string;

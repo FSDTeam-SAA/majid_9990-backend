@@ -4,6 +4,7 @@ export interface IBankDetail {
       accountHolderName: string;
       bankName: string;
       accountNumber: string;
+      sortCode?: string;
       branchName: string;
       routingNumber: string;
       currency: string;

@@ -18,6 +18,11 @@ const bankDetailSchema = new Schema<IBankDetail>(
                   required: true,
                   trim: true,
             },
+            sortCode: {
+                  type: String,
+                  trim: true,
+                  default: null,
+            },
             branchName: {
                   type: String,
                   required: true,

@@ -15,6 +15,10 @@ const customerSchema = new Schema<ICustomer>(
             paymentType: { type: String, trim: true },
             alreadyPaid: { type: Number },
             customerId: { type: String, trim: true },
+            bankName: { type: String, trim: true },
+            accountHolderName: { type: String, trim: true },
+            accountNumber: { type: String, trim: true },
+            sortCode: { type: String, trim: true },
       },
       { 
             timestamps: true,
