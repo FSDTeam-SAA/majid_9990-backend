@@ -430,13 +430,13 @@ ${score >= 90 ? '🏆 Excellent cash management!' : score >= 75 ? '✅ Good job!
                               $sum: { $cond: [{ $not: '$isPurchase' }, '$amount', 0] },
                         },
                         cashExpenses: {
-                              $sum: { $cond: ['$isPurchase', '$amount', 0] },
+                              $sum: { $cond: [{ $and: ['$isPurchase', '$isCash'] }, '$amount', 0] },
                         },
                         invoiceCount: {
                               $sum: { $cond: [{ $not: '$isPurchase' }, 1, 0] },
                         },
                         expenseCount: {
-                              $sum: { $cond: ['$isPurchase', 1, 0] },
+                              $sum: { $cond: [{ $and: ['$isPurchase', '$isCash'] }, 1, 0] },
                         },
                   },
             };
@@ -451,6 +451,12 @@ ${score >= 90 ? '🏆 Excellent cash management!' : score >= 75 ? '✅ Good job!
                                                 { $toLower: { $trim: { input: { $ifNull: ['$type', ''] } } } },
                                                 ['purchase invoice', 'purchase', 'purchase-invoice', 'purchase_invoice'],
                                           ],
+                                    },
+                                    isCash: {
+                                          $regexMatch: {
+                                                input: { $ifNull: ['$paymentMethod', { $ifNull: ['$paymentType', 'cash'] }] },
+                                                regex: /^(cash|cash[ -_]on[ -_]delivery|cod)$/i,
+                                          },
                                     },
                                     amount: {
                                           $cond: [
@@ -517,9 +523,8 @@ ${score >= 90 ? '🏆 Excellent cash management!' : score >= 75 ? '✅ Good job!
             const lastWeekMetrics = formatPeriod(raw.lastWeek);
             const lastMonthMetrics = formatPeriod(raw.lastMonth);
 
-            const isDocToday = cashDoc ? this.isSameDay(cashDoc.date || cashDoc.updatedAt, new Date()) : false;
-            const startingDayCash = round2(Number(isDocToday && cashDoc ? cashDoc.startingDayCash || 0 : 0));
-            const banked = round2(Number(isDocToday && cashDoc ? cashDoc.banked || 0 : 0));
+            const startingDayCash = round2(Number(cashDoc ? cashDoc.startingDayCash || 0 : 0));
+            const banked = round2(Number(cashDoc ? cashDoc.banked || 0 : 0));
             const cashScore = Number(cashDoc ? cashDoc.cashManagementScore ?? 100 : 100);
             const aiInsight = cashDoc ? cashDoc.aiInsight || '' : '';
 
