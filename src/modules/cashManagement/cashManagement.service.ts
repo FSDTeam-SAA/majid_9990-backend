@@ -406,8 +406,9 @@ ${score >= 90 ? '🏆 Excellent cash management!' : score >= 75 ? '✅ Good job!
             const matchFilter: Record<string, unknown> = {
                   shopkeeperId: new Types.ObjectId(shopkeeperId),
                   $or: [
-                        { paymentMethod: { $regex: /^(cash|cash on delivery|cod|bank|bank transfer)$/i } },
-                        { paymentType: { $regex: /^(cash|cash on delivery|cod|bank|bank transfer)$/i } },
+                        { type: { $regex: /^(purchase|purchase[ -_]invoice)$/i } },
+                        { paymentMethod: { $regex: /^(cash|cash[ -_]on[ -_]delivery|cod|bank|bank[ -_]transfer)$/i } },
+                        { paymentType: { $regex: /^(cash|cash[ -_]on[ -_]delivery|cod|bank|bank[ -_]transfer)$/i } },
                   ],
             };
 
@@ -448,14 +449,20 @@ ${score >= 90 ? '🏆 Excellent cash management!' : score >= 75 ? '✅ Good job!
                                     isPurchase: {
                                           $in: [
                                                 { $toLower: { $trim: { input: { $ifNull: ['$type', ''] } } } },
-                                                ['purchase invoice', 'purchase'],
+                                                ['purchase invoice', 'purchase', 'purchase-invoice', 'purchase_invoice'],
                                           ],
                                     },
                                     amount: {
                                           $cond: [
                                                 { $gt: [{ $ifNull: ['$amountPaid', 0] }, 0] },
                                                 '$amountPaid',
-                                                { $ifNull: ['$totalAmount', 0] },
+                                                {
+                                                      $cond: [
+                                                            { $eq: [{ $toLower: { $ifNull: ['$paymentStatus', ''] } }, 'due'] },
+                                                            0,
+                                                            { $ifNull: ['$totalAmount', 0] },
+                                                      ],
+                                                },
                                           ],
                                     },
                                     createdAt: { $ifNull: ['$createdAt', new Date(0)] },
@@ -475,10 +482,11 @@ ${score >= 90 ? '🏆 Excellent cash management!' : score >= 75 ? '✅ Good job!
                   Invoice.find({
                         shopkeeperId: new Types.ObjectId(shopkeeperId),
                         $or: [
-                              { paymentMethod: { $regex: /^(cash|cash on delivery|cod|bank|bank transfer)$/i } },
-                              { paymentType: { $regex: /^(cash|cash on delivery|cod|bank|bank transfer)$/i } },
+                              { type: { $regex: /^(purchase|purchase[ -_]invoice)$/i } },
+                              { paymentMethod: { $regex: /^(cash|cash[ -_]on[ -_]delivery|cod|bank|bank[ -_]transfer)$/i } },
+                              { paymentType: { $regex: /^(cash|cash[ -_]on[ -_]delivery|cod|bank|bank[ -_]transfer)$/i } },
                         ],
-                        type: { $regex: /^(purchase|purchase invoice)$/i },
+                        type: { $regex: /^(purchase|purchase[ -_]invoice)$/i },
                   })
                         .sort({ createdAt: -1 })
                         .limit(20)
@@ -488,14 +496,16 @@ ${score >= 90 ? '🏆 Excellent cash management!' : score >= 75 ? '✅ Good job!
             ]);
 
             const raw = aggResult[0] || {};
+            const round2 = (n: number) => Math.round((n + Number.EPSILON) * 100) / 100;
+
             const formatPeriod = (arr: any[]) => {
                   const item = arr && arr[0] ? arr[0] : {};
-                  const cashSales = Number(item.cashSales || 0);
-                  const cashExpenses = Number(item.cashExpenses || 0);
+                  const cashSales = round2(Number(item.cashSales || 0));
+                  const cashExpenses = round2(Number(item.cashExpenses || 0));
                   return {
                         cashSales,
                         cashExpenses,
-                        netCash: cashSales - cashExpenses,
+                        netCash: round2(cashSales - cashExpenses),
                         invoiceCount: Number(item.invoiceCount || 0),
                         expenseCount: Number(item.expenseCount || 0),
                   };
@@ -507,13 +517,18 @@ ${score >= 90 ? '🏆 Excellent cash management!' : score >= 75 ? '✅ Good job!
             const lastWeekMetrics = formatPeriod(raw.lastWeek);
             const lastMonthMetrics = formatPeriod(raw.lastMonth);
 
-            const startingDayCash = Number(cashDoc ? cashDoc.startingDayCash || 0 : 0);
-            const banked = Number(cashDoc ? cashDoc.banked || 0 : 0);
+            const isDocToday = cashDoc ? this.isSameDay(cashDoc.date || cashDoc.updatedAt, new Date()) : false;
+            const startingDayCash = round2(Number(isDocToday && cashDoc ? cashDoc.startingDayCash || 0 : 0));
+            const banked = round2(Number(isDocToday && cashDoc ? cashDoc.banked || 0 : 0));
             const cashScore = Number(cashDoc ? cashDoc.cashManagementScore ?? 100 : 100);
             const aiInsight = cashDoc ? cashDoc.aiInsight || '' : '';
 
-            const previousSalesTotal = Math.max(0, allTimeMetrics.cashSales + startingDayCash - banked);
-            const availableCashToday = previousSalesTotal;
+            // Available In Drawer Today: Starting Day Float + Today's Cash Sales - Today's Stock Purchases (Expenses) - Banked to Owner
+            const availableCashToday = Math.max(
+                  0,
+                  round2(startingDayCash + todayMetrics.cashSales - todayMetrics.cashExpenses - banked)
+            );
+            const previousSalesTotal = round2(allTimeMetrics.cashSales);
 
             const cashExpensesList = (recentExpensesInvoices || []).map((inv: any) => ({
                   id: String(inv._id),
