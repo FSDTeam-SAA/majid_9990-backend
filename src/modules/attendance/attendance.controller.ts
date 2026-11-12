@@ -93,6 +93,30 @@ const updateNfcSettings = catchAsync(async (req, res) => {
   });
 });
 
+const getAttendanceMonitorData = catchAsync(async (req, res) => {
+  const shopId = (req.query.shopId as string) || (req.user?.shopId?.toString() as string);
+  const date = req.query.date as string;
+  const result = await attendanceService.getAttendanceMonitorData(req.user, shopId, date);
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'Attendance monitor data fetched successfully',
+    data: result,
+  });
+});
+
+const approveEarlyLeave = catchAsync(async (req, res) => {
+  const result = await attendanceService.approveEarlyLeave(req.user, req.body);
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'Early leave approved successfully',
+    data: result,
+  });
+});
+
 const attendanceController = {
   verifyToken,
   staffCheck,
@@ -101,6 +125,8 @@ const attendanceController = {
   getShopAttendanceLogs,
   getNfcSettings,
   updateNfcSettings,
+  getAttendanceMonitorData,
+  approveEarlyLeave,
 };
 
 export default attendanceController;

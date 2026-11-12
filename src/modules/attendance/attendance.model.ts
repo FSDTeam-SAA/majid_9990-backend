@@ -105,7 +105,7 @@ const attendanceSchema = new Schema<IAttendance>(
     },
     status: {
       type: String,
-      enum: ['present', 'late', 'early_departure', 'overtime', 'missed_tap', 'completed'],
+      enum: ['present', 'late', 'on_break', 'early_departure', 'overtime', 'missed_tap', 'completed'],
       default: 'present',
     },
     notes: {

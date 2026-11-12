@@ -328,6 +328,13 @@ const createStaff = async (payload: {
       weekendDays?: string[];
       idVerificationStatus?: 'pending' | 'verified' | 'rejected';
       idNumber?: string;
+      staffId?: string;
+      pin?: string;
+      jobRole?: string;
+      street?: string;
+      location?: string;
+      postalCode?: string;
+      referenceFaceUrl?: string;
 }) => {
       const {
             firstName,
@@ -343,6 +350,13 @@ const createStaff = async (payload: {
             weekendDays,
             idVerificationStatus,
             idNumber,
+            staffId,
+            pin,
+            jobRole,
+            street,
+            location,
+            postalCode,
+            referenceFaceUrl,
       } = payload;
 
       if (!shopkeeperId) {
@@ -367,7 +381,12 @@ const createStaff = async (payload: {
       }
 
       const generatedStaffId =
-            (payload as any).staffId || `STF-${Math.floor(1000 + Math.random() * 9000)}`;
+            staffId || (payload as any).staffId || `STF-${Math.floor(1000 + Math.random() * 9000)}`;
+
+      let staffPin: string | null = null;
+      if (pin && /^\d{4,6}$/.test(pin)) {
+            staffPin = await bcrypt.hash(pin, 10);
+      }
 
       const result = await User.create({
             firstName,
@@ -377,8 +396,16 @@ const createStaff = async (payload: {
             phone,
             role: 'staff',
             staffId: generatedStaffId,
+            staffPin,
+            jobRole: jobRole || 'Sales Executive',
+            street,
+            location,
+            postalCode,
+            referenceFaceUrl: referenceFaceUrl || null,
+            referenceFaceEnrolledAt: referenceFaceUrl ? new Date() : undefined,
             shopkeeperId: new Types.ObjectId(shopkeeperId),
             shopId: shopId && Types.ObjectId.isValid(shopId) ? new Types.ObjectId(shopId) : null,
+            assignedShopId: shopId && Types.ObjectId.isValid(shopId) ? new Types.ObjectId(shopId) : null,
             isVerified: true,
             wageType,
             wageAmount,

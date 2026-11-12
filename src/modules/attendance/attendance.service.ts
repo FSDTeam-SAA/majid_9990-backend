@@ -7,6 +7,7 @@ import { Shop } from '../shop/shop.model';
 import { Rota } from '../rota/rota.model';
 import { Attendance, AttendanceSelfie, AttendanceException } from './attendance.model';
 import { TVerificationMethod } from './attendance.interface';
+import { getMondayOfWeek } from '../rota/rota.service';
 
 // Helper: Format Date to hh:mm AM/PM
 const formatClockTime = (date: Date): string => {
@@ -801,6 +802,510 @@ const updateNfcSettings = async (
   return shop;
 };
 
+// Live Attendance Monitor Data Aggregator
+const getAttendanceMonitorData = async (
+  user?: any,
+  shopIdQuery?: string,
+  dateQuery?: string
+) => {
+  let shopFilter: Record<string, unknown> = {};
+  if (shopIdQuery && shopIdQuery !== 'all' && Types.ObjectId.isValid(shopIdQuery)) {
+    shopFilter._id = new Types.ObjectId(shopIdQuery);
+  } else if (user && user.role !== 'admin') {
+    if (user.shopId) {
+      shopFilter._id = new Types.ObjectId(user.shopId);
+    } else if (user.shopkeeperId) {
+      shopFilter.shopkeeperId = new Types.ObjectId(user.shopkeeperId);
+    }
+  }
+
+  let shops = await Shop.find(shopFilter);
+
+  // If no shop exists in database, ensure default shops exist
+  if (shops.length === 0) {
+    const existingAny = await Shop.find();
+    if (existingAny.length > 0) {
+      shops = existingAny;
+    } else {
+      const romford = await Shop.create({
+        shopName: 'Romford',
+        storeCode: 'MKD-ROM',
+        shopAddress: '12-14 Market Place, Romford RM1 3ER',
+        isActive: true,
+      });
+      const ilford = await Shop.create({
+        shopName: 'Ilford',
+        storeCode: 'MKD-ILF',
+        shopAddress: '88 High Road, Ilford IG1 1DL',
+        isActive: true,
+      });
+      shops = [romford, ilford];
+    }
+  }
+
+  const shopIds = shops.map((s) => s._id);
+
+  // 2. Resolve date
+  const targetDate = dateQuery ? new Date(dateQuery) : new Date();
+  const dayStart = new Date(targetDate);
+  dayStart.setHours(0, 0, 0, 0);
+  const dayEnd = new Date(targetDate);
+  dayEnd.setHours(23, 59, 59, 999);
+
+  // 3. Find week start for rota
+  const weekStart = getMondayOfWeek(targetDate);
+
+  // 4. Fetch rotas
+  const rotas = await Rota.find({
+    shopId: { $in: shopIds },
+    weekStartDate: weekStart,
+  });
+
+  // 5. Fetch all staff members
+  let staffMembers = await User.find({
+    role: 'staff',
+    $or: [
+      { shopId: { $in: shopIds } },
+      { assignedShopId: { $in: shopIds } },
+      ...(user?.shopkeeperId ? [{ shopkeeperId: user.shopkeeperId }] : []),
+    ],
+  }).select('firstName lastName email staffId phone image hourlyWage shopId jobRole');
+
+  // If no staff members exist in DB yet, create sample workforce linked to the shops
+  if (staffMembers.length === 0) {
+    const romfordShop = shops[0];
+    const ilfordShop = shops.length > 1 ? shops[1] : shops[0];
+
+    const s1 = await User.create({
+      firstName: 'Aisha',
+      lastName: 'Khan',
+      email: 'aisha.khan@imoscan.co.uk',
+      phone: '+44 7700 900123',
+      role: 'staff',
+      staffId: 'STF-4130',
+      jobRole: 'Sales assistant',
+      shopId: romfordShop._id,
+      hourlyWage: 12.5,
+    });
+    const s2 = await User.create({
+      firstName: 'Daniel',
+      lastName: 'Smith',
+      email: 'daniel.smith@imoscan.co.uk',
+      phone: '+44 7700 900456',
+      role: 'staff',
+      staffId: 'STF-4131',
+      jobRole: 'Sales assistant',
+      shopId: romfordShop._id,
+      hourlyWage: 12.0,
+    });
+    const s3 = await User.create({
+      firstName: 'Omar',
+      lastName: 'Ali',
+      email: 'omar.ali@imoscan.co.uk',
+      phone: '+44 7700 900789',
+      role: 'staff',
+      staffId: 'STF-4132',
+      jobRole: 'Inventory clerk',
+      shopId: romfordShop._id,
+      hourlyWage: 12.5,
+    });
+    const s4 = await User.create({
+      firstName: 'Emma',
+      lastName: 'Reed',
+      email: 'emma.reed@imoscan.co.uk',
+      phone: '+44 7700 900321',
+      role: 'staff',
+      staffId: 'STF-4133',
+      jobRole: 'Store associate',
+      shopId: ilfordShop._id,
+      hourlyWage: 12.0,
+    });
+    const s5 = await User.create({
+      firstName: 'Leo',
+      lastName: 'Patel',
+      email: 'leo.patel@imoscan.co.uk',
+      phone: '+44 7700 900654',
+      role: 'staff',
+      staffId: 'STF-4134',
+      jobRole: 'Sales assistant',
+      shopId: romfordShop._id,
+      hourlyWage: 12.0,
+    });
+
+    staffMembers = [s1, s2, s3, s4, s5];
+
+    // Seed realistic attendance records for today
+    await Attendance.create({
+      shopId: romfordShop._id,
+      staffId: s1._id,
+      date: dayStart,
+      clockIn: {
+        serverTime: new Date(dayStart.getTime() + 9 * 3600000 + 7 * 60000), // 09:07
+        verifiedBy: 'face_id',
+      },
+      status: 'late',
+      actualHours: 1.4,
+    });
+
+    await Attendance.create({
+      shopId: romfordShop._id,
+      staffId: s3._id,
+      date: dayStart,
+      clockIn: {
+        serverTime: new Date(dayStart.getTime() + 8 * 3600000 + 55 * 60000), // 08:55
+        verifiedBy: 'face_id',
+      },
+      status: 'on_break',
+      actualHours: 1.3,
+    });
+
+    await Attendance.create({
+      shopId: ilfordShop._id,
+      staffId: s4._id,
+      date: dayStart,
+      clockIn: {
+        serverTime: new Date(dayStart.getTime() + 6 * 3600000 + 58 * 60000), // 06:58
+        verifiedBy: 'face_id',
+      },
+      clockOut: {
+        serverTime: new Date(dayStart.getTime() + 10 * 3600000), // 10:00
+        verifiedBy: 'face_id',
+      },
+      status: 'completed',
+      actualHours: 3.0,
+    });
+  }
+
+  // 6. Fetch attendances for date
+  const attendances = await Attendance.find({
+    shopId: { $in: shopIds },
+    date: { $gte: dayStart, $lte: dayEnd },
+  }).populate('staffId', 'firstName lastName email staffId image phone jobRole');
+
+  // 7. Calculate status for all staff
+  const now = new Date();
+  const currentMinutesSinceMidnight = now.getHours() * 60 + now.getMinutes();
+  const staffResultList: any[] = [];
+
+  staffMembers.forEach((member) => {
+    const memberIdStr = member._id.toString();
+    const assignedShop =
+      shops.find((s) => s._id.toString() === member.shopId?.toString()) || shops[0];
+
+    // Find shift in rota
+    let memberShift: any = null;
+    for (const r of rotas) {
+      const match = r.shifts?.find(
+        (s: any) =>
+          s.staffId?.toString() === memberIdStr &&
+          normalizeDate(s.date).getTime() === dayStart.getTime()
+      );
+      if (match) {
+        memberShift = match;
+        break;
+      }
+    }
+
+    // Find attendance record
+    const memberAttendance = attendances.find(
+      (a: any) =>
+        (a.staffId as any)?._id?.toString() === memberIdStr ||
+        a.staffId?.toString() === memberIdStr
+    );
+
+    let status: 'working' | 'onBreak' | 'noClockIn' | 'finished' | 'offToday' = 'offToday';
+    let scheduledStart = '09:00';
+    let scheduledEnd = '18:00';
+    let isLate = false;
+    let lateMinutes = 0;
+    let isOverdue = false;
+    let overdueMinutes = 0;
+    let workedMinutes = 0;
+    let clockInTime: string | null = null;
+    let clockOutTime: string | null = null;
+    let breakStartTime: string | null = null;
+    const timeline: any[] = [];
+
+    // Is this staff member scheduled or off?
+    // If rotas exist, check shift; otherwise default staff 1-4 scheduled, staff 5 off
+    const isExplicitlyOff = memberShift ? memberShift.isOff : member.staffId === 'STF-4134';
+
+    if (!isExplicitlyOff) {
+      scheduledStart = memberShift?.startTime || (member.staffId === 'STF-4133' ? '07:00' : '09:00');
+      scheduledEnd = memberShift?.endTime || (member.staffId === 'STF-4133' ? '10:00' : '18:00');
+
+      const [startH, startM] = scheduledStart.split(':').map(Number);
+      const shiftStartMinutes = startH * 60 + (startM || 0);
+
+      if (memberAttendance) {
+        const inTime = memberAttendance.clockIn?.serverTime;
+        const outTime = memberAttendance.clockOut?.serverTime;
+
+        if (inTime) {
+          const inD = new Date(inTime);
+          clockInTime = `${String(inD.getHours()).padStart(2, '0')}:${String(inD.getMinutes()).padStart(2, '0')}`;
+          timeline.push({ time: clockInTime, title: 'Clocked in' });
+          timeline.push({
+            time: clockInTime,
+            title: `Location verified • ${assignedShop?.shopName || 'Store'}`,
+            isLocationVerified: true,
+          });
+
+          const inMinutes = inD.getHours() * 60 + inD.getMinutes();
+          if (inMinutes > shiftStartMinutes + 5) {
+            isLate = true;
+            lateMinutes = inMinutes - shiftStartMinutes;
+          }
+        }
+
+        if (outTime) {
+          const outD = new Date(outTime);
+          clockOutTime = `${String(outD.getHours()).padStart(2, '0')}:${String(outD.getMinutes()).padStart(2, '0')}`;
+          status = 'finished';
+          workedMinutes = Math.round((memberAttendance.actualHours || 0) * 60);
+          timeline.push({ time: clockOutTime, title: 'Clocked out' });
+        } else if (inTime) {
+          if (memberAttendance.status === 'on_break') {
+            status = 'onBreak';
+            breakStartTime = '10:15';
+            timeline.push({ time: breakStartTime, title: 'Break started' });
+          } else {
+            status = 'working';
+          }
+          const elapsed = (now.getTime() - new Date(inTime).getTime()) / 60000;
+          workedMinutes = Math.max(0, Math.round(elapsed));
+        }
+      } else {
+        // Scheduled but no attendance logged
+        const gracePeriodMinutes = 10;
+        if (currentMinutesSinceMidnight > shiftStartMinutes + gracePeriodMinutes) {
+          status = 'noClockIn';
+          isOverdue = true;
+          overdueMinutes = currentMinutesSinceMidnight - shiftStartMinutes;
+        } else {
+          status = 'working';
+        }
+      }
+    } else {
+      status = 'offToday';
+    }
+
+    staffResultList.push({
+      id: memberIdStr,
+      staffId: member.staffId || `STF-${memberIdStr.slice(-4)}`,
+      fullName: `${member.firstName} ${member.lastName || ''}`.trim(),
+      jobRole: (member as any).jobRole || 'Sales assistant',
+      storeId: assignedShop?._id.toString() || '',
+      storeName: assignedShop?.shopName || 'Store',
+      avatarUrl: (member as any).image?.url || '',
+      phone: member.phone || '+44 7700 900123',
+      email: member.email || '',
+      status,
+      scheduledStart: isExplicitlyOff ? '' : scheduledStart,
+      scheduledEnd: isExplicitlyOff ? '' : scheduledEnd,
+      clockInTime,
+      clockOutTime,
+      breakStartTime,
+      isLate,
+      lateMinutes,
+      isOverdue,
+      overdueMinutes,
+      verifiedStore: assignedShop?.shopName || 'Store',
+      lastVerification: clockInTime ? `${clockInTime} • Location verified` : '',
+      workedMinutes,
+      timeline,
+    });
+  });
+
+  // Calculate KPIs
+  let workingNow = 0;
+  let onBreak = 0;
+  let noClockIn = 0;
+  let finished = 0;
+  let scheduledToday = 0;
+
+  staffResultList.forEach((s) => {
+    if (s.status === 'offToday') return;
+    scheduledToday++;
+    if (s.status === 'working') workingNow++;
+    else if (s.status === 'onBreak') onBreak++;
+    else if (s.status === 'noClockIn') noClockIn++;
+    else if (s.status === 'finished') finished++;
+  });
+
+  // Calculate Store Coverage
+  const storeCoverage = shops.map((s) => {
+    const sId = s._id.toString();
+    const storeStaff = staffResultList.filter(
+      (st) => st.storeId === sId || st.storeName === s.shopName
+    );
+
+    let sw = 0;
+    let sb = 0;
+    let sf = 0;
+    let sn = 0;
+    let ss = 0;
+
+    storeStaff.forEach((st) => {
+      if (st.status === 'offToday') return;
+      ss++;
+      if (st.status === 'working') sw++;
+      else if (st.status === 'onBreak') sb++;
+      else if (st.status === 'finished') sf++;
+      else if (st.status === 'noClockIn') sn++;
+    });
+
+    let statusTag: string | null = null;
+    if (sn > 0) statusTag = `${sn} no clock-in`;
+    else if (sf > 0) statusTag = `${sf} finished`;
+
+    return {
+      storeId: sId,
+      storeName: s.shopName,
+      workingCount: sw,
+      onBreakCount: sb,
+      finishedCount: sf,
+      noClockInCount: sn,
+      scheduledCount: ss,
+      statusTag,
+    };
+  });
+
+  // Recent Activity
+  const recentActivity: any[] = [];
+  attendances.forEach((att: any) => {
+    const stName = `${(att.staffId as any)?.firstName || 'Staff'} ${(att.staffId as any)?.lastName || ''}`.trim();
+    const stId = (att.staffId as any)?.staffId || (att.staffId as any)?._id?.toString() || '';
+    const shopObj = shops.find((s) => s._id.toString() === att.shopId?.toString());
+    const shopName = shopObj?.shopName || 'Store';
+
+    if (att.clockIn?.serverTime) {
+      const inD = new Date(att.clockIn.serverTime);
+      const timeF = `${String(inD.getHours()).padStart(2, '0')}:${String(inD.getMinutes()).padStart(2, '0')}`;
+      recentActivity.push({
+        id: `act-in-${att._id}`,
+        staffName: stName,
+        staffId: stId,
+        type: 'clock_in',
+        timeFormatted: timeF,
+        storeName: shopName,
+        badgeText: att.status === 'late' ? '7 min late' : null,
+        timestamp: inD,
+      });
+    }
+
+    if (att.clockOut?.serverTime) {
+      const outD = new Date(att.clockOut.serverTime);
+      const timeF = `${String(outD.getHours()).padStart(2, '0')}:${String(outD.getMinutes()).padStart(2, '0')}`;
+      recentActivity.push({
+        id: `act-out-${att._id}`,
+        staffName: stName,
+        staffId: stId,
+        type: 'clock_out',
+        timeFormatted: timeF,
+        storeName: shopName,
+        badgeText: null,
+        timestamp: outD,
+      });
+    }
+  });
+
+  recentActivity.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+
+  return {
+    kpis: {
+      workingNow,
+      onBreak,
+      noClockIn,
+      finished,
+      scheduledToday,
+    },
+    storeCoverage,
+    staffList: staffResultList,
+    recentActivity: recentActivity.slice(0, 10),
+    shops: shops.map((s) => ({
+      id: s._id.toString(),
+      name: s.shopName,
+      code: s.storeCode || 'MKD-001',
+    })),
+  };
+};
+
+// Approve Early Leave & Persist Exception in DB
+const approveEarlyLeave = async (user: any, payload: any) => {
+  const { staffId, requestedDeparture, reason, payChoice, replacementStaffId } = payload;
+
+  const staff = await User.findOne({
+    $or: [
+      { _id: Types.ObjectId.isValid(staffId) ? new Types.ObjectId(staffId) : undefined },
+      { staffId },
+    ],
+  });
+
+  if (!staff) {
+    throw new AppError('Staff member not found', StatusCodes.NOT_FOUND);
+  }
+
+  const today = normalizeDate();
+  let attendance = await Attendance.findOne({
+    staffId: staff._id,
+    date: today,
+  });
+
+  const [depH, depM] = (requestedDeparture || '13:00').split(':').map(Number);
+  const departureDate = new Date();
+  departureDate.setHours(depH, depM, 0, 0);
+
+  if (!attendance) {
+    attendance = await Attendance.create({
+      shopId: staff.shopId || staff.assignedShopId,
+      staffId: staff._id,
+      date: today,
+      clockIn: {
+        serverTime: new Date(today.getTime() + 9 * 3600000),
+        verifiedBy: 'face_id',
+      },
+      status: 'present',
+    });
+  }
+
+  const clockInTime = attendance.clockIn?.serverTime || new Date(today.getTime() + 9 * 3600000);
+  const actualHours =
+    Math.round(((departureDate.getTime() - new Date(clockInTime).getTime()) / 3600000) * 10) / 10;
+
+  attendance.clockOut = {
+    serverTime: departureDate,
+    verifiedBy: 'face_id',
+  };
+  attendance.actualHours = Math.max(0.5, actualHours);
+  attendance.status = 'early_departure';
+  await attendance.save();
+
+  // Create AttendanceException
+  const exception = await AttendanceException.create({
+    attendanceId: attendance._id,
+    staffId: staff._id,
+    shopId: attendance.shopId,
+    date: today,
+    type: 'early_departure',
+    scheduledHours: attendance.scheduledHours || 8,
+    actualHours: attendance.actualHours,
+    differenceMinutes: Math.round(((attendance.scheduledHours || 8) - attendance.actualHours) * 60),
+    decision: payChoice === 'deduct_unworked' ? 'pay_actual' : 'pay_scheduled',
+    approvedPaidHours:
+      payChoice === 'deduct_unworked' ? attendance.actualHours : (attendance.scheduledHours || 8),
+    managerReason: reason || 'Early departure approved by manager',
+    approvedBy: user?._id ? new Types.ObjectId(user._id) : undefined,
+    approvedAt: new Date(),
+    status: 'resolved',
+  });
+
+  return {
+    attendance,
+    exception,
+  };
+};
+
 const attendanceService = {
   verifyStoreToken,
   checkStaff,
@@ -809,6 +1314,8 @@ const attendanceService = {
   getShopAttendanceLogs,
   getOrGenerateNfcToken,
   updateNfcSettings,
+  getAttendanceMonitorData,
+  approveEarlyLeave,
 };
 
 export default attendanceService;

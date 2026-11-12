@@ -32,6 +32,7 @@ export interface IUser {
       weekendDays?: string[];
       idVerificationStatus?: 'pending' | 'verified' | 'rejected' | string;
       idNumber?: string;
+      jobRole?: string;
       totalReviews?: number;
       averageRating?: number;
       shopkeeperId?: Types.ObjectId | string;

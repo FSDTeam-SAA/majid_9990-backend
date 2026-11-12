@@ -23,6 +23,10 @@ router.get(
   attendanceController.getStaffAttendance
 );
 
+// Live Attendance Monitor & Early Leave (used by mobile app & dashboard)
+router.get('/monitor', optionalProtect, attendanceController.getAttendanceMonitorData);
+router.post('/early-leave', optionalProtect, attendanceController.approveEarlyLeave);
+
 // Shopkeeper Attendance Logs
 router.get(
   '/shop/:shopId',

@@ -166,6 +166,10 @@ const userSchema = new Schema<IUser>(
                   unique: true,
                   trim: true,
             },
+            jobRole: {
+                  type: String,
+                  default: 'Sales Executive',
+            },
             assignedShopId: {
                   type: Schema.Types.ObjectId,
                   ref: 'Shop',

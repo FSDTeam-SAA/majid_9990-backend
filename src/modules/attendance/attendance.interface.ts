@@ -4,6 +4,7 @@ export type TVerificationMethod = 'passkey' | 'selfie' | 'face_id';
 export type TAttendanceStatus =
   | 'present'
   | 'late'
+  | 'on_break'
   | 'early_departure'
   | 'overtime'
   | 'missed_tap'
