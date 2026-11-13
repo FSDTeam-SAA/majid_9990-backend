@@ -72,7 +72,7 @@ const shopSchema = new Schema<IShop>(
     currency: {
       type: String,
       uppercase: true,
-      default: 'USD',
+      default: 'GBP',
     },
     isDefault: {
       type: Boolean,

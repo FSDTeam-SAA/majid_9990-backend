@@ -1,4 +1,5 @@
 // src/modules/repairRequest/repairPdf.service.ts
+import { getCurrencySymbol } from '../../utils/email/email.templates';
 
 export interface RepairPdfData {
       requestId: string;
@@ -12,6 +13,8 @@ export interface RepairPdfData {
       statusLabel: string;
       statusNote?: string;
       price?: number;
+      currency?: string;
+      currencySymbol?: string;
       shopName?: string;
       shopPhone?: string;
       shopAddress?: string;
@@ -42,7 +45,8 @@ const asText = (value: unknown): string => {
 
 const pdfText = (value: unknown): string =>
       asText(value)
-            .replace(/[^\x20-\x7E]/g, '?')
+            .replace(/£/g, '\xA3')
+            .replace(/[^\x20-\x7E\xA0-\xFF]/g, '?')
             .replace(/\\/g, '\\\\')
             .replace(/\(/g, '\\(')
             .replace(/\)/g, '\\)');
@@ -144,6 +148,8 @@ const buildRepairLines = (data: RepairPdfData): string[] => {
             ''
       );
 
+      const currSymbol = getCurrencySymbol(data.currency, data.currencySymbol);
+
       if (data.technicianNotes && data.technicianNotes.length > 0) {
             lines.push(
                   '----------------------------------------------------------------------------------------',
@@ -152,14 +158,14 @@ const buildRepairLines = (data: RepairPdfData): string[] => {
             );
             data.technicianNotes.forEach((note, idx) => {
                   lines.push(
-                        `${idx + 1}. ${note.partName} - Cost: $${Number(note.cost).toFixed(2)} (Est. Time: ${note.time} hrs)`
+                        `${idx + 1}. ${note.partName} - Cost: ${currSymbol}${Number(note.cost).toFixed(2)} (Est. Time: ${note.time} hrs)`
                   );
             });
             lines.push('');
       }
 
       if (data.price && data.price > 0) {
-            lines.push(`Total Repair Price / Estimate: $${Number(data.price).toFixed(2)}`, '');
+            lines.push(`Total Repair Price / Estimate: ${currSymbol}${Number(data.price).toFixed(2)}`, '');
       }
 
       if (data.technicianFeedback) {
@@ -199,7 +205,7 @@ const createPdfBuffer = (lines: string[]): Buffer => {
 
       objects[1] = '<< /Type /Catalog /Pages 2 0 R >>';
       objects[2] = `<< /Type /Pages /Kids [${pageObjectIds.map((id) => `${id} 0 R`).join(' ')}] /Count ${pages.length} >>`;
-      objects[3] = '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>';
+      objects[3] = '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>';
 
       pages.forEach((pageLines, index) => {
             const pageObjectId = pageObjectIds[index];
@@ -219,11 +225,11 @@ const createPdfBuffer = (lines: string[]): Buffer => {
             objects[pageObjectId] =
                   `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents ${contentObjectId} 0 R >>`;
             objects[contentObjectId] =
-                  `<< /Length ${Buffer.byteLength(content, 'ascii')} >>\nstream\n${content}\nendstream`;
+                  `<< /Length ${Buffer.byteLength(content, 'latin1')} >>\nstream\n${content}\nendstream`;
       });
 
       const header = '%PDF-1.4\n';
-      const chunks: Buffer[] = [Buffer.from(header, 'ascii')];
+      const chunks: Buffer[] = [Buffer.from(header, 'latin1')];
       const offsets = [0];
       let offset = Buffer.byteLength(header, 'ascii');
 

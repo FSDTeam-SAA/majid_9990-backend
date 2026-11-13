@@ -4,8 +4,15 @@ import { CashManagement } from './cashManagement.model';
 import { ICashManagement, ICashManagementInput, ICashManagementWithAI } from './cashManagement.interface';
 import { getOpenAiInsight } from '../deviceCheck/scanInfo.transformer';
 import { Invoice } from '../invoice/invoice.model';
+import { User } from '../user/user.model';
+import { getCurrencySymbol } from '../../utils/currency';
 
 class CashManagementService {
+      public formatInsightCurrency(insight?: string | null, currency?: string, currencySymbol?: string): string {
+            if (!insight) return '';
+            const currSymbol = getCurrencySymbol(currency, currencySymbol);
+            return insight.replace(/([-\s:]|^)(?:CA\$|A\$|[\$£€৳₨₹])\s?(\d+(?:\.\d{1,2})?)/g, `$1${currSymbol}$2`);
+      }
       private calculateCashManagementScore(data: {
             startingDayCash: number;
             banked: number;
@@ -57,8 +64,10 @@ class CashManagementService {
             banked: number;
             cashInDrawer: number;
             score: number;
+            currency?: string;
+            currencySymbol?: string;
       }): Promise<string> {
-            const { shopkeeperName, startingDayCash, banked, cashInDrawer, score } = data;
+            const { shopkeeperName, startingDayCash, banked, cashInDrawer, score, currency, currencySymbol } = data;
 
             const totalCash = banked + cashInDrawer;
             const variance = Math.abs(totalCash - startingDayCash);
@@ -84,17 +93,19 @@ class CashManagementService {
                   recommendation = 'Urgent review required. Implement strict cash handling protocols immediately.';
             }
 
+            const currSymbol = getCurrencySymbol(currency, currencySymbol);
+
             const insight = `
 Cash Management Report for ${shopkeeperName}
 Date: ${new Date().toLocaleDateString()}
 Status: ${status} (Score: ${score}/100)
 
 Cash Summary:
-- Starting Day Cash: $${startingDayCash.toFixed(2)}
-- Banked Cash: $${banked.toFixed(2)}
-- Cash in Drawer: $${cashInDrawer.toFixed(2)}
-- Total Cash Accounted: $${totalCash.toFixed(2)}
-- Variance: $${variance.toFixed(2)} (${variancePercentage}%)
+- Starting Day Cash: ${currSymbol}${startingDayCash.toFixed(2)}
+- Banked Cash: ${currSymbol}${banked.toFixed(2)}
+- Cash in Drawer: ${currSymbol}${cashInDrawer.toFixed(2)}
+- Total Cash Accounted: ${currSymbol}${totalCash.toFixed(2)}
+- Variance: ${currSymbol}${variance.toFixed(2)} (${variancePercentage}%)
 
 Analysis:
 ${recommendation}
@@ -121,7 +132,7 @@ ${score >= 90 ? '🏆 Excellent cash management!' : score >= 75 ? '✅ Good job!
       }
 
       async createOrUpdateCashManagement(payload: ICashManagementInput): Promise<ICashManagementWithAI> {
-            const { shopkeeperId, startingDayCash, banked = 0, cashInDrawer = 0 } = payload;
+            const { shopkeeperId, startingDayCash, banked = 0, cashInDrawer = 0, currency, currencySymbol } = payload;
 
             if (!Types.ObjectId.isValid(shopkeeperId)) {
                   throw new AppError('Invalid shopkeeper ID', 400);
@@ -138,6 +149,13 @@ ${score >= 90 ? '🏆 Excellent cash management!' : score >= 75 ? '✅ Good job!
             if (cashInDrawer < 0) {
                   throw new AppError('Cash in drawer cannot be negative', 400);
             }
+
+            // Resolve user info and active currency
+            const user = await User.findById(shopkeeperId).select('firstName lastName shopName currency');
+            const resolvedCurrency = currency ? String(currency).trim().toUpperCase() : (user?.currency || 'GBP');
+            const shopkeeperName = user
+                  ? `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.shopName || 'Shopkeeper'
+                  : 'Shopkeeper';
 
             // Calculate the score
             const score = this.calculateCashManagementScore({
@@ -160,6 +178,7 @@ ${score >= 90 ? '🏆 Excellent cash management!' : score >= 75 ? '✅ Good job!
                               banked,
                               cashInDrawer,
                               cashManagementScore: score,
+                              currency: resolvedCurrency,
                               date: new Date(),
                         },
                         { new: true, runValidators: true }
@@ -172,6 +191,7 @@ ${score >= 90 ? '🏆 Excellent cash management!' : score >= 75 ? '✅ Good job!
                         banked,
                         cashInDrawer,
                         cashManagementScore: score,
+                        currency: resolvedCurrency,
                         date: new Date(),
                   });
             }
@@ -181,17 +201,22 @@ ${score >= 90 ? '🏆 Excellent cash management!' : score >= 75 ? '✅ Good job!
             }
 
             // Generate AI Insight
-            const shopkeeperName = 'Shopkeeper'; // You can fetch user name from User model if needed
             const aiInsight = await this.generateAIInsight({
                   shopkeeperName,
                   startingDayCash,
                   banked,
                   cashInDrawer,
                   score,
+                  currency: resolvedCurrency,
+                  currencySymbol,
             });
 
             // Update with AI insight
-            const updated = await CashManagement.findByIdAndUpdate(cashManagement._id, { aiInsight }, { new: true });
+            const updated = await CashManagement.findByIdAndUpdate(
+                  cashManagement._id,
+                  { aiInsight, currency: resolvedCurrency },
+                  { new: true }
+            );
 
             if (!updated) {
                   throw new AppError('Failed to update cash management with AI insight', 500);
@@ -207,12 +232,17 @@ ${score >= 90 ? '🏆 Excellent cash management!' : score >= 75 ? '✅ Good job!
 
             let cashManagement = await CashManagement.findOne({ shopkeeperId }).populate(
                   'shopkeeperId',
-                  'firstName lastName email phone'
+                  'firstName lastName email phone currency'
             );
 
             if (!cashManagement) {
                   return null;
             }
+
+            const userCurrency = (cashManagement.shopkeeperId as any)?.currency || (cashManagement as any).currency || 'GBP';
+            const shopkeeperName = cashManagement.shopkeeperId
+                  ? `${(cashManagement.shopkeeperId as any).firstName || ''} ${(cashManagement.shopkeeperId as any).lastName || ''}`.trim() || 'Shopkeeper'
+                  : 'Shopkeeper';
 
             // Check if record is from a previous calendar day -> Auto-reset for today
             const isToday = this.isSameDay(cashManagement.date || cashManagement.updatedAt, new Date());
@@ -222,15 +252,13 @@ ${score >= 90 ? '🏆 Excellent cash management!' : score >= 75 ? '✅ Good job!
                         banked: 0,
                         cashInDrawer: 0,
                   });
-                  const shopkeeperName = cashManagement.shopkeeperId
-                        ? `${(cashManagement.shopkeeperId as any).firstName || ''} ${(cashManagement.shopkeeperId as any).lastName || ''}`.trim() || 'Shopkeeper'
-                        : 'Shopkeeper';
                   const aiInsight = await this.generateAIInsight({
                         shopkeeperName,
                         startingDayCash: 0,
                         banked: 0,
                         cashInDrawer: 0,
                         score,
+                        currency: userCurrency,
                   });
 
                   cashManagement = await CashManagement.findByIdAndUpdate(
@@ -241,17 +269,17 @@ ${score >= 90 ? '🏆 Excellent cash management!' : score >= 75 ? '✅ Good job!
                               cashInDrawer: 0,
                               cashManagementScore: score,
                               aiInsight,
+                              currency: userCurrency,
                               date: new Date(),
                         },
                         { new: true }
-                  ).populate('shopkeeperId', 'firstName lastName email phone');
+                  ).populate('shopkeeperId', 'firstName lastName email phone currency');
 
                   if (!cashManagement) return null;
             }
 
             // If no AI insight exists, generate it
             if (!cashManagement.aiInsight || !cashManagement.cashManagementScore) {
-                  const shopkeeperName = 'Shopkeeper';
                   const score = this.calculateCashManagementScore({
                         startingDayCash: cashManagement.startingDayCash,
                         banked: cashManagement.banked || 0,
@@ -264,6 +292,7 @@ ${score >= 90 ? '🏆 Excellent cash management!' : score >= 75 ? '✅ Good job!
                         banked: cashManagement.banked || 0,
                         cashInDrawer: cashManagement.cashInDrawer || 0,
                         score,
+                        currency: userCurrency,
                   });
 
                   const updated = await CashManagement.findByIdAndUpdate(
@@ -271,11 +300,20 @@ ${score >= 90 ? '🏆 Excellent cash management!' : score >= 75 ? '✅ Good job!
                         {
                               cashManagementScore: score,
                               aiInsight: aiInsight,
+                              currency: userCurrency,
                         },
                         { new: true }
                   );
 
+                  if (updated && updated.aiInsight) {
+                        updated.aiInsight = this.formatInsightCurrency(updated.aiInsight, userCurrency);
+                  }
+
                   return updated as ICashManagementWithAI;
+            }
+
+            if (cashManagement && cashManagement.aiInsight) {
+                  cashManagement.aiInsight = this.formatInsightCurrency(cashManagement.aiInsight, userCurrency);
             }
 
             return cashManagement as ICashManagementWithAI;
@@ -287,7 +325,7 @@ ${score >= 90 ? '🏆 Excellent cash management!' : score >= 75 ? '✅ Good job!
       ): Promise<{ data: ICashManagementWithAI[]; total: number }> {
             const [data, total] = await Promise.all([
                   CashManagement.find()
-                        .populate('shopkeeperId', 'firstName lastName email phone')
+                        .populate('shopkeeperId', 'firstName lastName email phone currency')
                         .sort({ createdAt: -1 })
                         .limit(limit)
                         .skip(skip),
@@ -297,6 +335,7 @@ ${score >= 90 ? '🏆 Excellent cash management!' : score >= 75 ? '✅ Good job!
             // Generate AI insights for records that don't have them
             const processedData = await Promise.all(
                   data.map(async (record) => {
+                        const recCurrency = (record.shopkeeperId as any)?.currency || record.currency || 'GBP';
                         if (!record.aiInsight || !record.cashManagementScore) {
                               const score = this.calculateCashManagementScore({
                                     startingDayCash: record.startingDayCash,
@@ -315,6 +354,7 @@ ${score >= 90 ? '🏆 Excellent cash management!' : score >= 75 ? '✅ Good job!
                                     banked: record.banked || 0,
                                     cashInDrawer: record.cashInDrawer || 0,
                                     score,
+                                    currency: recCurrency,
                               });
 
                               const updated = await CashManagement.findByIdAndUpdate(
@@ -322,11 +362,19 @@ ${score >= 90 ? '🏆 Excellent cash management!' : score >= 75 ? '✅ Good job!
                                     {
                                           cashManagementScore: score,
                                           aiInsight: aiInsight,
+                                          currency: recCurrency,
                                     },
                                     { new: true }
                               );
 
+                              if (updated && updated.aiInsight) {
+                                    updated.aiInsight = this.formatInsightCurrency(updated.aiInsight, recCurrency);
+                              }
+
                               return updated as ICashManagementWithAI;
+                        }
+                        if (record.aiInsight) {
+                              record.aiInsight = this.formatInsightCurrency(record.aiInsight, recCurrency);
                         }
                         return record as ICashManagementWithAI;
                   })
@@ -441,7 +489,7 @@ ${score >= 90 ? '🏆 Excellent cash management!' : score >= 75 ? '✅ Good job!
                   },
             };
 
-            const [aggResult, cashDoc, recentExpensesInvoices] = await Promise.all([
+            const [aggResult, cashDoc, recentExpensesInvoices, userDoc] = await Promise.all([
                   Invoice.aggregate([
                         { $match: matchFilter },
                         {
@@ -499,6 +547,7 @@ ${score >= 90 ? '🏆 Excellent cash management!' : score >= 75 ? '✅ Good job!
                         .populate('itemsIds', 'itemName')
                         .populate('customerInfo', 'firstName lastName')
                         .lean(),
+                  User.findById(shopkeeperId).select('currency'),
             ]);
 
             const raw = aggResult[0] || {};
@@ -523,10 +572,12 @@ ${score >= 90 ? '🏆 Excellent cash management!' : score >= 75 ? '✅ Good job!
             const lastWeekMetrics = formatPeriod(raw.lastWeek);
             const lastMonthMetrics = formatPeriod(raw.lastMonth);
 
+            const userCurrency = (userDoc as any)?.currency || (cashDoc as any)?.currency || 'GBP';
             const startingDayCash = round2(Number(cashDoc ? cashDoc.startingDayCash || 0 : 0));
             const banked = round2(Number(cashDoc ? cashDoc.banked || 0 : 0));
             const cashScore = Number(cashDoc ? cashDoc.cashManagementScore ?? 100 : 100);
-            const aiInsight = cashDoc ? cashDoc.aiInsight || '' : '';
+            const rawInsight = cashDoc ? cashDoc.aiInsight || '' : '';
+            const aiInsight = this.formatInsightCurrency(rawInsight, userCurrency);
 
             // Available In Drawer Today: Starting Day Float + Today's Cash Sales - Today's Stock Purchases (Expenses) - Banked to Owner
             const availableCashToday = Math.max(
@@ -555,6 +606,8 @@ ${score >= 90 ? '🏆 Excellent cash management!' : score >= 75 ? '✅ Good job!
                   banked,
                   cashScore,
                   aiInsight,
+                  currency: userCurrency,
+                  currencySymbol: getCurrencySymbol(userCurrency),
                   availableCashToday,
                   previousSalesTotal,
                   todayMetrics,

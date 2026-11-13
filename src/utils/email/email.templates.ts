@@ -1,10 +1,14 @@
 // utils/email/email.templates.ts
+import { getCurrencySymbol } from '../currency';
+export { getCurrencySymbol };
 
 export interface CompletionEmailData {
       customerName: string;
       deviceModel: string;
       description: string;
       price?: number;
+      currency?: string;
+      currencySymbol?: string;
       technicianFeedback?: string;
       completionDate: string;
       requestId: string;
@@ -21,6 +25,8 @@ export interface RepairStatusEmailData {
       statusLabel: string;
       statusNote?: string;
       price?: number;
+      currency?: string;
+      currencySymbol?: string;
       shopName?: string;
       requestId: string;
       trackingUrl: string;
@@ -72,7 +78,8 @@ export const generateRepairStatusEmailHTML = (data: RepairStatusEmailData): stri
 
       const shopDisplayName = shopName || 'Imoscan Repair Services';
       const badgeColors = getStatusBadgeColors(status);
-      const priceDisplay = price ? `$${price.toFixed(2)}` : undefined;
+      const currSymbol = getCurrencySymbol(data.currency, data.currencySymbol);
+      const priceDisplay = price != null && !isNaN(Number(price)) ? `${currSymbol}${Number(price).toFixed(2)}` : undefined;
 
       return `
     <!DOCTYPE html>
@@ -310,10 +317,25 @@ export const generateRepairStatusEmailHTML = (data: RepairStatusEmailData): stri
 };
 
 export const generateCompletionEmailHTML = (data: CompletionEmailData): string => {
-      const { customerName, deviceModel, description, price, technicianFeedback, completionDate, requestId, shopName, trackingUrl } = data;
+      const {
+            customerName,
+            deviceModel,
+            description,
+            price,
+            currency,
+            currencySymbol,
+            technicianFeedback,
+            completionDate,
+            requestId,
+            shopName,
+            trackingUrl,
+      } = data;
 
       const shopDisplayName = shopName || 'Imoscan Repair Services';
-      const priceDisplay = price ? `$${price.toFixed(2)}` : 'To be determined';
+      const currSymbol = getCurrencySymbol(currency, currencySymbol);
+      const priceDisplay = price != null && !isNaN(Number(price))
+            ? `${currSymbol}${Number(price).toFixed(2)}`
+            : 'To be determined';
       const feedbackDisplay = technicianFeedback || 'No additional feedback provided.';
 
       return `
@@ -451,7 +473,7 @@ export const generateCompletionEmailHTML = (data: CompletionEmailData): string =
           </div>
           
           <div style="text-align: center; margin: 24px 0;">
-            <span class="status-badge">&check; Completed</span>
+            <span class="status-badge">&#10003; Completed</span>
           </div>
 
           ${

@@ -161,11 +161,23 @@ const getCustomerRepairHistory = catchAsync(async (req, res) => {
       });
 });
 
+const updateRepairRequestDetails = catchAsync(async (req, res) => {
+      const { id } = req.params;
+      const result = await repairRequestService.updateRepairRequestDetails(id as string, req.body);
+      sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: 'Repair request updated successfully',
+            data: result,
+      });
+});
+
 const repairRequestController = {
       addNewRepairRequest,
       getMyRepairRequestsHistory,
       getSingleRepairRequest,
       updateStatusByShopKeeper,
+      updateRepairRequestDetails,
       addNoteByShopKeeper,
       addTeachNoteByTechnician,
       generateTechnicianFeedback,

@@ -35,6 +35,11 @@ const cashManagementSchema = new Schema<ICashManagement>(
                   type: String,
                   trim: true,
             },
+            currency: {
+                  type: String,
+                  default: 'GBP',
+                  uppercase: true,
+            },
             date: {
                   type: Date,
                   default: Date.now,

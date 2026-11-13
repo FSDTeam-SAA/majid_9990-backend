@@ -5,6 +5,7 @@ import { uploadToCloudinary } from '../../utils/cloudinary';
 import config from '../../config/config';
 import { generateTechnicianFeedback } from '../../utils/technicianFeedback';
 import { sendRepairCompletionEmail, sendRepairStatusEmail } from '../../utils/email/email.service';
+import { getCurrencySymbol } from '../../utils/email/email.templates';
 import { User } from '../user/user.model';
 import Shop from '../shop/shop.model';
 import { IRepairRequest, IRepairRequestStatusUpdatePayload } from './repairRequest.interface';
@@ -35,7 +36,6 @@ const addNewRepairRequest = async (payload: IRepairRequest, files: Express.Multe
       if (!user) throw new AppError('User not found', StatusCodes.UNAUTHORIZED);
 
       if (!payload.firstName) throw new AppError('First name is required', StatusCodes.BAD_REQUEST);
-      if (!payload.email) throw new AppError('Email is required', StatusCodes.BAD_REQUEST);
       if (!payload.phoneNumber) throw new AppError('Phone number is required', StatusCodes.BAD_REQUEST);
       if (!payload.deviceModel) throw new AppError('Device model is required', StatusCodes.BAD_REQUEST);
       if (!payload.description && (!payload.issues || payload.issues.length === 0)) {
@@ -125,9 +125,10 @@ const addNewRepairRequest = async (payload: IRepairRequest, files: Express.Multe
             userId: payload.userId || user._id,
             shopId: payload.shopId ?? null,
             firstName: payload.firstName,
-            email: payload.email,
+            email: payload.email || '',
             phoneNumber: payload.phoneNumber,
             price: payload.price || 0,
+            currency: payload.currency ? String(payload.currency).trim().toUpperCase() : (user.currency || 'GBP'),
             deviceModel: payload.deviceModel,
             category: payload.category || 'Mobile Phone',
             brand: payload.brand || '',
@@ -302,26 +303,28 @@ const resolveShopInfo = async (repairRequest: IRepairRequest) => {
       try {
             if (repairRequest.shopId && Types.ObjectId.isValid(String(repairRequest.shopId))) {
                   const shop = await Shop.findById(repairRequest.shopId).select(
-                        'shopName shopAddress whatsappNumber phone email'
+                        'shopName shopAddress whatsappNumber phone email currency'
                   );
                   if (shop && shop.shopName) {
                         return {
                               shopName: shop.shopName,
                               shopAddress: shop.shopAddress || '',
                               shopPhone: shop.whatsappNumber || (shop as any).phone || '',
+                              currency: shop.currency || 'GBP',
                         };
                   }
             }
 
             if (repairRequest.userId && Types.ObjectId.isValid(String(repairRequest.userId))) {
                   const user = await User.findById(repairRequest.userId).select(
-                        'shopName shopAddress whatsappNumber phone'
+                        'shopName shopAddress whatsappNumber phone currency'
                   );
                   if (user && user.shopName) {
                         return {
                               shopName: user.shopName,
                               shopAddress: user.shopAddress || '',
                               shopPhone: user.whatsappNumber || user.phone || '',
+                              currency: user.currency || 'GBP',
                         };
                   }
             }
@@ -333,6 +336,7 @@ const resolveShopInfo = async (repairRequest: IRepairRequest) => {
             shopName: 'Imoscan Repair Service',
             shopAddress: '',
             shopPhone: '',
+            currency: 'GBP',
       };
 };
 
@@ -370,6 +374,9 @@ const sendStatusUpdateEmail = async (repairRequest: IRepairRequest, customNote?:
             const trackingUrl = getTrackingUrl(rawId);
             const statusLabel = getStatusDisplayLabel(repairRequest.status);
 
+            const repairCurrency = (repairRequest as any).currency || shopInfo.currency || 'GBP';
+            const currencySymbol = getCurrencySymbol(repairCurrency);
+
             const pdfData = {
                   requestId: shortId || rawId,
                   customerName: repairRequest.firstName,
@@ -382,6 +389,8 @@ const sendStatusUpdateEmail = async (repairRequest: IRepairRequest, customNote?:
                   statusLabel,
                   statusNote: customNote,
                   price: repairRequest.price,
+                  currency: repairCurrency,
+                  currencySymbol,
                   shopName: shopInfo.shopName,
                   shopPhone: shopInfo.shopPhone,
                   shopAddress: shopInfo.shopAddress,
@@ -405,6 +414,8 @@ const sendStatusUpdateEmail = async (repairRequest: IRepairRequest, customNote?:
                   statusLabel,
                   statusNote: customNote,
                   price: repairRequest.price,
+                  currency: repairCurrency,
+                  currencySymbol,
                   shopName: shopInfo.shopName,
                   requestId: shortId || rawId,
                   trackingUrl,
@@ -438,6 +449,9 @@ const sendCompletionEmail = async (repairRequest: IRepairRequest) => {
             const trackingUrl = getTrackingUrl(rawId);
             const statusLabel = getStatusDisplayLabel('completed');
 
+            const repairCurrency = (repairRequest as any).currency || shopInfo.currency || 'GBP';
+            const currencySymbol = getCurrencySymbol(repairCurrency);
+
             const pdfData = {
                   requestId: shortId || rawId,
                   customerName: repairRequest.firstName,
@@ -449,6 +463,8 @@ const sendCompletionEmail = async (repairRequest: IRepairRequest) => {
                   status: 'completed',
                   statusLabel,
                   price: repairRequest.price,
+                  currency: repairCurrency,
+                  currencySymbol,
                   shopName: shopInfo.shopName,
                   shopPhone: shopInfo.shopPhone,
                   shopAddress: shopInfo.shopAddress,
@@ -465,6 +481,8 @@ const sendCompletionEmail = async (repairRequest: IRepairRequest) => {
                   deviceModel: repairRequest.deviceModel,
                   description: repairRequest.description,
                   price: repairRequest.price,
+                  currency: repairCurrency,
+                  currencySymbol,
                   technicianFeedback: repairRequest.technicianFeedback,
                   completionDate: new Date().toLocaleDateString('en-US', {
                         year: 'numeric',
@@ -711,11 +729,50 @@ const getCustomerRepairHistory = async (
       };
 };
 
+const updateRepairRequestDetails = async (id: string, payload: any) => {
+      assertValidRepairRequestId(id);
+
+      const updateData: Record<string, any> = {};
+
+      if (payload.firstName !== undefined) updateData.firstName = payload.firstName;
+      if (payload.customerName !== undefined && !payload.firstName) updateData.firstName = payload.customerName;
+      if (payload.email !== undefined) updateData.email = payload.email;
+      if (payload.phoneNumber !== undefined) updateData.phoneNumber = payload.phoneNumber;
+      if (payload.phone !== undefined && !payload.phoneNumber) updateData.phoneNumber = payload.phone;
+      if (payload.deviceModel !== undefined) updateData.deviceModel = payload.deviceModel;
+      if (payload.modelName !== undefined) updateData.modelName = payload.modelName;
+      if (payload.serialNumber !== undefined) updateData.serialNumber = payload.serialNumber;
+      if (payload.IMEINumber !== undefined) updateData.IMEINumber = payload.IMEINumber;
+      if (payload.colour !== undefined) updateData.colour = payload.colour;
+      if (payload.brand !== undefined) updateData.brand = payload.brand;
+      if (payload.modelCode !== undefined) updateData.modelCode = payload.modelCode;
+      if (payload.releaseYear !== undefined) updateData.releaseYear = payload.releaseYear;
+      if (payload.condition !== undefined) updateData.condition = payload.condition;
+      if (payload.price !== undefined) updateData.price = Number(payload.price);
+      if (payload.currency !== undefined) updateData.currency = String(payload.currency).trim().toUpperCase();
+      if (payload.description !== undefined) updateData.description = payload.description;
+      if (payload.technician !== undefined) updateData.technician = payload.technician;
+      if (payload.technicianName !== undefined) updateData.technician = payload.technicianName;
+
+      const result = await RepairRequest.findByIdAndUpdate(
+            id,
+            { $set: updateData },
+            { new: true, runValidators: true }
+      );
+
+      if (!result) {
+            throw new AppError('Repair request not found', StatusCodes.NOT_FOUND);
+      }
+
+      return result;
+};
+
 const repairRequestService = {
       addNewRepairRequest,
       getMyRepairRequestsHistory,
       getSingleRepairRequest,
       updateStatusByShopKeeper,
+      updateRepairRequestDetails,
       addNoteByShopKeeper,
       addTeachNoteByTechnician,
       generateTechnicianFeedbackByRequest,

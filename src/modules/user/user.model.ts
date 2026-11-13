@@ -104,7 +104,7 @@ const userSchema = new Schema<IUser>(
             averageRating: { type: Number, default: 0 },
             currency: {
                   type: String,
-                  default: 'USD',
+                  default: 'GBP',
                   uppercase: true,
             },
             logoSettings: {

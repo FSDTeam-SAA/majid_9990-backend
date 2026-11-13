@@ -11,8 +11,10 @@ router.get('/my-history', protect, repairRequestController.getMyRepairRequestsHi
 router.get('/technicians', protect, repairRequestController.getTechnicians);
 router.get('/customer-history', protect, repairRequestController.getCustomerRepairHistory);
 router.get('/:id', repairRequestController.getSingleRepairRequest);
+router.put('/reassign/:id', protect, repairRequestController.updateRepairRequestDetails);
 router.put('/update-status/:id', protect, repairRequestController.updateStatusByShopKeeper);
 router.put('/add-note/:id', protect, upload.array('images', 6), repairRequestController.addNoteByShopKeeper);
+router.put('/:id', protect, repairRequestController.updateRepairRequestDetails);
 
 router.put('/tech-note/:id', protect, repairRequestController.addTeachNoteByTechnician);
 router.post('/technician-feedback/:id', protect, repairRequestController.generateTechnicianFeedback);

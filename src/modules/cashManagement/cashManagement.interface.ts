@@ -8,6 +8,7 @@ export interface ICashManagement {
       cashInDrawer: number;
       cashManagementScore?: number;
       aiInsight?: string;
+      currency?: string;
       date: Date;
       createdAt?: Date;
       updatedAt?: Date;
@@ -18,6 +19,8 @@ export interface ICashManagementInput {
       startingDayCash: number;
       banked?: number;
       cashInDrawer?: number;
+      currency?: string;
+      currencySymbol?: string;
 }
 
 export interface ICashManagementWithAI extends ICashManagement {

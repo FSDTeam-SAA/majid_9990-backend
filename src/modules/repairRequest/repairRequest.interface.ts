@@ -71,6 +71,7 @@ export interface IRepairRequest {
       email: string;
       phoneNumber: string;
       price?: number;
+      currency?: string;
       deviceModel: string;
       category?: string;
       brand?: string;
