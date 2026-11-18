@@ -38,10 +38,20 @@ export interface IInvoiceOrderDetails {
       deliveryTo?: string;
 }
 
+export interface IInvoiceUnitIdentifier {
+      imeiNumber?: string;
+      serialNumber?: string;
+}
+
 export interface IInvoiceLineItem {
       itemId: string;
       quantity: number;
       variantId?: string;
+      name?: string;
+      imeiNumber?: string;
+      serialNumber?: string;
+      upcEan?: string;
+      units?: IInvoiceUnitIdentifier[];
 }
 
 export interface IInvoice {

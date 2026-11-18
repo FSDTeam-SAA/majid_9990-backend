@@ -46,7 +46,23 @@ const invoiceSchema = new Schema<IInvoice>(
                   ref: 'Inventory',
                   default: [],
             },
-            lineItems: [{ itemId: { type: Schema.Types.ObjectId, ref: 'Inventory', required: true }, quantity: { type: Number, required: true, min: 1 }, variantId: { type: Schema.Types.ObjectId } }],
+            lineItems: [
+                  {
+                        itemId: { type: Schema.Types.ObjectId, ref: 'Inventory', required: true },
+                        quantity: { type: Number, required: true, min: 1 },
+                        variantId: { type: Schema.Types.ObjectId },
+                        name: { type: String, trim: true },
+                        imeiNumber: { type: String, trim: true },
+                        serialNumber: { type: String, trim: true },
+                        upcEan: { type: String, trim: true },
+                        units: [
+                              {
+                                    imeiNumber: { type: String, trim: true },
+                                    serialNumber: { type: String, trim: true },
+                              },
+                        ],
+                  },
+            ],
             totalAmount: {
                   type: Number,
                   default: null,

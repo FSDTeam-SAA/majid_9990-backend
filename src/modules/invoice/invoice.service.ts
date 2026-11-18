@@ -226,22 +226,40 @@ const createInvoice = async (
       const totalAmount = normalizeOptionalNumber(payload.totalAmount, 'totalAmount');
       const dueAmount = normalizeOptionalNumber(payload.dueAmount, 'dueAmount');
       const amountPaid = normalizeOptionalNumber(payload.amountPaid, 'amountPaid');
-      let lineItems: Array<{ itemId: string; quantity: number; variantId?: string }> = [];
+      let lineItems: Array<IInvoiceLineItem> = [];
       try {
             lineItems = typeof payload.lineItems === 'string' ? JSON.parse(payload.lineItems) : payload.lineItems || [];
       } catch {
             throw new AppError('lineItems must be valid JSON', StatusCodes.BAD_REQUEST);
       }
-      for (const line of lineItems) {
+      for (const line of lineItems as any[]) {
             if (!Types.ObjectId.isValid(line.itemId) || !Number.isInteger(Number(line.quantity)) || Number(line.quantity) <= 0) {
                   throw new AppError('Invalid invoice line item', StatusCodes.BAD_REQUEST);
             }
             const stockFilter: any = line.variantId
                   ? { _id: line.itemId, variants: { $elemMatch: { _id: line.variantId, quantity: { $gte: Number(line.quantity) } } } }
                   : { _id: line.itemId, quantity: { $gte: Number(line.quantity) } };
-            if (!(await Inventory.exists(stockFilter))) {
+            const invItem = await Inventory.findOne(stockFilter);
+            if (!invItem) {
                   throw new AppError('One or more selected items no longer have enough stock', StatusCodes.CONFLICT);
             }
+
+            const variant = line.variantId ? invItem.variants?.find((v: any) => String(v._id) === String(line.variantId)) : undefined;
+            const imeiNumber = line.imeiNumber || (variant && variant.imeiNumber) || invItem.imeiNumber || (invItem.units && invItem.units[0]?.imeiNumber) || undefined;
+            const serialNumber = line.serialNumber || invItem.serialNumber || (invItem.units && invItem.units[0]?.serialNumber) || undefined;
+            const upcEan = line.upcEan || (variant && ((variant as any).sku || (variant as any).barcode || (variant as any).upc || (variant as any).ean)) || invItem.sku || (invItem.categoryAttributes && (invItem.categoryAttributes.upc || invItem.categoryAttributes.ean || invItem.categoryAttributes.barcode)) || undefined;
+            const name = line.name || invItem.itemName;
+            const units = line.units && Array.isArray(line.units) && line.units.length > 0
+                  ? line.units
+                  : (invItem.units && invItem.units.length > 0
+                        ? invItem.units.slice(0, Number(line.quantity)).map((u: any) => ({ imeiNumber: u.imeiNumber, serialNumber: u.serialNumber }))
+                        : undefined);
+
+            line.name = name;
+            if (imeiNumber) line.imeiNumber = String(imeiNumber).trim();
+            if (serialNumber) line.serialNumber = String(serialNumber).trim();
+            if (upcEan) line.upcEan = String(upcEan).trim();
+            if (units) line.units = units;
       }
 
       if (!type) {
@@ -554,7 +572,8 @@ const getInvoiceByShopkeeperId = async (shopkeeperId: string, query: InvoicePagi
             const invoices = await Invoice.find(listFilter)
                   .populate('shopkeeperId')
                   .populate('customerInfo')
-                  .populate('itemsIds', 'itemName imeiNumber expectedPrice image')
+                  .populate('itemsIds', 'itemName imeiNumber serialNumber sku modelNumber units variants expectedPrice image')
+                  .populate('lineItems.itemId', 'itemName imeiNumber serialNumber sku modelNumber units variants expectedPrice image')
                   .sort({ createdAt: -1, _id: -1 });
             return invoices.map(sanitizeInvoiceIdImages);
       }
@@ -572,7 +591,8 @@ const getInvoiceByShopkeeperId = async (shopkeeperId: string, query: InvoicePagi
             Invoice.find(filter)
             .populate('shopkeeperId')
             .populate('customerInfo')
-            .populate('itemsIds', 'itemName imeiNumber expectedPrice image')
+            .populate('itemsIds', 'itemName imeiNumber serialNumber sku modelNumber units variants expectedPrice image')
+            .populate('lineItems.itemId', 'itemName imeiNumber serialNumber sku modelNumber units variants expectedPrice image')
             .sort({ createdAt: -1, _id: -1 })
             .skip((page - 1) * limit)
             .limit(limit),
@@ -594,7 +614,8 @@ const getAllInvoices = async () => {
       const invoices = await Invoice.find()
             .populate('shopkeeperId')
             .populate('customerInfo')
-            .populate('itemsIds', 'itemName imeiNumber expectedPrice image')
+            .populate('itemsIds', 'itemName imeiNumber serialNumber sku modelNumber units variants expectedPrice image')
+            .populate('lineItems.itemId', 'itemName imeiNumber serialNumber sku modelNumber units variants expectedPrice image')
             .sort({ createdAt: -1 });
       return invoices.map(sanitizeInvoiceIdImages);
 };
@@ -608,7 +629,8 @@ const getInvoiceById = async (id: string) => {
       const invoice = await Invoice.findById(trimmedId)
             .populate('shopkeeperId')
             .populate('customerInfo')
-            .populate('itemsIds', 'itemName imeiNumber expectedPrice image');
+            .populate('itemsIds', 'itemName imeiNumber serialNumber sku modelNumber units variants expectedPrice image')
+            .populate('lineItems.itemId', 'itemName imeiNumber serialNumber sku modelNumber units variants expectedPrice image');
 
       if (!invoice) {
             throw new AppError('Invoice not found', StatusCodes.NOT_FOUND);
@@ -773,7 +795,8 @@ const updateInvoice = async (id: string, payload: IInvoicePayload, file?: Expres
       })
             .populate('shopkeeperId', 'firstName lastName email phone role shopName')
             .populate('customerInfo', 'firstName lastName email phone address')
-            .populate('itemsIds', 'itemName imeiNumber expectedPrice image');
+            .populate('itemsIds', 'itemName imeiNumber serialNumber sku modelNumber units variants expectedPrice image')
+            .populate('lineItems.itemId', 'itemName imeiNumber serialNumber sku modelNumber units variants expectedPrice image');
 
       return result;
 };
@@ -827,7 +850,8 @@ const getInvoicesByCustomerId = async (
       const invoices = await Invoice.find(filter)
             .populate('shopkeeperId')
             .populate('customerInfo')
-            .populate('itemsIds', 'itemName imeiNumber expectedPrice image')
+            .populate('itemsIds', 'itemName imeiNumber serialNumber sku modelNumber units variants expectedPrice image')
+            .populate('lineItems.itemId', 'itemName imeiNumber serialNumber sku modelNumber units variants expectedPrice image')
             .sort({ createdAt: -1, _id: -1 })
             .lean();
 
@@ -913,6 +937,85 @@ const sendInvoiceEmail = async (userId: string, payload: ISendInvoiceEmailPayloa
       const customerName = payload.customerName || 'Valued Customer';
       const pdfUrl = payload.pdfUrl || '';
 
+      let invoiceDoc: any = null;
+      if (payload.invoiceId && Types.ObjectId.isValid(String(payload.invoiceId))) {
+            invoiceDoc = await Invoice.findById(payload.invoiceId)
+                  .populate('lineItems.itemId', 'itemName imeiNumber serialNumber sku modelNumber units variants expectedPrice image')
+                  .populate('itemsIds', 'itemName imeiNumber serialNumber sku modelNumber units variants expectedPrice image');
+      } else if (invoiceRef && invoiceRef !== 'Invoice') {
+            invoiceDoc = await Invoice.findOne({ invoiceNumber: invoiceRef })
+                  .populate('lineItems.itemId', 'itemName imeiNumber serialNumber sku modelNumber units variants expectedPrice image')
+                  .populate('itemsIds', 'itemName imeiNumber serialNumber sku modelNumber units variants expectedPrice image');
+      }
+
+      let itemsHtml = '';
+      if (invoiceDoc) {
+            const rawItems: any[] = (invoiceDoc.lineItems && invoiceDoc.lineItems.length > 0)
+                  ? invoiceDoc.lineItems
+                  : (invoiceDoc.itemsIds && invoiceDoc.itemsIds.length > 0 ? invoiceDoc.itemsIds.map((it: any) => ({ itemId: it, quantity: 1, name: it.itemName, imeiNumber: it.imeiNumber, serialNumber: it.serialNumber, upcEan: it.sku })) : []);
+
+            if (rawItems.length > 0) {
+                  const rows = rawItems.map((line: any) => {
+                        const itemObj = line.itemId || {};
+                        const name = line.name || itemObj.itemName || 'Item';
+                        const imei = line.imeiNumber || itemObj.imeiNumber || (itemObj.units && itemObj.units[0]?.imeiNumber);
+                        const serial = line.serialNumber || itemObj.serialNumber || (itemObj.units && itemObj.units[0]?.serialNumber);
+                        const upcEan = line.upcEan || itemObj.sku || (itemObj.categoryAttributes && (itemObj.categoryAttributes.upc || itemObj.categoryAttributes.ean));
+                        const units = line.units && line.units.length > 0 ? line.units : (itemObj.units && itemObj.units.length > 0 ? itemObj.units : []);
+                        const qty = line.quantity || 1;
+                        const isDevice = Boolean(imei || serial || upcEan || units.length > 0);
+
+                        let detailsHtml = '';
+                        if (isDevice) {
+                              if (units.length > 1) {
+                                    const unitLines = units.slice(0, qty).map((u: any, idx: number) => `
+                                          <div>Unit ${idx + 1}: IMEI: <strong>${u.imeiNumber || 'Not recorded'}</strong> | Serial: <strong>${u.serialNumber || 'Not recorded'}</strong></div>
+                                    `).join('');
+                                    detailsHtml = `
+                                          <div style="font-size:11px; color:#4b5563; margin-top:4px; line-height:1.4;">
+                                                ${unitLines}
+                                                <div>UPC/EAN: <strong>${upcEan || 'Not recorded'}</strong></div>
+                                          </div>
+                                    `;
+                              } else {
+                                    detailsHtml = `
+                                          <div style="font-size:11px; color:#4b5563; margin-top:4px; line-height:1.4;">
+                                                <div>IMEI: <strong>${imei || 'Not recorded'}</strong></div>
+                                                <div>Serial: <strong>${serial || 'Not recorded'}</strong></div>
+                                                <div>UPC/EAN: <strong>${upcEan || 'Not recorded'}</strong></div>
+                                          </div>
+                                    `;
+                              }
+                        }
+
+                        return `
+                              <tr>
+                                    <td style="padding:10px 12px; border-bottom:1px solid #e5e7eb; vertical-align:top;">
+                                          <div style="font-weight:600; color:#111827;">${name}</div>
+                                          ${detailsHtml}
+                                    </td>
+                                    <td align="center" style="padding:10px 12px; border-bottom:1px solid #e5e7eb; vertical-align:top; color:#374151;">
+                                          ${qty}
+                                    </td>
+                              </tr>
+                        `;
+                  }).join('');
+
+                  itemsHtml = `
+                        <div style="margin-bottom:24px; border:1px solid #e5e7eb; border-radius:8px; overflow:hidden;">
+                              <div style="background:#f9fafb; padding:10px 14px; font-weight:700; font-size:12px; color:#374151; border-bottom:1px solid #e5e7eb; text-transform:uppercase;">
+                                    Invoice Items & Device Details
+                              </div>
+                              <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse; font-size:13px;">
+                                    <tbody>
+                                          ${rows}
+                                    </tbody>
+                              </table>
+                        </div>
+                  `;
+            }
+      }
+
       const html = `
 <!DOCTYPE html>
 <html lang="en">
@@ -957,6 +1060,8 @@ const sendInvoiceEmail = async (userId: string, payload: ISendInvoiceEmailPayloa
                   </tr>` : ''}
                 </table>
               </div>
+
+              ${itemsHtml}
 
               ${pdfUrl ? `
               <div style="text-align:center; margin:28px 0;">
@@ -1428,7 +1533,8 @@ const attachCustomerToInvoice = async (
       const populatedInvoice = await Invoice.findById(trimmedInvoiceId)
             .populate('shopkeeperId')
             .populate('customerInfo')
-            .populate('itemsIds', 'itemName imeiNumber expectedPrice image');
+            .populate('itemsIds', 'itemName imeiNumber serialNumber sku modelNumber units variants expectedPrice image')
+            .populate('lineItems.itemId', 'itemName imeiNumber serialNumber sku modelNumber units variants expectedPrice image');
 
       return sanitizeInvoiceIdImages(populatedInvoice);
 };
