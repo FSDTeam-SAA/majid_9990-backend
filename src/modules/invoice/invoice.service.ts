@@ -12,6 +12,7 @@ import { Customer } from '../customer/customer.model';
 import {
       IInvoice,
       IInvoiceIdImages,
+      IInvoiceLineItem,
       IInvoiceOrderDetails,
       IInvoicePayload,
       IInvoicePaymentDetails,
