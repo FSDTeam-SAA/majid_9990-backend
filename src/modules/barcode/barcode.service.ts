@@ -1,6 +1,7 @@
 import axios from 'axios';
 import AppError from '../../errors/AppError';
 import { IBarcodeSearchResult, ICacheEntry } from './barcode.interface';
+import masterCatalogueService from '../masterCatalogue/masterCatalogue.service';
 
 // In-memory cache Map
 const barcodeCache = new Map<string, ICacheEntry>();
@@ -62,6 +63,40 @@ const formatBarcodeResult = (product: any, barcode: string): IBarcodeSearchResul
             image: images[0] || undefined,
             images,
             rawData: product,
+      };
+};
+
+/**
+ * Format master catalogue item to match standard IBarcodeSearchResult
+ */
+const formatMasterCatalogueResult = (item: any, fallbackBarcode: string): IBarcodeSearchResult => {
+      const images = item.imageUrl ? [item.imageUrl] : [];
+      const resolvedBarcode = item.barcode || item.ean || item.upc || item.gtin14 || fallbackBarcode;
+
+      return {
+            name: item.deviceName || (item.brand ? `${item.brand} ${item.model}` : item.model) || 'Unknown Product',
+            brand: item.brand,
+            category: item.category,
+            description: [item.model, item.storage, item.colour].filter(Boolean).join(' ') || undefined,
+            color: item.colour || undefined,
+            size: item.storage || undefined,
+            barcode: resolvedBarcode,
+            image: item.imageUrl || undefined,
+            images,
+            rawData: {
+                  ...item,
+                  masterCatalogId: item._id,
+                  isPreloaded: true,
+                  source: item.sourceStatus || 'preloaded',
+                  modelNumber: item.modelNumber,
+                  partNumber: item.partNumber,
+                  upc: item.upc,
+                  ean: item.ean,
+                  gtin14: item.gtin14,
+                  sku: item.sku,
+                  autoFillApproved: item.autoFillApproved,
+                  specs: item.specs,
+            },
       };
 };
 
@@ -180,8 +215,10 @@ const performBarcodeSearchWithRetry = async (cleanCode: string): Promise<IBarcod
 };
 
 /**
- * Search product by barcode via BarcodeLookup API
- * Includes retry logic and caching
+ * Search product by barcode (EAN / UPC / GTIN / ISBN)
+ * Step 1: Check memory cache
+ * Step 2: Search internal Master Product Catalogue (sub-10ms, accurate, 0 API cost)
+ * Step 3: Only on internal miss -> Fallback to external BarcodeLookup API
  */
 const searchByBarcode = async (code: string): Promise<IBarcodeSearchResult> => {
       // Validate barcode
@@ -192,14 +229,31 @@ const searchByBarcode = async (code: string): Promise<IBarcodeSearchResult> => {
       const cleanCode = code.trim();
       const cacheKey = `barcode_${cleanCode}`;
 
-      // Check cache first
+      // 1. Check in-memory cache
       const cachedEntry = barcodeCache.get(cacheKey);
       if (cachedEntry && isCacheValid(cachedEntry.timestamp)) {
             console.log(`[Barcode Cache Hit] ${cleanCode}`);
             return cachedEntry.data;
       }
 
-      // Search with retries
+      // 2. Step 1: Query internal Master Product Catalogue FIRST
+      try {
+            const internalItem = await masterCatalogueService.findByBarcode(cleanCode);
+            if (internalItem) {
+                  console.log(`[Master Catalogue Hit] Found preloaded specs for barcode: ${cleanCode} (${internalItem.deviceName})`);
+                  const result = formatMasterCatalogueResult(internalItem, cleanCode);
+                  barcodeCache.set(cacheKey, {
+                        data: result,
+                        timestamp: Date.now(),
+                  });
+                  return result;
+            }
+      } catch (catErr: any) {
+            console.warn(`[Master Catalogue Lookup Warning]: ${catErr?.message}`);
+      }
+
+      // 3. Step 2: Fallback to external BarcodeLookup API ONLY after internal miss
+      console.log(`[Master Catalogue Miss] -> Falling back to External Barcode API for code: ${cleanCode}`);
       const result = await performBarcodeSearchWithRetry(cleanCode);
 
       // Cache the result
@@ -237,8 +291,9 @@ const performNameSearchWithRetry = async (cleanQuery: string): Promise<IBarcodeS
 };
 
 /**
- * Search product by name keyword
- * Includes retry logic
+ * Search product by name / keyword
+ * Step 1: Query internal Master Product Catalogue (returns 10-20 lightweight matches)
+ * Step 2: Only if zero matches found -> Fallback to external API
  */
 const searchByName = async (query: string): Promise<IBarcodeSearchResult[]> => {
       // Validate query
@@ -260,7 +315,30 @@ const searchByName = async (query: string): Promise<IBarcodeSearchResult[]> => {
             return [cachedEntry.data];
       }
 
-      // Search with retries
+      // Step 1: Query internal Master Product Catalogue FIRST
+      try {
+            const internalSearchResult = await masterCatalogueService.searchCatalogue({
+                  query: cleanQuery,
+                  limit: 20,
+            });
+
+            if (internalSearchResult.results && internalSearchResult.results.length > 0) {
+                  console.log(`[Master Catalogue Hit] Found ${internalSearchResult.results.length} internal matches for: ${cleanQuery}`);
+                  const formattedResults = internalSearchResult.results.map((item) =>
+                        formatMasterCatalogueResult(item, item.barcode || item.ean || item.upc || 'N/A')
+                  );
+                  barcodeCache.set(cacheKey, {
+                        data: formattedResults[0],
+                        timestamp: Date.now(),
+                  });
+                  return formattedResults;
+            }
+      } catch (catErr: any) {
+            console.warn(`[Master Catalogue Name Search Warning]: ${catErr?.message}`);
+      }
+
+      // Step 2: Fallback to external API if internal catalogue returns no results
+      console.log(`[Master Catalogue Miss] -> Falling back to External Name Search for query: ${cleanQuery}`);
       const results = await performNameSearchWithRetry(cleanQuery);
 
       // Cache the first result

@@ -12,6 +12,11 @@ const inventorySchema = new Schema<IInventory>(
                   type: String,
                   trim: true,
             },
+            masterCatalogueId: {
+                  type: Schema.Types.ObjectId,
+                  ref: 'MasterCatalogue',
+                  index: true,
+            },
             categoryId: {
                   type: Schema.Types.ObjectId,
                   ref: 'Category',

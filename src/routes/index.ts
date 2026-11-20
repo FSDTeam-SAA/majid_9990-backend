@@ -31,6 +31,7 @@ import attendanceRouter from '../modules/attendance/attendance.router';
 import rotaRouter from '../modules/rota/rota.router';
 import leaveRouter from '../modules/leave/leave.router';
 import wagesRouter from '../modules/wages/wages.router';
+import masterCatalogueRouter from '../modules/masterCatalogue/masterCatalogue.router';
 
 const router = Router();
 
@@ -178,6 +179,10 @@ const moduleRoutes = [
       {
         path: '/wages',
         route: wagesRouter,
+      },
+      {
+        path: '/master-catalogue',
+        route: masterCatalogueRouter,
       },
 ];
 moduleRoutes.forEach((route) => router.use(route.path, route.route));

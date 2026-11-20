@@ -19,6 +19,7 @@ export interface IInventoryVariant {
 
 export interface IInventory {
       itemName: string;
+      masterCatalogueId?: Types.ObjectId;
       categoryId?: Types.ObjectId;
       sku?: string;
       brand?: string;

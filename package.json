@@ -9,7 +9,9 @@
     "prettier:check": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json)\"",
     "lint": "eslint . --ext .ts",
     "start": "node dist/server.js",
-    "build": "tsc"
+    "build": "tsc",
+    "seed:catalogue": "ts-node-dev --transpile-only ./src/scripts/seedMasterCatalogue.ts --dry-run",
+    "seed:catalogue:live": "ts-node-dev --transpile-only ./src/scripts/seedMasterCatalogue.ts --import"
   },
   "keywords": [],
   "author": "",

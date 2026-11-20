@@ -1243,6 +1243,9 @@ const createInventoryFromBarcode = async (
                         ? parseStringArray(payload.sourceImageUrls)
                         : barcodeImages,
                   categoryId: payload.categoryId ? parseObjectId(payload.categoryId, 'categoryId') : undefined,
+                  masterCatalogueId: barcodeResult.rawData?.masterCatalogId
+                        ? parseObjectId(String(barcodeResult.rawData.masterCatalogId), 'masterCatalogueId')
+                        : undefined,
                   storeId: payload.storeId ? parseObjectId(payload.storeId, 'storeId') : undefined,
                   type: normalizeInventoryType(payload.type ?? payload.status),
                   status: normalizeInventoryStatus(
