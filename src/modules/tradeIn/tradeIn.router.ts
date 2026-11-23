@@ -8,5 +8,6 @@ const router = Router();
  * GET /trade-in/catalog/search?query=iPhone+15+Pro&category=phone
  */
 router.get('/catalog/search', tradeInController.searchCatalog);
+router.get('/search', tradeInController.searchCatalog);
 
 export default router;
