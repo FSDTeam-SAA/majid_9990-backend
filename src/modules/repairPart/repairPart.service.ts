@@ -46,17 +46,44 @@ export class RepairPartService {
     }
 
     if (q) {
+      const normQ = q.replace(/^sm-/, '').replace(/\/(dsn|ds)$/i, '');
+      const hasSpecificVariant = {
+        fe: /\bfe\b/i.test(q),
+        plus: /\b(plus|\+)\b/i.test(q),
+        ultra: /\bultra\b/i.test(q),
+        edge: /\bedge\b/i.test(q),
+        fourG: /\b4g\b/i.test(q),
+        fiveG: /\b5g\b/i.test(q),
+      };
+
       results = results.filter((d) => {
         const name = d.modelName.toLowerCase();
         const code = d.modelCode.toLowerCase();
         const codeNoSM = code.replace(/^sm-/, '');
+        const codeBase = codeNoSM.replace(/\/(dsn|ds)$/i, '');
         const year = String(d.releaseYear).toLowerCase();
-        return (
+
+        const matchesQuery =
           name.includes(q) ||
           code.includes(q) ||
           codeNoSM.includes(cleanQ) ||
-          year.includes(q)
-        );
+          codeBase.includes(normQ) ||
+          year.includes(q) ||
+          `${name} ${year}`.includes(q) ||
+          `${name} (${year})`.includes(q);
+
+        if (!matchesQuery) return false;
+
+        // Keep FE, Plus, Ultra, Edge, 4G and 5G variants separate
+        if (hasSpecificVariant.fe && !name.includes('fe')) return false;
+        if (!hasSpecificVariant.fe && name.includes('fe') && (hasSpecificVariant.plus || hasSpecificVariant.ultra)) return false;
+        if (hasSpecificVariant.ultra && !name.includes('ultra')) return false;
+        if (hasSpecificVariant.plus && !(name.includes('plus') || name.includes('+'))) return false;
+        if (hasSpecificVariant.edge && !name.includes('edge')) return false;
+        if (hasSpecificVariant.fourG && !name.includes('4g')) return false;
+        if (hasSpecificVariant.fiveG && !name.includes('5g')) return false;
+
+        return true;
       });
     }
 
@@ -404,6 +431,16 @@ export class RepairPartService {
       ];
     } else if (params.modelName) {
       filter.modelName = new RegExp(params.modelName.trim(), 'i');
+    }
+
+    const isFoldable = (params.modelName && /flip|fold/i.test(params.modelName)) ||
+                       (params.modelCode && /flip|fold/i.test(params.modelCode));
+    const isScreenCategory = mappedCategory === 'Screen';
+    if (isFoldable && isScreenCategory && !params.screenPlacement) {
+      throw new AppError(
+        'Screen placement (Inner screen or Cover screen) is required before showing compatible stock for Flip/Fold devices',
+        httpStatus.BAD_REQUEST
+      );
     }
 
     if (params.screenPlacement) {

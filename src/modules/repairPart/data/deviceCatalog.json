@@ -51,7 +51,7 @@
   {
     "brand": "Apple",
     "deviceType": "Phone",
-    "modelName": "iPhone SE \u2014 1st generation",
+    "modelName": "iPhone SE — 1st generation",
     "releaseYear": "2016",
     "modelCode": "A1723"
   },
@@ -135,7 +135,7 @@
   {
     "brand": "Apple",
     "deviceType": "Phone",
-    "modelName": "iPhone SE \u2014 2nd generation",
+    "modelName": "iPhone SE — 2nd generation",
     "releaseYear": "2020",
     "modelCode": "A2296"
   },
@@ -198,7 +198,7 @@
   {
     "brand": "Apple",
     "deviceType": "Phone",
-    "modelName": "iPhone SE \u2014 3rd generation",
+    "modelName": "iPhone SE — 3rd generation",
     "releaseYear": "2022",
     "modelCode": "A2783"
   },
@@ -352,7 +352,7 @@
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "iPad \u2014 1st generation",
+    "modelName": "iPad — 1st generation",
     "releaseYear": "2010",
     "modelCode": "A1219"
   },
@@ -366,56 +366,56 @@
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "iPad \u2014 3rd generation",
+    "modelName": "iPad — 3rd generation",
     "releaseYear": "2012",
     "modelCode": "A1416"
   },
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "iPad \u2014 4th generation",
+    "modelName": "iPad — 4th generation",
     "releaseYear": "2012",
     "modelCode": "A1458"
   },
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "iPad \u2014 5th generation",
+    "modelName": "iPad — 5th generation",
     "releaseYear": "2017",
     "modelCode": "A1822"
   },
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "iPad \u2014 6th generation",
+    "modelName": "iPad — 6th generation",
     "releaseYear": "2018",
     "modelCode": "A1893"
   },
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "iPad \u2014 7th generation",
+    "modelName": "iPad — 7th generation",
     "releaseYear": "2019",
     "modelCode": "A2197"
   },
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "iPad \u2014 8th generation",
+    "modelName": "iPad — 8th generation",
     "releaseYear": "2020",
     "modelCode": "A2270"
   },
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "iPad \u2014 9th generation",
+    "modelName": "iPad — 9th generation",
     "releaseYear": "2021",
     "modelCode": "A2602"
   },
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "iPad \u2014 10th generation",
+    "modelName": "iPad — 10th generation",
     "releaseYear": "2022",
     "modelCode": "A2696"
   },
@@ -429,154 +429,133 @@
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "iPad mini",
-    "releaseYear": "Model",
-    "modelCode": "Year"
+    "modelName": "iPad mini — 1st generation",
+    "releaseYear": "2012",
+    "modelCode": "A1432"
   },
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "Reference model number",
-    "releaseYear": "iPad mini \u2014 1st generation",
-    "modelCode": "2012"
+    "modelName": "iPad mini 2",
+    "releaseYear": "2013",
+    "modelCode": "A1489"
   },
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "A1432",
-    "releaseYear": "iPad mini 2",
-    "modelCode": "2013"
+    "modelName": "iPad mini 3",
+    "releaseYear": "2014",
+    "modelCode": "A1599"
   },
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "A1489",
-    "releaseYear": "iPad mini 3",
-    "modelCode": "2014"
+    "modelName": "iPad mini 4",
+    "releaseYear": "2015",
+    "modelCode": "A1538"
   },
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "A1599",
-    "releaseYear": "iPad mini 4",
-    "modelCode": "2015"
+    "modelName": "iPad mini — 5th generation",
+    "releaseYear": "2019",
+    "modelCode": "A2133"
   },
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "A1538",
-    "releaseYear": "iPad mini \u2014 5th generation",
-    "modelCode": "2019"
+    "modelName": "iPad mini — 6th generation",
+    "releaseYear": "2021",
+    "modelCode": "A2567"
   },
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "A2133",
-    "releaseYear": "iPad mini \u2014 6th generation",
-    "modelCode": "2021"
+    "modelName": "iPad mini (A17 Pro)",
+    "releaseYear": "2024",
+    "modelCode": "A2993"
   },
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "A2567",
-    "releaseYear": "iPad mini (A17 Pro)",
-    "modelCode": "2024"
+    "modelName": "iPad Air — 1st generation",
+    "releaseYear": "2013",
+    "modelCode": "A1474"
   },
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "A2993",
-    "releaseYear": "iPad Air",
-    "modelCode": "Model"
+    "modelName": "iPad Air 2",
+    "releaseYear": "2014",
+    "modelCode": "A1566"
   },
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "Year",
-    "releaseYear": "Reference model number",
-    "modelCode": "iPad Air \u2014 1st generation"
+    "modelName": "iPad Air — 3rd generation",
+    "releaseYear": "2019",
+    "modelCode": "A2152"
   },
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "2013",
-    "releaseYear": "A1474",
-    "modelCode": "iPad Air 2"
+    "modelName": "iPad Air — 4th generation",
+    "releaseYear": "2020",
+    "modelCode": "A2316"
   },
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "2014",
-    "releaseYear": "A1566",
-    "modelCode": "iPad Air \u2014 3rd generation"
+    "modelName": "iPad Air — 5th generation, M1",
+    "releaseYear": "2022",
+    "modelCode": "A2588"
   },
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "2019",
-    "releaseYear": "A2152",
-    "modelCode": "iPad Air \u2014 4th generation"
+    "modelName": "iPad Air 11-inch (M2)",
+    "releaseYear": "2024",
+    "modelCode": "A2902"
   },
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "2020",
-    "releaseYear": "A2316",
-    "modelCode": "iPad Air \u2014 5th generation, M1"
+    "modelName": "iPad Air 13-inch (M2)",
+    "releaseYear": "2024",
+    "modelCode": "A2898"
   },
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "2022",
-    "releaseYear": "A2588",
-    "modelCode": "iPad Air 11-inch (M2)"
+    "modelName": "iPad Air 11-inch (M3)",
+    "releaseYear": "2025",
+    "modelCode": "A3266"
   },
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "2024",
-    "releaseYear": "A2902",
-    "modelCode": "iPad Air 13-inch (M2)"
+    "modelName": "iPad Air 13-inch (M3)",
+    "releaseYear": "2025",
+    "modelCode": "A3268"
   },
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "2024",
-    "releaseYear": "A2898",
-    "modelCode": "iPad Air 11-inch (M3)"
+    "modelName": "iPad Air 11-inch (M4)",
+    "releaseYear": "2026",
+    "modelCode": "A3459"
   },
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "2025",
-    "releaseYear": "A3266",
-    "modelCode": "iPad Air 13-inch (M3)"
+    "modelName": "iPad Air 13-inch (M4)",
+    "releaseYear": "2026",
+    "modelCode": "A3461"
   },
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "2025",
-    "releaseYear": "A3268",
-    "modelCode": "iPad Air 11-inch (M4)"
-  },
-  {
-    "brand": "Apple",
-    "deviceType": "Tablet",
-    "modelName": "2026",
-    "releaseYear": "A3459",
-    "modelCode": "iPad Air 13-inch (M4)"
-  },
-  {
-    "brand": "Apple",
-    "deviceType": "Tablet",
-    "modelName": "2026",
-    "releaseYear": "A3461",
-    "modelCode": "iPad Pro"
-  },
-  {
-    "brand": "Apple",
-    "deviceType": "Tablet",
-    "modelName": "iPad Pro 12.9-inch \u2014 1st generation",
+    "modelName": "iPad Pro 12.9-inch — 1st generation",
     "releaseYear": "2015",
     "modelCode": "A1584"
   },
@@ -597,63 +576,63 @@
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "iPad Pro 12.9-inch \u2014 2nd generation",
+    "modelName": "iPad Pro 12.9-inch — 2nd generation",
     "releaseYear": "2017",
     "modelCode": "A1670"
   },
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "iPad Pro 11-inch \u2014 1st generation",
+    "modelName": "iPad Pro 11-inch — 1st generation",
     "releaseYear": "2018",
     "modelCode": "A1980"
   },
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "iPad Pro 12.9-inch \u2014 3rd generation",
+    "modelName": "iPad Pro 12.9-inch — 3rd generation",
     "releaseYear": "2018",
     "modelCode": "A1876"
   },
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "iPad Pro 11-inch \u2014 2nd generation",
+    "modelName": "iPad Pro 11-inch — 2nd generation",
     "releaseYear": "2020",
     "modelCode": "A2228"
   },
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "iPad Pro 12.9-inch \u2014 4th generation",
+    "modelName": "iPad Pro 12.9-inch — 4th generation",
     "releaseYear": "2020",
     "modelCode": "A2229"
   },
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "iPad Pro 11-inch \u2014 3rd generation, M1",
+    "modelName": "iPad Pro 11-inch — 3rd generation, M1",
     "releaseYear": "2021",
     "modelCode": "A2377"
   },
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "iPad Pro 12.9-inch \u2014 5th generation, M1",
+    "modelName": "iPad Pro 12.9-inch — 5th generation, M1",
     "releaseYear": "2021",
     "modelCode": "A2378"
   },
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "iPad Pro 11-inch \u2014 4th generation, M2",
+    "modelName": "iPad Pro 11-inch — 4th generation, M2",
     "releaseYear": "2022",
     "modelCode": "A2759"
   },
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "iPad Pro 12.9-inch \u2014 6th generation, M2",
+    "modelName": "iPad Pro 12.9-inch — 6th generation, M2",
     "releaseYear": "2022",
     "modelCode": "A2436"
   },
@@ -688,492 +667,555 @@
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook 13-inch \u2014 white/black polycarbonate",
-    "releaseYear": "2006, 2007, 2008, 2009",
+    "modelName": "MacBook 13-inch — white/black polycarbonate",
+    "releaseYear": "2006–2009",
     "modelCode": "A1181"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook 13-inch \u2014 aluminium, Late 2008",
+    "modelName": "MacBook 13-inch — aluminium, Late 2008",
     "releaseYear": "2008",
     "modelCode": "A1278"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook 13-inch \u2014 white unibody",
-    "releaseYear": "Late 2009, Mid 2010",
+    "modelName": "MacBook 13-inch — white unibody",
+    "releaseYear": "2009–2010",
     "modelCode": "A1342"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
     "modelName": "MacBook Retina 12-inch",
-    "releaseYear": "2015, 2016, 2017",
+    "releaseYear": "2015–2017",
     "modelCode": "A1534"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Air 13-inch \u2014 original",
-    "releaseYear": "Early 2008",
+    "modelName": "MacBook Air 13-inch — original",
+    "releaseYear": "2008",
     "modelCode": "A1237"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
     "modelName": "MacBook Air 13-inch",
-    "releaseYear": "Late 2008, Mid 2009",
+    "releaseYear": "2008–2009",
     "modelCode": "A1304"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
     "modelName": "MacBook Air 11-inch",
-    "releaseYear": "Late 2010, Mid 2011",
+    "releaseYear": "2010–2011",
     "modelCode": "A1370"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
     "modelName": "MacBook Air 13-inch",
-    "releaseYear": "Late 2010, Mid 2011",
+    "releaseYear": "2010–2011",
     "modelCode": "A1369"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
     "modelName": "MacBook Air 11-inch",
-    "releaseYear": "2012, 2013, 2014, 2015",
+    "releaseYear": "2012–2015",
     "modelCode": "A1465"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
     "modelName": "MacBook Air 13-inch",
-    "releaseYear": "2012, 2013, 2014, 2015, 2017",
+    "releaseYear": "2012–2017",
     "modelCode": "A1466"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Air Retina 13-inch \u2014 Intel",
-    "releaseYear": "2018, 2019",
+    "modelName": "MacBook Air Retina 13-inch — Intel",
+    "releaseYear": "2018–2019",
     "modelCode": "A1932"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Air Retina 13-inch \u2014 Intel",
+    "modelName": "MacBook Air Retina 13-inch — Intel",
     "releaseYear": "2020",
     "modelCode": "A2179"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Air 13-inch \u2014 M1",
+    "modelName": "MacBook Air 13-inch — M1",
     "releaseYear": "2020",
     "modelCode": "A2337"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Air 13-inch \u2014 M2",
+    "modelName": "MacBook Air 13-inch — M2",
     "releaseYear": "2022",
     "modelCode": "A2681"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Air 15-inch \u2014 M2",
+    "modelName": "MacBook Air 15-inch — M2",
     "releaseYear": "2023",
     "modelCode": "A2941"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Air 13-inch \u2014 M3",
+    "modelName": "MacBook Air 13-inch — M3",
     "releaseYear": "2024",
     "modelCode": "A3113"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Air 15-inch \u2014 M3",
+    "modelName": "MacBook Air 15-inch — M3",
     "releaseYear": "2024",
     "modelCode": "A3114"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Air 13-inch \u2014 M4",
+    "modelName": "MacBook Air 13-inch — M4",
     "releaseYear": "2025",
     "modelCode": "A3240"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Air 15-inch \u2014 M4",
+    "modelName": "MacBook Air 15-inch — M4",
     "releaseYear": "2025",
     "modelCode": "A3241"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Air 13-inch \u2014 M5",
+    "modelName": "MacBook Air 13-inch — M5",
     "releaseYear": "2026",
     "modelCode": "A3449"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Air 15-inch \u2014 M5",
+    "modelName": "MacBook Air 15-inch — M5",
     "releaseYear": "2026",
     "modelCode": "A3448"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 15-inch \u2014 Core Duo",
-    "releaseYear": "Early/Mid 2006",
+    "modelName": "MacBook Pro 15-inch — Core Duo",
+    "releaseYear": "2006",
     "modelCode": "A1150"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 15-inch \u2014 Core 2 Duo",
-    "releaseYear": "Late 2006",
+    "modelName": "MacBook Pro 15-inch — Core 2 Duo",
+    "releaseYear": "2006",
     "modelCode": "A1211"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
     "modelName": "MacBook Pro 15-inch",
-    "releaseYear": "Mid/Late 2007",
+    "releaseYear": "2007",
     "modelCode": "A1226"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
     "modelName": "MacBook Pro 15-inch",
-    "releaseYear": "Early 2008",
+    "releaseYear": "2008",
     "modelCode": "A1260"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 17-inch \u2014 Core Duo",
+    "modelName": "MacBook Pro 17-inch — Core Duo",
     "releaseYear": "2006",
     "modelCode": "A1151"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 17-inch \u2014 Core 2 Duo",
-    "releaseYear": "Late 2006",
+    "modelName": "MacBook Pro 17-inch — Core 2 Duo",
+    "releaseYear": "2006",
     "modelCode": "A1212"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
     "modelName": "MacBook Pro 17-inch",
-    "releaseYear": "Mid/Late 2007",
+    "releaseYear": "2007",
     "modelCode": "A1229"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
     "modelName": "MacBook Pro 17-inch",
-    "releaseYear": "Early 2008",
+    "releaseYear": "2008",
     "modelCode": "A1261"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 13-inch \u2014 unibody, non-Retina",
-    "releaseYear": "2009, 2010, 2011, 2012",
+    "modelName": "MacBook Pro 13-inch — unibody, non-Retina",
+    "releaseYear": "2009–2012",
     "modelCode": "A1278"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 15-inch \u2014 unibody, non-Retina",
-    "releaseYear": "Late 2008, 2009, 2010, 2011, 2012",
+    "modelName": "MacBook Pro 15-inch — unibody, non-Retina",
+    "releaseYear": "2008–2012",
     "modelCode": "A1286"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 17-inch \u2014 unibody",
-    "releaseYear": "2009, 2010, 2011",
+    "modelName": "MacBook Pro 17-inch — unibody",
+    "releaseYear": "2009–2011",
     "modelCode": "A1297"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro \u2014 Retina and Intel USB-C models",
-    "releaseYear": "Model",
-    "modelCode": "Release year(s)"
+    "modelName": "MacBook Pro Retina 13-inch (Late 2012, Early 2013)",
+    "releaseYear": "2012",
+    "modelCode": "A1425"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "A1425",
-    "releaseYear": "MacBook Pro Retina 13-inch",
-    "modelCode": "Late 2013, Mid 2014, Early 2015"
+    "modelName": "MacBook Pro Retina 13-inch (Late 2013 - 2015)",
+    "releaseYear": "2013",
+    "modelCode": "A1502"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "A1502",
-    "releaseYear": "MacBook Pro Retina 15-inch",
-    "modelCode": "2012, 2013, 2014, 2015"
+    "modelName": "MacBook Pro Retina 15-inch (2012 - 2015)",
+    "releaseYear": "2012",
+    "modelCode": "A1398"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "A1398",
-    "releaseYear": "MacBook Pro 13-inch \u2014 two Thunderbolt 3 ports, no Touch Bar",
-    "modelCode": "2016, 2017"
+    "modelName": "MacBook Pro 13-inch — two Thunderbolt 3 ports (2016, 2017)",
+    "releaseYear": "2016",
+    "modelCode": "A1708"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "A1708",
-    "releaseYear": "MacBook Pro 13-inch \u2014 four Thunderbolt 3 ports, Touch Bar",
-    "modelCode": "2016, 2017"
+    "modelName": "MacBook Pro 13-inch — four Thunderbolt 3 ports, Touch Bar (2016, 2017)",
+    "releaseYear": "2016",
+    "modelCode": "A1706"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "A1706",
-    "releaseYear": "MacBook Pro 15-inch \u2014 Touch Bar",
-    "modelCode": "2016, 2017"
+    "modelName": "MacBook Pro 15-inch — Touch Bar (2016, 2017)",
+    "releaseYear": "2016",
+    "modelCode": "A1707"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "A1707",
-    "releaseYear": "MacBook Pro 13-inch \u2014 four Thunderbolt 3 ports",
-    "modelCode": "2018, 2019"
+    "modelName": "MacBook Pro 13-inch — four Thunderbolt 3 ports, Touch Bar (2018, 2019)",
+    "releaseYear": "2018",
+    "modelCode": "A1989"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "A1989",
-    "releaseYear": "MacBook Pro 15-inch \u2014 Touch Bar",
-    "modelCode": "2018, 2019"
+    "modelName": "MacBook Pro 15-inch — Touch Bar (2018, 2019)",
+    "releaseYear": "2018",
+    "modelCode": "A1990"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "A1990",
-    "releaseYear": "MacBook Pro 13-inch \u2014 two Thunderbolt 3 ports, Touch Bar",
-    "modelCode": "2019"
+    "modelName": "MacBook Pro 13-inch — two Thunderbolt 3 ports, Touch Bar (2019)",
+    "releaseYear": "2019",
+    "modelCode": "A2159"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "A2159",
-    "releaseYear": "MacBook Pro 16-inch \u2014 Intel",
-    "modelCode": "2019"
+    "modelName": "MacBook Pro 16-inch — Intel (2019)",
+    "releaseYear": "2019",
+    "modelCode": "A2141"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "A2141",
-    "releaseYear": "MacBook Pro 13-inch \u2014 Intel, two Thunderbolt 3 ports",
-    "modelCode": "2020"
+    "modelName": "MacBook Pro 13-inch — Intel, two Thunderbolt 3 ports (2020)",
+    "releaseYear": "2020",
+    "modelCode": "A2289"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "A2289",
-    "releaseYear": "MacBook Pro 13-inch \u2014 Intel, four Thunderbolt 3 ports",
-    "modelCode": "2020"
+    "modelName": "MacBook Pro 13-inch — Intel, four Thunderbolt 3 ports (2020)",
+    "releaseYear": "2020",
+    "modelCode": "A2251"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "A2251",
-    "releaseYear": "Apple distinguishes these generations by screen size, year and port configuration; its recycling guides also identify the relevant chassis model numbers. Apple Support (UK)",
-    "modelCode": "MacBook Pro \u2014 Apple silicon"
-  },
-  {
-    "brand": "Apple",
-    "deviceType": "Laptop",
-    "modelName": "MacBook Pro 13-inch \u2014 M1",
+    "modelName": "MacBook Pro 13-inch — M1",
     "releaseYear": "2020",
     "modelCode": "A2338"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 14-inch \u2014 M1 Pro / M1 Max",
+    "modelName": "MacBook Pro 14-inch — M1 Pro / M1 Max",
     "releaseYear": "2021",
     "modelCode": "A2442"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 16-inch \u2014 M1 Pro / M1 Max",
+    "modelName": "MacBook Pro 16-inch — M1 Pro / M1 Max",
     "releaseYear": "2021",
     "modelCode": "A2485"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 13-inch \u2014 M2",
+    "modelName": "MacBook Pro 13-inch — M2",
     "releaseYear": "2022",
     "modelCode": "A2338"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 14-inch \u2014 M2 Pro / M2 Max",
+    "modelName": "MacBook Pro 14-inch — M2 Pro / M2 Max",
     "releaseYear": "2023",
     "modelCode": "A2779"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 16-inch \u2014 M2 Pro / M2 Max",
+    "modelName": "MacBook Pro 16-inch — M2 Pro / M2 Max",
     "releaseYear": "2023",
     "modelCode": "A2780"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 14-inch \u2014 M3",
+    "modelName": "MacBook Pro 14-inch — M3",
     "releaseYear": "2023",
     "modelCode": "A2918"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 14-inch \u2014 M3 Pro / M3 Max",
+    "modelName": "MacBook Pro 14-inch — M3 Pro / M3 Max",
     "releaseYear": "2023",
     "modelCode": "A2992"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 16-inch \u2014 M3 Pro / M3 Max",
+    "modelName": "MacBook Pro 16-inch — M3 Pro / M3 Max",
     "releaseYear": "2023",
     "modelCode": "A2991"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 14-inch \u2014 M4",
+    "modelName": "MacBook Pro 14-inch — M4",
     "releaseYear": "2024",
     "modelCode": "A3112"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 14-inch \u2014 M4 Pro",
+    "modelName": "MacBook Pro 14-inch — M4 Pro",
     "releaseYear": "2024",
     "modelCode": "A3401"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 14-inch \u2014 M4 Max",
+    "modelName": "MacBook Pro 14-inch — M4 Max",
     "releaseYear": "2024",
     "modelCode": "A3185"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 16-inch \u2014 M4 Pro",
+    "modelName": "MacBook Pro 16-inch — M4 Pro",
     "releaseYear": "2024",
     "modelCode": "A3403"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 16-inch \u2014 M4 Max",
+    "modelName": "MacBook Pro 16-inch — M4 Max",
     "releaseYear": "2024",
     "modelCode": "A3186"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 14-inch \u2014 M5",
+    "modelName": "MacBook Pro 14-inch — M5",
     "releaseYear": "2025",
     "modelCode": "A3434"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 14-inch \u2014 M5 Pro",
+    "modelName": "MacBook Pro 14-inch — M5 Pro",
     "releaseYear": "2026",
     "modelCode": "A3426"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 14-inch \u2014 M5 Max",
+    "modelName": "MacBook Pro 14-inch — M5 Max",
     "releaseYear": "2026",
     "modelCode": "A3427"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 16-inch \u2014 M5 Pro",
+    "modelName": "MacBook Pro 16-inch — M5 Pro",
     "releaseYear": "2026",
     "modelCode": "A3428"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 16-inch \u2014 M5 Max",
+    "modelName": "MacBook Pro 16-inch — M5 Max",
     "releaseYear": "2026",
     "modelCode": "A3429"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "These A-numbers are documented in Apple\u2019s regulatory records and product guides. apple.com",
-    "releaseYear": "MacBook Neo",
-    "modelCode": "Model"
+    "modelName": "MacBook Neo 13-inch (A18 Pro)",
+    "releaseYear": "2026",
+    "modelCode": "A3404"
   },
   {
     "brand": "Apple",
-    "deviceType": "Laptop",
-    "modelName": "Release year",
-    "releaseYear": "Model number",
-    "modelCode": "MacBook Neo 13-inch \u2014 A18 Pro"
+    "deviceType": "Watch",
+    "modelName": "Apple Watch 1st generation",
+    "releaseYear": "2015",
+    "modelCode": "A1553"
   },
   {
     "brand": "Apple",
-    "deviceType": "Laptop",
-    "modelName": "2026",
-    "releaseYear": "A3404",
-    "modelCode": "Apple lists MacBook Neo separately from Air and Pro. App Store"
+    "deviceType": "Watch",
+    "modelName": "Apple Watch Series 1",
+    "releaseYear": "2016",
+    "modelCode": "A1802"
   },
   {
     "brand": "Apple",
-    "deviceType": "Laptop",
-    "modelName": "Developer notes",
-    "releaseYear": "* Search by name, A-number, year, screen size or chip.",
-    "modelCode": "* When an A-number covers multiple years, show the matching versions for staff to choose."
+    "deviceType": "Watch",
+    "modelName": "Apple Watch Series 2",
+    "releaseYear": "2016",
+    "modelCode": "A1757"
   },
   {
     "brand": "Apple",
-    "deviceType": "Laptop",
-    "modelName": "* Store the Apple model identifier where available to distinguish versions more accurately.",
-    "releaseYear": "* For UK keyboard stock, add Keyboard layout: UK English (ISO).",
-    "modelCode": "* Match each part to verified compatible models; a shared A-number does not guarantee every part is interchangeable."
+    "deviceType": "Watch",
+    "modelName": "Apple Watch Series 3",
+    "releaseYear": "2017",
+    "modelCode": "A1858"
   },
   {
     "brand": "Apple",
-    "deviceType": "Laptop",
-    "modelName": "Search result example: Apple MacBook Pro 13-inch \u2014 M2 \u2014 2022 \u2014 A2338.",
-    "releaseYear": "",
-    "modelCode": ""
+    "deviceType": "Watch",
+    "modelName": "Apple Watch Series 4",
+    "releaseYear": "2018",
+    "modelCode": "A1977"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Watch",
+    "modelName": "Apple Watch Series 5",
+    "releaseYear": "2019",
+    "modelCode": "A2092"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Watch",
+    "modelName": "Apple Watch SE (1st generation)",
+    "releaseYear": "2020",
+    "modelCode": "A2351"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Watch",
+    "modelName": "Apple Watch Series 6",
+    "releaseYear": "2020",
+    "modelCode": "A2291"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Watch",
+    "modelName": "Apple Watch Series 7",
+    "releaseYear": "2021",
+    "modelCode": "A2473"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Watch",
+    "modelName": "Apple Watch SE (2nd generation)",
+    "releaseYear": "2022",
+    "modelCode": "A2722"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Watch",
+    "modelName": "Apple Watch Series 8",
+    "releaseYear": "2022",
+    "modelCode": "A2770"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Watch",
+    "modelName": "Apple Watch Ultra",
+    "releaseYear": "2022",
+    "modelCode": "A2622"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Watch",
+    "modelName": "Apple Watch Series 9",
+    "releaseYear": "2023",
+    "modelCode": "A2978"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Watch",
+    "modelName": "Apple Watch Ultra 2",
+    "releaseYear": "2023",
+    "modelCode": "A2986"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Watch",
+    "modelName": "Apple Watch Series 10",
+    "releaseYear": "2024",
+    "modelCode": "A2997"
   },
   {
     "brand": "Samsung",
@@ -1367,7 +1409,7 @@
   {
     "brand": "Samsung",
     "deviceType": "Phone",
-    "modelName": "Galaxy A12 Nacho \u2014 different hardware",
+    "modelName": "Galaxy A12 Nacho — different hardware",
     "releaseYear": "2021",
     "modelCode": "SM-A127F"
   },
@@ -1451,14 +1493,14 @@
   {
     "brand": "Samsung",
     "deviceType": "Phone",
-    "modelName": "Galaxy A13 4G \u2014 original hardware",
+    "modelName": "Galaxy A13 4G — original hardware",
     "releaseYear": "2022",
     "modelCode": "SM-A135F"
   },
   {
     "brand": "Samsung",
     "deviceType": "Phone",
-    "modelName": "Galaxy A13 4G \u2014 alternative hardware",
+    "modelName": "Galaxy A13 4G — alternative hardware",
     "releaseYear": "2022",
     "modelCode": "SM-A137F"
   },
@@ -1829,27 +1871,6 @@
   {
     "brand": "Samsung",
     "deviceType": "Phone",
-    "modelName": "M-series availability varied by country. Samsung explicitly confirmed UK launches for M11, M12, M31 and M32; the broader table includes European variants and should not automatically mark every entry as UK-sold. I have not added newer overseas M models as confirmed UK models. Samsung Schweiz",
-    "releaseYear": "Developer notes",
-    "modelCode": "* Display: Samsung Galaxy A54 5G (2023) \u2014 SM-A546B."
-  },
-  {
-    "brand": "Samsung",
-    "deviceType": "Phone",
-    "modelName": "* Search by name, year, full model code and code without SM-.",
-    "releaseYear": "* Preserve /DS and /DSN as searchable dual-SIM aliases.",
-    "modelCode": "* Keep 4G, 5G and hardware revisions separate."
-  },
-  {
-    "brand": "Samsung",
-    "deviceType": "Phone",
-    "modelName": "* Confirm the full code under Settings \u2192 About phone before matching parts.",
-    "releaseYear": "* Store UK-sold / European / imported / unverified separately from the model name.",
-    "modelCode": ""
-  },
-  {
-    "brand": "Samsung",
-    "deviceType": "Phone",
     "modelName": "Galaxy S",
     "releaseYear": "2010",
     "modelCode": "GT-I9000"
@@ -1871,7 +1892,7 @@
   {
     "brand": "Samsung",
     "deviceType": "Phone",
-    "modelName": "Galaxy S II \u2014 NFC variant",
+    "modelName": "Galaxy S II — NFC variant",
     "releaseYear": "2011",
     "modelCode": "GT-I9100P"
   },
@@ -1934,7 +1955,7 @@
   {
     "brand": "Samsung",
     "deviceType": "Phone",
-    "modelName": "Galaxy S4 Zoom \u2014 LTE",
+    "modelName": "Galaxy S4 Zoom — LTE",
     "releaseYear": "2013",
     "modelCode": "SM-C105"
   },
@@ -2116,21 +2137,21 @@
   {
     "brand": "Samsung",
     "deviceType": "Phone",
-    "modelName": "Galaxy S20 FE 4G \u2014 Exynos",
+    "modelName": "Galaxy S20 FE 4G — Exynos",
     "releaseYear": "2020",
     "modelCode": "SM-G780F"
   },
   {
     "brand": "Samsung",
     "deviceType": "Phone",
-    "modelName": "Galaxy S20 FE 5G \u2014 Snapdragon",
+    "modelName": "Galaxy S20 FE 5G — Snapdragon",
     "releaseYear": "2020",
     "modelCode": "SM-G781B"
   },
   {
     "brand": "Samsung",
     "deviceType": "Phone",
-    "modelName": "Galaxy S20 FE 4G \u2014 Snapdragon revision",
+    "modelName": "Galaxy S20 FE 4G — Snapdragon revision",
     "releaseYear": "2021",
     "modelCode": "SM-G780G"
   },
@@ -2305,7 +2326,7 @@
   {
     "brand": "Samsung",
     "deviceType": "Phone",
-    "modelName": "Galaxy Z Flip \u2014 4G",
+    "modelName": "Galaxy Z Flip — 4G",
     "releaseYear": "2020",
     "modelCode": "SM-F700F"
   },
@@ -2368,7 +2389,7 @@
   {
     "brand": "Samsung",
     "deviceType": "Phone",
-    "modelName": "Galaxy Fold 5G \u2014 original UK model",
+    "modelName": "Galaxy Fold 5G — original UK model",
     "releaseYear": "2019",
     "modelCode": "SM-F907B"
   },
@@ -2429,24 +2450,213 @@
     "modelCode": "SM-F976B"
   },
   {
-    "brand": "Samsung",
+    "brand": "Google",
     "deviceType": "Phone",
-    "modelName": "The original UK Fold was the 5G version. Samsung\u2019s UK pages list Fold8 and Fold8 Ultra as separate models with different codes. Samsung Schweiz",
-    "releaseYear": "Developer notes",
-    "modelCode": "* Display: Samsung Galaxy S24 Ultra (2024) \u2014 SM-S928B."
+    "modelName": "Pixel 9 Pro XL",
+    "releaseYear": "2024",
+    "modelCode": "G1KGY"
   },
   {
-    "brand": "Samsung",
+    "brand": "Google",
     "deviceType": "Phone",
-    "modelName": "* Search by name, year, full code or code without SM-.",
-    "releaseYear": "* Preserve /DS and /DSN suffixes as searchable aliases.",
-    "modelCode": "* Keep FE, Plus, Ultra, Edge, 4G and 5G variants separate."
+    "modelName": "Pixel 9 Pro",
+    "releaseYear": "2024",
+    "modelCode": "GEC77"
   },
   {
-    "brand": "Samsung",
+    "brand": "Google",
     "deviceType": "Phone",
-    "modelName": "* For Flip/Fold screens, require Inner screen / Cover screen before showing compatible stock.",
-    "releaseYear": "* Confirm parts against the device\u2019s full model code under Settings \u2192 About phone.",
-    "modelCode": ""
+    "modelName": "Pixel 9",
+    "releaseYear": "2024",
+    "modelCode": "GUR25"
+  },
+  {
+    "brand": "Google",
+    "deviceType": "Phone",
+    "modelName": "Pixel 8 Pro",
+    "releaseYear": "2023",
+    "modelCode": "GC3VE"
+  },
+  {
+    "brand": "Google",
+    "deviceType": "Phone",
+    "modelName": "Pixel 8",
+    "releaseYear": "2023",
+    "modelCode": "G9BQD"
+  },
+  {
+    "brand": "Google",
+    "deviceType": "Phone",
+    "modelName": "Pixel 8a",
+    "releaseYear": "2024",
+    "modelCode": "G6GPR"
+  },
+  {
+    "brand": "Google",
+    "deviceType": "Phone",
+    "modelName": "Pixel 7 Pro",
+    "releaseYear": "2022",
+    "modelCode": "GP4BC"
+  },
+  {
+    "brand": "Google",
+    "deviceType": "Phone",
+    "modelName": "Pixel 7",
+    "releaseYear": "2022",
+    "modelCode": "GVU6C"
+  },
+  {
+    "brand": "Google",
+    "deviceType": "Phone",
+    "modelName": "Pixel 7a",
+    "releaseYear": "2023",
+    "modelCode": "GWKK3"
+  },
+  {
+    "brand": "Google",
+    "deviceType": "Phone",
+    "modelName": "Pixel 6 Pro",
+    "releaseYear": "2021",
+    "modelCode": "GLUOG"
+  },
+  {
+    "brand": "Google",
+    "deviceType": "Phone",
+    "modelName": "Pixel 6",
+    "releaseYear": "2021",
+    "modelCode": "GB7N6"
+  },
+  {
+    "brand": "Google",
+    "deviceType": "Phone",
+    "modelName": "Pixel 6a",
+    "releaseYear": "2022",
+    "modelCode": "GX7AS"
+  },
+  {
+    "brand": "Xiaomi",
+    "deviceType": "Phone",
+    "modelName": "Xiaomi 14 Ultra",
+    "releaseYear": "2024",
+    "modelCode": "24030PN60G"
+  },
+  {
+    "brand": "Xiaomi",
+    "deviceType": "Phone",
+    "modelName": "Xiaomi 14",
+    "releaseYear": "2024",
+    "modelCode": "23127PN0CG"
+  },
+  {
+    "brand": "Xiaomi",
+    "deviceType": "Phone",
+    "modelName": "Xiaomi 13T Pro",
+    "releaseYear": "2023",
+    "modelCode": "23078PND5G"
+  },
+  {
+    "brand": "Xiaomi",
+    "deviceType": "Phone",
+    "modelName": "Xiaomi 13T",
+    "releaseYear": "2023",
+    "modelCode": "2306EPN60G"
+  },
+  {
+    "brand": "Xiaomi",
+    "deviceType": "Phone",
+    "modelName": "Xiaomi 13 Pro",
+    "releaseYear": "2023",
+    "modelCode": "2210132G"
+  },
+  {
+    "brand": "Xiaomi",
+    "deviceType": "Phone",
+    "modelName": "Xiaomi 13",
+    "releaseYear": "2023",
+    "modelCode": "2211133G"
+  },
+  {
+    "brand": "Xiaomi",
+    "deviceType": "Phone",
+    "modelName": "Redmi Note 13 Pro+ 5G",
+    "releaseYear": "2024",
+    "modelCode": "23090RA98G"
+  },
+  {
+    "brand": "Xiaomi",
+    "deviceType": "Phone",
+    "modelName": "Redmi Note 13 Pro 5G",
+    "releaseYear": "2024",
+    "modelCode": "2312DRA50G"
+  },
+  {
+    "brand": "Xiaomi",
+    "deviceType": "Phone",
+    "modelName": "Redmi Note 13",
+    "releaseYear": "2024",
+    "modelCode": "23129RAA4G"
+  },
+  {
+    "brand": "Xiaomi",
+    "deviceType": "Phone",
+    "modelName": "Poco X6 Pro 5G",
+    "releaseYear": "2024",
+    "modelCode": "2311DRK48G"
+  },
+  {
+    "brand": "Xiaomi",
+    "deviceType": "Phone",
+    "modelName": "Poco F6 Pro",
+    "releaseYear": "2024",
+    "modelCode": "23113RKC6G"
+  },
+  {
+    "brand": "Xiaomi",
+    "deviceType": "Phone",
+    "modelName": "Poco F6",
+    "releaseYear": "2024",
+    "modelCode": "24069PC21G"
+  },
+  {
+    "brand": "OnePlus",
+    "deviceType": "Phone",
+    "modelName": "OnePlus 12",
+    "releaseYear": "2024",
+    "modelCode": "CPH2581"
+  },
+  {
+    "brand": "OnePlus",
+    "deviceType": "Phone",
+    "modelName": "OnePlus 12R",
+    "releaseYear": "2024",
+    "modelCode": "CPH2609"
+  },
+  {
+    "brand": "OnePlus",
+    "deviceType": "Phone",
+    "modelName": "OnePlus 11",
+    "releaseYear": "2023",
+    "modelCode": "CPH2449"
+  },
+  {
+    "brand": "OnePlus",
+    "deviceType": "Phone",
+    "modelName": "OnePlus Nord 4",
+    "releaseYear": "2024",
+    "modelCode": "CPH2663"
+  },
+  {
+    "brand": "OnePlus",
+    "deviceType": "Phone",
+    "modelName": "OnePlus Nord 3 5G",
+    "releaseYear": "2023",
+    "modelCode": "CPH2493"
+  },
+  {
+    "brand": "OnePlus",
+    "deviceType": "Phone",
+    "modelName": "OnePlus Open",
+    "releaseYear": "2023",
+    "modelCode": "CPH2551"
   }
 ]

@@ -95,6 +95,10 @@ export interface IRepairRequest {
       unableToRepairReason?: string;
       unableToRepairNote?: string;
       unableToRepairCustomerMessage?: string;
+      rejectionReason?: string;
+      expectedCollectionDate?: Date | string;
+      rejectedAt?: Date;
+      completedAt?: Date;
       shopkeeperNotes?: INote[];
       technicianNotes?: ITechNote[];
       createdAt: Date;
@@ -108,4 +112,6 @@ export interface IRepairRequestStatusUpdatePayload {
       unableToRepairReason?: string;
       unableToRepairNote?: string;
       unableToRepairCustomerMessage?: string;
+      rejectionReason?: string;
+      expectedCollectionDate?: Date | string;
 }

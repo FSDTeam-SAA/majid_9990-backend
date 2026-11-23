@@ -148,6 +148,9 @@ const addNewRepairRequest = async (payload: IRepairRequest, files: Express.Multe
             history: historyEvents,
             technician: payload.technician?.trim(),
             status: payload.status || 'inProgress',
+            expectedCollectionDate: payload.expectedCollectionDate
+                  ? new Date(payload.expectedCollectionDate)
+                  : new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
       });
 
       return newRequest;
@@ -253,6 +256,23 @@ const updateStatusByShopKeeper = async (id: string, payload: IRepairRequestStatu
                   waitingForPartsDays: 1,
                   waitingForPartsDescription: 1,
             };
+      }
+
+      if (payload.expectedCollectionDate) {
+            update.$set.expectedCollectionDate = new Date(payload.expectedCollectionDate);
+      }
+
+      if (payload.status === 'rejected') {
+            const reason = (payload.rejectionReason || payload.unableToRepairReason || (payload as any).reason)?.trim();
+            if (!reason) {
+                  throw new AppError('Rejection reason is required when rejecting a repair job', StatusCodes.BAD_REQUEST);
+            }
+            update.$set.rejectionReason = reason;
+            update.$set.rejectedAt = new Date();
+      }
+
+      if (payload.status === 'completed') {
+            update.$set.completedAt = new Date();
       }
 
       if (payload.status === 'unable-to-repair') {
