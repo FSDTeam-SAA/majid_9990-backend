@@ -89,8 +89,24 @@ export interface IInvoice {
       idImages?: IInvoiceIdImages;
       idImageDeleteAfter?: Date;
       tradeInConsentId?: Types.ObjectId | null;
+      tradeInDetails?: IInvoiceTradeInDetails;
       invoiceTemplate?: string;
       scoreReview?: IScoreReview;
+}
+
+export interface IInvoiceTradeInDetails {
+      deviceName?: string;
+      modelNumber?: string;
+      storage?: string;
+      color?: string;
+      condition?: string;
+      batteryHealth?: string;
+      blacklistStatus?: string;
+      networkLock?: string;
+      imei?: string;
+      serialNumber?: string;
+      buyingPrice?: number;
+      tradeInCredit?: number;
 }
 
 export interface IScoreReview {
@@ -163,6 +179,7 @@ export interface IInvoicePayload {
       idImages?: IInvoiceIdImages | string;
       idImageDeleteAfter?: Date | string;
       tradeInConsentId?: string;
+      tradeInDetails?: IInvoiceTradeInDetails | string;
       invoiceTemplate?: string;
       scoreReview?: IScoreReview | string;
       createdAt?: Date | string;

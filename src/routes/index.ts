@@ -32,6 +32,7 @@ import rotaRouter from '../modules/rota/rota.router';
 import leaveRouter from '../modules/leave/leave.router';
 import wagesRouter from '../modules/wages/wages.router';
 import masterCatalogueRouter from '../modules/masterCatalogue/masterCatalogue.router';
+import tradeInRouter from '../modules/tradeIn/tradeIn.router';
 
 const router = Router();
 
@@ -183,6 +184,10 @@ const moduleRoutes = [
       {
         path: '/master-catalogue',
         route: masterCatalogueRouter,
+      },
+      {
+        path: '/trade-in',
+        route: tradeInRouter,
       },
 ];
 moduleRoutes.forEach((route) => router.use(route.path, route.route));

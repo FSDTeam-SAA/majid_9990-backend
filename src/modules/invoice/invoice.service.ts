@@ -16,6 +16,7 @@ import {
       IInvoiceOrderDetails,
       IInvoicePayload,
       IInvoicePaymentDetails,
+      IInvoiceTradeInDetails,
       InvoicePaymentStatus,
       ISendInvoiceEmailPayload,
       ISendReviewRequestPayload,
@@ -353,6 +354,8 @@ const createInvoice = async (
             // Ignore parse errors
       }
 
+      const tradeInDetailsData = parseJsonObject<IInvoiceTradeInDetails>(payload.tradeInDetails, 'tradeInDetails');
+
       let customCreatedAt: Date | undefined = undefined;
       if (payload.createdAt) {
             const parsed = new Date(payload.createdAt);
@@ -421,6 +424,7 @@ const createInvoice = async (
                         payload.tradeInConsentId && Types.ObjectId.isValid(payload.tradeInConsentId)
                               ? new Types.ObjectId(payload.tradeInConsentId)
                               : null,
+                  tradeInDetails: tradeInDetailsData,
                   invoiceTemplate,
             };
 
@@ -537,6 +541,33 @@ const createInvoice = async (
 
                   if (updateRes.matchedCount === 0 || updateRes.modifiedCount === 0) {
                         throw new AppError('One or more selected items no longer have enough stock', StatusCodes.CONFLICT);
+                  }
+            }
+
+            if (tradeInDetailsData && tradeInDetailsData.deviceName && (Number(tradeInDetailsData.buyingPrice) > 0 || Number(tradeInDetailsData.tradeInCredit) > 0)) {
+                  try {
+                        const buyingPrice = Number(tradeInDetailsData.buyingPrice) || Number(tradeInDetailsData.tradeInCredit) || 0;
+                        await Inventory.create(
+                              [
+                                    {
+                                          itemName: tradeInDetailsData.deviceName,
+                                          userId: shopkeeperId,
+                                          shopId: shopId ? new Types.ObjectId(shopId) : undefined,
+                                          buyingPrice,
+                                          expectedPrice: buyingPrice > 0 ? Math.round(buyingPrice * 1.25) : 0,
+                                          quantity: 1,
+                                          currentState: 'good condition',
+                                          imeiNumber: tradeInDetailsData.imei || undefined,
+                                          serialNumber: tradeInDetailsData.serialNumber || undefined,
+                                          color: tradeInDetailsData.color ? [tradeInDetailsData.color] : [],
+                                          storage: tradeInDetailsData.storage ? [tradeInDetailsData.storage] : [],
+                                    },
+                              ],
+                              { session }
+                        );
+                  } catch (invErr) {
+                        // Inventory creation warning logged; don't abort invoice commit
+                        console.warn('[Trade-in] Optional inventory creation skipped:', invErr);
                   }
             }
 
