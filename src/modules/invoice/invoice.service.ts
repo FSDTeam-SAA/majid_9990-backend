@@ -11,6 +11,7 @@ import { User } from '../user/user.model';
 import { Customer } from '../customer/customer.model';
 import {
       IInvoice,
+      IInvoiceFile,
       IInvoiceIdImages,
       IInvoiceLineItem,
       IInvoiceOrderDetails,
@@ -68,20 +69,38 @@ const resolveShopkeeperId = async (shopkeeperId?: string) => {
       return new Types.ObjectId(trimmedShopkeeperId);
 };
 
-const buildInvoiceFile = async (file?: Express.Multer.File) => {
-      if (!file) {
-            throw new AppError('Invoice PDF is required', StatusCodes.BAD_REQUEST);
+const buildInvoiceFile = async (
+      file?: Express.Multer.File,
+      rawInvoice?: IInvoiceFile | string
+): Promise<IInvoiceFile> => {
+      if (file) {
+            const uploaded = await uploadToCloudinary(file.path);
+
+            if (!uploaded?.public_id || !uploaded.secure_url) {
+                  throw new AppError('Failed to upload invoice to Cloudinary', StatusCodes.INTERNAL_SERVER_ERROR);
+            }
+
+            return {
+                  public_id: uploaded.public_id,
+                  url: uploaded.secure_url,
+                  resource_type: 'raw' as const,
+            };
       }
 
-      const uploaded = await uploadToCloudinary(file.path);
-
-      if (!uploaded?.public_id || !uploaded.secure_url) {
-            throw new AppError('Failed to upload invoice to Cloudinary', StatusCodes.INTERNAL_SERVER_ERROR);
+      if (rawInvoice) {
+            const parsed = typeof rawInvoice === 'string' ? parseJsonObject<IInvoiceFile>(rawInvoice, 'invoice') : rawInvoice;
+            if (parsed?.url) {
+                  return {
+                        public_id: parsed.public_id || `receipt_${Date.now()}`,
+                        url: parsed.url,
+                        resource_type: 'raw' as const,
+                  };
+            }
       }
 
       return {
-            public_id: uploaded.public_id,
-            url: uploaded.secure_url,
+            public_id: `receipt_${Date.now()}`,
+            url: 'https://imoscan.com/receipt/default.pdf',
             resource_type: 'raw' as const,
       };
 };
@@ -292,7 +311,7 @@ const createInvoice = async (
             throw new AppError('Card last four digits must contain exactly 4 numbers', StatusCodes.BAD_REQUEST);
       }
 
-      const invoiceFile = await buildInvoiceFile(file);
+      const invoiceFile = await buildInvoiceFile(file, payload.invoice);
 
       // Handle ID image uploads (e.g. from Purchase Invoice trade-in)
       let idImagesData: IInvoiceIdImages | undefined = undefined;
@@ -357,8 +376,9 @@ const createInvoice = async (
       const tradeInDetailsData = parseJsonObject<IInvoiceTradeInDetails>(payload.tradeInDetails, 'tradeInDetails');
 
       let customCreatedAt: Date | undefined = undefined;
-      if (payload.createdAt) {
-            const parsed = new Date(payload.createdAt);
+      const rawDate = payload.createdAt || payload.paymentDate || payload.invoiceDate || payload.date;
+      if (rawDate) {
+            const parsed = new Date(rawDate);
             if (!isNaN(parsed.getTime())) {
                   customCreatedAt = parsed;
             }
@@ -900,13 +920,11 @@ const getInvoicesByCustomerId = async (
             const paidAmount = Number(
                   inv.amountPaid ??
                   inv.paymentDetails?.amountPaid ??
-                  (inv.paymentStatus === 'paid' || isPurchase ? invoiceAmount : 0)
+                  (inv.paymentStatus === 'paid' ? invoiceAmount : 0)
             ) || 0;
 
             let due = 0;
-            if (isPurchase) {
-                  due = 0;
-            } else if (inv.dueAmount !== null && inv.dueAmount !== undefined) {
+            if (inv.dueAmount !== null && inv.dueAmount !== undefined) {
                   due = Number(inv.dueAmount);
             } else {
                   due = Math.max(0, invoiceAmount - paidAmount);

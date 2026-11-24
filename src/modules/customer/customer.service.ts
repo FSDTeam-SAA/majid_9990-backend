@@ -169,14 +169,11 @@ const getByShopkeeperId = async (shopkeeperId: string, query: Record<string, unk
                         const paid = Number(
                               inv.amountPaid ??
                               inv.paymentDetails?.amountPaid ??
-                              (inv.paymentStatus === 'paid' || isPurchase ? invoiceAmount : 0)
+                              (inv.paymentStatus === 'paid' ? invoiceAmount : 0)
                         ) || 0;
 
                         let due = 0;
-                        if (isPurchase) {
-                              // Stock purchased from customer/supplier paid by shopkeeper: not customer receivables
-                              due = 0;
-                        } else if (inv.dueAmount !== null && inv.dueAmount !== undefined) {
+                        if (inv.dueAmount !== null && inv.dueAmount !== undefined) {
                               due = Number(inv.dueAmount);
                         } else {
                               due = Math.max(0, invoiceAmount - paid);

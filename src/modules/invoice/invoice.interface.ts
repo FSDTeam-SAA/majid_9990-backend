@@ -183,6 +183,10 @@ export interface IInvoicePayload {
       invoiceTemplate?: string;
       scoreReview?: IScoreReview | string;
       createdAt?: Date | string;
+      invoiceDate?: Date | string;
+      paymentDate?: Date | string;
+      date?: Date | string;
+      invoice?: IInvoiceFile | string;
 }
 
 export interface ISendInvoiceEmailPayload {

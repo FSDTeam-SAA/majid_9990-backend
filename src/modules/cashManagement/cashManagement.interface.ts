@@ -10,6 +10,9 @@ export interface ICashManagement {
       aiInsight?: string;
       currency?: string;
       date: Date;
+      availableCashToday?: number;
+      todayMetrics?: any;
+      allTimeMetrics?: any;
       createdAt?: Date;
       updatedAt?: Date;
 }
