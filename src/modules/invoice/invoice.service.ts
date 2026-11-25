@@ -17,12 +17,15 @@ import {
       IInvoiceOrderDetails,
       IInvoicePayload,
       IInvoicePaymentDetails,
+      IInvoiceRepairDetails,
       IInvoiceTradeInDetails,
       InvoicePaymentStatus,
       ISendInvoiceEmailPayload,
       ISendReviewRequestPayload,
       IUpdateReviewStatusPayload,
 } from './invoice.interface';
+import { renderRepairPhotosHtml } from '../../utils/email/email.templates';
+import { getCurrencySymbol } from '../../utils/currency';
 import { Invoice } from './invoice.model';
 import { Inventory } from '../inventory/inventory.model';
 import RepairRequest from '../repairRequest/repairRequest.model';
@@ -295,15 +298,49 @@ const createInvoice = async (
             throw new AppError('Invalid paymentStatus', StatusCodes.BAD_REQUEST);
       }
 
+      let repairDetailsData = parseJsonObject<IInvoiceRepairDetails>(payload.repairDetails, 'repairDetails');
       if (repairRequestId) {
-            const isReadyForCollection = await RepairRequest.exists({
+            const linkedRepair = await RepairRequest.findOne({
                   _id: repairRequestId,
                   userId: shopkeeperId,
-                  status: { $in: ['completed', 'approved'] },
-            });
+                  status: { $in: ['completed', 'ready-for-collection', 'approved'] },
+            }).lean();
 
-            if (!isReadyForCollection) {
+            if (!linkedRepair) {
                   throw new AppError('Repair order is no longer ready for collection', StatusCodes.CONFLICT);
+            }
+
+            if (!repairDetailsData) {
+                  const bookingPhotos: string[] = [];
+                  const completionPhotos: string[] = [];
+                  for (const photo of (linkedRepair as any).evidencePhotos || []) {
+                        const url = photo?.url;
+                        if (!url) continue;
+                        if (photo?.photoType === 'completion' || /completion/i.test(String(photo?.usedFor || ''))) {
+                              completionPhotos.push(url);
+                        } else {
+                              bookingPhotos.push(url);
+                        }
+                  }
+                  repairDetailsData = {
+                        orderNumber: linkedRepair.orderNumber,
+                        deviceModel: linkedRepair.deviceModel,
+                        modelCode: linkedRepair.modelCode,
+                        imeiNumber: linkedRepair.IMEINumber || undefined,
+                        serialNumber: linkedRepair.serialNumber || undefined,
+                        condition: linkedRepair.condition,
+                        colour: linkedRepair.colour,
+                        description: linkedRepair.description,
+                        reportedIssues: (linkedRepair.issues || []).map((iss: any) => ({
+                              category: iss.category || iss.issueCategory,
+                              problems: iss.problems || iss.commonProblems || [],
+                              estimatedPrice: iss.estimatedPrice ?? 0,
+                              estimatedTime: iss.estimatedTime,
+                              partName: iss.selectedPart?.partName,
+                        })),
+                        bookingPhotos,
+                        completionPhotos,
+                  };
             }
       }
 
@@ -423,6 +460,7 @@ const createInvoice = async (
                   totalAmount,
                   dueAmount,
                   repairRequestId: normalizeObjectId(payload.repairRequestId),
+                  repairDetails: repairDetailsData,
                   tax: normalizeOptionalNumber(payload.tax, 'tax'),
                   taxName: payload.taxName,
                   taxIncludedInPrice: payload.taxIncludedInPrice,
@@ -991,11 +1029,99 @@ const sendInvoiceEmail = async (userId: string, payload: ISendInvoiceEmailPayloa
       if (payload.invoiceId && Types.ObjectId.isValid(String(payload.invoiceId))) {
             invoiceDoc = await Invoice.findById(payload.invoiceId)
                   .populate('lineItems.itemId', 'itemName imeiNumber serialNumber sku modelNumber units variants expectedPrice image')
-                  .populate('itemsIds', 'itemName imeiNumber serialNumber sku modelNumber units variants expectedPrice image');
+                  .populate('itemsIds', 'itemName imeiNumber serialNumber sku modelNumber units variants expectedPrice image')
+                  .populate('repairRequestId');
       } else if (invoiceRef && invoiceRef !== 'Invoice') {
             invoiceDoc = await Invoice.findOne({ invoiceNumber: invoiceRef })
                   .populate('lineItems.itemId', 'itemName imeiNumber serialNumber sku modelNumber units variants expectedPrice image')
-                  .populate('itemsIds', 'itemName imeiNumber serialNumber sku modelNumber units variants expectedPrice image');
+                  .populate('itemsIds', 'itemName imeiNumber serialNumber sku modelNumber units variants expectedPrice image')
+                  .populate('repairRequestId');
+      }
+
+      let linkedRepairDoc: any =
+            invoiceDoc?.repairRequestId && typeof invoiceDoc.repairRequestId === 'object'
+                  ? invoiceDoc.repairRequestId
+                  : null;
+      if (!linkedRepairDoc && payload.repairId && Types.ObjectId.isValid(String(payload.repairId))) {
+            linkedRepairDoc = await RepairRequest.findById(payload.repairId).lean();
+      }
+
+      const effectiveRepairDetails: IInvoiceRepairDetails | null = (() => {
+            if (linkedRepairDoc) {
+                  const bookingPhotos: string[] = [];
+                  const completionPhotos: string[] = [];
+                  for (const photo of linkedRepairDoc.evidencePhotos || []) {
+                        const url = photo?.url;
+                        if (!url) continue;
+                        if (photo?.photoType === 'completion' || /completion/i.test(String(photo?.usedFor || ''))) {
+                              completionPhotos.push(url);
+                        } else {
+                              bookingPhotos.push(url);
+                        }
+                  }
+                  return {
+                        orderNumber: linkedRepairDoc.orderNumber,
+                        deviceModel: linkedRepairDoc.deviceModel,
+                        modelCode: linkedRepairDoc.modelCode,
+                        imeiNumber: linkedRepairDoc.IMEINumber || undefined,
+                        serialNumber: linkedRepairDoc.serialNumber || undefined,
+                        condition: linkedRepairDoc.condition,
+                        colour: linkedRepairDoc.colour,
+                        description: linkedRepairDoc.description,
+                        reportedIssues: (linkedRepairDoc.issues || []).map((iss: any) => ({
+                              category: iss.category || iss.issueCategory,
+                              problems: iss.problems || iss.commonProblems || [],
+                              estimatedPrice: iss.estimatedPrice ?? 0,
+                              estimatedTime: iss.estimatedTime,
+                              partName: iss.selectedPart?.partName,
+                        })),
+                        bookingPhotos,
+                        completionPhotos,
+                  };
+            }
+            return invoiceDoc?.repairDetails || null;
+      })();
+
+      let repairSummaryHtml = '';
+      if (effectiveRepairDetails) {
+            const currSym = getCurrencySymbol(invoiceDoc?.currency || linkedRepairDoc?.currency || 'GBP');
+            const issuesList = (effectiveRepairDetails.reportedIssues || [])
+                  .map((iss: any) => {
+                        const probs = Array.isArray(iss.problems) ? iss.problems.filter(Boolean).join(', ') : '';
+                        const pStr =
+                              iss.estimatedPrice && Number(iss.estimatedPrice) > 0
+                                    ? `${currSym}${Number(iss.estimatedPrice).toFixed(2)}`
+                                    : 'Price TBC';
+                        const partStr = iss.partName ? ` <span style="color:#6b7280;">(${iss.partName})</span>` : '';
+                        return `<li style="margin:3px 0;"><strong>${iss.category || 'Repair Issue'}</strong>${probs ? `: ${probs}` : ''}${partStr} &mdash; <strong>${pStr}</strong></li>`;
+                  })
+                  .join('');
+
+            const photosGalleryHtml = renderRepairPhotosHtml(
+                  effectiveRepairDetails.bookingPhotos,
+                  effectiveRepairDetails.completionPhotos
+            );
+
+            repairSummaryHtml = `
+                  <div style="margin-bottom:24px; border:1px solid #e5e7eb; border-radius:8px; overflow:hidden;">
+                        <div style="background:#f9fafb; padding:10px 14px; font-weight:700; font-size:12px; color:#374151; border-bottom:1px solid #e5e7eb; text-transform:uppercase;">
+                              Repair Job &amp; Intake Details
+                        </div>
+                        <div style="padding:14px 16px; font-size:13px; color:#374151; line-height:1.5;">
+                              ${effectiveRepairDetails.orderNumber ? `<div>Job Reference: <strong>${effectiveRepairDetails.orderNumber}</strong></div>` : ''}
+                              ${effectiveRepairDetails.deviceModel ? `<div>Device: <strong>${effectiveRepairDetails.deviceModel}</strong>${effectiveRepairDetails.modelCode ? ` (${effectiveRepairDetails.modelCode})` : ''}</div>` : ''}
+                              <div>Intake Condition: <strong>${effectiveRepairDetails.condition || 'Not recorded'}</strong></div>
+                              <div>Colour: <strong>${effectiveRepairDetails.colour || 'Not recorded'}</strong></div>
+                              ${effectiveRepairDetails.imeiNumber ? `<div>IMEI Number: <strong>${effectiveRepairDetails.imeiNumber}</strong></div>` : ''}
+                              ${effectiveRepairDetails.serialNumber ? `<div>Serial Number: <strong>${effectiveRepairDetails.serialNumber}</strong></div>` : ''}
+                              <div style="margin-top:8px;">
+                                    <strong>Reported Issues:</strong>
+                                    ${issuesList ? `<ul style="margin:4px 0 0 18px; padding:0;">${issuesList}</ul>` : `<div>${effectiveRepairDetails.description || 'Not recorded'}</div>`}
+                              </div>
+                        </div>
+                  </div>
+                  ${photosGalleryHtml}
+            `;
       }
 
       let itemsHtml = '';
@@ -1112,6 +1238,7 @@ const sendInvoiceEmail = async (userId: string, payload: ISendInvoiceEmailPayloa
               </div>
 
               ${itemsHtml}
+              ${repairSummaryHtml}
 
               ${pdfUrl ? `
               <div style="text-align:center; margin:28px 0;">
@@ -1149,16 +1276,33 @@ const sendInvoiceEmail = async (userId: string, payload: ISendInvoiceEmailPayloa
 </html>
       `;
 
-      let attachments: any[] | undefined = undefined;
+      const attachments: Array<{ filename: string; path: string; contentType?: string }> = [];
       if (pdfUrl && (pdfUrl.startsWith('http://') || pdfUrl.startsWith('https://'))) {
             const cleanRef = invoiceRef.replace(/[^a-zA-Z0-9_-]/g, '_');
-            attachments = [
-                  {
-                        filename: `${cleanRef || 'Invoice'}.pdf`,
-                        path: pdfUrl,
-                        contentType: 'application/pdf',
-                  },
-            ];
+            attachments.push({
+                  filename: `${cleanRef || 'Invoice'}.pdf`,
+                  path: pdfUrl,
+                  contentType: 'application/pdf',
+            });
+      }
+
+      if (effectiveRepairDetails) {
+            const seenUrls = new Set<string>();
+            const addPhotoAttachment = (url: string, prefix: string, index: number) => {
+                  const clean = String(url || '').trim();
+                  if (!/^https?:\/\//i.test(clean) || seenUrls.has(clean) || attachments.length >= 11) {
+                        return;
+                  }
+                  seenUrls.add(clean);
+                  const extMatch = clean.match(/\.(jpg|jpeg|png|webp|avif)(?:\?|$)/i);
+                  const ext = extMatch ? extMatch[1].toLowerCase() : 'jpg';
+                  attachments.push({
+                        filename: `${prefix}_${index + 1}.${ext}`,
+                        path: clean,
+                  });
+            };
+            (effectiveRepairDetails.bookingPhotos || []).forEach((u, i) => addPhotoAttachment(u, 'Booking_Photo', i));
+            (effectiveRepairDetails.completionPhotos || []).forEach((u, i) => addPhotoAttachment(u, 'Completion_Photo', i));
       }
 
       const result = await sendEmail({
@@ -1166,7 +1310,7 @@ const sendInvoiceEmail = async (userId: string, payload: ISendInvoiceEmailPayloa
             subject: `Invoice ${invoiceRef}`,
             html,
             fromName: senderName,
-            attachments,
+            attachments: attachments.length > 0 ? attachments : undefined,
       });
 
       if (!result.success) {

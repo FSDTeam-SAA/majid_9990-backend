@@ -2,16 +2,32 @@
 import { getCurrencySymbol } from '../currency';
 export { getCurrencySymbol };
 
+export interface EmailRepairIssue {
+      category: string;
+      problems?: string[];
+      estimatedPrice?: number;
+      estimatedTime?: string;
+      partName?: string;
+}
+
 export interface CompletionEmailData {
       customerName: string;
       deviceModel: string;
+      imei?: string;
+      serialNumber?: string;
+      condition?: string;
+      colour?: string;
       description: string;
+      issues?: EmailRepairIssue[];
+      bookingPhotos?: string[];
+      completionPhotos?: string[];
       price?: number;
       currency?: string;
       currencySymbol?: string;
       technicianFeedback?: string;
       completionDate: string;
       requestId: string;
+      orderNumber?: string;
       shopName?: string;
       trackingUrl?: string;
 }
@@ -20,7 +36,13 @@ export interface RepairStatusEmailData {
       customerName: string;
       deviceModel: string;
       imei?: string;
+      serialNumber?: string;
+      condition?: string;
+      colour?: string;
       description: string;
+      issues?: EmailRepairIssue[];
+      bookingPhotos?: string[];
+      completionPhotos?: string[];
       status: string;
       statusLabel: string;
       statusNote?: string;
@@ -29,11 +51,64 @@ export interface RepairStatusEmailData {
       currencySymbol?: string;
       shopName?: string;
       requestId: string;
+      orderNumber?: string;
       trackingUrl: string;
       technicianFeedback?: string;
       waitingForPartsDays?: number;
       waitingForPartsDescription?: string;
 }
+
+const renderIssuesListHtml = (
+      issues: EmailRepairIssue[] | undefined,
+      fallbackDesc: string,
+      currSymbol: string
+): string => {
+      if (!issues || issues.length === 0) {
+            return `<span>${fallbackDesc || 'No issue recorded'}</span>`;
+      }
+      const rows = issues
+            .map((iss) => {
+                  const probs = (iss.problems || []).filter(Boolean).join(', ');
+                  const priceStr =
+                        iss.estimatedPrice != null && Number(iss.estimatedPrice) > 0
+                              ? `${currSymbol}${Number(iss.estimatedPrice).toFixed(2)}`
+                              : 'Price TBC';
+                  const partHtml = iss.partName ? ` <span style="color:#6b7280;">(Part: ${iss.partName})</span>` : '';
+                  return `<li style="margin:4px 0;"><strong>${iss.category}</strong>${probs ? `: ${probs}` : ''}${partHtml} &mdash; <strong>${priceStr}</strong></li>`;
+            })
+            .join('');
+      return `<ul style="margin:6px 0 0 18px; padding:0;">${rows}</ul>`;
+};
+
+export const renderRepairPhotosHtml = (bookingPhotos?: string[], completionPhotos?: string[]): string => {
+      const booking = (bookingPhotos || []).filter((u) => /^https?:\/\//i.test(u));
+      const completion = (completionPhotos || []).filter((u) => /^https?:\/\//i.test(u));
+      if (booking.length === 0 && completion.length === 0) return '';
+
+      const renderGroup = (title: string, urls: string[]) => {
+            if (urls.length === 0) return '';
+            const thumbs = urls
+                  .map(
+                        (u, idx) =>
+                              `<a href="${u}" target="_blank" style="display:inline-block; margin:4px 6px 4px 0; border:1px solid #d1d5db; border-radius:6px; overflow:hidden; text-decoration:none;"><img src="${u}" alt="${title} ${idx + 1}" width="84" height="84" style="display:block; object-fit:cover; width:84px; height:84px;" /></a>`
+                  )
+                  .join('');
+            return `
+            <div style="margin-bottom:10px;">
+              <div style="font-size:12px; font-weight:700; color:#374151; margin-bottom:4px;">${title} (${urls.length})</div>
+              <div>${thumbs}</div>
+            </div>`;
+      };
+
+      return `
+        <div style="background-color:#f9fafb; border:1px solid #e5e7eb; border-radius:8px; padding:14px 16px; margin:16px 0;">
+          <div style="font-size:12px; font-weight:700; text-transform:uppercase; color:#1f2937; margin-bottom:8px;">
+            Inspection & Completion Photos (Also Attached)
+          </div>
+          ${renderGroup('Booking Photos', booking)}
+          ${renderGroup('Completion Photos', completion)}
+        </div>`;
+};
 
 const getStatusBadgeColors = (status: string): { bg: string; text: string; border: string } => {
       switch (status) {
@@ -49,6 +124,7 @@ const getStatusBadgeColors = (status: string): { bg: string; text: string; borde
             case 'quote-sent':
                   return { bg: '#FCE7F3', text: '#DB2777', border: '#EC4899' };
             case 'completed':
+            case 'ready-for-collection':
             case 'approved':
                   return { bg: '#D1FAE5', text: '#059669', border: '#10B981' };
             case 'rejected':
@@ -272,12 +348,17 @@ export const generateRepairStatusEmailHTML = (data: RepairStatusEmailData): stri
           }
 
           <div class="details-card">
-            <div class="detail-row"><span class="detail-label">Request ID:</span> #${requestId.toUpperCase()}</div>
+            <div class="detail-row"><span class="detail-label">Job Reference:</span> ${data.orderNumber || `#${requestId.toUpperCase()}`}</div>
             <div class="detail-row"><span class="detail-label">Device Model:</span> ${deviceModel}</div>
-            ${imei ? `<div class="detail-row"><span class="detail-label">IMEI / Serial:</span> ${imei}</div>` : ''}
-            <div class="detail-row"><span class="detail-label">Issue:</span> ${description}</div>
+            ${data.condition ? `<div class="detail-row"><span class="detail-label">Intake Condition:</span> ${data.condition}</div>` : ''}
+            ${data.colour ? `<div class="detail-row"><span class="detail-label">Colour:</span> ${data.colour}</div>` : ''}
+            ${imei ? `<div class="detail-row"><span class="detail-label">IMEI Number:</span> ${imei}</div>` : ''}
+            ${data.serialNumber ? `<div class="detail-row"><span class="detail-label">Serial Number:</span> ${data.serialNumber}</div>` : ''}
+            <div class="detail-row"><span class="detail-label">Reported Issues:</span> ${renderIssuesListHtml(data.issues, description, currSymbol)}</div>
             ${priceDisplay ? `<div class="detail-row"><span class="detail-label">Estimated Price:</span> ${priceDisplay}</div>` : ''}
           </div>
+
+          ${renderRepairPhotosHtml(data.bookingPhotos, data.completionPhotos)}
 
           ${
                 technicianFeedback
@@ -465,12 +546,18 @@ export const generateCompletionEmailHTML = (data: CompletionEmailData): string =
           </p>
           
           <div class="card">
+            <p><span class="label">Job Reference:</span> ${data.orderNumber || `#${requestId}`}</p>
             <p><span class="label">Device Model:</span> ${deviceModel}</p>
-            <p><span class="label">Issue Description:</span> ${description}</p>
+            ${data.condition ? `<p><span class="label">Intake Condition:</span> ${data.condition}</p>` : ''}
+            ${data.colour ? `<p><span class="label">Colour:</span> ${data.colour}</p>` : ''}
+            ${data.imei ? `<p><span class="label">IMEI Number:</span> ${data.imei}</p>` : ''}
+            ${data.serialNumber ? `<p><span class="label">Serial Number:</span> ${data.serialNumber}</p>` : ''}
+            <div style="margin:8px 0; color:#374151; font-size:14px;"><span class="label">Reported Issues:</span> ${renderIssuesListHtml(data.issues, description, currSymbol)}</div>
             <p><span class="label">Final Price:</span> ${priceDisplay}</p>
             <p><span class="label">Completion Date:</span> ${completionDate}</p>
-            <p><span class="label">Request ID:</span> #${requestId}</p>
           </div>
+
+          ${renderRepairPhotosHtml(data.bookingPhotos, data.completionPhotos)}
           
           <div style="text-align: center; margin: 24px 0;">
             <span class="status-badge">&#10003; Completed</span>

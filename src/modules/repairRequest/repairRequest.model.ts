@@ -52,6 +52,41 @@ const EvidencePhotoSchema = new Schema(
                   index: true,
             },
             usedFor: { type: String, default: 'Repair diagnosis only' },
+            photoType: {
+                  type: String,
+                  enum: ['booking', 'completion', 'note'],
+                  default: 'booking',
+            },
+      },
+      { _id: false }
+);
+
+const DevicePasscodeSchema = new Schema(
+      {
+            type: {
+                  type: String,
+                  enum: ['none', 'pin', 'password', 'pattern'],
+                  default: 'none',
+            },
+            encryptedValue: {
+                  type: String,
+                  select: false,
+            },
+            isSet: {
+                  type: Boolean,
+                  default: false,
+            },
+            maskedValue: {
+                  type: String,
+                  default: '',
+            },
+            lengthHint: {
+                  type: Number,
+                  default: 0,
+            },
+            updatedAt: {
+                  type: Date,
+            },
       },
       { _id: false }
 );
@@ -80,6 +115,11 @@ const RepairRequestSchema = new Schema<IRepairRequest>(
                   ref: 'Shop',
                   default: null,
             },
+            customerId: {
+                  type: Schema.Types.ObjectId,
+                  ref: 'Customer',
+                  default: null,
+            },
             firstName: { type: String, required: true },
             email: { type: String, default: '' },
             phoneNumber: { type: String, required: true },
@@ -104,7 +144,11 @@ const RepairRequestSchema = new Schema<IRepairRequest>(
                   set: (val: string) => (val ? val.toLowerCase() : 'imei'),
             },
             serialNumber: { type: String, default: '' },
-            IMEINumber: { type: String },
+            IMEINumber: { type: String, default: '' },
+            devicePasscode: {
+                  type: DevicePasscodeSchema,
+                  default: () => ({ type: 'none', isSet: false, maskedValue: '', lengthHint: 0 }),
+            },
             description: { type: String, required: true },
             issues: [RepairIssueSchema],
             evidencePhotos: [EvidencePhotoSchema],
@@ -116,16 +160,19 @@ const RepairRequestSchema = new Schema<IRepairRequest>(
                   enum: [
                         'inProgress',
                         'quote_sent',
+                        'quote-sent',
                         'approved',
                         'rejected',
                         'completed',
                         'collected',
+                        'ready-for-collection',
                         'inReview',
                         'start-work',
                         'waiting-for-parts',
                         'order-assigned',
                         'diagnosing',
                         'repairing',
+                        'reassigned',
                         'unable-to-repair',
                   ],
                   default: 'inProgress',
@@ -145,6 +192,22 @@ const RepairRequestSchema = new Schema<IRepairRequest>(
       {
             timestamps: true,
             versionKey: false,
+            toJSON: {
+                  transform(_doc, ret: any) {
+                        if (ret.devicePasscode) {
+                              delete ret.devicePasscode.encryptedValue;
+                        }
+                        return ret;
+                  },
+            },
+            toObject: {
+                  transform(_doc, ret: any) {
+                        if (ret.devicePasscode) {
+                              delete ret.devicePasscode.encryptedValue;
+                        }
+                        return ret;
+                  },
+            },
       }
 );
 

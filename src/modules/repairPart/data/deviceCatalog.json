@@ -51,7 +51,7 @@
   {
     "brand": "Apple",
     "deviceType": "Phone",
-    "modelName": "iPhone SE — 1st generation",
+    "modelName": "iPhone SE (1st generation)",
     "releaseYear": "2016",
     "modelCode": "A1723"
   },
@@ -135,7 +135,7 @@
   {
     "brand": "Apple",
     "deviceType": "Phone",
-    "modelName": "iPhone SE — 2nd generation",
+    "modelName": "iPhone SE (2nd generation)",
     "releaseYear": "2020",
     "modelCode": "A2296"
   },
@@ -198,7 +198,7 @@
   {
     "brand": "Apple",
     "deviceType": "Phone",
-    "modelName": "iPhone SE — 3rd generation",
+    "modelName": "iPhone SE (3rd generation)",
     "releaseYear": "2022",
     "modelCode": "A2783"
   },
@@ -352,7 +352,7 @@
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "iPad — 1st generation",
+    "modelName": "iPad (1st generation)",
     "releaseYear": "2010",
     "modelCode": "A1219"
   },
@@ -366,56 +366,56 @@
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "iPad — 3rd generation",
+    "modelName": "iPad (3rd generation)",
     "releaseYear": "2012",
     "modelCode": "A1416"
   },
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "iPad — 4th generation",
+    "modelName": "iPad (4th generation)",
     "releaseYear": "2012",
     "modelCode": "A1458"
   },
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "iPad — 5th generation",
+    "modelName": "iPad (5th generation)",
     "releaseYear": "2017",
     "modelCode": "A1822"
   },
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "iPad — 6th generation",
+    "modelName": "iPad (6th generation)",
     "releaseYear": "2018",
     "modelCode": "A1893"
   },
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "iPad — 7th generation",
+    "modelName": "iPad (7th generation)",
     "releaseYear": "2019",
     "modelCode": "A2197"
   },
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "iPad — 8th generation",
+    "modelName": "iPad (8th generation)",
     "releaseYear": "2020",
     "modelCode": "A2270"
   },
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "iPad — 9th generation",
+    "modelName": "iPad (9th generation)",
     "releaseYear": "2021",
     "modelCode": "A2602"
   },
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "iPad — 10th generation",
+    "modelName": "iPad (10th generation)",
     "releaseYear": "2022",
     "modelCode": "A2696"
   },
@@ -429,7 +429,7 @@
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "iPad mini — 1st generation",
+    "modelName": "iPad mini (1st generation)",
     "releaseYear": "2012",
     "modelCode": "A1432"
   },
@@ -457,14 +457,14 @@
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "iPad mini — 5th generation",
+    "modelName": "iPad mini (5th generation)",
     "releaseYear": "2019",
     "modelCode": "A2133"
   },
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "iPad mini — 6th generation",
+    "modelName": "iPad mini (6th generation)",
     "releaseYear": "2021",
     "modelCode": "A2567"
   },
@@ -478,7 +478,7 @@
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "iPad Air — 1st generation",
+    "modelName": "iPad Air (1st generation)",
     "releaseYear": "2013",
     "modelCode": "A1474"
   },
@@ -492,21 +492,21 @@
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "iPad Air — 3rd generation",
+    "modelName": "iPad Air (3rd generation)",
     "releaseYear": "2019",
     "modelCode": "A2152"
   },
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "iPad Air — 4th generation",
+    "modelName": "iPad Air (4th generation)",
     "releaseYear": "2020",
     "modelCode": "A2316"
   },
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "iPad Air — 5th generation, M1",
+    "modelName": "iPad Air (5th generation, M1)",
     "releaseYear": "2022",
     "modelCode": "A2588"
   },
@@ -555,7 +555,7 @@
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "iPad Pro 12.9-inch — 1st generation",
+    "modelName": "iPad Pro 12.9-inch (1st generation)",
     "releaseYear": "2015",
     "modelCode": "A1584"
   },
@@ -576,63 +576,63 @@
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "iPad Pro 12.9-inch — 2nd generation",
+    "modelName": "iPad Pro 12.9-inch (2nd generation)",
     "releaseYear": "2017",
     "modelCode": "A1670"
   },
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "iPad Pro 11-inch — 1st generation",
+    "modelName": "iPad Pro 11-inch (1st generation)",
     "releaseYear": "2018",
     "modelCode": "A1980"
   },
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "iPad Pro 12.9-inch — 3rd generation",
+    "modelName": "iPad Pro 12.9-inch (3rd generation)",
     "releaseYear": "2018",
     "modelCode": "A1876"
   },
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "iPad Pro 11-inch — 2nd generation",
+    "modelName": "iPad Pro 11-inch (2nd generation)",
     "releaseYear": "2020",
     "modelCode": "A2228"
   },
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "iPad Pro 12.9-inch — 4th generation",
+    "modelName": "iPad Pro 12.9-inch (4th generation)",
     "releaseYear": "2020",
     "modelCode": "A2229"
   },
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "iPad Pro 11-inch — 3rd generation, M1",
+    "modelName": "iPad Pro 11-inch (3rd generation, M1)",
     "releaseYear": "2021",
     "modelCode": "A2377"
   },
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "iPad Pro 12.9-inch — 5th generation, M1",
+    "modelName": "iPad Pro 12.9-inch (5th generation, M1)",
     "releaseYear": "2021",
     "modelCode": "A2378"
   },
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "iPad Pro 11-inch — 4th generation, M2",
+    "modelName": "iPad Pro 11-inch (4th generation, M2)",
     "releaseYear": "2022",
     "modelCode": "A2759"
   },
   {
     "brand": "Apple",
     "deviceType": "Tablet",
-    "modelName": "iPad Pro 12.9-inch — 6th generation, M2",
+    "modelName": "iPad Pro 12.9-inch (6th generation, M2)",
     "releaseYear": "2022",
     "modelCode": "A2436"
   },
@@ -667,21 +667,21 @@
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook 13-inch — white/black polycarbonate",
+    "modelName": "MacBook 13-inch (Polycarbonate)",
     "releaseYear": "2006–2009",
     "modelCode": "A1181"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook 13-inch — aluminium, Late 2008",
+    "modelName": "MacBook 13-inch (Aluminium)",
     "releaseYear": "2008",
     "modelCode": "A1278"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook 13-inch — white unibody",
+    "modelName": "MacBook 13-inch (White Unibody)",
     "releaseYear": "2009–2010",
     "modelCode": "A1342"
   },
@@ -695,7 +695,7 @@
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Air 13-inch — original",
+    "modelName": "MacBook Air 13-inch (Original)",
     "releaseYear": "2008",
     "modelCode": "A1237"
   },
@@ -737,91 +737,91 @@
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Air Retina 13-inch — Intel",
+    "modelName": "MacBook Air Retina 13-inch (Intel)",
     "releaseYear": "2018–2019",
     "modelCode": "A1932"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Air Retina 13-inch — Intel",
+    "modelName": "MacBook Air Retina 13-inch (Intel)",
     "releaseYear": "2020",
     "modelCode": "A2179"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Air 13-inch — M1",
+    "modelName": "MacBook Air 13-inch (M1)",
     "releaseYear": "2020",
     "modelCode": "A2337"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Air 13-inch — M2",
+    "modelName": "MacBook Air 13-inch (M2)",
     "releaseYear": "2022",
     "modelCode": "A2681"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Air 15-inch — M2",
+    "modelName": "MacBook Air 15-inch (M2)",
     "releaseYear": "2023",
     "modelCode": "A2941"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Air 13-inch — M3",
+    "modelName": "MacBook Air 13-inch (M3)",
     "releaseYear": "2024",
     "modelCode": "A3113"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Air 15-inch — M3",
+    "modelName": "MacBook Air 15-inch (M3)",
     "releaseYear": "2024",
     "modelCode": "A3114"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Air 13-inch — M4",
+    "modelName": "MacBook Air 13-inch (M4)",
     "releaseYear": "2025",
     "modelCode": "A3240"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Air 15-inch — M4",
+    "modelName": "MacBook Air 15-inch (M4)",
     "releaseYear": "2025",
     "modelCode": "A3241"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Air 13-inch — M5",
+    "modelName": "MacBook Air 13-inch (M5)",
     "releaseYear": "2026",
     "modelCode": "A3449"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Air 15-inch — M5",
+    "modelName": "MacBook Air 15-inch (M5)",
     "releaseYear": "2026",
     "modelCode": "A3448"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 15-inch — Core Duo",
+    "modelName": "MacBook Pro 15-inch (Core Duo)",
     "releaseYear": "2006",
     "modelCode": "A1150"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 15-inch — Core 2 Duo",
+    "modelName": "MacBook Pro 15-inch (Core 2 Duo)",
     "releaseYear": "2006",
     "modelCode": "A1211"
   },
@@ -842,14 +842,14 @@
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 17-inch — Core Duo",
+    "modelName": "MacBook Pro 17-inch (Core Duo)",
     "releaseYear": "2006",
     "modelCode": "A1151"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 17-inch — Core 2 Duo",
+    "modelName": "MacBook Pro 17-inch (Core 2 Duo)",
     "releaseYear": "2006",
     "modelCode": "A1212"
   },
@@ -870,21 +870,21 @@
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 13-inch — unibody, non-Retina",
+    "modelName": "MacBook Pro 13-inch (Unibody)",
     "releaseYear": "2009–2012",
     "modelCode": "A1278"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 15-inch — unibody, non-Retina",
+    "modelName": "MacBook Pro 15-inch (Unibody)",
     "releaseYear": "2008–2012",
     "modelCode": "A1286"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 17-inch — unibody",
+    "modelName": "MacBook Pro 17-inch (Unibody)",
     "releaseYear": "2009–2011",
     "modelCode": "A1297"
   },
@@ -912,196 +912,196 @@
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 13-inch — two Thunderbolt 3 ports (2016, 2017)",
-    "releaseYear": "2016",
+    "modelName": "MacBook Pro 13-inch (2x TB3)",
+    "releaseYear": "2016–2017",
     "modelCode": "A1708"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 13-inch — four Thunderbolt 3 ports, Touch Bar (2016, 2017)",
-    "releaseYear": "2016",
+    "modelName": "MacBook Pro 13-inch (Touch Bar, 4x TB3)",
+    "releaseYear": "2016–2017",
     "modelCode": "A1706"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 15-inch — Touch Bar (2016, 2017)",
-    "releaseYear": "2016",
+    "modelName": "MacBook Pro 15-inch (Touch Bar)",
+    "releaseYear": "2016–2017",
     "modelCode": "A1707"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 13-inch — four Thunderbolt 3 ports, Touch Bar (2018, 2019)",
-    "releaseYear": "2018",
+    "modelName": "MacBook Pro 13-inch (Touch Bar, 4x TB3)",
+    "releaseYear": "2018–2019",
     "modelCode": "A1989"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 15-inch — Touch Bar (2018, 2019)",
-    "releaseYear": "2018",
+    "modelName": "MacBook Pro 15-inch (Touch Bar)",
+    "releaseYear": "2018–2019",
     "modelCode": "A1990"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 13-inch — two Thunderbolt 3 ports, Touch Bar (2019)",
+    "modelName": "MacBook Pro 13-inch (Touch Bar, 2x TB3)",
     "releaseYear": "2019",
     "modelCode": "A2159"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 16-inch — Intel (2019)",
+    "modelName": "MacBook Pro 16-inch (Intel)",
     "releaseYear": "2019",
     "modelCode": "A2141"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 13-inch — Intel, two Thunderbolt 3 ports (2020)",
+    "modelName": "MacBook Pro 13-inch (Intel, 2x TB3)",
     "releaseYear": "2020",
     "modelCode": "A2289"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 13-inch — Intel, four Thunderbolt 3 ports (2020)",
+    "modelName": "MacBook Pro 13-inch (Intel, 4x TB3)",
     "releaseYear": "2020",
     "modelCode": "A2251"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 13-inch — M1",
+    "modelName": "MacBook Pro 13-inch (M1)",
     "releaseYear": "2020",
     "modelCode": "A2338"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 14-inch — M1 Pro / M1 Max",
+    "modelName": "MacBook Pro 14-inch (M1 Pro / Max)",
     "releaseYear": "2021",
     "modelCode": "A2442"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 16-inch — M1 Pro / M1 Max",
+    "modelName": "MacBook Pro 16-inch (M1 Pro / Max)",
     "releaseYear": "2021",
     "modelCode": "A2485"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 13-inch — M2",
+    "modelName": "MacBook Pro 13-inch (M2)",
     "releaseYear": "2022",
     "modelCode": "A2338"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 14-inch — M2 Pro / M2 Max",
+    "modelName": "MacBook Pro 14-inch (M2 Pro / Max)",
     "releaseYear": "2023",
     "modelCode": "A2779"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 16-inch — M2 Pro / M2 Max",
+    "modelName": "MacBook Pro 16-inch (M2 Pro / Max)",
     "releaseYear": "2023",
     "modelCode": "A2780"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 14-inch — M3",
+    "modelName": "MacBook Pro 14-inch (M3)",
     "releaseYear": "2023",
     "modelCode": "A2918"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 14-inch — M3 Pro / M3 Max",
+    "modelName": "MacBook Pro 14-inch (M3 Pro / Max)",
     "releaseYear": "2023",
     "modelCode": "A2992"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 16-inch — M3 Pro / M3 Max",
+    "modelName": "MacBook Pro 16-inch (M3 Pro / Max)",
     "releaseYear": "2023",
     "modelCode": "A2991"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 14-inch — M4",
+    "modelName": "MacBook Pro 14-inch (M4)",
     "releaseYear": "2024",
     "modelCode": "A3112"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 14-inch — M4 Pro",
+    "modelName": "MacBook Pro 14-inch (M4 Pro)",
     "releaseYear": "2024",
     "modelCode": "A3401"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 14-inch — M4 Max",
+    "modelName": "MacBook Pro 14-inch (M4 Max)",
     "releaseYear": "2024",
     "modelCode": "A3185"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 16-inch — M4 Pro",
+    "modelName": "MacBook Pro 16-inch (M4 Pro)",
     "releaseYear": "2024",
     "modelCode": "A3403"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 16-inch — M4 Max",
+    "modelName": "MacBook Pro 16-inch (M4 Max)",
     "releaseYear": "2024",
     "modelCode": "A3186"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 14-inch — M5",
+    "modelName": "MacBook Pro 14-inch (M5)",
     "releaseYear": "2025",
     "modelCode": "A3434"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 14-inch — M5 Pro",
+    "modelName": "MacBook Pro 14-inch (M5 Pro)",
     "releaseYear": "2026",
     "modelCode": "A3426"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 14-inch — M5 Max",
+    "modelName": "MacBook Pro 14-inch (M5 Max)",
     "releaseYear": "2026",
     "modelCode": "A3427"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 16-inch — M5 Pro",
+    "modelName": "MacBook Pro 16-inch (M5 Pro)",
     "releaseYear": "2026",
     "modelCode": "A3428"
   },
   {
     "brand": "Apple",
     "deviceType": "Laptop",
-    "modelName": "MacBook Pro 16-inch — M5 Max",
+    "modelName": "MacBook Pro 16-inch (M5 Max)",
     "releaseYear": "2026",
     "modelCode": "A3429"
   },
@@ -1409,7 +1409,7 @@
   {
     "brand": "Samsung",
     "deviceType": "Phone",
-    "modelName": "Galaxy A12 Nacho — different hardware",
+    "modelName": "Galaxy A12 Nacho",
     "releaseYear": "2021",
     "modelCode": "SM-A127F"
   },
@@ -1493,14 +1493,14 @@
   {
     "brand": "Samsung",
     "deviceType": "Phone",
-    "modelName": "Galaxy A13 4G — original hardware",
+    "modelName": "Galaxy A13 4G",
     "releaseYear": "2022",
     "modelCode": "SM-A135F"
   },
   {
     "brand": "Samsung",
     "deviceType": "Phone",
-    "modelName": "Galaxy A13 4G — alternative hardware",
+    "modelName": "Galaxy A13 4G",
     "releaseYear": "2022",
     "modelCode": "SM-A137F"
   },
@@ -1892,7 +1892,7 @@
   {
     "brand": "Samsung",
     "deviceType": "Phone",
-    "modelName": "Galaxy S II — NFC variant",
+    "modelName": "Galaxy S II NFC",
     "releaseYear": "2011",
     "modelCode": "GT-I9100P"
   },
@@ -1922,7 +1922,7 @@
     "deviceType": "Phone",
     "modelName": "Galaxy S III mini",
     "releaseYear": "2012",
-    "modelCode": "GT-I8190 / GT-I8190N"
+    "modelCode": "GT-I8190"
   },
   {
     "brand": "Samsung",
@@ -1955,7 +1955,7 @@
   {
     "brand": "Samsung",
     "deviceType": "Phone",
-    "modelName": "Galaxy S4 Zoom — LTE",
+    "modelName": "Galaxy S4 Zoom LTE",
     "releaseYear": "2013",
     "modelCode": "SM-C105"
   },
@@ -2137,21 +2137,21 @@
   {
     "brand": "Samsung",
     "deviceType": "Phone",
-    "modelName": "Galaxy S20 FE 4G — Exynos",
+    "modelName": "Galaxy S20 FE 4G",
     "releaseYear": "2020",
     "modelCode": "SM-G780F"
   },
   {
     "brand": "Samsung",
     "deviceType": "Phone",
-    "modelName": "Galaxy S20 FE 5G — Snapdragon",
+    "modelName": "Galaxy S20 FE 5G",
     "releaseYear": "2020",
     "modelCode": "SM-G781B"
   },
   {
     "brand": "Samsung",
     "deviceType": "Phone",
-    "modelName": "Galaxy S20 FE 4G — Snapdragon revision",
+    "modelName": "Galaxy S20 FE 4G",
     "releaseYear": "2021",
     "modelCode": "SM-G780G"
   },
@@ -2326,7 +2326,7 @@
   {
     "brand": "Samsung",
     "deviceType": "Phone",
-    "modelName": "Galaxy Z Flip — 4G",
+    "modelName": "Galaxy Z Flip 4G",
     "releaseYear": "2020",
     "modelCode": "SM-F700F"
   },
@@ -2389,7 +2389,7 @@
   {
     "brand": "Samsung",
     "deviceType": "Phone",
-    "modelName": "Galaxy Fold 5G — original UK model",
+    "modelName": "Galaxy Fold 5G",
     "releaseYear": "2019",
     "modelCode": "SM-F907B"
   },
@@ -2658,5 +2658,1902 @@
     "modelName": "OnePlus Open",
     "releaseYear": "2023",
     "modelCode": "CPH2551"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Phone",
+    "modelName": "Galaxy S III mini NFC",
+    "releaseYear": "2012",
+    "modelCode": "GT-I8190N"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Tablet",
+    "modelName": "iPad (1st generation) Cellular",
+    "releaseYear": "2010",
+    "modelCode": "A1337"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Tablet",
+    "modelName": "iPad (2nd generation) Cellular",
+    "releaseYear": "2011",
+    "modelCode": "A1396"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Tablet",
+    "modelName": "iPad (3rd generation) Cellular",
+    "releaseYear": "2012",
+    "modelCode": "A1430"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Tablet",
+    "modelName": "iPad (4th generation) Cellular",
+    "releaseYear": "2012",
+    "modelCode": "A1460"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Tablet",
+    "modelName": "iPad (5th generation) Cellular",
+    "releaseYear": "2017",
+    "modelCode": "A1823"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Tablet",
+    "modelName": "iPad (6th generation) Cellular",
+    "releaseYear": "2018",
+    "modelCode": "A1954"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Tablet",
+    "modelName": "iPad (7th generation) Cellular",
+    "releaseYear": "2019",
+    "modelCode": "A2198"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Tablet",
+    "modelName": "iPad (8th generation) Cellular",
+    "releaseYear": "2020",
+    "modelCode": "A2428"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Tablet",
+    "modelName": "iPad (9th generation) Cellular",
+    "releaseYear": "2021",
+    "modelCode": "A2604"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Tablet",
+    "modelName": "iPad (10th generation) Cellular",
+    "releaseYear": "2022",
+    "modelCode": "A2757"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Tablet",
+    "modelName": "iPad (A16) Cellular",
+    "releaseYear": "2025",
+    "modelCode": "A3355"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Tablet",
+    "modelName": "iPad mini (1st generation) Cellular",
+    "releaseYear": "2012",
+    "modelCode": "A1455"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Tablet",
+    "modelName": "iPad mini 2 Cellular",
+    "releaseYear": "2013",
+    "modelCode": "A1490"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Tablet",
+    "modelName": "iPad mini 3 Cellular",
+    "releaseYear": "2014",
+    "modelCode": "A1600"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Tablet",
+    "modelName": "iPad mini 4 Cellular",
+    "releaseYear": "2015",
+    "modelCode": "A1550"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Tablet",
+    "modelName": "iPad mini (5th generation) Cellular",
+    "releaseYear": "2019",
+    "modelCode": "A2124"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Tablet",
+    "modelName": "iPad mini (6th generation) Cellular",
+    "releaseYear": "2021",
+    "modelCode": "A2568"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Tablet",
+    "modelName": "iPad mini (A17 Pro) Cellular",
+    "releaseYear": "2024",
+    "modelCode": "A2995"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Tablet",
+    "modelName": "iPad mini (A20 Pro)",
+    "releaseYear": "2026",
+    "modelCode": "A3595"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Tablet",
+    "modelName": "iPad mini (A20 Pro) Cellular",
+    "releaseYear": "2026",
+    "modelCode": "A3596"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Tablet",
+    "modelName": "iPad Air (1st generation) Cellular",
+    "releaseYear": "2013",
+    "modelCode": "A1475"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Tablet",
+    "modelName": "iPad Air 2 Cellular",
+    "releaseYear": "2014",
+    "modelCode": "A1567"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Tablet",
+    "modelName": "iPad Air (3rd generation) Cellular",
+    "releaseYear": "2019",
+    "modelCode": "A2123"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Tablet",
+    "modelName": "iPad Air (4th generation) Cellular",
+    "releaseYear": "2020",
+    "modelCode": "A2072"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Tablet",
+    "modelName": "iPad Air (5th generation, M1) Cellular",
+    "releaseYear": "2022",
+    "modelCode": "A2589"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Tablet",
+    "modelName": "iPad Air 11-inch (M2) Cellular",
+    "releaseYear": "2024",
+    "modelCode": "A2903"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Tablet",
+    "modelName": "iPad Air 13-inch (M2) Cellular",
+    "releaseYear": "2024",
+    "modelCode": "A2899"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Tablet",
+    "modelName": "iPad Air 11-inch (M3) Cellular",
+    "releaseYear": "2025",
+    "modelCode": "A3267"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Tablet",
+    "modelName": "iPad Air 13-inch (M3) Cellular",
+    "releaseYear": "2025",
+    "modelCode": "A3269"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Tablet",
+    "modelName": "iPad Air 11-inch (M4) Cellular",
+    "releaseYear": "2026",
+    "modelCode": "A3460"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Tablet",
+    "modelName": "iPad Air 13-inch (M4) Cellular",
+    "releaseYear": "2026",
+    "modelCode": "A3462"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Tablet",
+    "modelName": "iPad Pro 12.9-inch (1st generation) Cellular",
+    "releaseYear": "2015",
+    "modelCode": "A1652"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Tablet",
+    "modelName": "iPad Pro 9.7-inch Cellular",
+    "releaseYear": "2016",
+    "modelCode": "A1674"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Tablet",
+    "modelName": "iPad Pro 10.5-inch Cellular",
+    "releaseYear": "2017",
+    "modelCode": "A1709"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Tablet",
+    "modelName": "iPad Pro 12.9-inch (2nd generation) Cellular",
+    "releaseYear": "2017",
+    "modelCode": "A1671"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Tablet",
+    "modelName": "iPad Pro 11-inch (1st generation) Cellular",
+    "releaseYear": "2018",
+    "modelCode": "A1934"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Tablet",
+    "modelName": "iPad Pro 12.9-inch (3rd generation) Cellular",
+    "releaseYear": "2018",
+    "modelCode": "A1895"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Tablet",
+    "modelName": "iPad Pro 11-inch (2nd generation) Cellular",
+    "releaseYear": "2020",
+    "modelCode": "A2230"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Tablet",
+    "modelName": "iPad Pro 12.9-inch (4th generation) Cellular",
+    "releaseYear": "2020",
+    "modelCode": "A2232"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Tablet",
+    "modelName": "iPad Pro 11-inch (3rd generation, M1) Cellular",
+    "releaseYear": "2021",
+    "modelCode": "A2459"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Tablet",
+    "modelName": "iPad Pro 12.9-inch (5th generation, M1) Cellular",
+    "releaseYear": "2021",
+    "modelCode": "A2461"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Tablet",
+    "modelName": "iPad Pro 11-inch (4th generation, M2) Cellular",
+    "releaseYear": "2022",
+    "modelCode": "A2761"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Tablet",
+    "modelName": "iPad Pro 12.9-inch (6th generation, M2) Cellular",
+    "releaseYear": "2022",
+    "modelCode": "A2764"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Tablet",
+    "modelName": "iPad Pro 11-inch (M4) Cellular",
+    "releaseYear": "2024",
+    "modelCode": "A2837"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Tablet",
+    "modelName": "iPad Pro 13-inch (M4) Cellular",
+    "releaseYear": "2024",
+    "modelCode": "A2926"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Tablet",
+    "modelName": "iPad Pro 11-inch (M5) Cellular",
+    "releaseYear": "2025",
+    "modelCode": "A3358"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Tablet",
+    "modelName": "iPad Pro 13-inch (M5) Cellular",
+    "releaseYear": "2025",
+    "modelCode": "A3361"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Watch",
+    "modelName": "Apple Watch Series 10 GPS + Cellular",
+    "releaseYear": "2024",
+    "modelCode": "A2999"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Watch",
+    "modelName": "Apple Watch Series 11 GPS",
+    "releaseYear": "2025",
+    "modelCode": "A3331"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Watch",
+    "modelName": "Apple Watch Series 11 GPS + Cellular",
+    "releaseYear": "2025",
+    "modelCode": "A3335"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Watch",
+    "modelName": "Apple Watch SE 3 GPS",
+    "releaseYear": "2025",
+    "modelCode": "A3324"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Watch",
+    "modelName": "Apple Watch SE 3 GPS + Cellular",
+    "releaseYear": "2025",
+    "modelCode": "A3325"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Watch",
+    "modelName": "Apple Watch Ultra 3",
+    "releaseYear": "2025",
+    "modelCode": "A3281"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Watch",
+    "modelName": "Apple Watch Series 12 GPS",
+    "releaseYear": "2026",
+    "modelCode": "A3581"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Watch",
+    "modelName": "Apple Watch Series 12 GPS + Cellular",
+    "releaseYear": "2026",
+    "modelCode": "A3584"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Watch",
+    "modelName": "Apple Watch Ultra 4",
+    "releaseYear": "2026",
+    "modelCode": "A3579"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Laptop",
+    "modelName": "MacBook Pro 14-inch (M5 Pro, PROLED XDR)",
+    "releaseYear": "2026",
+    "modelCode": "A3468"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Laptop",
+    "modelName": "MacBook Pro 14-inch (M5 Max, PROLED XDR)",
+    "releaseYear": "2026",
+    "modelCode": "A3375"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Laptop",
+    "modelName": "MacBook Pro 16-inch (M5 Pro, PROLED XDR)",
+    "releaseYear": "2026",
+    "modelCode": "A3469"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Laptop",
+    "modelName": "MacBook Pro 16-inch (M5 Max, PROLED XDR)",
+    "releaseYear": "2026",
+    "modelCode": "A3376"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Laptop",
+    "modelName": "MacBook Pro 14-inch (M6)",
+    "releaseYear": "2026",
+    "modelCode": "A3536"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Desktop",
+    "modelName": "iMac 21.5-inch",
+    "releaseYear": "2010–2011",
+    "modelCode": "A1311"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Desktop",
+    "modelName": "iMac 27-inch",
+    "releaseYear": "2010–2011",
+    "modelCode": "A1312"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Desktop",
+    "modelName": "iMac 21.5-inch (Slim)",
+    "releaseYear": "2012–2017",
+    "modelCode": "A1418"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Desktop",
+    "modelName": "iMac 27-inch Retina 5K",
+    "releaseYear": "2014–2017",
+    "modelCode": "A1419"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Desktop",
+    "modelName": "iMac Pro 27-inch",
+    "releaseYear": "2017",
+    "modelCode": "A1862"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Desktop",
+    "modelName": "iMac 21.5-inch Retina 4K",
+    "releaseYear": "2019",
+    "modelCode": "A2116"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Desktop",
+    "modelName": "iMac 27-inch Retina 5K",
+    "releaseYear": "2019–2020",
+    "modelCode": "A2115"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Desktop",
+    "modelName": "iMac 24-inch (M1, 2 Ports)",
+    "releaseYear": "2021",
+    "modelCode": "A2439"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Desktop",
+    "modelName": "iMac 24-inch (M1, 4 Ports)",
+    "releaseYear": "2021",
+    "modelCode": "A2438"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Desktop",
+    "modelName": "iMac 24-inch (M3, 2 Ports)",
+    "releaseYear": "2023",
+    "modelCode": "A2874"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Desktop",
+    "modelName": "iMac 24-inch (M3, 4 Ports)",
+    "releaseYear": "2023",
+    "modelCode": "A2873"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Desktop",
+    "modelName": "iMac 24-inch (M4, 2 Ports)",
+    "releaseYear": "2024",
+    "modelCode": "A3247"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Desktop",
+    "modelName": "iMac 24-inch (M4, 4 Ports)",
+    "releaseYear": "2024",
+    "modelCode": "A3137"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Desktop",
+    "modelName": "iMac 24-inch (M6, 2 Ports)",
+    "releaseYear": "2026",
+    "modelCode": "A3589"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Desktop",
+    "modelName": "iMac 24-inch (M6, 4 Ports)",
+    "releaseYear": "2026",
+    "modelCode": "A3590"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Desktop",
+    "modelName": "Mac mini (Intel)",
+    "releaseYear": "2010–2014",
+    "modelCode": "A1347"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Desktop",
+    "modelName": "Mac mini (Intel, Space Grey)",
+    "releaseYear": "2018",
+    "modelCode": "A1993"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Desktop",
+    "modelName": "Mac mini (M1)",
+    "releaseYear": "2020",
+    "modelCode": "A2348"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Desktop",
+    "modelName": "Mac mini (M2)",
+    "releaseYear": "2023",
+    "modelCode": "A2686"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Desktop",
+    "modelName": "Mac mini (M2 Pro)",
+    "releaseYear": "2023",
+    "modelCode": "A2816"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Desktop",
+    "modelName": "Mac mini (M4)",
+    "releaseYear": "2024",
+    "modelCode": "A3238"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Desktop",
+    "modelName": "Mac mini (M4 Pro)",
+    "releaseYear": "2024",
+    "modelCode": "A3239"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Desktop",
+    "modelName": "Mac mini (M6)",
+    "releaseYear": "2026",
+    "modelCode": "A3534"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Desktop",
+    "modelName": "Mac mini (M5 Pro)",
+    "releaseYear": "2026",
+    "modelCode": "A3535"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Desktop",
+    "modelName": "Mac Studio (M1 Max / Ultra)",
+    "releaseYear": "2022",
+    "modelCode": "A2615"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Desktop",
+    "modelName": "Mac Studio (M2 Max / Ultra)",
+    "releaseYear": "2023",
+    "modelCode": "A2901"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Desktop",
+    "modelName": "Mac Studio (M4 Max)",
+    "releaseYear": "2025",
+    "modelCode": "A3143"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Desktop",
+    "modelName": "Mac Studio (M3 Ultra)",
+    "releaseYear": "2025",
+    "modelCode": "A3389"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Desktop",
+    "modelName": "Mac Studio (M5 Max)",
+    "releaseYear": "2026",
+    "modelCode": "A3545"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Desktop",
+    "modelName": "Mac Studio (M5 Ultra)",
+    "releaseYear": "2026",
+    "modelCode": "A3546"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Desktop",
+    "modelName": "Mac Pro (Cylinder)",
+    "releaseYear": "2013",
+    "modelCode": "A1481"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Desktop",
+    "modelName": "Mac Pro (Tower)",
+    "releaseYear": "2019",
+    "modelCode": "A1991"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Desktop",
+    "modelName": "Mac Pro (M2 Ultra)",
+    "releaseYear": "2023",
+    "modelCode": "A2786"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Desktop",
+    "modelName": "Apple Thunderbolt Display 27-inch",
+    "releaseYear": "2011",
+    "modelCode": "A1407"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Desktop",
+    "modelName": "Apple Pro Display XDR",
+    "releaseYear": "2019",
+    "modelCode": "A1999"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Desktop",
+    "modelName": "Apple Studio Display",
+    "releaseYear": "2022",
+    "modelCode": "A2525"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Desktop",
+    "modelName": "Apple Studio Display",
+    "releaseYear": "2026",
+    "modelCode": "A3350"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Desktop",
+    "modelName": "Apple Studio Display XDR",
+    "releaseYear": "2026",
+    "modelCode": "A3348"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Audio",
+    "modelName": "AirPods (1st generation)",
+    "releaseYear": "2016",
+    "modelCode": "A1523"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Audio",
+    "modelName": "AirPods (2nd generation)",
+    "releaseYear": "2019",
+    "modelCode": "A2031"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Audio",
+    "modelName": "AirPods (3rd generation)",
+    "releaseYear": "2021",
+    "modelCode": "A2564"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Audio",
+    "modelName": "AirPods 4",
+    "releaseYear": "2024",
+    "modelCode": "A3053"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Audio",
+    "modelName": "AirPods 4 (ANC)",
+    "releaseYear": "2024",
+    "modelCode": "A3056"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Audio",
+    "modelName": "AirPods 5",
+    "releaseYear": "2026",
+    "modelCode": "A3531"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Audio",
+    "modelName": "AirPods Pro (1st generation)",
+    "releaseYear": "2019",
+    "modelCode": "A2083"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Audio",
+    "modelName": "AirPods Pro (2nd generation)",
+    "releaseYear": "2022",
+    "modelCode": "A2698"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Audio",
+    "modelName": "AirPods Pro (2nd generation USB-C)",
+    "releaseYear": "2023",
+    "modelCode": "A3047"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Audio",
+    "modelName": "AirPods Pro 3",
+    "releaseYear": "2025",
+    "modelCode": "A3063"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Audio",
+    "modelName": "AirPods Max (Lightning)",
+    "releaseYear": "2020",
+    "modelCode": "A2096"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Audio",
+    "modelName": "AirPods Max (USB-C)",
+    "releaseYear": "2024",
+    "modelCode": "A3184"
+  },
+  {
+    "brand": "Apple",
+    "deviceType": "Audio",
+    "modelName": "AirPods Max 2",
+    "releaseYear": "2026",
+    "modelCode": "A3454"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Phone",
+    "modelName": "Galaxy Note",
+    "releaseYear": "2011",
+    "modelCode": "GT-N7000"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Phone",
+    "modelName": "Galaxy Note II",
+    "releaseYear": "2012",
+    "modelCode": "GT-N7100"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Phone",
+    "modelName": "Galaxy Note II LTE",
+    "releaseYear": "2012",
+    "modelCode": "GT-N7105"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Phone",
+    "modelName": "Galaxy Note 3",
+    "releaseYear": "2013",
+    "modelCode": "SM-N900"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Phone",
+    "modelName": "Galaxy Note 3 LTE",
+    "releaseYear": "2013",
+    "modelCode": "SM-N9005"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Phone",
+    "modelName": "Galaxy Note 3 Neo",
+    "releaseYear": "2014",
+    "modelCode": "SM-N7505"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Phone",
+    "modelName": "Galaxy Note Edge",
+    "releaseYear": "2014",
+    "modelCode": "SM-N915F"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Phone",
+    "modelName": "Galaxy Note 4",
+    "releaseYear": "2014",
+    "modelCode": "SM-N910F"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Phone",
+    "modelName": "Galaxy Note 5",
+    "releaseYear": "2015",
+    "modelCode": "SM-N920F"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Phone",
+    "modelName": "Galaxy Note 8",
+    "releaseYear": "2017",
+    "modelCode": "SM-N950F"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Phone",
+    "modelName": "Galaxy Note 9",
+    "releaseYear": "2018",
+    "modelCode": "SM-N960F"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Phone",
+    "modelName": "Galaxy Note 10",
+    "releaseYear": "2019",
+    "modelCode": "SM-N970F"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Phone",
+    "modelName": "Galaxy Note 10+",
+    "releaseYear": "2019",
+    "modelCode": "SM-N975F"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Phone",
+    "modelName": "Galaxy Note 10+ 5G",
+    "releaseYear": "2019",
+    "modelCode": "SM-N976B"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Phone",
+    "modelName": "Galaxy Note 10 Lite",
+    "releaseYear": "2020",
+    "modelCode": "SM-N770F"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Phone",
+    "modelName": "Galaxy Note 20 4G",
+    "releaseYear": "2020",
+    "modelCode": "SM-N980F"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Phone",
+    "modelName": "Galaxy Note 20 5G",
+    "releaseYear": "2020",
+    "modelCode": "SM-N981B"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Phone",
+    "modelName": "Galaxy Note 20 Ultra 4G",
+    "releaseYear": "2020",
+    "modelCode": "SM-N985F"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Phone",
+    "modelName": "Galaxy Note 20 Ultra 5G",
+    "releaseYear": "2020",
+    "modelCode": "SM-N986B"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Phone",
+    "modelName": "Galaxy Alpha",
+    "releaseYear": "2014",
+    "modelCode": "SM-G850F"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Phone",
+    "modelName": "Galaxy A7 (2015)",
+    "releaseYear": "2015",
+    "modelCode": "SM-A700F"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Phone",
+    "modelName": "Galaxy A8 (2015)",
+    "releaseYear": "2015",
+    "modelCode": "SM-A800F"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Phone",
+    "modelName": "Galaxy A7 (2016)",
+    "releaseYear": "2016",
+    "modelCode": "SM-A710F"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Phone",
+    "modelName": "Galaxy A9 Pro (2016)",
+    "releaseYear": "2016",
+    "modelCode": "SM-A910F"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Phone",
+    "modelName": "Galaxy A7 (2017)",
+    "releaseYear": "2017",
+    "modelCode": "SM-A720F"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Phone",
+    "modelName": "Galaxy A8+ (2018)",
+    "releaseYear": "2018",
+    "modelCode": "SM-A730F"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Phone",
+    "modelName": "Galaxy A7 (2018)",
+    "releaseYear": "2018",
+    "modelCode": "SM-A750F"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Phone",
+    "modelName": "Galaxy A06 5G",
+    "releaseYear": "2025",
+    "modelCode": "SM-A066B"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Phone",
+    "modelName": "Galaxy A08 4G",
+    "releaseYear": "2026",
+    "modelCode": "SM-A085F"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Phone",
+    "modelName": "Galaxy M14 5G",
+    "releaseYear": "2023",
+    "modelCode": "SM-M146B"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Phone",
+    "modelName": "Galaxy M34 5G",
+    "releaseYear": "2023",
+    "modelCode": "SM-M346B"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Phone",
+    "modelName": "Galaxy M54 5G",
+    "releaseYear": "2023",
+    "modelCode": "SM-M546B"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Phone",
+    "modelName": "Galaxy M15 5G",
+    "releaseYear": "2024",
+    "modelCode": "SM-M156B"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Phone",
+    "modelName": "Galaxy M35 5G",
+    "releaseYear": "2024",
+    "modelCode": "SM-M356B"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Phone",
+    "modelName": "Galaxy M55 5G",
+    "releaseYear": "2024",
+    "modelCode": "SM-M556B"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Phone",
+    "modelName": "Galaxy M07",
+    "releaseYear": "2025",
+    "modelCode": "SM-M075F"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Phone",
+    "modelName": "Galaxy M17 5G",
+    "releaseYear": "2025",
+    "modelCode": "SM-M176B"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Phone",
+    "modelName": "Galaxy M36 5G",
+    "releaseYear": "2025",
+    "modelCode": "SM-M36B"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Phone",
+    "modelName": "Galaxy M56 5G",
+    "releaseYear": "2025",
+    "modelCode": "SM-M566B"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Phone",
+    "modelName": "Galaxy M08",
+    "releaseYear": "2026",
+    "modelCode": "SM-M085F"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Phone",
+    "modelName": "Galaxy M47 5G",
+    "releaseYear": "2026",
+    "modelCode": "SM-M476B"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S 8.4 Wi-Fi",
+    "releaseYear": "2014",
+    "modelCode": "SM-T700"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S 8.4 LTE",
+    "releaseYear": "2014",
+    "modelCode": "SM-T705"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S 10.5 Wi-Fi",
+    "releaseYear": "2014",
+    "modelCode": "SM-T800"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S 10.5 LTE",
+    "releaseYear": "2014",
+    "modelCode": "SM-T805"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab A 9.7 Wi-Fi",
+    "releaseYear": "2015",
+    "modelCode": "SM-T550"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab A 9.7 LTE",
+    "releaseYear": "2015",
+    "modelCode": "SM-T555"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S2 8.0 Wi-Fi",
+    "releaseYear": "2015",
+    "modelCode": "SM-T710"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S2 8.0 LTE",
+    "releaseYear": "2015",
+    "modelCode": "SM-T715"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S2 9.7 Wi-Fi",
+    "releaseYear": "2015",
+    "modelCode": "SM-T813"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab A 7.0 Wi-Fi",
+    "releaseYear": "2016",
+    "modelCode": "SM-T280"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab A 7.0 LTE",
+    "releaseYear": "2016",
+    "modelCode": "SM-T285"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab A 10.1 Wi-Fi",
+    "releaseYear": "2016",
+    "modelCode": "SM-T580"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab A 10.1 LTE",
+    "releaseYear": "2016",
+    "modelCode": "SM-T585"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab A 8.0 Wi-Fi",
+    "releaseYear": "2017",
+    "modelCode": "SM-T380"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab A 8.0 LTE",
+    "releaseYear": "2017",
+    "modelCode": "SM-T385"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S3 9.7 Wi-Fi",
+    "releaseYear": "2017",
+    "modelCode": "SM-T820"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S3 9.7 LTE",
+    "releaseYear": "2017",
+    "modelCode": "SM-T825"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab A 10.5 Wi-Fi",
+    "releaseYear": "2018",
+    "modelCode": "SM-T590"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab A 10.5 LTE",
+    "releaseYear": "2018",
+    "modelCode": "SM-T595"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S4 Wi-Fi",
+    "releaseYear": "2018",
+    "modelCode": "SM-T830"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S4 LTE",
+    "releaseYear": "2018",
+    "modelCode": "SM-T835"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab A 8.0 Wi-Fi",
+    "releaseYear": "2019",
+    "modelCode": "SM-T290"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab A 8.0 LTE",
+    "releaseYear": "2019",
+    "modelCode": "SM-T295"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab A 10.1 Wi-Fi",
+    "releaseYear": "2019",
+    "modelCode": "SM-T510"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab A 10.1 LTE",
+    "releaseYear": "2019",
+    "modelCode": "SM-T515"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S5e Wi-Fi",
+    "releaseYear": "2019",
+    "modelCode": "SM-T720"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S5e LTE",
+    "releaseYear": "2019",
+    "modelCode": "SM-T725"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S6 Wi-Fi",
+    "releaseYear": "2019",
+    "modelCode": "SM-T860"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S6 LTE",
+    "releaseYear": "2019",
+    "modelCode": "SM-T865"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab A7 Wi-Fi",
+    "releaseYear": "2020",
+    "modelCode": "SM-T500"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab A7 LTE",
+    "releaseYear": "2020",
+    "modelCode": "SM-T505"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S6 Lite Wi-Fi",
+    "releaseYear": "2020",
+    "modelCode": "SM-P610"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S6 Lite LTE",
+    "releaseYear": "2020",
+    "modelCode": "SM-P615"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S7 Wi-Fi",
+    "releaseYear": "2020",
+    "modelCode": "SM-T870"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S7 LTE",
+    "releaseYear": "2020",
+    "modelCode": "SM-T875"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S7+ Wi-Fi",
+    "releaseYear": "2020",
+    "modelCode": "SM-T970"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S7+ 5G",
+    "releaseYear": "2020",
+    "modelCode": "SM-T976B"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab A7 Lite Wi-Fi",
+    "releaseYear": "2021",
+    "modelCode": "SM-T220"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab A7 Lite LTE",
+    "releaseYear": "2021",
+    "modelCode": "SM-T225"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab A8 10.5 Wi-Fi",
+    "releaseYear": "2021",
+    "modelCode": "SM-X200"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab A8 10.5 LTE",
+    "releaseYear": "2021",
+    "modelCode": "SM-X205"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S7 FE Wi-Fi",
+    "releaseYear": "2021",
+    "modelCode": "SM-T733"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S7 FE 5G",
+    "releaseYear": "2021",
+    "modelCode": "SM-T736B"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S6 Lite (2022) Wi-Fi",
+    "releaseYear": "2022",
+    "modelCode": "SM-P613"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S6 Lite (2022) LTE",
+    "releaseYear": "2022",
+    "modelCode": "SM-P619"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S8 Wi-Fi",
+    "releaseYear": "2022",
+    "modelCode": "SM-X700"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S8 5G",
+    "releaseYear": "2022",
+    "modelCode": "SM-X706B"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S8+ Wi-Fi",
+    "releaseYear": "2022",
+    "modelCode": "SM-X800"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S8+ 5G",
+    "releaseYear": "2022",
+    "modelCode": "SM-X806B"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S8 Ultra Wi-Fi",
+    "releaseYear": "2022",
+    "modelCode": "SM-X900"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S8 Ultra 5G",
+    "releaseYear": "2022",
+    "modelCode": "SM-X906B"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab A9 Wi-Fi",
+    "releaseYear": "2023",
+    "modelCode": "SM-X110"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab A9 LTE",
+    "releaseYear": "2023",
+    "modelCode": "SM-X115"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab A9+ Wi-Fi",
+    "releaseYear": "2023",
+    "modelCode": "SM-X210"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab A9+ 5G",
+    "releaseYear": "2023",
+    "modelCode": "SM-X216B"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S9 FE Wi-Fi",
+    "releaseYear": "2023",
+    "modelCode": "SM-X510"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S9 FE 5G",
+    "releaseYear": "2023",
+    "modelCode": "SM-X516B"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S9 FE+ Wi-Fi",
+    "releaseYear": "2023",
+    "modelCode": "SM-X610"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S9 FE+ 5G",
+    "releaseYear": "2023",
+    "modelCode": "SM-X616B"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S9 Wi-Fi",
+    "releaseYear": "2023",
+    "modelCode": "SM-X710"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S9 5G",
+    "releaseYear": "2023",
+    "modelCode": "SM-X716B"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S9+ Wi-Fi",
+    "releaseYear": "2023",
+    "modelCode": "SM-X810"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S9+ 5G",
+    "releaseYear": "2023",
+    "modelCode": "SM-X816B"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S9 Ultra Wi-Fi",
+    "releaseYear": "2023",
+    "modelCode": "SM-X910"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S9 Ultra 5G",
+    "releaseYear": "2023",
+    "modelCode": "SM-X916B"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S6 Lite (2024) Wi-Fi",
+    "releaseYear": "2024",
+    "modelCode": "SM-P620"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S6 Lite (2024) LTE",
+    "releaseYear": "2024",
+    "modelCode": "SM-P625"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S10+ Wi-Fi",
+    "releaseYear": "2024",
+    "modelCode": "SM-X820"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S10+ 5G",
+    "releaseYear": "2024",
+    "modelCode": "SM-X826B"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S10 Ultra Wi-Fi",
+    "releaseYear": "2024",
+    "modelCode": "SM-X920"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S10 Ultra 5G",
+    "releaseYear": "2024",
+    "modelCode": "SM-X926B"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab A11 Wi-Fi",
+    "releaseYear": "2025",
+    "modelCode": "SM-X130"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab A11 LTE",
+    "releaseYear": "2025",
+    "modelCode": "SM-X135"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab A11+ Wi-Fi",
+    "releaseYear": "2025",
+    "modelCode": "SM-X230"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab A11+ 5G",
+    "releaseYear": "2025",
+    "modelCode": "SM-X236B"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S10 Lite Wi-Fi",
+    "releaseYear": "2025",
+    "modelCode": "SM-X400"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S10 Lite 5G",
+    "releaseYear": "2025",
+    "modelCode": "SM-X406B"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S10 FE Wi-Fi",
+    "releaseYear": "2025",
+    "modelCode": "SM-X520"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S10 FE 5G",
+    "releaseYear": "2025",
+    "modelCode": "SM-X526B"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S10 FE+ Wi-Fi",
+    "releaseYear": "2025",
+    "modelCode": "SM-X620"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S10 FE+ 5G",
+    "releaseYear": "2025",
+    "modelCode": "SM-X626B"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S11 Wi-Fi",
+    "releaseYear": "2025",
+    "modelCode": "SM-X730"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S11 5G",
+    "releaseYear": "2025",
+    "modelCode": "SM-X736B"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S11 Ultra Wi-Fi",
+    "releaseYear": "2025",
+    "modelCode": "SM-X930"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S11 Ultra 5G",
+    "releaseYear": "2025",
+    "modelCode": "SM-X936B"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S12+ Wi-Fi",
+    "releaseYear": "2026",
+    "modelCode": "SM-X840"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S12+ 5G",
+    "releaseYear": "2026",
+    "modelCode": "SM-X846B"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S12 Ultra Wi-Fi",
+    "releaseYear": "2026",
+    "modelCode": "SM-X940"
+  },
+  {
+    "brand": "Samsung",
+    "deviceType": "Tablet",
+    "modelName": "Galaxy Tab S12 Ultra 5G",
+    "releaseYear": "2026",
+    "modelCode": "SM-X946B"
+  },
+  {
+    "brand": "Sony",
+    "deviceType": "Console",
+    "modelName": "PlayStation 5",
+    "releaseYear": "2020",
+    "modelCode": "CFI-1000A"
+  },
+  {
+    "brand": "Sony",
+    "deviceType": "Console",
+    "modelName": "PlayStation 5 Digital Edition",
+    "releaseYear": "2020",
+    "modelCode": "CFI-1000B"
+  },
+  {
+    "brand": "Sony",
+    "deviceType": "Console",
+    "modelName": "PlayStation 5 Slim",
+    "releaseYear": "2023",
+    "modelCode": "CFI-2000A"
+  },
+  {
+    "brand": "Sony",
+    "deviceType": "Console",
+    "modelName": "PlayStation 5 Slim Digital Edition",
+    "releaseYear": "2023",
+    "modelCode": "CFI-2000B"
+  },
+  {
+    "brand": "Sony",
+    "deviceType": "Console",
+    "modelName": "PlayStation 5 Pro",
+    "releaseYear": "2024",
+    "modelCode": "CFI-7000"
+  },
+  {
+    "brand": "Sony",
+    "deviceType": "Console",
+    "modelName": "PlayStation Portal",
+    "releaseYear": "2023",
+    "modelCode": "CFI-Y1000"
+  },
+  {
+    "brand": "Sony",
+    "deviceType": "Console",
+    "modelName": "PlayStation 4",
+    "releaseYear": "2013",
+    "modelCode": "CUH-1000A"
+  },
+  {
+    "brand": "Sony",
+    "deviceType": "Console",
+    "modelName": "PlayStation 4 Slim",
+    "releaseYear": "2016",
+    "modelCode": "CUH-2000A"
+  },
+  {
+    "brand": "Sony",
+    "deviceType": "Console",
+    "modelName": "PlayStation 4 Pro",
+    "releaseYear": "2016",
+    "modelCode": "CUH-7000B"
+  },
+  {
+    "brand": "Sony",
+    "deviceType": "Console",
+    "modelName": "PlayStation 3 Slim",
+    "releaseYear": "2009",
+    "modelCode": "CECH-2000A"
+  },
+  {
+    "brand": "Sony",
+    "deviceType": "Console",
+    "modelName": "PlayStation Vita",
+    "releaseYear": "2011",
+    "modelCode": "PCH-1000"
+  },
+  {
+    "brand": "Sony",
+    "deviceType": "Console",
+    "modelName": "PlayStation Vita Slim",
+    "releaseYear": "2013",
+    "modelCode": "PCH-2000"
+  },
+  {
+    "brand": "Sony",
+    "deviceType": "Console",
+    "modelName": "PlayStation Portable (PSP)",
+    "releaseYear": "2004",
+    "modelCode": "PSP-1000"
+  },
+  {
+    "brand": "Microsoft",
+    "deviceType": "Console",
+    "modelName": "Xbox Series X",
+    "releaseYear": "2020",
+    "modelCode": "1882"
+  },
+  {
+    "brand": "Microsoft",
+    "deviceType": "Console",
+    "modelName": "Xbox Series S",
+    "releaseYear": "2020",
+    "modelCode": "1883"
+  },
+  {
+    "brand": "Microsoft",
+    "deviceType": "Console",
+    "modelName": "Xbox One X",
+    "releaseYear": "2017",
+    "modelCode": "1787"
+  },
+  {
+    "brand": "Microsoft",
+    "deviceType": "Console",
+    "modelName": "Xbox One S",
+    "releaseYear": "2016",
+    "modelCode": "1681"
+  },
+  {
+    "brand": "Microsoft",
+    "deviceType": "Console",
+    "modelName": "Xbox One",
+    "releaseYear": "2013",
+    "modelCode": "1540"
+  },
+  {
+    "brand": "Nintendo",
+    "deviceType": "Console",
+    "modelName": "Nintendo Switch 2",
+    "releaseYear": "2025",
+    "modelCode": "BEE-001"
+  },
+  {
+    "brand": "Nintendo",
+    "deviceType": "Console",
+    "modelName": "Nintendo Switch OLED",
+    "releaseYear": "2021",
+    "modelCode": "HEG-001"
+  },
+  {
+    "brand": "Nintendo",
+    "deviceType": "Console",
+    "modelName": "Nintendo Switch",
+    "releaseYear": "2017",
+    "modelCode": "HAC-001"
+  },
+  {
+    "brand": "Nintendo",
+    "deviceType": "Console",
+    "modelName": "Nintendo Switch Lite",
+    "releaseYear": "2019",
+    "modelCode": "HDH-001"
+  },
+  {
+    "brand": "Nintendo",
+    "deviceType": "Console",
+    "modelName": "New Nintendo 3DS XL",
+    "releaseYear": "2015",
+    "modelCode": "RED-001"
+  },
+  {
+    "brand": "Nintendo",
+    "deviceType": "Console",
+    "modelName": "New Nintendo 2DS XL",
+    "releaseYear": "2017",
+    "modelCode": "JAN-001"
+  },
+  {
+    "brand": "Nintendo",
+    "deviceType": "Console",
+    "modelName": "Nintendo 3DS",
+    "releaseYear": "2011",
+    "modelCode": "CTR-001"
+  },
+  {
+    "brand": "Nintendo",
+    "deviceType": "Console",
+    "modelName": "Nintendo 3DS XL",
+    "releaseYear": "2012",
+    "modelCode": "SPR-001"
+  },
+  {
+    "brand": "Nintendo",
+    "deviceType": "Console",
+    "modelName": "Nintendo DS Lite",
+    "releaseYear": "2006",
+    "modelCode": "USG-001"
+  },
+  {
+    "brand": "Nintendo",
+    "deviceType": "Console",
+    "modelName": "Wii",
+    "releaseYear": "2006",
+    "modelCode": "RVL-001"
   }
 ]

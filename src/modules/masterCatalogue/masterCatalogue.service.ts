@@ -5,40 +5,17 @@ import {
       ICatalogueSearchResult,
       IMasterCatalogue,
 } from './masterCatalogue.interface';
+import {
+      findLocalCatalogueByBarcode,
+      getLocalCatalogueStats,
+      normalizeBarcodeVariants,
+      searchLocalCatalogue,
+} from './localCatalogueIndex';
 import { MasterCatalogue } from './masterCatalogue.model';
 
-/**
- * Normalizes barcode strings and generates equivalent variations (UPC-A, EAN-13, GTIN-14)
- */
-export const normalizeBarcodeVariants = (rawCode: string): string[] => {
-      const code = String(rawCode || '').trim();
-      if (!code) return [];
+export { normalizeBarcodeVariants };
 
-      const variants = new Set<string>();
-      variants.add(code);
-
-      // Handle pure digits (UPC-A / EAN-13 / GTIN-14)
-      if (/^\d+$/.test(code)) {
-            if (code.length === 12) {
-                  // UPC-A -> EAN-13 (add leading 0), GTIN-14 (add leading 00)
-                  variants.add(`0${code}`);
-                  variants.add(`00${code}`);
-            } else if (code.length === 13 && code.startsWith('0')) {
-                  // EAN-13 with leading 0 -> UPC-A, GTIN-14
-                  variants.add(code.substring(1));
-                  variants.add(`0${code}`);
-            } else if (code.length === 14 && code.startsWith('00')) {
-                  // GTIN-14 with leading 00 -> UPC-A, EAN-13
-                  variants.add(code.substring(2));
-                  variants.add(code.substring(1));
-            } else if (code.length === 14 && code.startsWith('0')) {
-                  // GTIN-14 with leading 0 -> EAN-13
-                  variants.add(code.substring(1));
-            }
-      }
-
-      return Array.from(variants);
-};
+const isDbConnected = (): boolean => MasterCatalogue.db?.readyState === 1;
 
 /**
  * Fast indexed lookup by barcode (UPC / EAN / GTIN / SKU / Part Number)
@@ -49,20 +26,25 @@ const findByBarcode = async (code: string): Promise<IMasterCatalogue | null> => 
 
       const codeVariants = normalizeBarcodeVariants(cleanCode);
 
-      // Indexed query matching barcode, UPC, EAN, GTIN-14, SKU, or partNumber
-      const item = await MasterCatalogue.findOne({
-            $or: [
-                  { barcode: { $in: codeVariants } },
-                  { ean: { $in: codeVariants } },
-                  { upc: { $in: codeVariants } },
-                  { gtin14: { $in: codeVariants } },
-                  { sku: cleanCode },
-                  { partNumber: cleanCode },
-            ],
-            isActive: true,
-      }).lean();
+      if (isDbConnected()) {
+            const item = await MasterCatalogue.findOne({
+                  $or: [
+                        { barcode: { $in: codeVariants } },
+                        { ean: { $in: codeVariants } },
+                        { upc: { $in: codeVariants } },
+                        { gtin14: { $in: codeVariants } },
+                        { sku: cleanCode },
+                        { partNumber: cleanCode },
+                  ],
+                  isActive: true,
+            }).lean();
 
-      return item;
+            if (item) return item;
+      }
+
+      // Fallback to verified preloaded JSON catalogues so newly added datasets
+      // work immediately even before a manual DB re-seed.
+      return findLocalCatalogueByBarcode(cleanCode);
 };
 
 /**
@@ -168,10 +150,21 @@ const searchCatalogue = async (params: ICatalogueSearchParams): Promise<ICatalog
             [sortBy]: sortOrder === 'desc' ? -1 : 1,
       };
 
+      if (!isDbConnected()) {
+            return searchLocalCatalogue(params);
+      }
+
       const [results, total] = await Promise.all([
             MasterCatalogue.find(filter, projection).sort(sortOptions).skip(skip).limit(pageSize).lean(),
             MasterCatalogue.countDocuments(filter),
       ]);
+
+      if (total === 0) {
+            const localResult = searchLocalCatalogue(params);
+            if (localResult.pagination.total > 0) {
+                  return localResult;
+            }
+      }
 
       const totalPages = Math.ceil(total / pageSize);
 
@@ -292,12 +285,20 @@ const bulkUpsert = async (
  * Get statistics of the master catalogue
  */
 const getStats = async () => {
+      if (!isDbConnected()) {
+            return getLocalCatalogueStats();
+      }
+
       const [totalCount, brands, categories, autoApprovedCount] = await Promise.all([
             MasterCatalogue.countDocuments({ isActive: true }),
             MasterCatalogue.distinct('brand', { isActive: true }),
             MasterCatalogue.distinct('category', { isActive: true }),
             MasterCatalogue.countDocuments({ isActive: true, autoFillApproved: true }),
       ]);
+
+      if (totalCount === 0) {
+            return getLocalCatalogueStats();
+      }
 
       return {
             totalItems: totalCount,

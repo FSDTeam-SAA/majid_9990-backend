@@ -20,6 +20,11 @@ const addNewRepairRequest = catchAsync(async (req, res) => {
                   req.body.evidencePhotos = JSON.parse(req.body.evidencePhotos);
             } catch (_) {}
       }
+      if (typeof req.body.devicePasscode === 'string') {
+            try {
+                  req.body.devicePasscode = JSON.parse(req.body.devicePasscode);
+            } catch (_) {}
+      }
 
       const result = await repairRequestService.addNewRepairRequest(req.body, files, id);
 
@@ -58,12 +63,55 @@ const getSingleRepairRequest = catchAsync(async (req, res) => {
 
 const updateStatusByShopKeeper = catchAsync(async (req, res) => {
       const { id } = req.params;
-      const result = await repairRequestService.updateStatusByShopKeeper(id as string, req.body);
+      const files = (req.files as Express.Multer.File[]) || [];
+      if (typeof req.body.issues === 'string') {
+            try {
+                  req.body.issues = JSON.parse(req.body.issues);
+            } catch (_) {}
+      }
+      const result = await repairRequestService.updateStatusByShopKeeper(id as string, req.body, files);
 
       sendResponse(res, {
             statusCode: StatusCodes.OK,
             success: true,
             message: 'Repair request status updated successfully',
+            data: result,
+      });
+});
+
+const uploadRepairPhotos = catchAsync(async (req, res) => {
+      const { id } = req.params;
+      const files = (req.files as Express.Multer.File[]) || [];
+      const photoType = req.body?.photoType === 'booking' ? 'booking' : req.body?.photoType === 'note' ? 'note' : 'completion';
+      const actor = req.user?.firstName
+            ? `${req.user.firstName} ${req.user.lastName || ''}`.trim()
+            : req.user?.role === 'staff'
+              ? 'Technician'
+              : 'Shopkeeper';
+
+      const result = await repairRequestService.uploadRepairPhotos(id as string, files, photoType, actor);
+
+      sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: 'Repair photos uploaded successfully',
+            data: result,
+      });
+});
+
+const revealDevicePasscode = catchAsync(async (req, res) => {
+      const { id } = req.params;
+      const staffSessionToken = req.headers['x-staff-session'] as string | undefined;
+      const result = await repairRequestService.revealDevicePasscode(id as string, {
+            userId: req.user?._id?.toString() || req.user?.id,
+            staffSessionToken,
+            pin: req.body?.pin,
+      });
+
+      sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: 'Device passcode retrieved successfully',
             data: result,
       });
 });
@@ -163,6 +211,16 @@ const getCustomerRepairHistory = catchAsync(async (req, res) => {
 
 const updateRepairRequestDetails = catchAsync(async (req, res) => {
       const { id } = req.params;
+      if (typeof req.body.issues === 'string') {
+            try {
+                  req.body.issues = JSON.parse(req.body.issues);
+            } catch (_) {}
+      }
+      if (typeof req.body.devicePasscode === 'string') {
+            try {
+                  req.body.devicePasscode = JSON.parse(req.body.devicePasscode);
+            } catch (_) {}
+      }
       const result = await repairRequestService.updateRepairRequestDetails(id as string, req.body);
       sendResponse(res, {
             statusCode: StatusCodes.OK,
@@ -177,6 +235,8 @@ const repairRequestController = {
       getMyRepairRequestsHistory,
       getSingleRepairRequest,
       updateStatusByShopKeeper,
+      uploadRepairPhotos,
+      revealDevicePasscode,
       updateRepairRequestDetails,
       addNoteByShopKeeper,
       addTeachNoteByTechnician,

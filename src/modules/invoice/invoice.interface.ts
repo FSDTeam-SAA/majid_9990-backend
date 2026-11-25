@@ -54,6 +54,28 @@ export interface IInvoiceLineItem {
       units?: IInvoiceUnitIdentifier[];
 }
 
+export interface IInvoiceRepairIssueSnapshot {
+      category?: string;
+      problems?: string[];
+      estimatedPrice?: number;
+      estimatedTime?: string;
+      partName?: string;
+}
+
+export interface IInvoiceRepairDetails {
+      orderNumber?: string;
+      deviceModel?: string;
+      modelCode?: string;
+      imeiNumber?: string;
+      serialNumber?: string;
+      condition?: string;
+      colour?: string;
+      description?: string;
+      reportedIssues?: IInvoiceRepairIssueSnapshot[];
+      bookingPhotos?: string[];
+      completionPhotos?: string[];
+}
+
 export interface IInvoice {
       shopkeeperId: Types.ObjectId;
       shopId?: Types.ObjectId | null;
@@ -66,6 +88,7 @@ export interface IInvoice {
       totalAmount?: number;
       dueAmount?: number;
       repairRequestId?: Types.ObjectId;
+      repairDetails?: IInvoiceRepairDetails;
       tax?: number;
       taxName?: string;
       taxIncludedInPrice?: boolean;
@@ -156,6 +179,7 @@ export interface IInvoicePayload {
       totalAmount?: number;
       dueAmount?: number;
       repairRequestId?: string;
+      repairDetails?: IInvoiceRepairDetails | string;
       tax?: number;
       taxName?: string;
       taxIncludedInPrice?: boolean;
@@ -197,4 +221,5 @@ export interface ISendInvoiceEmailPayload {
       customerName?: string;
       customerId?: string;
       invoiceId?: string;
+      repairId?: string;
 }

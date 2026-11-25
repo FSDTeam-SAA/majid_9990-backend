@@ -35,7 +35,7 @@ const repairPartVariantSchema = new Schema<IRepairPartVariant>(
     deviceType: {
       type: String,
       required: true,
-      enum: ['Phone', 'Tablet', 'Laptop', 'Other'],
+      enum: ['Phone', 'Tablet', 'Laptop', 'Watch', 'Console', 'Desktop', 'Audio', 'Other'],
       default: 'Phone',
     },
     brand: {

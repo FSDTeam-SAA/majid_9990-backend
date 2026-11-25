@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import ExcelJS from 'exceljs';
 import { IMasterCatalogue } from '../modules/masterCatalogue/masterCatalogue.interface';
 import { MasterCatalogue } from '../modules/masterCatalogue/masterCatalogue.model';
+import { loadStructuredCatalogueItems } from '../modules/masterCatalogue/localCatalogueIndex';
 
 dotenv.config();
 
@@ -218,14 +219,12 @@ export const runSeeder = async (options: {
       // 1. Parse all datasets
       const ipadResult = parseIpadJson();
       const iphoneResult = await parseIphoneData();
-      const watchResult = parseWatchData();
-      const audioResult = parseAudioData();
+      const structuredItems = loadStructuredCatalogueItems();
 
       let allItems = [
             ...ipadResult.items,
             ...iphoneResult.items,
-            ...watchResult.items,
-            ...audioResult.items,
+            ...structuredItems,
       ];
 
       if (options.limit && options.limit > 0) {
@@ -234,10 +233,9 @@ export const runSeeder = async (options: {
       }
 
       console.log('\n--- Parse Summary ---');
-      console.log(`iPad catalog items:   ${ipadResult.validCount} / ${ipadResult.totalParsed}`);
-      console.log(`iPhone catalog items: ${iphoneResult.validCount} / ${iphoneResult.totalParsed}`);
-      console.log(`Apple Watch items:    ${watchResult.validCount} / ${watchResult.totalParsed}`);
-      console.log(`Audio catalog items:  ${audioResult.validCount} / ${audioResult.totalParsed}`);
+      console.log(`iPad catalog items:       ${ipadResult.validCount} / ${ipadResult.totalParsed}`);
+      console.log(`iPhone catalog items:     ${iphoneResult.validCount} / ${iphoneResult.totalParsed}`);
+      console.log(`Structured catalog items: ${structuredItems.length} (Watch, Audio/Beats, Android, Mac, Laptops, PCs, GPUs, Consoles, Home)`);
       console.log(`Total valid variants ready for catalogue: ${allItems.length}`);
 
       if (allItems.length > 0) {

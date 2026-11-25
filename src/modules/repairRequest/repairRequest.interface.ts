@@ -6,11 +6,26 @@ export type RepairStatus =
       | 'rejected'
       | 'completed'
       | 'collected'
+      | 'ready-for-collection'
       | 'inReview'
       | 'start-work'
       | 'quote-sent'
+      | 'quote_sent'
       | 'waiting-for-parts'
+      | 'order-assigned'
+      | 'diagnosing'
+      | 'repairing'
+      | 'reassigned'
       | 'unable-to-repair';
+
+export interface IDevicePasscode {
+      type: 'none' | 'pin' | 'password' | 'pattern';
+      encryptedValue?: string;
+      isSet: boolean;
+      maskedValue?: string;
+      lengthHint?: number;
+      updatedAt?: Date;
+}
 
 export interface INote {
       message: string;
@@ -53,6 +68,7 @@ export interface IEvidencePhoto {
       uploadedAt: Date;
       autoDeleteAt: Date;
       usedFor?: string;
+      photoType?: 'booking' | 'completion' | 'note';
 }
 
 export interface IRepairHistoryItem {
@@ -67,6 +83,7 @@ export interface IRepairRequest {
       orderNumber?: string;
       userId: Types.ObjectId;
       shopId?: Types.ObjectId | null;
+      customerId?: Types.ObjectId | null;
       firstName: string;
       email: string;
       phoneNumber: string;
@@ -82,7 +99,8 @@ export interface IRepairRequest {
       condition?: 'New' | 'Like New' | 'Good' | 'Fair' | 'Poor';
       serialType?: 'imei' | 'serial' | 'both';
       serialNumber?: string;
-      IMEINumber: string;
+      IMEINumber?: string;
+      devicePasscode?: IDevicePasscode;
       description: string;
       issues?: IRepairIssue[];
       evidencePhotos?: IEvidencePhoto[];
@@ -114,4 +132,8 @@ export interface IRepairRequestStatusUpdatePayload {
       unableToRepairCustomerMessage?: string;
       rejectionReason?: string;
       expectedCollectionDate?: Date | string;
+      issues?: IRepairIssue[];
+      price?: number;
+      description?: string;
+      photoType?: 'booking' | 'completion' | 'note';
 }

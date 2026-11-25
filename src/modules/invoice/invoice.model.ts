@@ -78,6 +78,27 @@ const invoiceSchema = new Schema<IInvoice>(
                   ref: 'RepairRequest',
                   default: null,
             },
+            repairDetails: {
+                  orderNumber: { type: String, trim: true, default: null },
+                  deviceModel: { type: String, trim: true, default: null },
+                  modelCode: { type: String, trim: true, default: null },
+                  imeiNumber: { type: String, trim: true, default: null },
+                  serialNumber: { type: String, trim: true, default: null },
+                  condition: { type: String, trim: true, default: null },
+                  colour: { type: String, trim: true, default: null },
+                  description: { type: String, trim: true, default: null },
+                  reportedIssues: [
+                        {
+                              category: { type: String, trim: true },
+                              problems: [{ type: String }],
+                              estimatedPrice: { type: Number, default: 0 },
+                              estimatedTime: { type: String, trim: true },
+                              partName: { type: String, trim: true },
+                        },
+                  ],
+                  bookingPhotos: [{ type: String }],
+                  completionPhotos: [{ type: String }],
+            },
 
             taxName: { type: String, default: null },
             taxIncludedInPrice: { type: Boolean, default: null },

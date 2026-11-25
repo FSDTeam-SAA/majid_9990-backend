@@ -1,14 +1,29 @@
 // src/modules/repairRequest/repairPdf.service.ts
 import { getCurrencySymbol } from '../../utils/email/email.templates';
 
+export interface RepairPdfIssue {
+      category: string;
+      problems?: string[];
+      estimatedPrice?: number;
+      estimatedTime?: string;
+      partName?: string;
+}
+
 export interface RepairPdfData {
       requestId: string;
+      orderNumber?: string;
       customerName: string;
       customerEmail: string;
       customerPhone?: string;
       deviceModel: string;
       imei?: string;
+      serialNumber?: string;
+      condition?: string;
+      colour?: string;
       description: string;
+      issues?: RepairPdfIssue[];
+      bookingPhotos?: string[];
+      completionPhotos?: string[];
       status: string;
       statusLabel: string;
       statusNote?: string;
@@ -83,6 +98,8 @@ const formatStatusLabel = (status: string): string => {
             repairing: 'REPAIR IN PROGRESS',
             'waiting-for-parts': 'WAITING FOR PARTS',
             completed: 'REPAIR COMPLETED',
+            'ready-for-collection': 'READY TO COLLECT',
+            reassigned: 'TECHNICIAN REASSIGNED',
             approved: 'QUOTE APPROVED',
             rejected: 'REPAIR REJECTED',
             collected: 'DEVICE COLLECTED',
@@ -137,14 +154,35 @@ const buildRepairLines = (data: RepairPdfData): string[] => {
             '----------------------------------------------------------------------------------------',
             'DEVICE & CUSTOMER INFORMATION',
             '----------------------------------------------------------------------------------------',
+            `Job Reference: ${data.orderNumber || `#${data.requestId.toUpperCase()}`}`,
             `Device Model:  ${data.deviceModel}`,
-            `IMEI / Serial: ${data.imei || 'N/A'}`,
+            `Intake Cond.:  ${data.condition || 'N/A'}`,
+            `Colour:        ${data.colour || 'N/A'}`,
+            `IMEI Number:   ${data.imei || 'N/A'}`,
+            `Serial Number: ${data.serialNumber || 'N/A'}`,
             `Customer Name: ${data.customerName}`,
             `Contact Email: ${data.customerEmail}`,
             `Contact Phone: ${data.customerPhone || 'N/A'}`,
             '',
-            'ISSUE DESCRIPTION:',
-            data.description || 'No initial issue description provided.',
+            'REPORTED ISSUES & DIAGNOSIS:',
+            ...(Array.isArray(data.issues) && data.issues.length > 0
+                  ? data.issues.map((iss, idx) => {
+                          const currSymbol = getCurrencySymbol(data.currency, data.currencySymbol);
+                          const probs = (iss.problems || []).join(', ');
+                          const pPrice =
+                                iss.estimatedPrice && Number(iss.estimatedPrice) > 0
+                                      ? ` (${currSymbol}${Number(iss.estimatedPrice).toFixed(2)})`
+                                      : ' (Price TBC)';
+                          const part = iss.partName ? ` | Part: ${iss.partName}` : '';
+                          return `${idx + 1}. ${iss.category}${probs ? `: ${probs}` : ''}${pPrice}${part}`;
+                    })
+                  : [data.description || 'No initial issue description provided.']),
+            ...((data.bookingPhotos?.length || data.completionPhotos?.length)
+                  ? [
+                          '',
+                          `Photos Attached: ${data.bookingPhotos?.length || 0} Booking photo(s), ${data.completionPhotos?.length || 0} Completion photo(s)`,
+                    ]
+                  : []),
             ''
       );
 

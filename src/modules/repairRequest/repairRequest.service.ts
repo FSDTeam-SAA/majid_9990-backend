@@ -1,4 +1,6 @@
 import { StatusCodes } from 'http-status-codes';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 import { FilterQuery, Types } from 'mongoose';
 import AppError from '../../errors/AppError';
 import { uploadToCloudinary } from '../../utils/cloudinary';
@@ -6,6 +8,12 @@ import config from '../../config/config';
 import { generateTechnicianFeedback } from '../../utils/technicianFeedback';
 import { sendRepairCompletionEmail, sendRepairStatusEmail } from '../../utils/email/email.service';
 import { getCurrencySymbol } from '../../utils/email/email.templates';
+import {
+      decryptDevicePasscode,
+      DevicePasscodeType,
+      encryptDevicePasscode,
+      isAuthorizedTechnicianRole,
+} from '../../utils/passcodeCrypto';
 import { User } from '../user/user.model';
 import Shop from '../shop/shop.model';
 import { IRepairRequest, IRepairRequestStatusUpdatePayload } from './repairRequest.interface';
@@ -31,6 +39,86 @@ const getPagination = (query: { page?: unknown; limit?: unknown }) => {
       };
 };
 
+const normalizeRepairIssues = (issues: unknown): any[] => {
+      if (!Array.isArray(issues)) return [];
+      return issues.map((iss: any) => {
+            const category = iss?.category || iss?.issueCategory || 'General Issue';
+            const rawProblems = iss?.problems || iss?.commonProblems || [];
+            const problems = Array.isArray(rawProblems)
+                  ? rawProblems.map((p: any) => String(p)).filter(Boolean)
+                  : typeof rawProblems === 'string' && rawProblems.trim().length > 0
+                    ? [rawProblems.trim()]
+                    : ['Repair inspection'];
+            const parsedPrice = Number(iss?.estimatedPrice ?? iss?.price ?? 0);
+            return {
+                  ...iss,
+                  category,
+                  problems: problems.length > 0 ? problems : ['Repair inspection'],
+                  additionalInfo: iss?.additionalInfo || iss?.additionalDetails || '',
+                  estimatedTime: iss?.estimatedTime || '1-2 Hours',
+                  estimatedPrice: Number.isFinite(parsedPrice) && parsedPrice >= 0 ? parsedPrice : 0,
+            };
+      });
+};
+
+const buildPasscodeField = (raw: any) => {
+      if (!raw || typeof raw !== 'object') return undefined;
+      if (raw.clear === true || raw.type === 'none') {
+            return { type: 'none' as const, encryptedValue: '', isSet: false, maskedValue: '', lengthHint: 0 };
+      }
+      const rawType = String(raw.type || '').toLowerCase();
+      const allowedTypes: DevicePasscodeType[] = ['pin', 'password', 'pattern'];
+      const type: DevicePasscodeType = allowedTypes.includes(rawType as DevicePasscodeType)
+            ? (rawType as DevicePasscodeType)
+            : 'pin';
+      const secret = String(raw.value ?? raw.passcode ?? '').trim();
+      if (!secret) {
+            return undefined;
+      }
+      return encryptDevicePasscode(type, secret);
+};
+
+const uploadEvidenceFiles = async (
+      files: Express.Multer.File[] = [],
+      photoType: 'booking' | 'completion' | 'note' = 'booking'
+) => {
+      const photos: any[] = [];
+      for (const file of files) {
+            const uploaded = await uploadToCloudinary(file.path);
+            if (uploaded && uploaded.public_id && uploaded.secure_url) {
+                  photos.push({
+                        url: uploaded.secure_url,
+                        public_id: uploaded.public_id,
+                        uploadedAt: new Date(),
+                        autoDeleteAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+                        usedFor:
+                              photoType === 'completion'
+                                    ? 'Completion verification photo'
+                                    : photoType === 'note'
+                                      ? 'Repair note photo'
+                                      : 'Booking intake photo',
+                        photoType,
+                  });
+            }
+      }
+      return photos;
+};
+
+const extractRepairPhotoGroups = (evidencePhotos: any[] = []) => {
+      const bookingPhotos: string[] = [];
+      const completionPhotos: string[] = [];
+      for (const p of evidencePhotos || []) {
+            const url = typeof p === 'string' ? p : p?.url;
+            if (!url) continue;
+            if (p?.photoType === 'completion' || /completion/i.test(String(p?.usedFor || ''))) {
+                  completionPhotos.push(url);
+            } else {
+                  bookingPhotos.push(url);
+            }
+      }
+      return { bookingPhotos, completionPhotos };
+};
+
 const addNewRepairRequest = async (payload: IRepairRequest, files: Express.Multer.File[] = [], userId: string) => {
       const user = await User.findById(userId);
       if (!user) throw new AppError('User not found', StatusCodes.UNAUTHORIZED);
@@ -43,21 +131,7 @@ const addNewRepairRequest = async (payload: IRepairRequest, files: Express.Multe
       }
 
       // Normalize problems and category across both payload naming conventions
-      const normalizedIssues = (payload.issues || []).map((iss: any) => {
-            const category = iss.category || iss.issueCategory || 'General Issue';
-            const rawProblems = iss.problems || iss.commonProblems || [];
-            const problems = Array.isArray(rawProblems)
-                  ? rawProblems
-                  : typeof rawProblems === 'string' && rawProblems.trim().length > 0
-                        ? [rawProblems.trim()]
-                        : ['Repair inspection'];
-            return {
-                  ...iss,
-                  category,
-                  problems,
-                  additionalInfo: iss.additionalInfo || iss.additionalDetails || '',
-            };
-      });
+      const normalizedIssues = normalizeRepairIssues(payload.issues);
 
       const desc =
             payload.description ||
@@ -65,21 +139,14 @@ const addNewRepairRequest = async (payload: IRepairRequest, files: Express.Multe
                   ? normalizedIssues.map((i: any) => `${i.category}: ${(i.problems || []).join(', ')}`).join('; ')
                   : 'Repair Request');
 
-      const images: { public_id: string; url: string }[] = [];
-      const evidencePhotos: any[] = payload.evidencePhotos ? [...payload.evidencePhotos] : [];
-      for (const file of files) {
-            const uploaded = await uploadToCloudinary(file.path);
-            if (uploaded && uploaded.public_id && uploaded.secure_url) {
-                  images.push({ public_id: uploaded.public_id, url: uploaded.secure_url });
-                  evidencePhotos.push({
-                        url: uploaded.secure_url,
-                        public_id: uploaded.public_id,
-                        uploadedAt: new Date(),
-                        autoDeleteAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-                        usedFor: 'Repair diagnosis only',
-                  });
-            }
-      }
+      const uploadedPhotos = await uploadEvidenceFiles(files, 'booking');
+      const existingEvidence = Array.isArray(payload.evidencePhotos)
+            ? payload.evidencePhotos.map((p: any) => ({
+                    ...p,
+                    photoType: p?.photoType || 'booking',
+              }))
+            : [];
+      const evidencePhotos: any[] = [...existingEvidence, ...uploadedPhotos];
 
       const randomSuffix = Math.floor(10000 + Math.random() * 90000);
       const orderNumber = payload.orderNumber || `R-${randomSuffix}`;
@@ -113,21 +180,35 @@ const addNewRepairRequest = async (payload: IRepairRequest, files: Express.Multe
 
       if (evidencePhotos.length > 0) {
             historyEvents.push({
-                  title: `Photo Uploaded (${evidencePhotos.length})`,
-                  description: 'Evidence photos added',
+                  title: `Booking Photo Uploaded (${evidencePhotos.length})`,
+                  description: 'Booking intake photos added',
                   actor: 'Shopkeeper',
                   createdAt: new Date(),
             });
       }
 
+      const rawCustomerId = String((payload as any).customerId || '').trim();
+      const customerId = rawCustomerId && Types.ObjectId.isValid(rawCustomerId)
+            ? new Types.ObjectId(rawCustomerId)
+            : null;
+      const passcodeField = buildPasscodeField((payload as any).devicePasscode);
+
+      // Keep IMEI and Serial Number strictly independent — never auto-copy one into the other.
+      const cleanSerial = payload.serialNumber != null ? String(payload.serialNumber).trim() : '';
+      const cleanImei = payload.IMEINumber != null ? String(payload.IMEINumber).trim() : '';
+
+      const numericPrice = Number(payload.price);
+      const safePrice = Number.isFinite(numericPrice) && numericPrice >= 0 ? numericPrice : 0;
+
       const newRequest = await RepairRequest.create({
             orderNumber,
             userId: payload.userId || user._id,
             shopId: payload.shopId ?? null,
+            customerId,
             firstName: payload.firstName,
             email: payload.email || '',
             phoneNumber: payload.phoneNumber,
-            price: payload.price || 0,
+            price: safePrice,
             currency: payload.currency ? String(payload.currency).trim().toUpperCase() : (user.currency || 'GBP'),
             deviceModel: payload.deviceModel,
             category: payload.category || 'Mobile Phone',
@@ -140,8 +221,9 @@ const addNewRepairRequest = async (payload: IRepairRequest, files: Express.Multe
             serialType: payload.serialType
                   ? (payload.serialType.toLowerCase() as 'imei' | 'serial' | 'both')
                   : 'imei',
-            serialNumber: payload.serialNumber || payload.IMEINumber || '',
-            IMEINumber: payload.IMEINumber || payload.serialNumber || '',
+            serialNumber: cleanSerial,
+            IMEINumber: cleanImei,
+            ...(passcodeField ? { devicePasscode: passcodeField } : {}),
             description: desc,
             issues: normalizedIssues,
             evidencePhotos,
@@ -161,11 +243,36 @@ const getMyRepairRequestsHistory = async (userId: string, query: any) => {
 
       const readyForCollection = String(query.readyForCollection ?? '').toLowerCase() === 'true';
       const filter: FilterQuery<IRepairRequest> = readyForCollection
-            ? { userId, status: { $in: ['completed', 'approved'] } }
+            ? { userId, status: { $in: ['completed', 'ready-for-collection', 'approved'] } }
             : { userId };
+
+      const andConditions: FilterQuery<IRepairRequest>[] = [];
       if (query.shopId && Types.ObjectId.isValid(String(query.shopId))) {
-            filter.$or = [{ shopId: new Types.ObjectId(String(query.shopId)) }, { shopId: null }];
+            andConditions.push({ $or: [{ shopId: new Types.ObjectId(String(query.shopId)) }, { shopId: null }] });
       }
+      if (query.search && String(query.search).trim()) {
+            const rawQ = String(query.search).trim();
+            const escaped = rawQ.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const digitsOnly = rawQ.replace(/[^a-zA-Z0-9-]/g, '');
+            const searchOr: any[] = [
+                  { orderNumber: { $regex: escaped, $options: 'i' } },
+                  { deviceModel: { $regex: escaped, $options: 'i' } },
+                  { firstName: { $regex: escaped, $options: 'i' } },
+                  { phoneNumber: { $regex: escaped, $options: 'i' } },
+                  { email: { $regex: escaped, $options: 'i' } },
+                  { IMEINumber: { $regex: escaped, $options: 'i' } },
+                  { serialNumber: { $regex: escaped, $options: 'i' } },
+                  { modelCode: { $regex: escaped, $options: 'i' } },
+            ];
+            if (digitsOnly && !digitsOnly.startsWith('R-') && /^\d+$/.test(digitsOnly)) {
+                  searchOr.push({ orderNumber: { $regex: `R-${digitsOnly}`, $options: 'i' } });
+            }
+            andConditions.push({ $or: searchOr });
+      }
+      if (andConditions.length > 0) {
+            filter.$and = andConditions;
+      }
+
       const data = await RepairRequest.find(filter).skip(skip).limit(limit).sort({ createdAt: -1, _id: -1 });
       const total = await RepairRequest.countDocuments(filter);
 
@@ -221,7 +328,11 @@ const generateAndSaveTechnicianFeedback = async (id: string) => {
       return result;
 };
 
-const updateStatusByShopKeeper = async (id: string, payload: IRepairRequestStatusUpdatePayload) => {
+const updateStatusByShopKeeper = async (
+      id: string,
+      payload: IRepairRequestStatusUpdatePayload,
+      files: Express.Multer.File[] = []
+) => {
       assertValidRepairRequestId(id);
 
       if (!payload.status) {
@@ -231,6 +342,7 @@ const updateStatusByShopKeeper = async (id: string, payload: IRepairRequestStatu
       const update: {
             $set: Record<string, unknown>;
             $unset?: Record<string, 1>;
+            $push?: Record<string, unknown>;
       } = {
             $set: {
                   status: payload.status,
@@ -262,6 +374,27 @@ const updateStatusByShopKeeper = async (id: string, payload: IRepairRequestStatu
             update.$set.expectedCollectionDate = new Date(payload.expectedCollectionDate);
       }
 
+      if (Array.isArray(payload.issues)) {
+            const normIssues = normalizeRepairIssues(payload.issues);
+            update.$set.issues = normIssues;
+            if (payload.price !== undefined) {
+                  const p = Number(payload.price);
+                  update.$set.price = Number.isFinite(p) && p >= 0 ? p : 0;
+            }
+            if (payload.description !== undefined) {
+                  update.$set.description = payload.description;
+            } else if (normIssues.length > 0) {
+                  update.$set.description = normIssues
+                        .map((i: any) => `${i.category}: ${(i.problems || []).join(', ')}`)
+                        .join('; ');
+            }
+      } else if (payload.price !== undefined) {
+            const p = Number(payload.price);
+            if (Number.isFinite(p) && p >= 0) {
+                  update.$set.price = p;
+            }
+      }
+
       if (payload.status === 'rejected') {
             const reason = (payload.rejectionReason || payload.unableToRepairReason || (payload as any).reason)?.trim();
             if (!reason) {
@@ -271,7 +404,7 @@ const updateStatusByShopKeeper = async (id: string, payload: IRepairRequestStatu
             update.$set.rejectedAt = new Date();
       }
 
-      if (payload.status === 'completed') {
+      if (payload.status === 'completed' || payload.status === 'ready-for-collection') {
             update.$set.completedAt = new Date();
       }
 
@@ -287,6 +420,46 @@ const updateStatusByShopKeeper = async (id: string, payload: IRepairRequestStatu
             }
       }
 
+      const historyPush: any[] = [
+            {
+                  title: getStatusDisplayLabel(payload.status),
+                  description: `Status updated to ${getStatusDisplayLabel(payload.status)}`,
+                  actor: 'Shopkeeper',
+                  createdAt: new Date(),
+            },
+      ];
+
+      let uploadedPhotos: any[] = [];
+      if (files && files.length > 0) {
+            const photoType =
+                  payload.photoType ||
+                  (payload.status === 'completed' ||
+                  payload.status === 'ready-for-collection' ||
+                  payload.status === 'collected'
+                        ? 'completion'
+                        : 'booking');
+            uploadedPhotos = await uploadEvidenceFiles(files, photoType);
+            if (uploadedPhotos.length > 0) {
+                  historyPush.push({
+                        title:
+                              photoType === 'completion'
+                                    ? `Completion Photo Uploaded (${uploadedPhotos.length})`
+                                    : `Photo Uploaded (${uploadedPhotos.length})`,
+                        description:
+                              photoType === 'completion'
+                                    ? 'Completion verification photos attached'
+                                    : 'Photos attached',
+                        actor: 'Technician',
+                        createdAt: new Date(),
+                  });
+            }
+      }
+
+      update.$push = {
+            history: { $each: historyPush },
+            ...(uploadedPhotos.length > 0 ? { evidencePhotos: { $each: uploadedPhotos } } : {}),
+      };
+
       const result = await RepairRequest.findByIdAndUpdate(id, update, {
             new: true,
             runValidators: true,
@@ -296,13 +469,11 @@ const updateStatusByShopKeeper = async (id: string, payload: IRepairRequestStatu
             throw new AppError('Repair request not found', StatusCodes.NOT_FOUND);
       }
 
-      // ✅ If status is completed, generate feedback AND send email
-      if (payload.status === 'completed') {
-            // Generate technician feedback first
+      // If status is completed or ready-for-collection, generate feedback AND send email
+      if (payload.status === 'completed' || payload.status === 'ready-for-collection') {
             const updatedWithFeedback = await generateAndSaveTechnicianFeedback(id);
 
             if (updatedWithFeedback) {
-                  // Send email notification
                   await sendCompletionEmail(updatedWithFeedback);
             }
 
@@ -312,11 +483,176 @@ const updateStatusByShopKeeper = async (id: string, payload: IRepairRequestStatu
             const customMessage =
                   result.status === 'unable-to-repair'
                         ? result.unableToRepairCustomerMessage || result.unableToRepairReason
-                        : undefined;
+                        : result.status === 'rejected'
+                          ? result.rejectionReason
+                          : undefined;
             await sendStatusUpdateEmail(result, customMessage);
       }
 
       return result;
+};
+
+const uploadRepairPhotos = async (
+      id: string,
+      files: Express.Multer.File[],
+      photoType: 'booking' | 'completion' | 'note' = 'completion',
+      actor = 'Technician'
+) => {
+      assertValidRepairRequestId(id);
+
+      if (!files || files.length === 0) {
+            throw new AppError('At least one image file is required', StatusCodes.BAD_REQUEST);
+      }
+
+      const uploaded = await uploadEvidenceFiles(files, photoType);
+      if (uploaded.length === 0) {
+            throw new AppError('Failed to upload repair photos', StatusCodes.INTERNAL_SERVER_ERROR);
+      }
+
+      const result = await RepairRequest.findByIdAndUpdate(
+            id,
+            {
+                  $push: {
+                        evidencePhotos: { $each: uploaded },
+                        history: {
+                              title:
+                                    photoType === 'completion'
+                                          ? `Completion Photo Uploaded (${uploaded.length})`
+                                          : `Booking Photo Uploaded (${uploaded.length})`,
+                              description:
+                                    photoType === 'completion'
+                                          ? 'Completion verification photos added'
+                                          : 'Intake photos added',
+                              actor,
+                              createdAt: new Date(),
+                        },
+                  },
+            },
+            { new: true, runValidators: true }
+      );
+
+      if (!result) {
+            throw new AppError('Repair request not found', StatusCodes.NOT_FOUND);
+      }
+
+      return result;
+};
+
+const revealDevicePasscode = async (
+      id: string,
+      authCtx: { userId?: string; staffSessionToken?: string; pin?: string }
+) => {
+      assertValidRepairRequestId(id);
+
+      const repair = await RepairRequest.findById(id).select('+devicePasscode.encryptedValue');
+      if (!repair) {
+            throw new AppError('Repair request not found', StatusCodes.NOT_FOUND);
+      }
+
+      let effectiveRole = '';
+      let effectiveJobRole = '';
+      let effectiveName = '';
+      let actingUserId = authCtx.userId;
+
+      if (authCtx.staffSessionToken && authCtx.staffSessionToken !== 'invalid') {
+            try {
+                  const decoded: any = jwt.verify(authCtx.staffSessionToken, config.JWT_SECRET as string);
+                  if (decoded?._id) {
+                        actingUserId = String(decoded._id);
+                  }
+            } catch {
+                  throw new AppError('Invalid or expired staff session', StatusCodes.UNAUTHORIZED);
+            }
+      }
+
+      if (actingUserId && Types.ObjectId.isValid(actingUserId)) {
+            const actorUser = await User.findById(actingUserId).select('role jobRole firstName lastName email');
+            if (actorUser) {
+                  effectiveRole = actorUser.role || '';
+                  effectiveJobRole = (actorUser as any).jobRole || '';
+                  effectiveName =
+                        `${actorUser.firstName || ''} ${actorUser.lastName || ''}`.trim() ||
+                        actorUser.email ||
+                        effectiveRole;
+            }
+      }
+
+      let isAuthorized = isAuthorizedTechnicianRole({
+            role: effectiveRole,
+            jobRole: effectiveJobRole,
+            actorName: effectiveName,
+            assignedTechnician: repair.technician,
+      });
+
+      // If switched to a non-technician or explicit PIN is supplied for override verification
+      if (!isAuthorized && authCtx.pin && /^\d{4,6}$/.test(String(authCtx.pin).trim())) {
+            const ownerId = repair.userId?.toString();
+            if (ownerId && Types.ObjectId.isValid(ownerId)) {
+                  const techCandidates = await User.find({
+                        shopkeeperId: new Types.ObjectId(ownerId),
+                        role: 'staff',
+                  }).select('+staffPin firstName lastName email jobRole');
+
+                  for (const cand of techCandidates) {
+                        if (!cand.staffPin) continue;
+                        const pinOk = await bcrypt.compare(String(authCtx.pin).trim(), cand.staffPin);
+                        if (!pinOk) continue;
+                        const candName = `${cand.firstName || ''} ${cand.lastName || ''}`.trim() || cand.email;
+                        if (
+                              isAuthorizedTechnicianRole({
+                                    role: 'staff',
+                                    jobRole: (cand as any).jobRole,
+                                    actorName: candName,
+                                    assignedTechnician: repair.technician,
+                              })
+                        ) {
+                              isAuthorized = true;
+                              effectiveName = candName;
+                              break;
+                        }
+                  }
+            }
+      }
+
+      if (!isAuthorized) {
+            throw new AppError(
+                  'Only authorised technicians or shop owners can reveal the device passcode',
+                  StatusCodes.FORBIDDEN
+            );
+      }
+
+      const pc = (repair as any).devicePasscode;
+      if (!pc || !pc.isSet || pc.type === 'none' || !pc.encryptedValue) {
+            return {
+                  type: pc?.type || 'none',
+                  isSet: false,
+                  value: '',
+                  maskedValue: '',
+                  revealedBy: effectiveName,
+                  revealedAt: new Date(),
+            };
+      }
+
+      const value = decryptDevicePasscode(pc.encryptedValue);
+      await RepairRequest.findByIdAndUpdate(id, {
+            $push: {
+                  history: {
+                        title: 'Passcode Viewed',
+                        description: `Device passcode revealed by ${effectiveName || 'Authorised Technician'}`,
+                        actor: effectiveName || 'Authorised Technician',
+                        createdAt: new Date(),
+                  },
+            },
+      });
+
+      return {
+            type: pc.type,
+            isSet: true,
+            value,
+            maskedValue: pc.maskedValue || '••••••',
+            revealedBy: effectiveName || 'Authorised Technician',
+            revealedAt: new Date(),
+      };
 };
 
 const resolveShopInfo = async (repairRequest: IRepairRequest) => {
@@ -375,6 +711,8 @@ const getStatusDisplayLabel = (status: string): string => {
             repairing: 'Repair in Progress',
             'waiting-for-parts': 'Waiting for Parts',
             completed: 'Repair Completed',
+            'ready-for-collection': 'Ready to Collect',
+            reassigned: 'Technician Reassigned',
             approved: 'Quote Approved',
             rejected: 'Repair Rejected',
             collected: 'Device Collected',
@@ -396,15 +734,32 @@ const sendStatusUpdateEmail = async (repairRequest: IRepairRequest, customNote?:
 
             const repairCurrency = (repairRequest as any).currency || shopInfo.currency || 'GBP';
             const currencySymbol = getCurrencySymbol(repairCurrency);
+            const { bookingPhotos, completionPhotos } = extractRepairPhotoGroups(
+                  (repairRequest as any).evidencePhotos
+            );
+            const formattedIssues = (repairRequest.issues || []).map((iss: any) => ({
+                  category: iss.category || 'Repair Issue',
+                  problems: iss.problems || [],
+                  estimatedPrice: iss.estimatedPrice,
+                  estimatedTime: iss.estimatedTime,
+                  partName: iss.selectedPart?.partName,
+            }));
 
             const pdfData = {
                   requestId: shortId || rawId,
+                  orderNumber: repairRequest.orderNumber,
                   customerName: repairRequest.firstName,
                   customerEmail: repairRequest.email,
                   customerPhone: repairRequest.phoneNumber,
                   deviceModel: repairRequest.deviceModel,
                   imei: repairRequest.IMEINumber,
+                  serialNumber: repairRequest.serialNumber,
+                  condition: repairRequest.condition,
+                  colour: repairRequest.colour,
                   description: repairRequest.description,
+                  issues: formattedIssues,
+                  bookingPhotos,
+                  completionPhotos,
                   status: repairRequest.status,
                   statusLabel,
                   statusNote: customNote,
@@ -429,7 +784,13 @@ const sendStatusUpdateEmail = async (repairRequest: IRepairRequest, customNote?:
                   customerName: repairRequest.firstName,
                   deviceModel: repairRequest.deviceModel,
                   imei: repairRequest.IMEINumber,
+                  serialNumber: repairRequest.serialNumber,
+                  condition: repairRequest.condition,
+                  colour: repairRequest.colour,
                   description: repairRequest.description,
+                  issues: formattedIssues,
+                  bookingPhotos,
+                  completionPhotos,
                   status: repairRequest.status,
                   statusLabel,
                   statusNote: customNote,
@@ -438,6 +799,7 @@ const sendStatusUpdateEmail = async (repairRequest: IRepairRequest, customNote?:
                   currencySymbol,
                   shopName: shopInfo.shopName,
                   requestId: shortId || rawId,
+                  orderNumber: repairRequest.orderNumber,
                   trackingUrl,
                   technicianFeedback: repairRequest.technicianFeedback,
                   waitingForPartsDays: repairRequest.waitingForPartsDays,
@@ -458,7 +820,7 @@ const sendStatusUpdateEmail = async (repairRequest: IRepairRequest, customNote?:
       }
 };
 
-// ✅ Helper function to send completion email
+// Helper function to send completion email
 const sendCompletionEmail = async (repairRequest: IRepairRequest) => {
       try {
             if (!repairRequest.email) return;
@@ -467,20 +829,37 @@ const sendCompletionEmail = async (repairRequest: IRepairRequest) => {
             const rawId = (repairRequest as any)._id?.toString() || '';
             const shortId = rawId ? rawId.slice(-6).toUpperCase() : '';
             const trackingUrl = getTrackingUrl(rawId);
-            const statusLabel = getStatusDisplayLabel('completed');
+            const statusLabel = getStatusDisplayLabel(repairRequest.status || 'completed');
 
             const repairCurrency = (repairRequest as any).currency || shopInfo.currency || 'GBP';
             const currencySymbol = getCurrencySymbol(repairCurrency);
+            const { bookingPhotos, completionPhotos } = extractRepairPhotoGroups(
+                  (repairRequest as any).evidencePhotos
+            );
+            const formattedIssues = (repairRequest.issues || []).map((iss: any) => ({
+                  category: iss.category || 'Repair Issue',
+                  problems: iss.problems || [],
+                  estimatedPrice: iss.estimatedPrice,
+                  estimatedTime: iss.estimatedTime,
+                  partName: iss.selectedPart?.partName,
+            }));
 
             const pdfData = {
                   requestId: shortId || rawId,
+                  orderNumber: repairRequest.orderNumber,
                   customerName: repairRequest.firstName,
                   customerEmail: repairRequest.email,
                   customerPhone: repairRequest.phoneNumber,
                   deviceModel: repairRequest.deviceModel,
                   imei: repairRequest.IMEINumber,
+                  serialNumber: repairRequest.serialNumber,
+                  condition: repairRequest.condition,
+                  colour: repairRequest.colour,
                   description: repairRequest.description,
-                  status: 'completed',
+                  issues: formattedIssues,
+                  bookingPhotos,
+                  completionPhotos,
+                  status: repairRequest.status || 'completed',
                   statusLabel,
                   price: repairRequest.price,
                   currency: repairCurrency,
@@ -499,7 +878,14 @@ const sendCompletionEmail = async (repairRequest: IRepairRequest) => {
             const emailData = {
                   customerName: repairRequest.firstName,
                   deviceModel: repairRequest.deviceModel,
+                  imei: repairRequest.IMEINumber,
+                  serialNumber: repairRequest.serialNumber,
+                  condition: repairRequest.condition,
+                  colour: repairRequest.colour,
                   description: repairRequest.description,
+                  issues: formattedIssues,
+                  bookingPhotos,
+                  completionPhotos,
                   price: repairRequest.price,
                   currency: repairCurrency,
                   currencySymbol,
@@ -510,6 +896,7 @@ const sendCompletionEmail = async (repairRequest: IRepairRequest) => {
                         day: 'numeric',
                   }),
                   requestId: shortId || rawId,
+                  orderNumber: repairRequest.orderNumber,
                   shopName: shopInfo.shopName,
                   trackingUrl,
             };
@@ -688,7 +1075,7 @@ const getCompletedRepairRequests = async (userId: string, query: any) => {
 
       const filter: FilterQuery<IRepairRequest> = {
             userId,
-            status: 'completed',
+            status: { $in: ['completed', 'ready-for-collection'] },
       };
 
       const data = await RepairRequest.find(filter).skip(skip).limit(limit).sort({ createdAt: -1 });
@@ -709,8 +1096,11 @@ const getCustomerRepairHistory = async (
       shopkeeperId: string,
       query: { phone?: string; email?: string; customerId?: string }
 ) => {
-      const { phone, email } = query;
+      const { phone, email, customerId } = query;
       const orConditions: any[] = [];
+      if (customerId && Types.ObjectId.isValid(customerId.trim())) {
+            orConditions.push({ customerId: new Types.ObjectId(customerId.trim()) });
+      }
       if (phone && phone.trim()) {
             orConditions.push({ phoneNumber: phone.trim() });
       }
@@ -756,27 +1146,64 @@ const updateRepairRequestDetails = async (id: string, payload: any) => {
 
       if (payload.firstName !== undefined) updateData.firstName = payload.firstName;
       if (payload.customerName !== undefined && !payload.firstName) updateData.firstName = payload.customerName;
+      if (payload.customerId !== undefined) {
+            const cid = String(payload.customerId || '').trim();
+            updateData.customerId = cid && Types.ObjectId.isValid(cid) ? new Types.ObjectId(cid) : null;
+      }
       if (payload.email !== undefined) updateData.email = payload.email;
       if (payload.phoneNumber !== undefined) updateData.phoneNumber = payload.phoneNumber;
       if (payload.phone !== undefined && !payload.phoneNumber) updateData.phoneNumber = payload.phone;
       if (payload.deviceModel !== undefined) updateData.deviceModel = payload.deviceModel;
       if (payload.modelName !== undefined) updateData.modelName = payload.modelName;
-      if (payload.serialNumber !== undefined) updateData.serialNumber = payload.serialNumber;
-      if (payload.IMEINumber !== undefined) updateData.IMEINumber = payload.IMEINumber;
+      if (payload.serialType !== undefined) updateData.serialType = String(payload.serialType).toLowerCase();
+      if (payload.serialNumber !== undefined) updateData.serialNumber = String(payload.serialNumber || '').trim();
+      if (payload.IMEINumber !== undefined) updateData.IMEINumber = String(payload.IMEINumber || '').trim();
       if (payload.colour !== undefined) updateData.colour = payload.colour;
       if (payload.brand !== undefined) updateData.brand = payload.brand;
       if (payload.modelCode !== undefined) updateData.modelCode = payload.modelCode;
       if (payload.releaseYear !== undefined) updateData.releaseYear = payload.releaseYear;
       if (payload.condition !== undefined) updateData.condition = payload.condition;
-      if (payload.price !== undefined) updateData.price = Number(payload.price);
+      if (payload.expectedCollectionDate !== undefined && payload.expectedCollectionDate) {
+            updateData.expectedCollectionDate = new Date(payload.expectedCollectionDate);
+      }
+      if (Array.isArray(payload.issues)) {
+            const normalizedIssues = normalizeRepairIssues(payload.issues);
+            updateData.issues = normalizedIssues;
+            if (payload.description === undefined && normalizedIssues.length > 0) {
+                  updateData.description = normalizedIssues
+                        .map((i: any) => `${i.category}: ${(i.problems || []).join(', ')}`)
+                        .join('; ');
+            }
+      }
+      if (payload.price !== undefined) {
+            const parsedPrice = Number(payload.price);
+            updateData.price = Number.isFinite(parsedPrice) && parsedPrice >= 0 ? parsedPrice : 0;
+      }
       if (payload.currency !== undefined) updateData.currency = String(payload.currency).trim().toUpperCase();
       if (payload.description !== undefined) updateData.description = payload.description;
       if (payload.technician !== undefined) updateData.technician = payload.technician;
       if (payload.technicianName !== undefined) updateData.technician = payload.technicianName;
 
+      const passcodeField = buildPasscodeField(payload.devicePasscode);
+      if (passcodeField) {
+            updateData.devicePasscode = passcodeField;
+      }
+
+      const updateOp: Record<string, any> = { $set: updateData };
+      if (Array.isArray(payload.issues)) {
+            updateOp.$push = {
+                  history: {
+                        title: 'Faults & Estimate Updated',
+                        description: 'Confirmed faults, pricing or parts updated',
+                        actor: payload.updatedBy || 'Technician',
+                        createdAt: new Date(),
+                  },
+            };
+      }
+
       const result = await RepairRequest.findByIdAndUpdate(
             id,
-            { $set: updateData },
+            updateOp,
             { new: true, runValidators: true }
       );
 
@@ -792,6 +1219,8 @@ const repairRequestService = {
       getMyRepairRequestsHistory,
       getSingleRepairRequest,
       updateStatusByShopKeeper,
+      uploadRepairPhotos,
+      revealDevicePasscode,
       updateRepairRequestDetails,
       addNoteByShopKeeper,
       addTeachNoteByTechnician,
