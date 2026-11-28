@@ -1,0 +1,1300 @@
+{
+  "total": 48,
+  "rows": [
+    {
+      "deviceName": "Sonos Era 100 (Black)",
+      "model": "Era 100",
+      "brand": "Sonos",
+      "category": "Audio",
+      "barcode": "8717755779632",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Black",
+      "modelNumber": "Era 100",
+      "partNumber": "E10G1UK1BLK",
+      "sku": "E10G1UK1BLK",
+      "upc": "840136805854",
+      "ean": "8717755779632",
+      "gtin14": "08717755779632",
+      "sourceUrl": "https://www.sonos.com/en-gb/shop/era-100-black",
+      "sources": [
+        "https://www.sonos.com/en-gb/shop/era-100-black",
+        "https://www.richersounds.com/sonos-era-100-black/"
+      ],
+      "specs": {
+        "price": 199.0,
+        "currency": "GBP",
+        "subCategory": "Home speakers"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Sonos Era 100 (White)",
+      "model": "Era 100",
+      "brand": "Sonos",
+      "category": "Audio",
+      "barcode": "8717755779625",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "White",
+      "modelNumber": "Era 100",
+      "partNumber": "E10G1UK1",
+      "sku": "E10G1UK1",
+      "upc": "840136805847",
+      "ean": "8717755779625",
+      "gtin14": "08717755779625",
+      "sourceUrl": "https://www.sonos.com/en-gb/shop/era-100-white",
+      "sources": [
+        "https://www.sonos.com/en-gb/shop/era-100-white",
+        "https://www.richersounds.com/sonos-era-100-white/"
+      ],
+      "specs": {
+        "price": 199.0,
+        "currency": "GBP",
+        "subCategory": "Home speakers"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Sonos Era 100 SL (Black)",
+      "model": "Era 100 SL",
+      "brand": "Sonos",
+      "category": "Audio",
+      "barcode": "8717755779717",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Black",
+      "modelNumber": "Era 100 SL",
+      "partNumber": "E10SLUK1BLK",
+      "sku": "E10SLUK1BLK",
+      "ean": "8717755779717",
+      "gtin14": "08717755779717",
+      "sourceUrl": "https://www.sonos.com/en-gb/shop/era-100-sl-black",
+      "sources": [
+        "https://www.sonos.com/en-gb/shop/era-100-sl-black",
+        "https://www.richersounds.com/sonos-era-100-sl-black/"
+      ],
+      "specs": {
+        "price": 149.0,
+        "currency": "GBP",
+        "subCategory": "Home speakers",
+        "priceSource": "Offer shown to | 2026-11-29"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Sonos Era 100 SL (White)",
+      "model": "Era 100 SL",
+      "brand": "Sonos",
+      "category": "Audio",
+      "barcode": "8717755779700",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "White",
+      "modelNumber": "Era 100 SL",
+      "partNumber": "E10SLUK1",
+      "sku": "E10SLUK1",
+      "ean": "8717755779700",
+      "gtin14": "08717755779700",
+      "sourceUrl": "https://www.sonos.com/en-gb/shop/era-100-sl-white",
+      "sources": [
+        "https://www.sonos.com/en-gb/shop/era-100-sl-white",
+        "https://www.richersounds.com/sonos-era-100-sl-white/"
+      ],
+      "specs": {
+        "price": 149.0,
+        "currency": "GBP",
+        "subCategory": "Home speakers",
+        "priceSource": "Offer shown to | 2026-11-29"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Sonos Era 300 (Black)",
+      "model": "Era 300",
+      "brand": "Sonos",
+      "category": "Audio",
+      "barcode": "8717755779496",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Black",
+      "modelNumber": "Era 300",
+      "partNumber": "E30G1UK1BLK",
+      "sku": "E30G1UK1BLK",
+      "upc": "840136805618",
+      "ean": "8717755779496",
+      "gtin14": "08717755779496",
+      "sourceUrl": "https://www.sonos.com/en-gb/shop/era-300-black",
+      "sources": [
+        "https://www.sonos.com/en-gb/shop/era-300-black",
+        "https://www.richersounds.com/sonos-era-300-blk/"
+      ],
+      "specs": {
+        "price": 399.0,
+        "currency": "GBP",
+        "subCategory": "Home speakers",
+        "priceSource": "Offer shown to | 2026-11-29"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Sonos Era 300 (White)",
+      "model": "Era 300",
+      "brand": "Sonos",
+      "category": "Audio",
+      "barcode": "8717755779489",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "White",
+      "modelNumber": "Era 300",
+      "partNumber": "E30G1UK1",
+      "sku": "E30G1UK1",
+      "upc": "840136805601",
+      "ean": "8717755779489",
+      "gtin14": "08717755779489",
+      "sourceUrl": "https://www.sonos.com/en-gb/shop/era-300-white",
+      "sources": [
+        "https://www.sonos.com/en-gb/shop/era-300-white",
+        "https://www.richersounds.com/sonos-era-300-wt/"
+      ],
+      "specs": {
+        "price": 399.0,
+        "currency": "GBP",
+        "subCategory": "Home speakers",
+        "priceSource": "Offer shown to | 2026-11-29"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Sonos Five (Black)",
+      "model": "Five",
+      "brand": "Sonos",
+      "category": "Audio",
+      "barcode": "8717755777140",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Black",
+      "modelNumber": "Five",
+      "partNumber": "FIVE1UK1BLK",
+      "sku": "FIVE1UK1BLK",
+      "ean": "8717755777140",
+      "gtin14": "08717755777140",
+      "sourceUrl": "https://www.sonos.com/en-gb/shop/five-black",
+      "sources": [
+        "https://www.sonos.com/en-gb/shop/five-black"
+      ],
+      "specs": {
+        "price": 399.0,
+        "currency": "GBP",
+        "subCategory": "Home speakers",
+        "priceSource": "Offer shown to | 2026-11-29"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Sonos Five (White)",
+      "model": "Five",
+      "brand": "Sonos",
+      "category": "Audio",
+      "barcode": "8717755777133",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "White",
+      "modelNumber": "Five",
+      "partNumber": "FIVE1UK1",
+      "sku": "FIVE1UK1",
+      "ean": "8717755777133",
+      "gtin14": "08717755777133",
+      "sourceUrl": "https://www.sonos.com/en-gb/shop/five-white",
+      "sources": [
+        "https://www.sonos.com/en-gb/shop/five-white"
+      ],
+      "specs": {
+        "price": 399.0,
+        "currency": "GBP",
+        "subCategory": "Home speakers",
+        "priceSource": "Offer shown to | 2026-11-29"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Sonos Move 2 (Black)",
+      "model": "Move 2",
+      "brand": "Sonos",
+      "category": "Audio",
+      "barcode": "8720862501423",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Black",
+      "modelNumber": "Move 2",
+      "partNumber": "MOVE2UK1BLK",
+      "sku": "MOVE2UK1BLK",
+      "ean": "8720862501423",
+      "gtin14": "08720862501423",
+      "sourceUrl": "https://www.sonos.com/en-gb/shop/move-2-black",
+      "sources": [
+        "https://www.sonos.com/en-gb/shop/move-2-black"
+      ],
+      "specs": {
+        "price": 359.0,
+        "currency": "GBP",
+        "subCategory": "Portable speakers",
+        "priceSource": "Offer shown to | 2026-11-29"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Sonos Move 2 (Green)",
+      "model": "Move 2",
+      "brand": "Sonos",
+      "category": "Audio",
+      "barcode": "8720862501430",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Green",
+      "modelNumber": "Move 2",
+      "partNumber": "MOVE2UK1OGRN",
+      "sku": "MOVE2UK1OGRN",
+      "ean": "8720862501430",
+      "gtin14": "08720862501430",
+      "sourceUrl": "https://www.sonos.com/en-gb/shop/move-2-olive",
+      "sources": [
+        "https://www.sonos.com/en-gb/shop/move-2-olive"
+      ],
+      "specs": {
+        "price": 359.0,
+        "currency": "GBP",
+        "subCategory": "Portable speakers",
+        "priceSource": "Offer shown to | 2026-11-29"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Sonos Move 2 (White)",
+      "model": "Move 2",
+      "brand": "Sonos",
+      "category": "Audio",
+      "barcode": "8720862501416",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "White",
+      "modelNumber": "Move 2",
+      "partNumber": "MOVE2UK1",
+      "sku": "MOVE2UK1",
+      "ean": "8720862501416",
+      "gtin14": "08720862501416",
+      "sourceUrl": "https://www.sonos.com/en-gb/shop/move-2-white",
+      "sources": [
+        "https://www.sonos.com/en-gb/shop/move-2-white"
+      ],
+      "specs": {
+        "price": 359.0,
+        "currency": "GBP",
+        "subCategory": "Portable speakers",
+        "priceSource": "Offer shown to | 2026-11-29"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Sonos Roam 2 (Black)",
+      "model": "Roam 2",
+      "brand": "Sonos",
+      "category": "Audio",
+      "barcode": "8720862502680",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Black",
+      "modelNumber": "Roam 2",
+      "partNumber": "ROAM2R21BLK",
+      "sku": "ROAM2R21BLK",
+      "ean": "8720862502680",
+      "gtin14": "08720862502680",
+      "sourceUrl": "https://www.sonos.com/en-gb/shop/roam-2-black",
+      "sources": [
+        "https://www.sonos.com/en-gb/shop/roam-2-black"
+      ],
+      "specs": {
+        "price": 139.0,
+        "currency": "GBP",
+        "subCategory": "Portable speakers",
+        "priceSource": "Offer shown to | 2026-11-29"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Sonos Roam 2 (Blue)",
+      "model": "Roam 2",
+      "brand": "Sonos",
+      "category": "Audio",
+      "barcode": "8720862502703",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Blue",
+      "modelNumber": "Roam 2",
+      "partNumber": "ROAM2R21WBLU",
+      "sku": "ROAM2R21WBLU",
+      "ean": "8720862502703",
+      "gtin14": "08720862502703",
+      "sourceUrl": "https://www.sonos.com/en-gb/shop/roam-2-wave",
+      "sources": [
+        "https://www.sonos.com/en-gb/shop/roam-2-wave"
+      ],
+      "specs": {
+        "price": 139.0,
+        "currency": "GBP",
+        "subCategory": "Portable speakers",
+        "priceSource": "Offer shown to | 2026-11-29"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Sonos Roam 2 (Green)",
+      "model": "Roam 2",
+      "brand": "Sonos",
+      "category": "Audio",
+      "barcode": "8720862502697",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Green",
+      "modelNumber": "Roam 2",
+      "partNumber": "ROAM2R21OGRN",
+      "sku": "ROAM2R21OGRN",
+      "ean": "8720862502697",
+      "gtin14": "08720862502697",
+      "sourceUrl": "https://www.sonos.com/en-gb/shop/roam-2-olive",
+      "sources": [
+        "https://www.sonos.com/en-gb/shop/roam-2-olive"
+      ],
+      "specs": {
+        "price": 139.0,
+        "currency": "GBP",
+        "subCategory": "Portable speakers",
+        "priceSource": "Offer shown to | 2026-11-29"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Sonos Roam 2 (Red)",
+      "model": "Roam 2",
+      "brand": "Sonos",
+      "category": "Audio",
+      "barcode": "8720862502710",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Red",
+      "modelNumber": "Roam 2",
+      "partNumber": "ROAM2R21SRED",
+      "sku": "ROAM2R21SRED",
+      "ean": "8720862502710",
+      "gtin14": "08720862502710",
+      "sourceUrl": "https://www.sonos.com/en-gb/shop/roam-2-sunset",
+      "sources": [
+        "https://www.sonos.com/en-gb/shop/roam-2-sunset"
+      ],
+      "specs": {
+        "price": 139.0,
+        "currency": "GBP",
+        "subCategory": "Portable speakers",
+        "priceSource": "Offer shown to | 2026-11-29"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Sonos Roam 2 (White)",
+      "model": "Roam 2",
+      "brand": "Sonos",
+      "category": "Audio",
+      "barcode": "8720862502673",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "White",
+      "modelNumber": "Roam 2",
+      "partNumber": "ROAM2R21",
+      "sku": "ROAM2R21",
+      "ean": "8720862502673",
+      "gtin14": "08720862502673",
+      "sourceUrl": "https://www.sonos.com/en-gb/shop/roam-2-white",
+      "sources": [
+        "https://www.sonos.com/en-gb/shop/roam-2-white"
+      ],
+      "specs": {
+        "price": 139.0,
+        "currency": "GBP",
+        "subCategory": "Portable speakers",
+        "priceSource": "Offer shown to | 2026-11-29"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Sonos Play (Black)",
+      "model": "Sonos Play",
+      "brand": "Sonos",
+      "category": "Audio",
+      "barcode": "8720862503786",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Black",
+      "modelNumber": "Sonos Play",
+      "partNumber": "PLAYPR21BLK",
+      "sku": "PLAYPR21BLK",
+      "ean": "8720862503786",
+      "gtin14": "08720862503786",
+      "sourceUrl": "https://www.sonos.com/en-gb/shop/sonos-play-black",
+      "sources": [
+        "https://www.sonos.com/en-gb/shop/sonos-play-black",
+        "https://www.richersounds.com/sonos-play-black/"
+      ],
+      "specs": {
+        "price": 239.0,
+        "currency": "GBP",
+        "subCategory": "Portable speakers",
+        "priceSource": "Offer shown to | 2026-11-29"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Sonos Play (Sand)",
+      "model": "Sonos Play",
+      "brand": "Sonos",
+      "category": "Audio",
+      "barcode": "8720862503793",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Sand",
+      "modelNumber": "Sonos Play",
+      "partNumber": "PLAYPR21SAND",
+      "sku": "PLAYPR21SAND",
+      "ean": "8720862503793",
+      "gtin14": "08720862503793",
+      "sourceUrl": "https://www.sonos.com/en-gb/shop/sonos-play-sand",
+      "sources": [
+        "https://www.sonos.com/en-gb/shop/sonos-play-sand",
+        "https://www.toppreise.ch/price-comparison/Smart-speakers/SONOS-Play-Sand-p883112"
+      ],
+      "specs": {
+        "price": 239.0,
+        "currency": "GBP",
+        "subCategory": "Portable speakers",
+        "priceSource": "Offer shown to | 2026-11-29"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Sonos Play (White)",
+      "model": "Sonos Play",
+      "brand": "Sonos",
+      "category": "Audio",
+      "barcode": "8720862503779",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "White",
+      "modelNumber": "Sonos Play",
+      "partNumber": "PLAYPR21",
+      "sku": "PLAYPR21",
+      "ean": "8720862503779",
+      "gtin14": "08720862503779",
+      "sourceUrl": "https://www.sonos.com/en-gb/shop/sonos-play-white",
+      "sources": [
+        "https://www.sonos.com/en-gb/shop/sonos-play-white",
+        "https://www.richersounds.com/sonos-play-white/"
+      ],
+      "specs": {
+        "price": 239.0,
+        "currency": "GBP",
+        "subCategory": "Portable speakers",
+        "priceSource": "Offer shown to | 2026-11-29"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Sonos Arc Ultra (Black)",
+      "model": "Arc Ultra",
+      "brand": "Sonos",
+      "category": "Audio",
+      "barcode": "8720862502833",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Black",
+      "modelNumber": "Arc Ultra",
+      "partNumber": "ARCG2UK1BLK",
+      "sku": "ARCG2UK1BLK",
+      "ean": "8720862502833",
+      "gtin14": "08720862502833",
+      "sourceUrl": "https://www.sonos.com/en-gb/shop/arc-ultra-black",
+      "sources": [
+        "https://www.sonos.com/en-gb/shop/arc-ultra-black",
+        "https://www.richersounds.com/sonos-arc-ultra-black/"
+      ],
+      "specs": {
+        "price": 799.0,
+        "currency": "GBP",
+        "subCategory": "Soundbars",
+        "priceSource": "Offer shown to | 2026-11-29"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Sonos Arc Ultra (White)",
+      "model": "Arc Ultra",
+      "brand": "Sonos",
+      "category": "Audio",
+      "barcode": "8720862502826",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "White",
+      "modelNumber": "Arc Ultra",
+      "partNumber": "ARCG2UK1",
+      "sku": "ARCG2UK1",
+      "ean": "8720862502826",
+      "gtin14": "08720862502826",
+      "sourceUrl": "https://www.sonos.com/en-gb/shop/arc-ultra-white",
+      "sources": [
+        "https://www.sonos.com/en-gb/shop/arc-ultra-white",
+        "https://www.richersounds.com/sonos-arc-ultra-white/"
+      ],
+      "specs": {
+        "price": 799.0,
+        "currency": "GBP",
+        "subCategory": "Soundbars",
+        "priceSource": "Offer shown to | 2026-11-29"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Sonos Beam (Gen 2) (Black)",
+      "model": "Beam (Gen 2)",
+      "brand": "Sonos",
+      "category": "Audio",
+      "barcode": "8717755778116",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Black",
+      "modelNumber": "Beam (Gen 2)",
+      "partNumber": "BEAM2UK1BLK",
+      "sku": "BEAM2UK1BLK",
+      "ean": "8717755778116",
+      "gtin14": "08717755778116",
+      "sourceUrl": "https://www.sonos.com/en-gb/shop/beam-black",
+      "sources": [
+        "https://www.sonos.com/en-gb/shop/beam-black"
+      ],
+      "specs": {
+        "price": 339.0,
+        "currency": "GBP",
+        "subCategory": "Soundbars",
+        "priceSource": "Offer shown to | 2026-11-29"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Sonos Beam (Gen 2) (White)",
+      "model": "Beam (Gen 2)",
+      "brand": "Sonos",
+      "category": "Audio",
+      "barcode": "8717755778109",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "White",
+      "modelNumber": "Beam (Gen 2)",
+      "partNumber": "BEAM2UK1",
+      "sku": "BEAM2UK1",
+      "ean": "8717755778109",
+      "gtin14": "08717755778109",
+      "sourceUrl": "https://www.sonos.com/en-gb/shop/beam-white",
+      "sources": [
+        "https://www.sonos.com/en-gb/shop/beam-white"
+      ],
+      "specs": {
+        "price": 339.0,
+        "currency": "GBP",
+        "subCategory": "Soundbars",
+        "priceSource": "Offer shown to | 2026-11-29"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Sonos Beam Ultra (Black)",
+      "model": "Beam Ultra",
+      "brand": "Sonos",
+      "category": "Audio",
+      "barcode": "8720862506466",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Black",
+      "modelNumber": "Beam Ultra",
+      "partNumber": "BMULTUK1BLK",
+      "sku": "BMULTUK1BLK",
+      "ean": "8720862506466",
+      "gtin14": "08720862506466",
+      "sourceUrl": "https://www.sonos.com/en-gb/shop/beam-ultra-black",
+      "sources": [
+        "https://www.sonos.com/en-gb/shop/beam-ultra-black",
+        "https://www.richersounds.com/sonos-beam-ultra-black/"
+      ],
+      "specs": {
+        "price": 699.0,
+        "currency": "GBP",
+        "subCategory": "Soundbars"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Sonos Beam Ultra (White)",
+      "model": "Beam Ultra",
+      "brand": "Sonos",
+      "category": "Audio",
+      "barcode": "8720862506459",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "White",
+      "modelNumber": "Beam Ultra",
+      "partNumber": "BMULTUK1",
+      "sku": "BMULTUK1",
+      "ean": "8720862506459",
+      "gtin14": "08720862506459",
+      "sourceUrl": "https://www.sonos.com/en-gb/shop/beam-ultra-white",
+      "sources": [
+        "https://www.sonos.com/en-gb/shop/beam-ultra-white",
+        "https://www.richersounds.com/sonos-beam-ultra-white/"
+      ],
+      "specs": {
+        "price": 699.0,
+        "currency": "GBP",
+        "subCategory": "Soundbars"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Sonos Ray (Black)",
+      "model": "Ray",
+      "brand": "Sonos",
+      "category": "Audio",
+      "barcode": "8717755778499",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Black",
+      "modelNumber": "Ray",
+      "partNumber": "RAYG1UK1BLK",
+      "sku": "RAYG1UK1BLK",
+      "upc": "840136802860",
+      "ean": "8717755778499",
+      "gtin14": "08717755778499",
+      "sourceUrl": "https://www.sonos.com/en-gb/shop/ray-black",
+      "sources": [
+        "https://www.sonos.com/en-gb/shop/ray-black",
+        "https://www.richersounds.com/sonos-ray-black/"
+      ],
+      "specs": {
+        "price": 169.0,
+        "currency": "GBP",
+        "subCategory": "Soundbars",
+        "priceSource": "Offer shown to | 2026-11-29"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Sonos Ray (White)",
+      "model": "Ray",
+      "brand": "Sonos",
+      "category": "Audio",
+      "barcode": "8717755778482",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "White",
+      "modelNumber": "Ray",
+      "partNumber": "RAYG1UK1",
+      "sku": "RAYG1UK1",
+      "upc": "840136802853",
+      "ean": "8717755778482",
+      "gtin14": "08717755778482",
+      "sourceUrl": "https://www.sonos.com/en-gb/shop/ray-white",
+      "sources": [
+        "https://www.sonos.com/en-gb/shop/ray-white",
+        "https://www.richersounds.com/sonos-ray-white/"
+      ],
+      "specs": {
+        "price": 169.0,
+        "currency": "GBP",
+        "subCategory": "Soundbars",
+        "priceSource": "Offer shown to | 2026-11-29"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Sonos Sub 4 (Black)",
+      "model": "Sub 4",
+      "brand": "Sonos",
+      "category": "Audio",
+      "barcode": "8720862503694",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Black",
+      "modelNumber": "Sub 4",
+      "partNumber": "SUBG4UK1BLK",
+      "sku": "SUBG4UK1BLK",
+      "ean": "8720862503694",
+      "gtin14": "08720862503694",
+      "sourceUrl": "https://www.sonos.com/en-gb/shop/sub-4-black",
+      "sources": [
+        "https://www.sonos.com/en-gb/shop/sub-4-black",
+        "https://www.richersounds.com/sonos-sub-4-black/"
+      ],
+      "specs": {
+        "price": 639.0,
+        "currency": "GBP",
+        "subCategory": "Subwoofers",
+        "priceSource": "Offer shown to | 2026-11-29"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Sonos Sub 4 (White)",
+      "model": "Sub 4",
+      "brand": "Sonos",
+      "category": "Audio",
+      "barcode": "8720862503687",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "White",
+      "modelNumber": "Sub 4",
+      "partNumber": "SUBG4UK1",
+      "sku": "SUBG4UK1",
+      "ean": "8720862503687",
+      "gtin14": "08720862503687",
+      "sourceUrl": "https://www.sonos.com/en-gb/shop/sub-4-white",
+      "sources": [
+        "https://www.sonos.com/en-gb/shop/sub-4-white",
+        "https://www.richersounds.com/sonos-sub-4-white/"
+      ],
+      "specs": {
+        "price": 639.0,
+        "currency": "GBP",
+        "subCategory": "Subwoofers",
+        "priceSource": "Offer shown to | 2026-11-29"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Sonos Sub Mini (Black)",
+      "model": "Sub Mini",
+      "brand": "Sonos",
+      "category": "Audio",
+      "barcode": "8717755779113",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Black",
+      "modelNumber": "Sub Mini",
+      "partNumber": "SUBM1UK1BLK",
+      "sku": "SUBM1UK1BLK",
+      "upc": "840136804079",
+      "ean": "8717755779113",
+      "gtin14": "08717755779113",
+      "sourceUrl": "https://www.sonos.com/en-gb/shop/sub-mini-black",
+      "sources": [
+        "https://www.sonos.com/en-gb/shop/sub-mini-black",
+        "https://www.richersounds.com/sono-sub-min-b/"
+      ],
+      "specs": {
+        "price": 339.0,
+        "currency": "GBP",
+        "subCategory": "Subwoofers",
+        "priceSource": "Offer shown to | 2026-11-29"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Sonos Sub Mini (White)",
+      "model": "Sub Mini",
+      "brand": "Sonos",
+      "category": "Audio",
+      "barcode": "8717755779106",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "White",
+      "modelNumber": "Sub Mini",
+      "partNumber": "SUBM1UK1",
+      "sku": "SUBM1UK1",
+      "upc": "840136804062",
+      "ean": "8717755779106",
+      "gtin14": "08717755779106",
+      "sourceUrl": "https://www.sonos.com/en-gb/shop/sub-mini-white",
+      "sources": [
+        "https://www.sonos.com/en-gb/shop/sub-mini-white",
+        "https://www.richersounds.com/sono-sub-min-w/"
+      ],
+      "specs": {
+        "price": 339.0,
+        "currency": "GBP",
+        "subCategory": "Subwoofers",
+        "priceSource": "Offer shown to | 2026-11-29"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Sonos In-Ceiling Speakers by Sonance (6-inch pair)",
+      "model": "In-Ceiling Speakers by",
+      "brand": "Sonos",
+      "category": "Audio",
+      "barcode": "8717755775993",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "modelNumber": "In-Ceiling Speakers by",
+      "partNumber": "INCLGWW1",
+      "sku": "INCLGWW1",
+      "ean": "8717755775993",
+      "gtin14": "08717755775993",
+      "sourceUrl": "https://www.sonos.com/en-gb/shop/ceiling-speaker-pair-six-inch",
+      "sources": [
+        "https://www.sonos.com/en-gb/shop/ceiling-speaker-pair-six-inch",
+        "https://www.richersounds.com/sonos-in-ceiling-by-sonance-6-inch/"
+      ],
+      "specs": {
+        "price": 699.0,
+        "currency": "GBP",
+        "subCategory": "Architectural speakers"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Sonos In-Ceiling Speakers by Sonance (8-inch pair)",
+      "model": "In-Ceiling Speakers by",
+      "brand": "Sonos",
+      "category": "Audio",
+      "barcode": "8720862502338",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "modelNumber": "In-Ceiling Speakers by",
+      "partNumber": "INCL8WW1",
+      "sku": "INCL8WW1",
+      "ean": "8720862502338",
+      "gtin14": "08720862502338",
+      "sourceUrl": "https://www.sonos.com/en-gb/shop/ceiling-speaker-pair-eight-inch",
+      "sources": [
+        "https://www.sonos.com/en-gb/shop/ceiling-speaker-pair-eight-inch",
+        "https://www.richersounds.com/sonos-in-ceiling-by-sonance-8-inch/"
+      ],
+      "specs": {
+        "price": 999.0,
+        "currency": "GBP",
+        "subCategory": "Architectural speakers"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Sonos In-Wall Speakers by Sonos and Sonance",
+      "model": "In-Wall Speakers by",
+      "brand": "Sonos",
+      "category": "Audio",
+      "barcode": "8717755776006",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "modelNumber": "In-Wall Speakers by",
+      "partNumber": "INWLLWW1",
+      "sku": "INWLLWW1",
+      "ean": "8717755776006",
+      "gtin14": "08717755776006",
+      "sourceUrl": "https://www.sonos.com/en-gb/shop/wall-speaker-pair",
+      "sources": [
+        "https://www.sonos.com/en-gb/shop/wall-speaker-pair",
+        "https://www.richersounds.com/sonos-in-wall-by-sonance/"
+      ],
+      "specs": {
+        "price": 699.0,
+        "currency": "GBP",
+        "subCategory": "Architectural speakers"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Sonos Outdoor Speakers by Sonos and Sonance (Black)",
+      "model": "Outdoor Speakers by",
+      "brand": "Sonos",
+      "category": "Audio",
+      "barcode": "8717755779588",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Black",
+      "modelNumber": "Outdoor Speakers by",
+      "partNumber": "OUTDRWW1BLK",
+      "sku": "OUTDRWW1BLK",
+      "ean": "8717755779588",
+      "gtin14": "08717755779588",
+      "sourceUrl": "https://www.sonos.com/en-gb/shop/outdoor-speaker-pair-black",
+      "sources": [
+        "https://www.sonos.com/en-gb/shop/outdoor-speaker-pair-black",
+        "https://www.richersounds.com/sonos-outdoor-by-sonance-black/"
+      ],
+      "specs": {
+        "price": 899.0,
+        "currency": "GBP",
+        "subCategory": "Architectural speakers"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Sonos Outdoor Speakers by Sonos and Sonance (White)",
+      "model": "Outdoor Speakers by",
+      "brand": "Sonos",
+      "category": "Audio",
+      "barcode": "8717755776013",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "White",
+      "modelNumber": "Outdoor Speakers by",
+      "partNumber": "OUTDRWW1",
+      "sku": "OUTDRWW1",
+      "ean": "8717755776013",
+      "gtin14": "08717755776013",
+      "sourceUrl": "https://www.sonos.com/en-gb/shop/outdoor-speaker-pair-white",
+      "sources": [
+        "https://www.sonos.com/en-gb/shop/outdoor-speaker-pair-white",
+        "https://www.richersounds.com/sonos-outdoor-by-sonance-white/"
+      ],
+      "specs": {
+        "price": 899.0,
+        "currency": "GBP",
+        "subCategory": "Architectural speakers"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Sonos One (Black)",
+      "model": "One",
+      "brand": "Sonos",
+      "category": "Audio",
+      "barcode": "8717755775788",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Black",
+      "modelNumber": "One",
+      "partNumber": "ONEG2UK1BLK",
+      "sku": "ONEG2UK1BLK",
+      "ean": "8717755775788",
+      "gtin14": "08717755775788",
+      "sourceUrl": "https://www.sonos.com/en-gb/shop/one-black",
+      "sources": [
+        "https://www.sonos.com/en-gb/shop/one-black"
+      ],
+      "specs": {
+        "price": 199.0,
+        "currency": "GBP",
+        "subCategory": "Earlier home speakers",
+        "priceSource": "Out of stock / last | listed"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Sonos One (White)",
+      "model": "One",
+      "brand": "Sonos",
+      "category": "Audio",
+      "barcode": "8717755775771",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "White",
+      "modelNumber": "One",
+      "partNumber": "ONEG2UK1",
+      "sku": "ONEG2UK1",
+      "ean": "8717755775771",
+      "gtin14": "08717755775771",
+      "sourceUrl": "https://www.sonos.com/en-gb/shop/one-white",
+      "sources": [
+        "https://www.sonos.com/en-gb/shop/one-white"
+      ],
+      "specs": {
+        "price": 199.0,
+        "currency": "GBP",
+        "subCategory": "Earlier home speakers",
+        "priceSource": "Out of stock / last | listed"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Sonos One SL (Black)",
+      "model": "One SL",
+      "brand": "Sonos",
+      "category": "Audio",
+      "barcode": "8717755776624",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Black",
+      "modelNumber": "One SL",
+      "partNumber": "ONESLUK1BLK",
+      "sku": "ONESLUK1BLK",
+      "ean": "8717755776624",
+      "gtin14": "08717755776624",
+      "sourceUrl": "https://www.sonos.com/en-gb/shop/one-sl-black",
+      "sources": [
+        "https://www.sonos.com/en-gb/shop/one-sl-black"
+      ],
+      "specs": {
+        "price": 179.0,
+        "currency": "GBP",
+        "subCategory": "Earlier home speakers",
+        "priceSource": "Out of stock / last | listed"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Sonos One SL (White)",
+      "model": "One SL",
+      "brand": "Sonos",
+      "category": "Audio",
+      "barcode": "8717755776617",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "White",
+      "modelNumber": "One SL",
+      "partNumber": "ONESLUK1",
+      "sku": "ONESLUK1",
+      "ean": "8717755776617",
+      "gtin14": "08717755776617",
+      "sourceUrl": "https://www.sonos.com/en-gb/shop/one-sl-white",
+      "sources": [
+        "https://www.sonos.com/en-gb/shop/one-sl-white"
+      ],
+      "specs": {
+        "price": 179.0,
+        "currency": "GBP",
+        "subCategory": "Earlier home speakers",
+        "priceSource": "Out of stock / last | listed"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Sonos Arc (Black)",
+      "model": "Arc",
+      "brand": "Sonos",
+      "category": "Audio",
+      "barcode": "8717755777188",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Black",
+      "modelNumber": "Arc",
+      "partNumber": "ARCG1UK1BLK",
+      "sku": "ARCG1UK1BLK",
+      "ean": "8717755777188",
+      "gtin14": "08717755777188",
+      "sourceUrl": "https://www.sonos.com/en-gb/shop/arc-black",
+      "sources": [
+        "https://www.sonos.com/en-gb/shop/arc-black"
+      ],
+      "specs": {
+        "price": 899.0,
+        "currency": "GBP",
+        "subCategory": "Earlier soundbars",
+        "priceSource": "Out of stock / last | listed"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Sonos Arc (White)",
+      "model": "Arc",
+      "brand": "Sonos",
+      "category": "Audio",
+      "barcode": "8717755777171",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "White",
+      "modelNumber": "Arc",
+      "partNumber": "ARCG1UK1",
+      "sku": "ARCG1UK1",
+      "ean": "8717755777171",
+      "gtin14": "08717755777171",
+      "sourceUrl": "https://www.sonos.com/en-gb/shop/arc-white",
+      "sources": [
+        "https://www.sonos.com/en-gb/shop/arc-white"
+      ],
+      "specs": {
+        "price": 899.0,
+        "currency": "GBP",
+        "subCategory": "Earlier soundbars"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Sonos Ace (Black)",
+      "model": "S49",
+      "brand": "Sonos",
+      "category": "Audio",
+      "barcode": "8720862502642",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Black",
+      "modelNumber": "S49",
+      "partNumber": "ACEG1R21BLK",
+      "sku": "ACEG1R21BLK",
+      "upc": "840136811046",
+      "ean": "8720862502642",
+      "gtin14": "08720862502642",
+      "imageUrl": "https://media.sonos.com/images/znqtjj88/production/34735de0ce8535cb9fe2af5a78db26dcb4aaa9f1-2500x2500.png",
+      "sourceUrl": "https://www.sonos.com/en-gb/shop/sonos-ace-black",
+      "sources": [
+        "https://www.sonos.com/en-gb/shop/sonos-ace-black",
+        "https://media.sonos.com/images/znqtjj88/production/34735de0ce8535cb9fe2af5a78db26dcb4aaa9f1-2500x2500.png",
+        "https://www.sonos.com/pdfs/conformity/ace.pdf",
+        "https://www.richersounds.com/sonos-ace-black/"
+      ],
+      "specs": {
+        "price": 199.0,
+        "currency": "GBP",
+        "subCategory": "Headphones & earphones",
+        "priceSource": "Sonos UK offer"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Sonos Ace (Soft White)",
+      "model": "S49",
+      "brand": "Sonos",
+      "category": "Audio",
+      "barcode": "8720862502635",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Soft White",
+      "modelNumber": "S49",
+      "partNumber": "ACEG1R21",
+      "sku": "ACEG1R21",
+      "upc": "840136811039",
+      "ean": "8720862502635",
+      "gtin14": "08720862502635",
+      "imageUrl": "https://media.sonos.com/images/znqtjj88/production/9d695f869fc53e3275d8243cb186878de43dffc9-2500x2500.png",
+      "sourceUrl": "https://www.sonos.com/en-gb/shop/sonos-ace-white",
+      "sources": [
+        "https://www.sonos.com/en-gb/shop/sonos-ace-white",
+        "https://media.sonos.com/images/znqtjj88/production/9d695f869fc53e3275d8243cb186878de43dffc9-2500x2500.png",
+        "https://www.sonos.com/pdfs/conformity/ace.pdf",
+        "https://www.richersounds.com/sonos-ace-white/"
+      ],
+      "specs": {
+        "price": 199.0,
+        "currency": "GBP",
+        "subCategory": "Headphones & earphones",
+        "priceSource": "Sonos UK offer"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Sonos Ace Ultra (Black)",
+      "model": "S52A",
+      "brand": "Sonos",
+      "category": "Audio",
+      "barcode": "8720862506251",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Black",
+      "modelNumber": "S52A",
+      "partNumber": "ACEULWW1BLK",
+      "sku": "ACEULWW1BLK",
+      "upc": "840136817185",
+      "ean": "8720862506251",
+      "gtin14": "08720862506251",
+      "imageUrl": "https://media.sonos.com/images/znqtjj88/production/9b437ac1b24bdddc64be4434ef09f296bb60b4cf-2000x2000.png",
+      "sourceUrl": "https://www.sonos.com/en-gb/shop/sonos-ace-ultra-black",
+      "sources": [
+        "https://www.sonos.com/en-gb/shop/sonos-ace-ultra-black",
+        "https://media.sonos.com/images/znqtjj88/production/9b437ac1b24bdddc64be4434ef09f296bb60b4cf-2000x2000.png",
+        "https://fccid.io/SBVRM052",
+        "https://www.richersounds.com/sonos-ace-ultra-black/"
+      ],
+      "specs": {
+        "price": 399.0,
+        "currency": "GBP",
+        "subCategory": "Headphones & earphones",
+        "priceSource": "Sonos UK"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Sonos Ace Ultra (Soft White)",
+      "model": "S52A",
+      "brand": "Sonos",
+      "category": "Audio",
+      "barcode": "8720862506244",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Soft White",
+      "modelNumber": "S52A",
+      "partNumber": "ACEULWW1",
+      "sku": "ACEULWW1",
+      "upc": "840136817178",
+      "ean": "8720862506244",
+      "gtin14": "08720862506244",
+      "imageUrl": "https://media.sonos.com/images/znqtjj88/production/8aa60d458034cd3b4bd5c22ff73074e77b0bc491-2000x2000.png",
+      "sourceUrl": "https://www.sonos.com/en-gb/shop/sonos-ace-ultra-white",
+      "sources": [
+        "https://www.sonos.com/en-gb/shop/sonos-ace-ultra-white",
+        "https://media.sonos.com/images/znqtjj88/production/8aa60d458034cd3b4bd5c22ff73074e77b0bc491-2000x2000.png",
+        "https://fccid.io/SBVRM052",
+        "https://www.richersounds.com/sonos-ace-ultra-white/"
+      ],
+      "specs": {
+        "price": 399.0,
+        "currency": "GBP",
+        "subCategory": "Headphones & earphones",
+        "priceSource": "Sonos UK"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Sonos Ace Ultra (Agave)",
+      "model": "S52A",
+      "brand": "Sonos",
+      "category": "Audio",
+      "barcode": "0840136817192",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Agave",
+      "modelNumber": "S52A",
+      "partNumber": "ACEULWW1AGAV",
+      "sku": "ACEULWW1AGAV",
+      "upc": "840136817192",
+      "ean": "0840136817192",
+      "gtin14": "00840136817192",
+      "imageUrl": "https://media.sonos.com/images/znqtjj88/production/aa37d8c32004da907a05afb81fd832c9964dbf9f-2000x2000.png",
+      "sourceUrl": "https://www.sonos.com/en-gb/shop/sonos-ace-ultra-agave",
+      "sources": [
+        "https://www.sonos.com/en-gb/shop/sonos-ace-ultra-agave",
+        "https://media.sonos.com/images/znqtjj88/production/aa37d8c32004da907a05afb81fd832c9964dbf9f-2000x2000.png",
+        "https://fccid.io/SBVRM052"
+      ],
+      "specs": {
+        "price": 399.0,
+        "currency": "GBP",
+        "subCategory": "Headphones & earphones",
+        "priceSource": "Sonos UK"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Sonos Ace Ultra (Sand)",
+      "model": "S52A",
+      "brand": "Sonos",
+      "category": "Audio",
+      "barcode": "0840136817208",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Sand",
+      "modelNumber": "S52A",
+      "partNumber": "ACEULWW1SAND",
+      "sku": "ACEULWW1SAND",
+      "upc": "840136817208",
+      "ean": "0840136817208",
+      "gtin14": "00840136817208",
+      "imageUrl": "https://media.sonos.com/images/znqtjj88/production/8de354bcfd45d563469f8225ae8ea81fbccaf121-2000x2000.png",
+      "sourceUrl": "https://www.sonos.com/en-gb/shop/sonos-ace-ultra-sand",
+      "sources": [
+        "https://www.sonos.com/en-gb/shop/sonos-ace-ultra-sand",
+        "https://media.sonos.com/images/znqtjj88/production/8de354bcfd45d563469f8225ae8ea81fbccaf121-2000x2000.png",
+        "https://fccid.io/SBVRM052"
+      ],
+      "specs": {
+        "price": 399.0,
+        "currency": "GBP",
+        "subCategory": "Headphones & earphones",
+        "priceSource": "Sonos UK"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    }
+  ]
+}

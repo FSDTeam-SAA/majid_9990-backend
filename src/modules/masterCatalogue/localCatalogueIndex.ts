@@ -13,6 +13,11 @@ const STRUCTURED_CATALOGUE_FILES = [
       'IMOSCAN_Mac_Catalogue.json',
       'IMOSCAN_Laptop_PC_Monitor_Catalogue.json',
       'IMOSCAN_Components_Consoles_Home_Catalogue.json',
+      'IMOSCAN_Bang_And_Olufsen_Audio_Catalogue.json',
+      'IMOSCAN_Bose_Audio_Catalogue.json',
+      'IMOSCAN_Seven_Brand_UK_Audio_Catalogue.json',
+      'IMOSCAN_Sonos_Audio_Catalogue.json',
+      'IMOSCAN_UK_Vape_Catalogue.json',
 ];
 
 let cachedItems: Partial<IMasterCatalogue>[] | null = null;
@@ -88,6 +93,8 @@ const mapStructuredRow = (r: Record<string, any>): Partial<IMasterCatalogue> | n
             imageUrl: r.imageUrl || r.image_url || undefined,
             imageKey: r.imageKey || r.image_key || undefined,
             sourceStatus: r.sourceStatus || 'preloaded',
+            sourceUrl: r.sourceUrl || r.source_url || undefined,
+            sources: Array.isArray(r.sources) ? r.sources : undefined,
             market: r.market ? String(r.market).trim() : undefined,
             specs:
                   r.specs && typeof r.specs === 'object'

@@ -37,6 +37,12 @@ const run = async () => {
             { code: '4712900743449', brand: 'ASUS', category: 'Graphics Card' }, // GPU
             { code: '0711719051831', brand: 'PlayStation', category: 'Gaming Console' }, // Console
             { code: '195951201412', brand: 'Beats', category: 'Audio' }, // Beats supplement via UPC-A
+            { code: '5705260087994', brand: 'Bang & Olufsen', category: 'Audio' }, // B&O Beolit 20
+            { code: '017817852470', brand: 'Bose', category: 'Audio' }, // Bose SoundLink Flex via UPC-A
+            { code: '1200130024269', brand: 'JBL', category: 'Audio' }, // JBL Boombox 4 (Seven Brand)
+            { code: '840136805854', brand: 'Sonos', category: 'Audio' }, // Sonos Era 100 via UPC-A
+            { code: '8717755779632', brand: 'Sonos', category: 'Audio' }, // Sonos Era 100 via distinct EAN-13
+            { code: '6942886102673', brand: 'Vaporesso', category: 'Vape' }, // UK Vape
       ];
 
       for (const sample of samples) {
@@ -45,6 +51,14 @@ const run = async () => {
             assert.strictEqual(hit.brand, sample.brand);
             assert.strictEqual(hit.category, sample.category);
       }
+
+      // 3b. Verify UK Vape & Audio search
+      const vapeSearch = searchLocalCatalogue({ query: 'Vaporesso Armour', category: 'Vape' });
+      assert(vapeSearch.results.length > 0, 'Expected UK Vape search results for Vaporesso Armour');
+      assert.strictEqual(vapeSearch.results[0].specs?.currency, 'GBP');
+
+      const sonosSearch = searchLocalCatalogue({ query: 'Era 100', brand: 'Sonos', category: 'Audio' });
+      assert(sonosSearch.results.length > 0, 'Expected Sonos Audio search results for Era 100');
 
       // 4. Confirm Mac CONFLICT barcodes (marked "Do not import") were excluded
       assert.strictEqual(

@@ -1,0 +1,1905 @@
+{
+  "total": 66,
+  "rows": [
+    {
+      "deviceName": "Beolit 20 (Black Anthracite)",
+      "model": "Beolit 20",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260087994",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Black Anthracite",
+      "modelNumber": "Beolit 20",
+      "partNumber": "1253300",
+      "sku": "1253300",
+      "ean": "5705260087994",
+      "gtin14": "05705260087994",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/7EQmEYkru13ZNGl5v32rmN/a26b3d0c38e4cc70438fb2ac6c0135cb/BL20_ant_iphone_2.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/speakers/beolit-20?variant=beolit-20-black-anthracite",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/speakers/beolit-20?variant=beolit-20-black-anthracite",
+        "https://images.ctfassets.net/8cd2csgvqd3m/7EQmEYkru13ZNGl5v32rmN/a26b3d0c38e4cc70438fb2ac6c0135cb/BL20_ant_iphone_2.png",
+        "https://catalog.asbis.bg/en/product/1253300"
+      ],
+      "specs": {
+        "price": 579.0,
+        "currency": "GBP",
+        "subCategory": "Portable speakers",
+        "priceSource": "B&O UK"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beolit 20 (Grey Mist)",
+      "model": "Beolit 20",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260088021",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Grey Mist",
+      "modelNumber": "Beolit 20",
+      "partNumber": "1253303",
+      "sku": "1253303",
+      "ean": "5705260088021",
+      "gtin14": "05705260088021",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/3rUMHE0GRKR0eACCntNBlr/2dc73adfb01a3bbf79e19f12578376d5/BL20_Grey_iphone_2.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/speakers/beolit-20?variant=beolit-20-grey-mist",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/speakers/beolit-20?variant=beolit-20-grey-mist",
+        "https://images.ctfassets.net/8cd2csgvqd3m/3rUMHE0GRKR0eACCntNBlr/2dc73adfb01a3bbf79e19f12578376d5/BL20_Grey_iphone_2.png",
+        "https://catalog.asbis.bg/en/product/1253303"
+      ],
+      "specs": {
+        "price": 579.0,
+        "currency": "GBP",
+        "subCategory": "Portable speakers",
+        "priceSource": "B&O UK"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beosound A1 3rd Gen (Eucalyptus Green)",
+      "model": "Beosound A1 3rd Gen",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260123838",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Eucalyptus Green",
+      "modelNumber": "Beosound A1 3rd Gen",
+      "partNumber": "1736009",
+      "sku": "1736009",
+      "ean": "5705260123838",
+      "gtin14": "05705260123838",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/6DXLm6jZ24m1q5FBb5wMw0/e274915531504ca84b611ec7770f1c28/Packshot-Beosound-A1-3rd-Gen-Eucalyptus-Green-Perspective-0009-s1200x1200px.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/speakers/beosound-a1?variant=beosound-a1-3rd-gen-eucalyptus-green",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/speakers/beosound-a1?variant=beosound-a1-3rd-gen-eucalyptus-green",
+        "https://images.ctfassets.net/8cd2csgvqd3m/6DXLm6jZ24m1q5FBb5wMw0/e274915531504ca84b611ec7770f1c28/Packshot-Beosound-A1-3rd-Gen-Eucalyptus-Green-Perspective-0009-s1200x1200px.png",
+        "https://cdn.c2ccertified.org/certifications/Bang_Olufsen_AS/Beosound_A1_3rd_Gen/Bang_Beoso_Bronz_CERT1796_2025-04-30_104644.pdf"
+      ],
+      "specs": {
+        "price": 299.0,
+        "currency": "GBP",
+        "subCategory": "Portable speakers",
+        "priceSource": "B&O UK"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beosound A1 3rd Gen (Honey Tone)",
+      "model": "Beosound A1 3rd Gen",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260120226",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Honey Tone",
+      "modelNumber": "Beosound A1 3rd Gen",
+      "partNumber": "1736001",
+      "sku": "1736001",
+      "ean": "5705260120226",
+      "gtin14": "05705260120226",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/43y54oeSiAvrhoUGmN4gXm/db7ef7e5a6eae7f2e7c214fc609fb55a/Packshot-Beosound-A1-3rd-Gen-Honey-Tone-Perspective-0015-s1200x1200px.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/speakers/beosound-a1?variant=beosound-a1-3rd-gen-honey-tone",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/speakers/beosound-a1?variant=beosound-a1-3rd-gen-honey-tone",
+        "https://images.ctfassets.net/8cd2csgvqd3m/43y54oeSiAvrhoUGmN4gXm/db7ef7e5a6eae7f2e7c214fc609fb55a/Packshot-Beosound-A1-3rd-Gen-Honey-Tone-Perspective-0015-s1200x1200px.png",
+        "https://cdn.c2ccertified.org/certifications/Bang_Olufsen_AS/Beosound_A1_3rd_Gen/Bang_Beoso_Bronz_CERT1796_2025-04-30_104644.pdf"
+      ],
+      "specs": {
+        "price": 299.0,
+        "currency": "GBP",
+        "subCategory": "Portable speakers",
+        "priceSource": "B&O UK"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beosound A1 3rd Gen (Lavender Purple)",
+      "model": "Beosound A1 3rd Gen",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260131246",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Lavender Purple",
+      "modelNumber": "Beosound A1 3rd Gen",
+      "partNumber": "1736015",
+      "sku": "1736015",
+      "ean": "5705260131246",
+      "gtin14": "05705260131246",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/5uAoqbF2jgLcBQWVWHmR7w/ba88aca5d74da283be3306d7e6e8948c/test4.webp",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/speakers/beosound-a1?variant=beosound-a1-3rd-gen-lavender-purple",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/speakers/beosound-a1?variant=beosound-a1-3rd-gen-lavender-purple",
+        "https://images.ctfassets.net/8cd2csgvqd3m/5uAoqbF2jgLcBQWVWHmR7w/ba88aca5d74da283be3306d7e6e8948c/test4.webp",
+        "https://www.elcorteingles.pt/tecnologia/MP_0906814_1736015-coluna-bluetooth-beosound-a1-3rd-gen-lavender-purple/"
+      ],
+      "specs": {
+        "price": 299.0,
+        "currency": "GBP",
+        "subCategory": "Portable speakers",
+        "priceSource": "B&O UK"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beosound A1 3rd Gen (Natural Aluminium)",
+      "model": "Beosound A1 3rd Gen",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260120233",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Natural Aluminium",
+      "modelNumber": "Beosound A1 3rd Gen",
+      "partNumber": "1736002",
+      "sku": "1736002",
+      "ean": "5705260120233",
+      "gtin14": "05705260120233",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/4b8J9zwiP0mqZLddB6S1Dn/502de4e95c6bab99cca4e35f290d2638/Packshot-Beosound-A1-3rd-Gen-Natural-Aluminium-Perspective-0003-s1200x1200px.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/speakers/beosound-a1?variant=beosound-a1-3rd-gen-natural-aluminium",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/speakers/beosound-a1?variant=beosound-a1-3rd-gen-natural-aluminium",
+        "https://images.ctfassets.net/8cd2csgvqd3m/4b8J9zwiP0mqZLddB6S1Dn/502de4e95c6bab99cca4e35f290d2638/Packshot-Beosound-A1-3rd-Gen-Natural-Aluminium-Perspective-0003-s1200x1200px.png",
+        "https://cdn.c2ccertified.org/certifications/Bang_Olufsen_AS/Beosound_A1_3rd_Gen/Bang_Beoso_Bronz_CERT1796_2025-04-30_104644.pdf"
+      ],
+      "specs": {
+        "price": 299.0,
+        "currency": "GBP",
+        "subCategory": "Portable speakers",
+        "priceSource": "B&O UK"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beosound A1 3rd Gen (Rustic Red)",
+      "model": "Beosound A1 3rd Gen",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260129298",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Rustic Red",
+      "modelNumber": "Beosound A1 3rd Gen",
+      "partNumber": "1736012",
+      "sku": "1736012",
+      "ean": "5705260129298",
+      "gtin14": "05705260129298",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/2LaNjnx5FG3xnPFqI48wXp/30729d264e4b9f99ad01875d3159e4d9/rusticredfilipsimge1.webp",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/speakers/beosound-a1?variant=beosound-a1-3rd-gen-rustic-red",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/speakers/beosound-a1?variant=beosound-a1-3rd-gen-rustic-red",
+        "https://images.ctfassets.net/8cd2csgvqd3m/2LaNjnx5FG3xnPFqI48wXp/30729d264e4b9f99ad01875d3159e4d9/rusticredfilipsimge1.webp",
+        "https://catalog.asbis.lv/en/product/1736012"
+      ],
+      "specs": {
+        "price": 299.0,
+        "currency": "GBP",
+        "subCategory": "Portable speakers",
+        "priceSource": "B&O UK"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beosound A1 3rd Gen (Warm Granite)",
+      "model": "Beosound A1 3rd Gen",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260120219",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Warm Granite",
+      "modelNumber": "Beosound A1 3rd Gen",
+      "partNumber": "1736000",
+      "sku": "1736000",
+      "ean": "5705260120219",
+      "gtin14": "05705260120219",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/6xFgsjm7X6YfFNZLX0dMS0/f82ff75ce86cbce66e9d4d1a0651e6f3/Packshot-Beosound-a1-3rd-gen-Granite-Perspective-0021-s1200x1200px.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/speakers/beosound-a1?variant=beosound-a1-3rd-gen-warm-granite",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/speakers/beosound-a1?variant=beosound-a1-3rd-gen-warm-granite",
+        "https://images.ctfassets.net/8cd2csgvqd3m/6xFgsjm7X6YfFNZLX0dMS0/f82ff75ce86cbce66e9d4d1a0651e6f3/Packshot-Beosound-a1-3rd-gen-Granite-Perspective-0021-s1200x1200px.png",
+        "https://cdn.c2ccertified.org/certifications/Bang_Olufsen_AS/Beosound_A1_3rd_Gen/Bang_Beoso_Bronz_CERT1796_2025-07-23_5344.pdf"
+      ],
+      "specs": {
+        "price": 299.0,
+        "currency": "GBP",
+        "subCategory": "Portable speakers",
+        "priceSource": "B&O UK"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beosound A5 (Dark Oak)",
+      "model": "Beosound A5",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260097214",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Dark Oak",
+      "modelNumber": "Beosound A5",
+      "partNumber": "1254100",
+      "sku": "1254100",
+      "ean": "5705260097214",
+      "gtin14": "05705260097214",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/4RJBK4ay1tqJCkeOXte7nn/1589559d668e1046ee9985d63645d7e6/Beosound_A5_-_PDP_-_Image_1_-_Dark_Oak.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/speakers/beosound-a5?variant=beosound-a5-dark-oak",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/speakers/beosound-a5?variant=beosound-a5-dark-oak",
+        "https://images.ctfassets.net/8cd2csgvqd3m/4RJBK4ay1tqJCkeOXte7nn/1589559d668e1046ee9985d63645d7e6/Beosound_A5_-_PDP_-_Image_1_-_Dark_Oak.png",
+        "https://uk-new.ingrammicro.com/site/productdetail?id=CG86564"
+      ],
+      "specs": {
+        "price": 1400.0,
+        "currency": "GBP",
+        "subCategory": "Portable speakers",
+        "priceSource": "B&O UK"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beosound A5 (Navy Blue)",
+      "model": "Beosound A5",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260117806",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Navy Blue",
+      "modelNumber": "Beosound A5",
+      "partNumber": "1254112",
+      "sku": "1254112",
+      "ean": "5705260117806",
+      "gtin14": "05705260117806",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/4HjSYdm9IlP8r1wUbHeman/26b6c95d9f72781c5462722796ea8335/Packshot-Beosound-A5-Riva-0006-Front-s1200x1200px.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/speakers/beosound-a5?variant=beosound-a5-riva",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/speakers/beosound-a5?variant=beosound-a5-riva",
+        "https://images.ctfassets.net/8cd2csgvqd3m/4HjSYdm9IlP8r1wUbHeman/26b6c95d9f72781c5462722796ea8335/Packshot-Beosound-A5-Riva-0006-Front-s1200x1200px.png",
+        "https://catalog.asbis.bg/en/product/1254112"
+      ],
+      "specs": {
+        "price": 2050.0,
+        "currency": "GBP",
+        "subCategory": "Portable speakers",
+        "priceSource": "B&O UK"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beosound A5 (Oak)",
+      "model": "Beosound A5",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260123562",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Oak",
+      "modelNumber": "Beosound A5",
+      "partNumber": "1254119",
+      "sku": "1254119",
+      "ean": "5705260123562",
+      "gtin14": "05705260123562",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/18q5B9Mo33OZYrdKWi5R1F/9b2cd14640edd3b78f296def418e0d9e/123__1_.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/speakers/beosound-a5?variant=beosound-a5-oak",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/speakers/beosound-a5?variant=beosound-a5-oak",
+        "https://images.ctfassets.net/8cd2csgvqd3m/18q5B9Mo33OZYrdKWi5R1F/9b2cd14640edd3b78f296def418e0d9e/123__1_.png",
+        "https://catalog.asbis.lv/en/product/1254119"
+      ],
+      "specs": {
+        "price": 1400.0,
+        "currency": "GBP",
+        "subCategory": "Portable speakers",
+        "priceSource": "B&O UK"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beosound Explore (Black Anthracite)",
+      "model": "Beosound Explore",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260089745",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Black Anthracite",
+      "modelNumber": "Beosound Explore",
+      "partNumber": "1626000",
+      "sku": "1626000",
+      "ean": "5705260089745",
+      "gtin14": "05705260089745",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/7vnVelbkyTnpTetUUZvvA8/aaca5f532ecfb3284ebb37018ce239e9/Packshot-Beosound-Explore-Black-Anthracite-0035-Perspective-1200x1200.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/speakers/beosound-explore?variant=beosound-explore-blackanthracite",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/speakers/beosound-explore?variant=beosound-explore-blackanthracite",
+        "https://images.ctfassets.net/8cd2csgvqd3m/7vnVelbkyTnpTetUUZvvA8/aaca5f532ecfb3284ebb37018ce239e9/Packshot-Beosound-Explore-Black-Anthracite-0035-Perspective-1200x1200.png",
+        "https://www.ebay.co.uk/p/19047196470"
+      ],
+      "specs": {
+        "price": 219.0,
+        "currency": "GBP",
+        "subCategory": "Portable speakers",
+        "priceSource": "B&O UK"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beosound Explore (Bonfire Orange)",
+      "model": "Beosound Explore",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260117745",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Bonfire Orange",
+      "modelNumber": "Beosound Explore",
+      "partNumber": "1626037",
+      "sku": "1626037",
+      "ean": "5705260117745",
+      "gtin14": "05705260117745",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/6XGtrHeKepyYPGF3hXjMfE/c41ebf03357393cd03760a72c89183e1/Packshot-Beosound-Explore-Bonfire-Orange_0007_Packshot---2000x2000---_0006_Beosound-Explore-0162.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/speakers/beosound-explore?variant=beosound-explore-bonfire-orange",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/speakers/beosound-explore?variant=beosound-explore-bonfire-orange",
+        "https://images.ctfassets.net/8cd2csgvqd3m/6XGtrHeKepyYPGF3hXjMfE/c41ebf03357393cd03760a72c89183e1/Packshot-Beosound-Explore-Bonfire-Orange_0007_Packshot---2000x2000---_0006_Beosound-Explore-0162.png",
+        "https://catalog.asbis.bg/en/product/1626037"
+      ],
+      "specs": {
+        "price": 219.0,
+        "currency": "GBP",
+        "subCategory": "Portable speakers",
+        "priceSource": "B&O UK"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beosound Explore (Green)",
+      "model": "Beosound Explore",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260090901",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Green",
+      "modelNumber": "Beosound Explore",
+      "partNumber": "1626004",
+      "sku": "1626004",
+      "ean": "5705260090901",
+      "gtin14": "05705260090901",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/2MsqTRY5PEMO9qHDciqtDL/c7ddc710a5deae40adc6f094ce1aa6b2/Packshot-Beosound-Explore-Green-0033-Perspective-1200x1200.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/speakers/beosound-explore?variant=beosound-explore-green",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/speakers/beosound-explore?variant=beosound-explore-green",
+        "https://images.ctfassets.net/8cd2csgvqd3m/2MsqTRY5PEMO9qHDciqtDL/c7ddc710a5deae40adc6f094ce1aa6b2/Packshot-Beosound-Explore-Green-0033-Perspective-1200x1200.png",
+        "https://catalog.asbis.bg/en/product/1626004"
+      ],
+      "specs": {
+        "price": 219.0,
+        "currency": "GBP",
+        "subCategory": "Portable speakers",
+        "priceSource": "B&O UK"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beosound Explore (Grey Mist)",
+      "model": "Beosound Explore",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260090895",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Grey Mist",
+      "modelNumber": "Beosound Explore",
+      "partNumber": "1626003",
+      "sku": "1626003",
+      "ean": "5705260090895",
+      "gtin14": "05705260090895",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/2XPkh6COIXVDDsFw28quog/ecd5818bea8ebcee573d1e402c686e90/Packshot-Beosound-Explore-Grey-Mist-0034-Perspective-1200x1200.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/speakers/beosound-explore?variant=beosound-explore-greymist",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/speakers/beosound-explore?variant=beosound-explore-greymist",
+        "https://images.ctfassets.net/8cd2csgvqd3m/2XPkh6COIXVDDsFw28quog/ecd5818bea8ebcee573d1e402c686e90/Packshot-Beosound-Explore-Grey-Mist-0034-Perspective-1200x1200.png",
+        "https://catalog.asbis.bg/en/product/1626003"
+      ],
+      "specs": {
+        "price": 219.0,
+        "currency": "GBP",
+        "subCategory": "Portable speakers",
+        "priceSource": "B&O UK"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beolab 19 (Gold Tone)",
+      "model": "Beolab 19",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260093780",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Gold Tone",
+      "modelNumber": "Beolab 19",
+      "partNumber": "1620690",
+      "sku": "1620690",
+      "ean": "5705260093780",
+      "gtin14": "05705260093780",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/Z4vM9rKw3fvkaTtQVXj9i/014c5d73e241bbf8bba8450376d9286f/Beolab_19_-_Gold_Tone_-_Front_side.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/speakers/beolab-19?variant=beolab-19-goldtone",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/speakers/beolab-19?variant=beolab-19-goldtone",
+        "https://images.ctfassets.net/8cd2csgvqd3m/Z4vM9rKw3fvkaTtQVXj9i/014c5d73e241bbf8bba8450376d9286f/Beolab_19_-_Gold_Tone_-_Front_side.png",
+        "https://catalog.asbis.bg/en/product/1620690"
+      ],
+      "specs": {
+        "price": 3500.0,
+        "currency": "GBP",
+        "subCategory": "Home speakers & subwoofers",
+        "priceSource": "B&O UK"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beolab 28 (Gold Tone)",
+      "model": "Beolab 28",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260090642",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Gold Tone",
+      "modelNumber": "Beolab 28",
+      "partNumber": "1454902",
+      "sku": "1454902",
+      "ean": "5705260090642",
+      "gtin14": "05705260090642",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/4Xyy7NQEvc6n6IGXe7Fh82/dcd148d6b043ee001b1754ce6caac864/Gold_tone_-_stereo.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/speakers/beolab-28?variant=beolab-28-gold-tone",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/speakers/beolab-28?variant=beolab-28-gold-tone",
+        "https://images.ctfassets.net/8cd2csgvqd3m/4Xyy7NQEvc6n6IGXe7Fh82/dcd148d6b043ee001b1754ce6caac864/Gold_tone_-_stereo.png",
+        "https://catalog.asbis.bg/en/product/1454902"
+      ],
+      "specs": {
+        "price": 16100.0,
+        "currency": "GBP",
+        "subCategory": "Home speakers & subwoofers",
+        "priceSource": "B&O UK"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beolab 28 (Grey)",
+      "model": "Beolab 28",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260085198",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Grey",
+      "modelNumber": "Beolab 28",
+      "partNumber": "1454500",
+      "sku": "1454500",
+      "ean": "5705260085198",
+      "gtin14": "05705260085198",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/1cA5kHv1Msa0bYXA49iOdK/aace4897dea16ab71105abb6d5b599b2/Beolab_28_0191_1.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/speakers/beolab-28?variant=beolab-28-grey",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/speakers/beolab-28?variant=beolab-28-grey",
+        "https://images.ctfassets.net/8cd2csgvqd3m/1cA5kHv1Msa0bYXA49iOdK/aace4897dea16ab71105abb6d5b599b2/Beolab_28_0191_1.png",
+        "https://catalog.asbis.bg/en/product/1454500"
+      ],
+      "specs": {
+        "price": 14900.0,
+        "currency": "GBP",
+        "subCategory": "Home speakers & subwoofers",
+        "priceSource": "B&O UK"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beolab 28 (Oak)",
+      "model": "Beolab 28",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260090628",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Oak",
+      "modelNumber": "Beolab 28",
+      "partNumber": "1454502",
+      "sku": "1454502",
+      "ean": "5705260090628",
+      "gtin14": "05705260090628",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/44bO6H5bKeUyCU7LoTLGwC/8a0e0142284210683788d965b7d8101b/Packshot-Beolab-28-Oak-0192-Front-S1200x1200px.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/speakers/beolab-28?variant=beolab-28-oak",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/speakers/beolab-28?variant=beolab-28-oak",
+        "https://images.ctfassets.net/8cd2csgvqd3m/44bO6H5bKeUyCU7LoTLGwC/8a0e0142284210683788d965b7d8101b/Packshot-Beolab-28-Oak-0192-Front-S1200x1200px.png",
+        "https://catalog.asbis.bg/en/product/1454502"
+      ],
+      "specs": {
+        "price": 16100.0,
+        "currency": "GBP",
+        "subCategory": "Home speakers & subwoofers",
+        "priceSource": "B&O UK"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beolab 90 (Sand)",
+      "model": "Beolab 90",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260089578",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Sand",
+      "modelNumber": "Beolab 90",
+      "partNumber": "1620636",
+      "sku": "1620636",
+      "ean": "5705260089578",
+      "gtin14": "05705260089578",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/221Vk9rVq3QhbED4MnF1YW/b670378612200194b6d791eb41c97497/Product-Variant---beolab-90-sand-goldentone-light-oak---stereo.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/speakers/beolab-90?variant=beolab-90-sand-goldentone-lightoak",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/speakers/beolab-90?variant=beolab-90-sand-goldentone-lightoak",
+        "https://images.ctfassets.net/8cd2csgvqd3m/221Vk9rVq3QhbED4MnF1YW/b670378612200194b6d791eb41c97497/Product-Variant---beolab-90-sand-goldentone-light-oak---stereo.png",
+        "https://catalog.asbis.bg/en/product/1620636"
+      ],
+      "specs": {
+        "price": 143600.0,
+        "currency": "GBP",
+        "subCategory": "Home speakers & subwoofers",
+        "priceSource": "B&O UK"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beosound 2 3rd Gen (Black Anthracite)",
+      "model": "Beosound 2 3rd Gen",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260099454",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Black Anthracite",
+      "modelNumber": "Beosound 2 3rd Gen",
+      "partNumber": "1309105",
+      "sku": "1309105",
+      "ean": "5705260099454",
+      "gtin14": "05705260099454",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/36I3t3W8K2jpbGcUht7l1T/af0fbc1155e42a9c8646b8f6b8061ea6/Beosound_2_-_Black_Anthracite_-_Image_1.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/speakers/beosound-2?variant=beosound-2-black-anthracite",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/speakers/beosound-2?variant=beosound-2-black-anthracite",
+        "https://images.ctfassets.net/8cd2csgvqd3m/36I3t3W8K2jpbGcUht7l1T/af0fbc1155e42a9c8646b8f6b8061ea6/Beosound_2_-_Black_Anthracite_-_Image_1.png",
+        "https://catalog.asbis.ua/en/product/multimedia-speaker-wi-fi-1309105"
+      ],
+      "specs": {
+        "price": 2850.0,
+        "currency": "GBP",
+        "subCategory": "Home speakers & subwoofers",
+        "priceSource": "B&O UK"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beosound 2 3rd Gen (Gold Tone)",
+      "model": "Beosound 2 3rd Gen",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260099447",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Gold Tone",
+      "modelNumber": "Beosound 2 3rd Gen",
+      "partNumber": "1309104",
+      "sku": "1309104",
+      "ean": "5705260099447",
+      "gtin14": "05705260099447",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/3suGGvYDf1XmbMwWgEXbzV/736bc8b1de5ece388ab35a64d8021c34/Beosound_2_-_Goldd_Tone_-_Image_1.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/speakers/beosound-2?variant=beosound-2-gold-tone",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/speakers/beosound-2?variant=beosound-2-gold-tone",
+        "https://images.ctfassets.net/8cd2csgvqd3m/3suGGvYDf1XmbMwWgEXbzV/736bc8b1de5ece388ab35a64d8021c34/Beosound_2_-_Goldd_Tone_-_Image_1.png",
+        "https://catalog.asbis.bg/en/product/1309104"
+      ],
+      "specs": {
+        "price": 2850.0,
+        "currency": "GBP",
+        "subCategory": "Home speakers & subwoofers",
+        "priceSource": "B&O UK"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beosound 2 3rd Gen (Natural)",
+      "model": "Beosound 2 3rd Gen",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260099430",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Natural",
+      "modelNumber": "Beosound 2 3rd Gen",
+      "partNumber": "1309103",
+      "sku": "1309103",
+      "ean": "5705260099430",
+      "gtin14": "05705260099430",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/6Ce6Tmp258rXFpvH9OXJ5p/1145ffc0121100cf7a95d37f003e7f93/Beosound_2_-_Silver_-_Image_1.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/speakers/beosound-2?variant=beosound-2-natural",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/speakers/beosound-2?variant=beosound-2-natural",
+        "https://images.ctfassets.net/8cd2csgvqd3m/6Ce6Tmp258rXFpvH9OXJ5p/1145ffc0121100cf7a95d37f003e7f93/Beosound_2_-_Silver_-_Image_1.png",
+        "https://catalog.asbis.ua/en/product/multimedia-speaker-wi-fi-1309103"
+      ],
+      "specs": {
+        "price": 2850.0,
+        "currency": "GBP",
+        "subCategory": "Home speakers & subwoofers",
+        "priceSource": "B&O UK"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beosound 2 3rd Gen (Navy Blue)",
+      "model": "Beosound 2 3rd Gen",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260117790",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Navy Blue",
+      "modelNumber": "Beosound 2 3rd Gen",
+      "partNumber": "1309124",
+      "sku": "1309124",
+      "ean": "5705260117790",
+      "gtin14": "05705260117790",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/4kVtQEVZKnaMyLznYRTqQA/2323f0820cf665be769c8d37e1be7f0d/riva.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/speakers/beosound-2?variant=beosound-2-riva",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/speakers/beosound-2?variant=beosound-2-riva",
+        "https://images.ctfassets.net/8cd2csgvqd3m/4kVtQEVZKnaMyLznYRTqQA/2323f0820cf665be769c8d37e1be7f0d/riva.png",
+        "https://catalog.asbis.bg/en/product/1309124"
+      ],
+      "specs": {
+        "price": 4450.0,
+        "currency": "GBP",
+        "subCategory": "Home speakers & subwoofers",
+        "priceSource": "B&O UK"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beosound A9 5th Gen (Black Anthracite)",
+      "model": "Type 3090",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260099300",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Black Anthracite",
+      "modelNumber": "Type 3090",
+      "partNumber": "1200632",
+      "sku": "1200632",
+      "ean": "5705260099300",
+      "gtin14": "05705260099300",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/4zG5FEGxX9SyTrRwM86XUY/8e34a24f21f426040d4f31afb78f716c/beoplay-a9-4-gen-back-front.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/speakers/beosound-a9?variant=beosound-a9-black-anthracite",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/speakers/beosound-a9?variant=beosound-a9-black-anthracite",
+        "https://images.ctfassets.net/8cd2csgvqd3m/4zG5FEGxX9SyTrRwM86XUY/8e34a24f21f426040d4f31afb78f716c/beoplay-a9-4-gen-back-front.png",
+        "https://boulanger.scene7.com/is/content/Boulanger/5705260099317_f_0"
+      ],
+      "specs": {
+        "price": 3200.0,
+        "currency": "GBP",
+        "subCategory": "Home speakers & subwoofers",
+        "priceSource": "B&O UK"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beosound A9 5th Gen (Gold Tone)",
+      "model": "Type 3090",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260099317",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Gold Tone",
+      "modelNumber": "Type 3090",
+      "partNumber": "1200633",
+      "sku": "1200633",
+      "ean": "5705260099317",
+      "gtin14": "05705260099317",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/5ffQPWX2hMWg1Lcvv4Ndmh/715d29139574b6992a7db3b00ff04053/A9_Gold_1_Resized.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/speakers/beosound-a9?variant=beosound-a9-gold-tone",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/speakers/beosound-a9?variant=beosound-a9-gold-tone",
+        "https://images.ctfassets.net/8cd2csgvqd3m/5ffQPWX2hMWg1Lcvv4Ndmh/715d29139574b6992a7db3b00ff04053/A9_Gold_1_Resized.png",
+        "https://boulanger.scene7.com/is/content/Boulanger/5705260099317_f_0"
+      ],
+      "specs": {
+        "price": 3300.0,
+        "currency": "GBP",
+        "subCategory": "Home speakers & subwoofers",
+        "priceSource": "B&O UK"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beosound A9 5th Gen (Natural Aluminium)",
+      "model": "Type 3090",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260099324",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Natural Aluminium",
+      "modelNumber": "Type 3090",
+      "partNumber": "1200634",
+      "sku": "1200634",
+      "ean": "5705260099324",
+      "gtin14": "05705260099324",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/6MY54qtFJLXKRQ9QhwlZ8Z/df818ad6f174b3aaaf611748d810503d/Beosound_A9_-_Natural_Aluminium_-_Image_1.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/speakers/beosound-a9?variant=beosound-a9-natural-aluminium",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/speakers/beosound-a9?variant=beosound-a9-natural-aluminium",
+        "https://images.ctfassets.net/8cd2csgvqd3m/6MY54qtFJLXKRQ9QhwlZ8Z/df818ad6f174b3aaaf611748d810503d/Beosound_A9_-_Natural_Aluminium_-_Image_1.png",
+        "https://boulanger.scene7.com/is/content/Boulanger/5705260099317_f_0"
+      ],
+      "specs": {
+        "price": 3300.0,
+        "currency": "GBP",
+        "subCategory": "Home speakers & subwoofers",
+        "priceSource": "B&O UK"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beosound Balance (Black Oak)",
+      "model": "Beosound Balance",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260082272",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Black Oak",
+      "modelNumber": "Beosound Balance",
+      "partNumber": "1200503",
+      "sku": "1200503",
+      "ean": "5705260082272",
+      "gtin14": "05705260082272",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/7j5qzxwHZAyibgfOgcSFah/177de919d03517e5e6491bbf838eae81/Balance_black_front.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/speakers/beosound-balance?variant=beosound-balance-blackoak",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/speakers/beosound-balance?variant=beosound-balance-blackoak",
+        "https://images.ctfassets.net/8cd2csgvqd3m/7j5qzxwHZAyibgfOgcSFah/177de919d03517e5e6491bbf838eae81/Balance_black_front.png",
+        "https://catalog.asbc.ge/en/product/multimedia-speaker-wi-fi-1200503"
+      ],
+      "specs": {
+        "price": 2700.0,
+        "currency": "GBP",
+        "subCategory": "Home speakers & subwoofers",
+        "priceSource": "B&O UK"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beosound Balance (Natural Oak)",
+      "model": "Beosound Balance",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260082265",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Natural Oak",
+      "modelNumber": "Beosound Balance",
+      "partNumber": "1200502",
+      "sku": "1200502",
+      "ean": "5705260082265",
+      "gtin14": "05705260082265",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/54re9IQ4soRmJxfcijWpPr/590d58d08fd2632b7314ea8bad71b787/Balance_her_natural_oak.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/speakers/beosound-balance?variant=beosound-balance-naturaloak",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/speakers/beosound-balance?variant=beosound-balance-naturaloak",
+        "https://images.ctfassets.net/8cd2csgvqd3m/54re9IQ4soRmJxfcijWpPr/590d58d08fd2632b7314ea8bad71b787/Balance_her_natural_oak.png",
+        "https://se-new.ingrammicro.com/site/productdetail?id=I670066"
+      ],
+      "specs": {
+        "price": 2700.0,
+        "currency": "GBP",
+        "subCategory": "Home speakers & subwoofers",
+        "priceSource": "B&O UK"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beosound Emerge (Gold Tone)",
+      "model": "Beosound Emerge",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260085426",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Gold Tone",
+      "modelNumber": "Beosound Emerge",
+      "partNumber": "1273701",
+      "sku": "1273701",
+      "ean": "5705260085426",
+      "gtin14": "05705260085426",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/2dINMWxsOGJelHEkv9oWoe/6793dcad6cc66f60fe4d580ce5615e68/Packshot-Beosound-Emerge-Gold-Tone-0068-Perspective-S1200x1200px_new.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/speakers/beosound-emerge?variant=beosound-emerge-goldtone",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/speakers/beosound-emerge?variant=beosound-emerge-goldtone",
+        "https://images.ctfassets.net/8cd2csgvqd3m/2dINMWxsOGJelHEkv9oWoe/6793dcad6cc66f60fe4d580ce5615e68/Packshot-Beosound-Emerge-Gold-Tone-0068-Perspective-S1200x1200px_new.png",
+        "https://www.ebay.co.uk/p/26046146976"
+      ],
+      "specs": {
+        "price": 900.0,
+        "currency": "GBP",
+        "subCategory": "Home speakers & subwoofers",
+        "priceSource": "B&O UK"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beosound Bollard (Bronze / Round)",
+      "model": "Beosound Bollard",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260104288",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Bronze / Round",
+      "modelNumber": "Beosound Bollard",
+      "partNumber": "1279402",
+      "sku": "1279402",
+      "ean": "5705260104288",
+      "gtin14": "05705260104288",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/4uOEXqOwqtvgi8Id45jE0O/300fdea304be3f20e2000c7e335f3cc1/230714_B_O_10110_v2.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/speakers/beosound-bollard?variant=beosound-bollard-bronze-round",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/speakers/beosound-bollard?variant=beosound-bollard-bronze-round",
+        "https://images.ctfassets.net/8cd2csgvqd3m/4uOEXqOwqtvgi8Id45jE0O/300fdea304be3f20e2000c7e335f3cc1/230714_B_O_10110_v2.png",
+        "https://catalog.asbis.bg/en/product/1279402"
+      ],
+      "specs": {
+        "price": 1750.0,
+        "currency": "GBP",
+        "subCategory": "Architectural & modular speakers",
+        "priceSource": "B&O UK"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beosound Bollard (Natural / Square)",
+      "model": "Beosound Bollard",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260104301",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Natural / Square",
+      "modelNumber": "Beosound Bollard",
+      "partNumber": "1279501",
+      "sku": "1279501",
+      "ean": "5705260104301",
+      "gtin14": "05705260104301",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/41oFnVhbUFmG4GvMjbfLoE/570d8e70fd1d9a2bc90e92b41c86a9e6/230714_B_O_10110_v4.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/speakers/beosound-bollard?variant=beosound-bollard-natural-squared",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/speakers/beosound-bollard?variant=beosound-bollard-natural-squared",
+        "https://images.ctfassets.net/8cd2csgvqd3m/41oFnVhbUFmG4GvMjbfLoE/570d8e70fd1d9a2bc90e92b41c86a9e6/230714_B_O_10110_v4.png",
+        "https://catalog.asbis.bg/en/product/1279501"
+      ],
+      "specs": {
+        "price": 2100.0,
+        "currency": "GBP",
+        "subCategory": "Architectural & modular speakers",
+        "priceSource": "B&O UK"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Celestial (Black Anthracite)",
+      "model": "Celestial",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260084177",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Black Anthracite",
+      "modelNumber": "Celestial",
+      "partNumber": "1939278",
+      "sku": "1939278",
+      "ean": "5705260084177",
+      "gtin14": "05705260084177",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/4qN9UIzV0UgeVeds4qH7A9/841ca7f9b0c71ac3e4f7cd2c2f56cd39/Celestial-Black-Anthracitee.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/speakers/celestial?variant=celestial-anthracite",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/speakers/celestial?variant=celestial-anthracite",
+        "https://images.ctfassets.net/8cd2csgvqd3m/4qN9UIzV0UgeVeds4qH7A9/841ca7f9b0c71ac3e4f7cd2c2f56cd39/Celestial-Black-Anthracitee.png",
+        "https://catalog.asbis.bg/en/product/1939278"
+      ],
+      "specs": {
+        "subCategory": "Architectural & modular speakers",
+        "priceSource": "Dealer quote"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Celestial (Brass Tone)",
+      "model": "Celestial",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260084153",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Brass Tone",
+      "modelNumber": "Celestial",
+      "partNumber": "1939265",
+      "sku": "1939265",
+      "ean": "5705260084153",
+      "gtin14": "05705260084153",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/2dZAwokV3DLW7yCS5nz2JR/94936e3eb46709431be1f0fdcecb05ce/Celestial-Gold-tonee.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/speakers/celestial?variant=celestial-brass",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/speakers/celestial?variant=celestial-brass",
+        "https://images.ctfassets.net/8cd2csgvqd3m/2dZAwokV3DLW7yCS5nz2JR/94936e3eb46709431be1f0fdcecb05ce/Celestial-Gold-tonee.png",
+        "https://catalog.asbis.bg/en/product/1939265"
+      ],
+      "specs": {
+        "subCategory": "Architectural & modular speakers",
+        "priceSource": "Dealer quote"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Celestial (Bronze Tone)",
+      "model": "Celestial",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260084160",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Bronze Tone",
+      "modelNumber": "Celestial",
+      "partNumber": "1939235",
+      "sku": "1939235",
+      "ean": "5705260084160",
+      "gtin14": "05705260084160",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/2o3KfmFO0w5cjhAeZzBCHP/84b37b6b443f96d3b78831570b1d3806/Celestial-Bronze.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/speakers/celestial?variant=celestial-bronze",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/speakers/celestial?variant=celestial-bronze",
+        "https://images.ctfassets.net/8cd2csgvqd3m/2o3KfmFO0w5cjhAeZzBCHP/84b37b6b443f96d3b78831570b1d3806/Celestial-Bronze.png",
+        "https://catalog.asbis.bg/en/product/1939235"
+      ],
+      "specs": {
+        "subCategory": "Architectural & modular speakers",
+        "priceSource": "Dealer quote"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Celestial (Gold Tone)",
+      "model": "Celestial",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260093827",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Gold Tone",
+      "modelNumber": "Celestial",
+      "partNumber": "1939204",
+      "sku": "1939204",
+      "ean": "5705260093827",
+      "gtin14": "05705260093827",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/66ULtLtetqW3KDidni9Qn2/f97e48a11260f8511ed68167452c927c/brass.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/speakers/celestial?variant=celestial-gold",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/speakers/celestial?variant=celestial-gold",
+        "https://images.ctfassets.net/8cd2csgvqd3m/66ULtLtetqW3KDidni9Qn2/f97e48a11260f8511ed68167452c927c/brass.png",
+        "https://catalog.asbis.bg/en/product/1939204"
+      ],
+      "specs": {
+        "subCategory": "Architectural & modular speakers",
+        "priceSource": "Dealer quote"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Celestial (Natural)",
+      "model": "Celestial",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260077810",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Natural",
+      "modelNumber": "Celestial",
+      "partNumber": "1939211",
+      "sku": "1939211",
+      "ean": "5705260077810",
+      "gtin14": "05705260077810",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/23VJkumalO7QApu5xt75I4/6b7feb245d5915f75562d1acd92d5c5b/Celestial-Aluminium.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/speakers/celestial?variant=celestial-aluminium",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/speakers/celestial?variant=celestial-aluminium",
+        "https://images.ctfassets.net/8cd2csgvqd3m/23VJkumalO7QApu5xt75I4/6b7feb245d5915f75562d1acd92d5c5b/Celestial-Aluminium.png",
+        "https://catalog.asbis.bg/en/product/1939211"
+      ],
+      "specs": {
+        "subCategory": "Architectural & modular speakers",
+        "priceSource": "Dealer quote"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Palatial (Black Anthracite)",
+      "model": "Palatial",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260093834",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Black Anthracite",
+      "modelNumber": "Palatial",
+      "partNumber": "1939390",
+      "sku": "1939390",
+      "ean": "5705260093834",
+      "gtin14": "05705260093834",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/2asyX6sVb81BcyoN4gvbCL/4d36f88a6767d61719a84014a7239c1f/Palatial_-_Black_Anthracite.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/speakers/palatial?variant=palatial-black-anthracite",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/speakers/palatial?variant=palatial-black-anthracite",
+        "https://images.ctfassets.net/8cd2csgvqd3m/2asyX6sVb81BcyoN4gvbCL/4d36f88a6767d61719a84014a7239c1f/Palatial_-_Black_Anthracite.png",
+        "https://catalog.asbis.bg/en/product/1939390"
+      ],
+      "specs": {
+        "subCategory": "Architectural & modular speakers",
+        "priceSource": "Dealer quote"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Palatial (Gold Tone)",
+      "model": "Palatial",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260093841",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Gold Tone",
+      "modelNumber": "Palatial",
+      "partNumber": "1939304",
+      "sku": "1939304",
+      "ean": "5705260093841",
+      "gtin14": "05705260093841",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/3KTk3rhWarWYYj3Uvfu9dd/703801181b22ba63edebc8fe7596026a/Palatial_-_Gold_Tone.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/speakers/palatial?variant=palatial-gold",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/speakers/palatial?variant=palatial-gold",
+        "https://images.ctfassets.net/8cd2csgvqd3m/3KTk3rhWarWYYj3Uvfu9dd/703801181b22ba63edebc8fe7596026a/Palatial_-_Gold_Tone.png",
+        "https://catalog.asbis.bg/en/product/1939304"
+      ],
+      "specs": {
+        "subCategory": "Architectural & modular speakers",
+        "priceSource": "Dealer quote"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beosound Premiere (Black Anthracite)",
+      "model": "Beosound Premiere",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260123036",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Black Anthracite",
+      "modelNumber": "Beosound Premiere",
+      "partNumber": "1312003",
+      "sku": "1312003",
+      "ean": "5705260123036",
+      "gtin14": "05705260123036",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/79jxOrPJkC1KRJlm5kYCw/edbe3e31b10326c642185d7ee09e6ef5/beosound-premiere-blackanthracite-packshot-202510-12-1x1.webp",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/soundbars/beosound-premiere?variant=beosound-premiere-black-anthracite",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/soundbars/beosound-premiere?variant=beosound-premiere-black-anthracite",
+        "https://images.ctfassets.net/8cd2csgvqd3m/79jxOrPJkC1KRJlm5kYCw/edbe3e31b10326c642185d7ee09e6ef5/beosound-premiere-blackanthracite-packshot-202510-12-1x1.webp",
+        "https://catalog.asbc.md/en/product/1312003"
+      ],
+      "specs": {
+        "price": 3100.0,
+        "currency": "GBP",
+        "subCategory": "Soundbars",
+        "priceSource": "B&O UK"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beosound Premiere (Gold Tone)",
+      "model": "Beosound Premiere",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260123029",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Gold Tone",
+      "modelNumber": "Beosound Premiere",
+      "partNumber": "1312002",
+      "sku": "1312002",
+      "ean": "5705260123029",
+      "gtin14": "05705260123029",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/1ibTSFmB8jj6X2sC5fYix8/e629ca71cb8ea44951a3d3213ed87287/beosound-premiere-goldtone-packshot-202510-10-1x1.webp",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/soundbars/beosound-premiere?variant=beosound-premiere-gold-tone",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/soundbars/beosound-premiere?variant=beosound-premiere-gold-tone",
+        "https://images.ctfassets.net/8cd2csgvqd3m/1ibTSFmB8jj6X2sC5fYix8/e629ca71cb8ea44951a3d3213ed87287/beosound-premiere-goldtone-packshot-202510-10-1x1.webp",
+        "https://catalog.asbisme.ae/product/1312002"
+      ],
+      "specs": {
+        "price": 3100.0,
+        "currency": "GBP",
+        "subCategory": "Soundbars",
+        "priceSource": "B&O UK"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beosound Premiere (Natural)",
+      "model": "Beosound Premiere",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260123012",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Natural",
+      "modelNumber": "Beosound Premiere",
+      "partNumber": "1312001",
+      "sku": "1312001",
+      "ean": "5705260123012",
+      "gtin14": "05705260123012",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/497mT2lOhY300WYsJ7JEFO/42726a9e6b2ff09be49a324f089ba415/beosound-premiere-natural-packshot-202510-11-1x1.webp",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/soundbars/beosound-premiere?variant=beosound-premiere-natural",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/soundbars/beosound-premiere?variant=beosound-premiere-natural",
+        "https://images.ctfassets.net/8cd2csgvqd3m/497mT2lOhY300WYsJ7JEFO/42726a9e6b2ff09be49a324f089ba415/beosound-premiere-natural-packshot-202510-11-1x1.webp",
+        "https://catalog.asbisme.ae/product/1312001"
+      ],
+      "specs": {
+        "price": 3100.0,
+        "currency": "GBP",
+        "subCategory": "Soundbars",
+        "priceSource": "B&O UK"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beosound Theatre (Soundbar Natural Grey Melange)",
+      "model": "Beosound Theatre",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260100785",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Soundbar Natural Grey Melange",
+      "modelNumber": "Beosound Theatre",
+      "partNumber": "1200642",
+      "sku": "1200642",
+      "ean": "5705260100785",
+      "gtin14": "05705260100785",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/13uHdPK9tDpqRTAATOxXOf/1f274721f6c8e422112de909f6768239/Theatre_Alu_Hero.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/soundbars/beosound-theatre?variant=beosound-theatre-silver-greymelange",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/soundbars/beosound-theatre?variant=beosound-theatre-silver-greymelange",
+        "https://images.ctfassets.net/8cd2csgvqd3m/13uHdPK9tDpqRTAATOxXOf/1f274721f6c8e422112de909f6768239/Theatre_Alu_Hero.png",
+        "https://pt-new.ingrammicro.com/site/productdetail?id=CF60655"
+      ],
+      "specs": {
+        "price": 9100.0,
+        "currency": "GBP",
+        "subCategory": "Soundbars",
+        "priceSource": "B&O UK"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beoplay H100 (Hourglass Sand)",
+      "model": "Beoplay H100",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260103311",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Hourglass Sand",
+      "modelNumber": "Beoplay H100",
+      "partNumber": "1224403",
+      "sku": "1224403",
+      "ean": "5705260103311",
+      "gtin14": "05705260103311",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/4aZbwNfeHWfhgVrjQGN6Rt/7943f72a3089c19e6037632ca30ffee2/Packshot-Beoplay-H100-Hourglass-Sand-perspective-0020-s1200x1200px.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/headphones/beoplay-h100?variant=beoplay-h100-hourglass-sand",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/headphones/beoplay-h100?variant=beoplay-h100-hourglass-sand",
+        "https://images.ctfassets.net/8cd2csgvqd3m/4aZbwNfeHWfhgVrjQGN6Rt/7943f72a3089c19e6037632ca30ffee2/Packshot-Beoplay-H100-Hourglass-Sand-perspective-0020-s1200x1200px.png",
+        "https://catalog.asbis.lv/en/product/1224403"
+      ],
+      "specs": {
+        "price": 1450.0,
+        "currency": "GBP",
+        "subCategory": "Headphones",
+        "priceSource": "B&O UK"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beoplay H100 (Infinite Black)",
+      "model": "Beoplay H100",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260099591",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Infinite Black",
+      "modelNumber": "Beoplay H100",
+      "partNumber": "1224400",
+      "sku": "1224400",
+      "ean": "5705260099591",
+      "gtin14": "05705260099591",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/4LVhpWsAABYquQgNu89iHo/758e886f4009dada8e999e220f4686d0/Packshot-Beoplay-H100-Infinite-Black-perspective-0006-s1200x1200px.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/headphones/beoplay-h100?variant=beoplay-h100-infinite-black",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/headphones/beoplay-h100?variant=beoplay-h100-infinite-black",
+        "https://images.ctfassets.net/8cd2csgvqd3m/4LVhpWsAABYquQgNu89iHo/758e886f4009dada8e999e220f4686d0/Packshot-Beoplay-H100-Infinite-Black-perspective-0006-s1200x1200px.png",
+        "https://catalog.asbis.lv/en/product/1224400"
+      ],
+      "specs": {
+        "price": 1450.0,
+        "currency": "GBP",
+        "subCategory": "Headphones",
+        "priceSource": "B&O UK"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beoplay H100 (Navy)",
+      "model": "Beoplay H100",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260134315",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Navy",
+      "modelNumber": "Beoplay H100",
+      "partNumber": "1224431",
+      "sku": "1224431",
+      "ean": "5705260134315",
+      "gtin14": "05705260134315",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/39X7NOu5OrlL56tHJPC0Gz/e0bdd901fb013930e12ece140310de22/beoplay-h100-packshot-202601-01-1x1.webp",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/headphones/beoplay-h100?variant=beoplay-h100-navy",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/headphones/beoplay-h100?variant=beoplay-h100-navy",
+        "https://images.ctfassets.net/8cd2csgvqd3m/39X7NOu5OrlL56tHJPC0Gz/e0bdd901fb013930e12ece140310de22/beoplay-h100-packshot-202601-01-1x1.webp",
+        "https://catalog.asbis.lv/en/product/1224431"
+      ],
+      "specs": {
+        "price": 1450.0,
+        "currency": "GBP",
+        "subCategory": "Headphones",
+        "priceSource": "B&O UK"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beoplay H100 (Sunset Apricot)",
+      "model": "Beoplay H100",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260103328",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Sunset Apricot",
+      "modelNumber": "Beoplay H100",
+      "partNumber": "1224404",
+      "sku": "1224404",
+      "ean": "5705260103328",
+      "gtin14": "05705260103328",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/4DcPm9xftAy3jjaf3zH0x7/1880f9ea8945f635139b0545585f9723/Packshot-Beoplay-H100-Sunses-Apricot-perspective-0036-s1200x1200px.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/headphones/beoplay-h100?variant=beoplay-h100-sunset-apricot",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/headphones/beoplay-h100?variant=beoplay-h100-sunset-apricot",
+        "https://images.ctfassets.net/8cd2csgvqd3m/4DcPm9xftAy3jjaf3zH0x7/1880f9ea8945f635139b0545585f9723/Packshot-Beoplay-H100-Sunses-Apricot-perspective-0036-s1200x1200px.png",
+        "https://catalog.asbis.lv/en/product/1224404"
+      ],
+      "specs": {
+        "price": 1450.0,
+        "currency": "GBP",
+        "subCategory": "Headphones",
+        "priceSource": "B&O UK"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beoplay H95 (Black)",
+      "model": "Beoplay H95",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260084528",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Black",
+      "modelNumber": "Beoplay H95",
+      "partNumber": "1266100",
+      "sku": "1266100",
+      "ean": "5705260084528",
+      "gtin14": "05705260084528",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/4LDrvOSN2bdGyvQbYIKRfj/689345b78e59ffaaff2789c2c6b01ab8/Packshot-Beoplay-H95-Black-0043-Perspective-1200x1200px.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/headphones/beoplay-h95?variant=beoplay-h95-black",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/headphones/beoplay-h95?variant=beoplay-h95-black",
+        "https://images.ctfassets.net/8cd2csgvqd3m/4LDrvOSN2bdGyvQbYIKRfj/689345b78e59ffaaff2789c2c6b01ab8/Packshot-Beoplay-H95-Black-0043-Perspective-1200x1200px.png",
+        "https://catalog.asbis.bg/en/product/1266100"
+      ],
+      "specs": {
+        "price": 879.0,
+        "currency": "GBP",
+        "subCategory": "Headphones",
+        "priceSource": "B&O UK"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beoplay H95 (Chestnut)",
+      "model": "Beoplay H95",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260095036",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Chestnut",
+      "modelNumber": "Beoplay H95",
+      "partNumber": "1266115",
+      "sku": "1266115",
+      "ean": "5705260095036",
+      "gtin14": "05705260095036",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/2wE9fJWazHXvRpdgl2gJY5/0af9077011cb72a27c04b8ad62660ffb/Packshot-Beoplay-H95-Chestnut-0256-Perspective-S1200x1200px.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/headphones/beoplay-h95?variant=beoplay-h95-chestnut",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/headphones/beoplay-h95?variant=beoplay-h95-chestnut",
+        "https://images.ctfassets.net/8cd2csgvqd3m/2wE9fJWazHXvRpdgl2gJY5/0af9077011cb72a27c04b8ad62660ffb/Packshot-Beoplay-H95-Chestnut-0256-Perspective-S1200x1200px.png",
+        "https://catalog.asbis.lv/en/product/1266115"
+      ],
+      "specs": {
+        "price": 879.0,
+        "currency": "GBP",
+        "subCategory": "Headphones",
+        "priceSource": "B&O UK"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beoplay H95 (Gold Tone)",
+      "model": "Beoplay H95",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260087253",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Gold Tone",
+      "modelNumber": "Beoplay H95",
+      "partNumber": "1266106",
+      "sku": "1266106",
+      "ean": "5705260087253",
+      "gtin14": "05705260087253",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/26XtRwxmomi69pWKqcuyS8/3a5285a2e0b4a5cb29484bcbe0763258/Packshot-Beoplay-H95-Gold-Tone-0006-Perspective-1200x1200px.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/headphones/beoplay-h95?variant=beoplay-h95-goldentone",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/headphones/beoplay-h95?variant=beoplay-h95-goldentone",
+        "https://images.ctfassets.net/8cd2csgvqd3m/26XtRwxmomi69pWKqcuyS8/3a5285a2e0b4a5cb29484bcbe0763258/Packshot-Beoplay-H95-Gold-Tone-0006-Perspective-1200x1200px.png",
+        "https://catalog.asbis.lv/en/product/1266106"
+      ],
+      "specs": {
+        "price": 879.0,
+        "currency": "GBP",
+        "subCategory": "Headphones",
+        "priceSource": "B&O UK"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beoplay H95 (Navy)",
+      "model": "Beoplay H95",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260095043",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Navy",
+      "modelNumber": "Beoplay H95",
+      "partNumber": "1266116",
+      "sku": "1266116",
+      "ean": "5705260095043",
+      "gtin14": "05705260095043",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/09BRtbVKLg6THihokrSXw/abe0eec5fd62e04ab29bb113ee818b79/Packshot-Beoplay-H95-Navy-0257-Perspective-1200x1200px.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/headphones/beoplay-h95?variant=beoplay-h95-navy",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/headphones/beoplay-h95?variant=beoplay-h95-navy",
+        "https://images.ctfassets.net/8cd2csgvqd3m/09BRtbVKLg6THihokrSXw/abe0eec5fd62e04ab29bb113ee818b79/Packshot-Beoplay-H95-Navy-0257-Perspective-1200x1200px.png",
+        "https://catalog.asbis.lv/en/product/1266116"
+      ],
+      "specs": {
+        "price": 879.0,
+        "currency": "GBP",
+        "subCategory": "Headphones",
+        "priceSource": "B&O UK"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beoplay HX (Black Anthracite)",
+      "model": "Beoplay HX",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260089196",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Black Anthracite",
+      "modelNumber": "Beoplay HX",
+      "partNumber": "1224000",
+      "sku": "1224000",
+      "ean": "5705260089196",
+      "gtin14": "05705260089196",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/733sXvgazeMkkQX3I7jAHB/7c3fb88c436327a45743d5feb3621959/Packshot-Beoplay-HX-Black-Anthracite-0050-Perspective-S1200x1200px.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/headphones/beoplay-hx?variant=beoplay-hx-black-anthracite",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/headphones/beoplay-hx?variant=beoplay-hx-black-anthracite",
+        "https://images.ctfassets.net/8cd2csgvqd3m/733sXvgazeMkkQX3I7jAHB/7c3fb88c436327a45743d5feb3621959/Packshot-Beoplay-HX-Black-Anthracite-0050-Perspective-S1200x1200px.png",
+        "https://catalog.asbis.lv/en/product/1224000"
+      ],
+      "specs": {
+        "price": 549.0,
+        "currency": "GBP",
+        "subCategory": "Headphones",
+        "priceSource": "B&O UK"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beoplay HX (Gold Tone)",
+      "model": "Beoplay HX",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260099560",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Gold Tone",
+      "modelNumber": "Beoplay HX",
+      "partNumber": "1224016",
+      "sku": "1224016",
+      "ean": "5705260099560",
+      "gtin14": "05705260099560",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/6ztC6Puch2jYHAZAt60suD/55686bb4b133ef8bbced3a388d6dcf60/Packshot-Beoplay-HX-Gold-Tone-0188-Perspective-S1200x1200px.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/headphones/beoplay-hx?variant=beoplay-hx-goldentone",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/headphones/beoplay-hx?variant=beoplay-hx-goldentone",
+        "https://images.ctfassets.net/8cd2csgvqd3m/6ztC6Puch2jYHAZAt60suD/55686bb4b133ef8bbced3a388d6dcf60/Packshot-Beoplay-HX-Gold-Tone-0188-Perspective-S1200x1200px.png",
+        "https://www.stockinthechannel.co.uk/Product/Bang-Olufsen-BeoPlay-HX-Headset-Wired-Wireless-Head-band-Calls-Music-Bluetooth-Beige-Gold/93153226"
+      ],
+      "specs": {
+        "price": 549.0,
+        "currency": "GBP",
+        "subCategory": "Headphones",
+        "priceSource": "B&O UK"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beoplay HX (Timber)",
+      "model": "Beoplay HX",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260089219",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Timber",
+      "modelNumber": "Beoplay HX",
+      "partNumber": "1224002",
+      "sku": "1224002",
+      "ean": "5705260089219",
+      "gtin14": "05705260089219",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/3zMbwPFhHDHkbq31CIjGdg/24c5fc443a752c746524722ac83ce72d/Packshot-Beoplay-HX-Timber-0061-Perspective-S1200x1200px.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/headphones/beoplay-hx?variant=beoplay-hx-timber",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/headphones/beoplay-hx?variant=beoplay-hx-timber",
+        "https://images.ctfassets.net/8cd2csgvqd3m/3zMbwPFhHDHkbq31CIjGdg/24c5fc443a752c746524722ac83ce72d/Packshot-Beoplay-HX-Timber-0061-Perspective-S1200x1200px.png",
+        "https://catalog.asbis.lv/en/product/1224002"
+      ],
+      "specs": {
+        "price": 549.0,
+        "currency": "GBP",
+        "subCategory": "Headphones",
+        "priceSource": "B&O UK"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beo Grace (Honey Tone)",
+      "model": "Beo Grace",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260103373",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Honey Tone",
+      "modelNumber": "Beo Grace",
+      "partNumber": "1240901",
+      "sku": "1240901",
+      "ean": "5705260103373",
+      "gtin14": "05705260103373",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/7FGLRBjRuuuOqbi8NeRoqn/e4c81c0802c7d6347af95318767c09ce/Packshot-Beo-Grace-Honey-Tone-Front-0014-s1200x1200px_2.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/earphones/beograce?variant=beograce-honey-tone",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/earphones/beograce?variant=beograce-honey-tone",
+        "https://images.ctfassets.net/8cd2csgvqd3m/7FGLRBjRuuuOqbi8NeRoqn/e4c81c0802c7d6347af95318767c09ce/Packshot-Beo-Grace-Honey-Tone-Front-0014-s1200x1200px_2.png",
+        "https://catalog.asbc.com.ua/en/product/1240901"
+      ],
+      "specs": {
+        "price": 1000.0,
+        "currency": "GBP",
+        "subCategory": "Earphones & earbuds",
+        "priceSource": "B&O UK"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beo Grace (Natural Aluminium)",
+      "model": "Beo Grace",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260101980",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Natural Aluminium",
+      "modelNumber": "Beo Grace",
+      "partNumber": "1240900",
+      "sku": "1240900",
+      "ean": "5705260101980",
+      "gtin14": "05705260101980",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/5OT4Ao8wtV233U9PEuRIR0/06ad4ca0598d6f9893061745153d1e5f/Packshot-Beo-Natural-Aluminium-Front-0005-s1200x1200px_2.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/earphones/beograce?variant=beograce-natural-aluminium",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/earphones/beograce?variant=beograce-natural-aluminium",
+        "https://images.ctfassets.net/8cd2csgvqd3m/5OT4Ao8wtV233U9PEuRIR0/06ad4ca0598d6f9893061745153d1e5f/Packshot-Beo-Natural-Aluminium-Front-0005-s1200x1200px_2.png",
+        "https://www.hinnavaatlus.ee/search/?dealer_id=379&page=4&sort=name_full"
+      ],
+      "specs": {
+        "price": 1000.0,
+        "currency": "GBP",
+        "subCategory": "Earphones & earbuds",
+        "priceSource": "B&O UK"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beoplay Eleven (Copper Tone)",
+      "model": "Beoplay Eleven",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260118995",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Copper Tone",
+      "modelNumber": "Beoplay Eleven",
+      "partNumber": "1241001",
+      "sku": "1241001",
+      "ean": "5705260118995",
+      "gtin14": "05705260118995",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/5PiiAkqbY9qH1Yb3XOHk9K/80b555d2452c1759c868fb4c504209a8/Packshot-Beoplay-Eleven-Copper-Tone-Case-Earphones-Perspective-s1200x1200px.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/earphones/beoplay-eleven?variant=beoplay-eleven-copper-tone",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/earphones/beoplay-eleven?variant=beoplay-eleven-copper-tone",
+        "https://images.ctfassets.net/8cd2csgvqd3m/5PiiAkqbY9qH1Yb3XOHk9K/80b555d2452c1759c868fb4c504209a8/Packshot-Beoplay-Eleven-Copper-Tone-Case-Earphones-Perspective-s1200x1200px.png",
+        "https://catalog.asbis.lv/en/product/1241001"
+      ],
+      "specs": {
+        "price": 429.0,
+        "currency": "GBP",
+        "subCategory": "Earphones & earbuds",
+        "priceSource": "B&O UK"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beoplay Eleven (Eucalyptus Green)",
+      "model": "Beoplay Eleven",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260127850",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Eucalyptus Green",
+      "modelNumber": "Beoplay Eleven",
+      "partNumber": "1241009",
+      "sku": "1241009",
+      "ean": "5705260127850",
+      "gtin14": "05705260127850",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/1cIzXKXadGJ6PDKlEhk6rk/f797fc5d8e35808dd052878335e7ae03/beosound_eleven_eucalyptus_packshot_01_1x1.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/earphones/beoplay-eleven?variant=beoplay-eleven-eucalyptus-green",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/earphones/beoplay-eleven?variant=beoplay-eleven-eucalyptus-green",
+        "https://images.ctfassets.net/8cd2csgvqd3m/1cIzXKXadGJ6PDKlEhk6rk/f797fc5d8e35808dd052878335e7ae03/beosound_eleven_eucalyptus_packshot_01_1x1.png",
+        "https://www.ebay.com/itm/168764536881"
+      ],
+      "specs": {
+        "price": 429.0,
+        "currency": "GBP",
+        "subCategory": "Earphones & earbuds",
+        "priceSource": "B&O UK"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beoplay Eleven (Natural Aluminium)",
+      "model": "Beoplay Eleven",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260118988",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Natural Aluminium",
+      "modelNumber": "Beoplay Eleven",
+      "partNumber": "1241000",
+      "sku": "1241000",
+      "ean": "5705260118988",
+      "gtin14": "05705260118988",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/3BE6J9Uedmlare2XxhVJ2d/eed84296ab0058cf63bce634f23ac862/Packshot-Beoplay-Eleven-Natural-Aluminium-Case-Earphones-Perspective-s1200x1200px.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/earphones/beoplay-eleven?variant=beoplay-eleven-natural-aluminium",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/earphones/beoplay-eleven?variant=beoplay-eleven-natural-aluminium",
+        "https://images.ctfassets.net/8cd2csgvqd3m/3BE6J9Uedmlare2XxhVJ2d/eed84296ab0058cf63bce634f23ac862/Packshot-Beoplay-Eleven-Natural-Aluminium-Case-Earphones-Perspective-s1200x1200px.png",
+        "https://catalog.asbis.lv/en/product/1241000"
+      ],
+      "specs": {
+        "price": 429.0,
+        "currency": "GBP",
+        "subCategory": "Earphones & earbuds",
+        "priceSource": "B&O UK"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beosound Stage (Black Anthracite)",
+      "model": "Beosound Stage",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260093711",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Black Anthracite",
+      "modelNumber": "Beosound Stage",
+      "partNumber": "1200581",
+      "sku": "1200581",
+      "ean": "5705260093711",
+      "gtin14": "05705260093711",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/4hLMEOSKm5Yybssrb2RS2J/cca49ad2fe4fc1a03c8a3c596cb7919d/Packshot-Beosound-Black-Anthracite-Tone-0223-Perspective-1200x1200px.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/soundbars/beosound-stage?variant=beosound-stage-black-anthracite-eu",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/soundbars/beosound-stage?variant=beosound-stage-black-anthracite-eu",
+        "https://images.ctfassets.net/8cd2csgvqd3m/4hLMEOSKm5Yybssrb2RS2J/cca49ad2fe4fc1a03c8a3c596cb7919d/Packshot-Beosound-Black-Anthracite-Tone-0223-Perspective-1200x1200px.png",
+        "https://asbc.it/en/product/home-audio-system-bang-olufsen-beosound-stage-black-adark-grey-1200581"
+      ],
+      "specs": {
+        "price": 2100.0,
+        "currency": "GBP",
+        "subCategory": "Earlier soundbars",
+        "priceSource": "Last B&O UK listing"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beosound Stage (Natural)",
+      "model": "Beosound Stage",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260078671",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Natural",
+      "modelNumber": "Beosound Stage",
+      "partNumber": "1200463",
+      "sku": "1200463",
+      "ean": "5705260078671",
+      "gtin14": "05705260078671",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/1MPTOsoI77h48sttFOfKYL/32347074be835e51586d724452e3a85c/Packshot-Beosound-Stage-Natural-0003-Perspective-1200x1200px.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/soundbars/beosound-stage?variant=beosound-stage-silver-black-eu",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/soundbars/beosound-stage?variant=beosound-stage-silver-black-eu",
+        "https://images.ctfassets.net/8cd2csgvqd3m/1MPTOsoI77h48sttFOfKYL/32347074be835e51586d724452e3a85c/Packshot-Beosound-Stage-Natural-0003-Perspective-1200x1200px.png",
+        "https://www.manuals.co.uk/bang-olufsen/beosound-stage/manual?file=2400431"
+      ],
+      "specs": {
+        "price": 1800.0,
+        "currency": "GBP",
+        "subCategory": "Earlier soundbars",
+        "priceSource": "Last B&O UK listing"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beoplay EQ (Black)",
+      "model": "Beoplay EQ",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260089349",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Black",
+      "modelNumber": "Beoplay EQ",
+      "partNumber": "1240000",
+      "sku": "1240000",
+      "ean": "5705260089349",
+      "gtin14": "05705260089349",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/2vd2BV9axTr6kwZ7DXpY5P/0185e45cc2dd1c16fd461776d8e86c06/EQ_black_10.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/earphones/beoplay-eq?variant=beoplay-eq-black",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/earphones/beoplay-eq?variant=beoplay-eq-black",
+        "https://images.ctfassets.net/8cd2csgvqd3m/2vd2BV9axTr6kwZ7DXpY5P/0185e45cc2dd1c16fd461776d8e86c06/EQ_black_10.png",
+        "https://asset.conrad.com/media10/add/160267/c1/-/de/860947564DS00/datasheet-2638149-bang-olufsen-beoplay-eq-stuplove-sluchadla-bluetooth-stereo-cierna.pdf"
+      ],
+      "specs": {
+        "price": 349.0,
+        "currency": "GBP",
+        "subCategory": "Earlier headphones & earphones",
+        "priceSource": "Last B&O UK listing"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beoplay EQ (Sand)",
+      "model": "Beoplay EQ",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260089356",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Sand",
+      "modelNumber": "Beoplay EQ",
+      "partNumber": "1240001",
+      "sku": "1240001",
+      "ean": "5705260089356",
+      "gtin14": "05705260089356",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/2fflkbAdBpzb1NYrFYPmBJ/8bc4d10440f8456564301eb6a31a981a/EQ_grey_10.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/earphones/beoplay-eq?variant=beoplay-eq-sand",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/earphones/beoplay-eq?variant=beoplay-eq-sand",
+        "https://images.ctfassets.net/8cd2csgvqd3m/2fflkbAdBpzb1NYrFYPmBJ/8bc4d10440f8456564301eb6a31a981a/EQ_grey_10.png",
+        "https://www.ebay.com/p/16048631628"
+      ],
+      "specs": {
+        "price": 349.0,
+        "currency": "GBP",
+        "subCategory": "Earlier headphones & earphones",
+        "priceSource": "Last B&O UK listing"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beoplay EX (Anthracite Oxygen)",
+      "model": "Beoplay EX",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260094039",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Anthracite Oxygen",
+      "modelNumber": "Beoplay EX",
+      "partNumber": "1240602",
+      "sku": "1240602",
+      "ean": "5705260094039",
+      "gtin14": "05705260094039",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/4QIRGpRvCXZ6j2PYiyVxmR/efe41b2878a4874c079ce148b84db997/Packshot-Beoplay-Ex-Anthracite-Oxygen-0034-Perspective-S1200x1200px.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/earphones/beoplay-ex?variant=beoplay-ex-anthracite-oxygen",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/earphones/beoplay-ex?variant=beoplay-ex-anthracite-oxygen",
+        "https://images.ctfassets.net/8cd2csgvqd3m/4QIRGpRvCXZ6j2PYiyVxmR/efe41b2878a4874c079ce148b84db997/Packshot-Beoplay-Ex-Anthracite-Oxygen-0034-Perspective-S1200x1200px.png",
+        "https://fnac.qa/english/bang-olufsen-beoplay-ex-anthracite-oxygen.html"
+      ],
+      "specs": {
+        "price": 349.0,
+        "currency": "GBP",
+        "subCategory": "Earlier headphones & earphones",
+        "priceSource": "Last B&O UK listing"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beoplay EX (Black Anthracite)",
+      "model": "Beoplay EX",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260094015",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Black Anthracite",
+      "modelNumber": "Beoplay EX",
+      "partNumber": "1240600",
+      "sku": "1240600",
+      "ean": "5705260094015",
+      "gtin14": "05705260094015",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/7AdyFHvn7QPcZ9aMbfEewY/033578369b617f673a919aa98ff4b4db/Beoplay-EX-Black-Anthracite-Hero.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/earphones/beoplay-ex?variant=beoplay-ex-black-anthracite",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/earphones/beoplay-ex?variant=beoplay-ex-black-anthracite",
+        "https://images.ctfassets.net/8cd2csgvqd3m/7AdyFHvn7QPcZ9aMbfEewY/033578369b617f673a919aa98ff4b4db/Beoplay-EX-Black-Anthracite-Hero.png",
+        "https://www.ebay.co.uk/p/10060234519"
+      ],
+      "specs": {
+        "price": 349.0,
+        "currency": "GBP",
+        "subCategory": "Earlier headphones & earphones",
+        "priceSource": "Last B&O UK listing"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    },
+    {
+      "deviceName": "Beoplay EX (Gold Tone)",
+      "model": "Beoplay EX",
+      "brand": "Bang & Olufsen",
+      "category": "Audio",
+      "barcode": "5705260094022",
+      "sourceStatus": "preloaded",
+      "autoFillApproved": true,
+      "colour": "Gold Tone",
+      "modelNumber": "Beoplay EX",
+      "partNumber": "1240601",
+      "sku": "1240601",
+      "ean": "5705260094022",
+      "gtin14": "05705260094022",
+      "imageUrl": "https://images.ctfassets.net/8cd2csgvqd3m/1YBwp2WWt3B4fdhB3fumjZ/47b6a073755704b217be0a742984e3d4/Beoplay-EX-Gold-Tone-Hero.png",
+      "sourceUrl": "https://www.bang-olufsen.com/en/gb/earphones/beoplay-ex?variant=beoplay-ex-gold-tone",
+      "sources": [
+        "https://www.bang-olufsen.com/en/gb/earphones/beoplay-ex?variant=beoplay-ex-gold-tone",
+        "https://images.ctfassets.net/8cd2csgvqd3m/1YBwp2WWt3B4fdhB3fumjZ/47b6a073755704b217be0a742984e3d4/Beoplay-EX-Gold-Tone-Hero.png",
+        "https://fnac.qa/english/b-o-beoplay-ex-gold-tone.html"
+      ],
+      "specs": {
+        "price": 349.0,
+        "currency": "GBP",
+        "subCategory": "Earlier headphones & earphones",
+        "priceSource": "Last B&O UK listing"
+      },
+      "market": "UK Audio Catalogue (27 Nov 2026)"
+    }
+  ]
+}

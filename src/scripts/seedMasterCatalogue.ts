@@ -235,7 +235,7 @@ export const runSeeder = async (options: {
       console.log('\n--- Parse Summary ---');
       console.log(`iPad catalog items:       ${ipadResult.validCount} / ${ipadResult.totalParsed}`);
       console.log(`iPhone catalog items:     ${iphoneResult.validCount} / ${iphoneResult.totalParsed}`);
-      console.log(`Structured catalog items: ${structuredItems.length} (Watch, Audio/Beats, Android, Mac, Laptops, PCs, GPUs, Consoles, Home)`);
+      console.log(`Structured catalog items: ${structuredItems.length} (Watch, Audio/Beats/B&O/Bose/Sonos/7-Brand, Android, Mac, Laptops, PCs, GPUs, Consoles, Home, UK Vape)`);
       console.log(`Total valid variants ready for catalogue: ${allItems.length}`);
 
       if (allItems.length > 0) {

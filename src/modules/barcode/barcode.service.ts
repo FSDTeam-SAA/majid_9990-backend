@@ -96,6 +96,8 @@ const formatMasterCatalogueResult = (item: any, fallbackBarcode: string): IBarco
                   sku: item.sku,
                   autoFillApproved: item.autoFillApproved,
                   specs: item.specs,
+                  ...(item.specs?.price !== undefined ? { price: item.specs.price } : {}),
+                  ...(item.specs?.currency ? { currency: item.specs.currency } : {}),
             },
       };
 };
